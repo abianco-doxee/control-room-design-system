@@ -46,10 +46,13 @@
     "test:a11y": "playwright test tests/a11y.spec.mjs",
     "test:visual": "playwright test tests/visual.spec.mjs",
     "test:visual:update": "playwright test tests/visual.spec.mjs --update-snapshots",
+    "changeset": "changeset",
+    "version": "changeset version",
     "verify": "npm run verify:tokens && npm run verify:catalog && npm run skills:check"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
+    "@changesets/cli": "^2.31.1",
     "@playwright/test": "^1.62.1",
     "style-dictionary": "^4.3.0",
     "undici": "^8.10.0"

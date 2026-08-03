@@ -46,7 +46,9 @@ control-room-design-system/
 ├── scripts/skills-sync.mjs        # install the skill into .claude / .cursor / .opencode
 ├── astro.config.mjs               # Astro + Starlight docs site (repo root)
 ├── src/                           # Starlight content (generated from references) + theme
-└── public/gallery.html            # GENERATED — live, self-contained gallery
+├── public/gallery.html            # GENERATED — live, self-contained gallery
+├── tests/                         # Playwright a11y + visual tests (+ snapshot baselines)
+└── .changeset/                    # release changesets (versioning → CHANGELOG)
 ```
 
 ## Design approach

@@ -1,0 +1,36 @@
+name: Release
+
+# When changesets land on main, open/update a "Version Packages" PR that bumps
+# the version and updates CHANGELOG.md. Merging that PR cuts the release.
+# This package is PRIVATE — there is no npm publish step.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Create/update the Version Packages PR
+        uses: changesets/action@v1
+        with:
+          version: npm run version
+          # no `publish:` — private package, versioning + changelog only
+          title: "Release: version packages"
+          commit: "chore: version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
