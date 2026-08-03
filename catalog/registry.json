@@ -1,5 +1,5 @@
 {
-  "$comment": "Component registry — the hand-authored source of truth for the catalog. Prose specs live in references/components.md; this is the structured index. Run `npm run build:catalog` to generate catalog/catalog.json.",
+  "$comment": "Component registry — the hand-authored source of truth for the catalog. Prose specs live in references/components.md; this is the structured index. Run `npm run build:catalog` to generate catalog/catalog.json. Each component MAY carry an optional `figma` map { fileKey, componentKey, props } for the free Figma bridge (references/figma-bridge.md); absent = not yet mapped. The `button` entry shows the shape (keys null until a Figma kit exists).",
   "origin": "control-room",
   "components": [
     {
@@ -107,7 +107,8 @@
         { "cssVar": "--shadow-off", "description": "press offset" },
         { "cssVar": "--on-sig", "description": "text" }
       ],
-      "keywords": ["button", "action", "cta", "press", "snap"]
+      "keywords": ["button", "action", "cta", "press", "snap"],
+      "figma": { "fileKey": null, "componentKey": null, "props": { "Kind": "kind", "State": "state" } }
     },
     {
       "id": "bezel", "name": "Bezel + Screen", "category": "layout", "kind": "component", "lifecycle": "stable",

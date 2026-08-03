@@ -16,6 +16,12 @@ the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Figma bridge (optional, free)** — `references/figma-bridge.md` + a `.mcp.json`
+  wiring the open-source Framelink Figma MCP (reads a read-only `FIGMA_TOKEN` from
+  env), an optional `figma` map on catalog entries (passed through by
+  `build:catalog`), and the node → component agent workflow. Reproduces Figma
+  Code Connect's result without a paid seat; secrets stay in env, never committed
+  (`.gitignore` blocks `.env*`/`*.pat`/`*.secret`; `.env.example` documents it).
 - **Component catalog** — `catalog/registry.json` (source) → `catalog/catalog.json`
   (generated, deterministic, drift-gated via `verify:catalog`), plus a rendered
   catalog page. Mirrors the hub's registry → catalog model.

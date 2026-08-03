@@ -52,6 +52,7 @@ Detail lives in `references/`. Load only what the task needs.
 | `references/motion.md` | The four motion tiers, the glitch/CRT vocabulary, and the reduced-motion contract. |
 | `references/accessibility.md` | The accessibility contract — contrast, focus, ARIA, and how the aesthetic and a11y coexist. |
 | `references/seeded-cat.md` | The seeded pixel-cat: identity-from-seed, pose-is-state, the `paint()` contract. |
+| `references/figma-bridge.md` | Optional, free Figma → code round-trip: the `figma` map, the open-source Figma MCP, secret handling, and the node → component agent workflow. |
 | `tokens/tokens.json` | Machine-readable token source (parse this to generate CSS/Tailwind/JSON). |
 | `dist/control-room.css` | Ready-to-use CSS custom properties for all four themes. Import and go. |
 | `templates/component.md` | The authoring template every new component follows. |
