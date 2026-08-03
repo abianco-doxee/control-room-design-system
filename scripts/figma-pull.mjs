@@ -43,6 +43,18 @@ if (!token) {
 const fileKey = process.argv[2];
 const headers = { "X-Figma-Token": token };
 
+// Route through the agent proxy when present (Claude Code env). Node's built-in
+// fetch ignores HTTPS_PROXY, so a direct request is refused by egress. In
+// GitHub Actions there is no proxy, so this is skipped and undici isn't needed.
+if (process.env.HTTPS_PROXY || process.env.https_proxy) {
+  try {
+    const { EnvHttpProxyAgent, setGlobalDispatcher } = await import("undici");
+    setGlobalDispatcher(new EnvHttpProxyAgent());
+  } catch {
+    console.error("  (HTTPS_PROXY is set but 'undici' isn't installed — run `npm install`; trying direct)");
+  }
+}
+
 async function figma(path) {
   const res = await fetch(`https://api.figma.com${path}`, { headers });
   if (!res.ok) throw new Error(`Figma API ${res.status} ${res.statusText} for ${path}`);

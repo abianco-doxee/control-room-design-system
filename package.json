@@ -39,7 +39,8 @@
     "verify": "npm run verify:tokens && npm run verify:catalog && npm run skills:check"
   },
   "devDependencies": {
-    "style-dictionary": "^4.3.0"
+    "style-dictionary": "^4.3.0",
+    "undici": "^8.10.0"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.41.6",
