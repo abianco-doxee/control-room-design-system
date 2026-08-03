@@ -10,6 +10,10 @@ description: >-
   room", "sprint dashboard", "neon-noir dashboard", "the seven laws", building
   a Panel/Chip/Button/StatusDot/SessionRow/Bezel in this style, adding a theme,
   or generating a component that must read as part of this system.
+metadata:
+  version: "1.0.0"
+  license: proprietary
+  bundle: control-room
 ---
 
 # Control Room Design System
@@ -49,7 +53,7 @@ Detail lives in `references/`. Load only what the task needs.
 | `references/accessibility.md` | The accessibility contract — contrast, focus, ARIA, and how the aesthetic and a11y coexist. |
 | `references/seeded-cat.md` | The seeded pixel-cat: identity-from-seed, pose-is-state, the `paint()` contract. |
 | `tokens/tokens.json` | Machine-readable token source (parse this to generate CSS/Tailwind/JSON). |
-| `tokens/control-room.css` | Ready-to-use CSS custom properties for all four themes. Import and go. |
+| `dist/control-room.css` | Ready-to-use CSS custom properties for all four themes. Import and go. |
 | `templates/component.md` | The authoring template every new component follows. |
 | `checklists/component-checklist.md` | The ship gate. A component is not done until it passes. |
 
@@ -68,7 +72,7 @@ system *generable* rather than merely described.
 
 The irreducible rules. Each expands in the references.
 
-- **MUST** build on the token layer (`tokens/control-room.css`). Never hardcode a
+- **MUST** build on the token layer (`dist/control-room.css`). Never hardcode a
   hex, a border width, or a shadow that a token already names.
 - **MUST** keep every corner square. `--radius` is `0` and stays `0`. **NEVER**
   round a corner, blur a shadow, or add a gradient to a content surface.
@@ -94,7 +98,7 @@ The irreducible rules. Each expands in the references.
 
 ```html
 <!-- 1. Load the token layer once, at the root. -->
-<link rel="stylesheet" href="tokens/control-room.css" />
+<link rel="stylesheet" href="dist/control-room.css" />
 
 <!-- 2. Set a theme on <html>. Omit for dark. -->
 <html data-theme="dark">

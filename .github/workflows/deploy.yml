@@ -25,8 +25,10 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - name: Verify dist/ matches tokens.json
+      - name: Verify generated tokens (CSS, Tailwind, flat, DTCG) match tokens.json
         run: npm run verify:tokens
+      - name: Validate the skill source
+        run: npm run skills:check
       - name: Build gallery + docs site
         run: |
           node build/build-gallery.mjs

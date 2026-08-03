@@ -5,7 +5,7 @@ anatomy → tokens → states/variants → copy-ready markup → rules**. Markup
 framework-agnostic HTML + CSS custom properties; port to React/Vue/Svelte by
 mapping props to the variants listed.
 
-All components assume `tokens/control-room.css` is loaded. All obey the seven
+All components assume `dist/control-room.css` is loaded. All obey the seven
 laws (`references/design-language.md`) — the rules here are the laws made
 concrete per component. Before shipping any component, run it through
 `checklists/component-checklist.md`.
