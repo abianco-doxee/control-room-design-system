@@ -516,6 +516,56 @@ body {
 
 @media (prefers-reduced-motion: reduce) { .cr-switch__track::after { transition: none; } }
 
+/* ── Modal (native <dialog> — free focus-trap + Esc + backdrop) ────────── */
+.cr-modal {
+  border: var(--brd-brush) solid var(--border); background: var(--panel); color: var(--ink);
+  box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
+  padding: 0; max-width: min(92vw, 34rem); border-radius: var(--radius-none);
+}
+.cr-modal::backdrop { background: color-mix(in srgb, var(--mass) 72%, transparent); }
+.cr-modal__head {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-3) var(--space-4); border-bottom: var(--brd) solid var(--border);
+}
+.cr-modal__title { flex: 1; margin: 0; font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
+.cr-modal__close {
+  font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1; cursor: pointer;
+  background: var(--panel); color: var(--ink); border: var(--brd) solid var(--border);
+  padding: var(--space-0-5) var(--space-2);
+}
+.cr-modal__body { padding: var(--space-4); font-size: var(--text-base); }
+
+/* ── Toast (keyed to a signal; role=status/alert) ──────────────────────── */
+.cr-toast {
+  display: flex; align-items: center; gap: var(--space-3);
+  border: var(--brd) solid var(--border); box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  padding: var(--space-2) var(--space-3); font-family: var(--font-mono); font-size: var(--text-sm);
+  background: var(--sig-work); color: var(--on-sig);
+}
+.cr-toast--done { background: var(--sig-done); color: var(--on-sig); }
+.cr-toast--wait { background: var(--sig-wait); color: var(--on-sig); }
+.cr-toast--err  { background: var(--sig-err);  color: var(--on-err); }
+.cr-toast__msg { flex: 1; }
+.cr-toast__close {
+  font-family: var(--font-mono); cursor: pointer; background: transparent; color: inherit;
+  border: 1.5px solid currentColor; padding: 0 var(--space-1); line-height: 1.4;
+}
+
+/* ── Tooltip (CSS reveal on hover/focus; role=tooltip + aria-describedby) ─ */
+.cr-tooltip { position: relative; display: inline-flex; }
+.cr-tooltip__trigger { cursor: help; border-bottom: 1.5px dotted var(--muted); }
+.cr-tooltip__bubble {
+  position: absolute; bottom: calc(100% + var(--space-2)); left: 50%; transform: translateX(-50%);
+  min-width: max-content; max-width: 16rem; z-index: var(--z-overlay);
+  background: var(--panel-2); color: var(--ink); border: var(--brd) solid var(--border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  padding: var(--space-1) var(--space-2); font-family: var(--font-mono); font-size: var(--text-xs);
+  opacity: 0; visibility: hidden; transition: opacity 0.08s;
+}
+.cr-tooltip:hover .cr-tooltip__bubble,
+.cr-tooltip:focus-within .cr-tooltip__bubble { opacity: 1; visibility: visible; }
+@media (prefers-reduced-motion: reduce) { .cr-tooltip__bubble { transition: none; } }
+
 
 /* gallery chrome only (not part of the system) */
 .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 100px;}
@@ -755,6 +805,38 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         <label class="cr-check"><input type="radio" name="g-r" checked /> Cyan</label>
         <label class="cr-check"><input type="radio" name="g-r" /> Magenta</label>
         <button type="button" role="switch" aria-checked="true" class="cr-switch"><span class="cr-switch__track" aria-hidden="true"></span> Live</button>
+      </div>
+    </div>
+    <div style="grid-column:1/-1">
+      <h3>Overlays — Modal · Toast · Tooltip</h3>
+      <div style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));align-items:start">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-bottom:8px">Modal (native &lt;dialog&gt;, shown open)</div>
+          <dialog class="cr-modal" open style="position:static;margin:0">
+            <div class="cr-modal__head">
+              <h2 class="cr-modal__title">Kill session?</h2>
+              <button type="button" class="cr-modal__close" aria-label="Close">✕</button>
+            </div>
+            <div class="cr-modal__body">CR-1130 is streaming. Terminating drops the turn and cannot be undone.</div>
+          </dialog>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-bottom:8px">Toasts (keyed to signal)</div>
+          <div style="display:grid;gap:8px">
+            <div class="cr-toast" role="status"><span class="cr-toast__msg">Scan started</span><button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button></div>
+            <div class="cr-toast cr-toast--done" role="status"><span class="cr-toast__msg">3 sessions cleared</span><button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button></div>
+            <div class="cr-toast cr-toast--wait" role="status"><span class="cr-toast__msg">Waiting on CR-1130</span><button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button></div>
+            <div class="cr-toast cr-toast--err" role="alert"><span class="cr-toast__msg">Endpoint unreachable</span><button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-bottom:8px">Tooltip (hover / focus the term)</div>
+          <p style="font-family:var(--font-mono);font-size:13px;color:var(--ink);line-height:1.7">
+            The session is
+            <span class="cr-tooltip"><span class="cr-tooltip__trigger" tabindex="0" aria-describedby="tt-drift">drifting</span><span class="cr-tooltip__bubble" role="tooltip" id="tt-drift">latency &gt; SLA for 3 consecutive turns</span></span>
+            and needs a look.
+          </p>
+        </div>
       </div>
     </div>
     <div style="grid-column:1/-1">

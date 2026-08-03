@@ -5,7 +5,7 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 23,
+    "count": 26,
     "categories": {
       "action": 1,
       "forms": 6,
@@ -13,11 +13,12 @@
       "layout": 4,
       "media": 1,
       "navigation": 1,
+      "overlay": 3,
       "primitives": 1,
       "state": 7
     },
     "lifecycles": {
-      "stable": 22,
+      "stable": 25,
       "experimental": 1
     }
   },
@@ -655,6 +656,137 @@
         "sidebar",
         "menu",
         "badge"
+      ]
+    },
+    {
+      "id": "modal",
+      "name": "Modal",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Native <dialog> modal; browser owns focus-trap, Esc, and backdrop.",
+      "spec": "references/components.md#modal",
+      "variants": {
+        "state": [
+          "closed",
+          "open"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "surface"
+        },
+        {
+          "cssVar": "--border",
+          "description": "frame"
+        },
+        {
+          "cssVar": "--shadow-col",
+          "description": "hard offset shadow"
+        },
+        {
+          "cssVar": "--mass",
+          "description": "::backdrop scrim"
+        }
+      ],
+      "keywords": [
+        "modal",
+        "dialog",
+        "overlay",
+        "popup"
+      ]
+    },
+    {
+      "id": "toast",
+      "name": "Toast",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Transient status readout keyed to a machine signal; err announces assertively.",
+      "spec": "references/components.md#toast",
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "default / work fill"
+        },
+        {
+          "cssVar": "--sig-done",
+          "description": "done fill"
+        },
+        {
+          "cssVar": "--sig-wait",
+          "description": "wait fill"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "err fill"
+        },
+        {
+          "cssVar": "--on-sig",
+          "description": "text on work/wait/done"
+        },
+        {
+          "cssVar": "--on-err",
+          "description": "text on err"
+        }
+      ],
+      "keywords": [
+        "toast",
+        "notification",
+        "status",
+        "snackbar",
+        "alert"
+      ]
+    },
+    {
+      "id": "tooltip",
+      "name": "Tooltip",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Hint bubble revealed on hover/focus; role=tooltip wired via aria-describedby, pure-CSS reveal.",
+      "spec": "references/components.md#tooltip",
+      "variants": {
+        "state": [
+          "hidden",
+          "shown"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "bubble surface"
+        },
+        {
+          "cssVar": "--border",
+          "description": "frame"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "dotted trigger underline"
+        },
+        {
+          "cssVar": "--z-overlay",
+          "description": "stacking"
+        }
+      ],
+      "keywords": [
+        "tooltip",
+        "hint",
+        "popover",
+        "describedby"
       ]
     },
     {

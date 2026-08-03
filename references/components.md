@@ -574,3 +574,93 @@ shadow, composing the **Nav rail** and a **board** (masthead/hero + panels).
 
 - **MUST** keep one keyed focal region (Law 2) in the board — one Hero, not many.
 - **SHOULD** let the board scroll; the rail stays fixed-width (`--cr-nav-w`).
+
+## Overlays
+
+Three surfaces that sit above the board. All three are square, inked, hard-shadowed
+like every other surface — an overlay is not a soft floating card, it's another
+panel that happens to stack on top. They obey the same laws (radius 0, hard offset
+shadow, texture only on hardware) and survive every theme flip.
+
+## Modal
+
+A blocking dialog built on the **native `<dialog>` element**, so the browser owns
+the focus-trap, `Escape`-to-close, and the `::backdrop` scrim — behaviour that is
+notoriously easy to get wrong is delegated to the platform and is identical in
+every framework target. The Mitosis component (`CrModal`) drives
+`showModal()`/`close()` imperatively from a single `open` prop and reports the
+native `close` event back through `onClose`.
+
+```html
+<dialog class="cr-modal">
+  <div class="cr-modal__head">
+    <h2 class="cr-modal__title">Kill session?</h2>
+    <button type="button" class="cr-modal__close" aria-label="Close">✕</button>
+  </div>
+  <div class="cr-modal__body">CR-1130 is streaming. Terminating drops the turn.</div>
+</dialog>
+```
+```tsx
+<CrModal open={open} title="Kill session?" onClose={() => setOpen(false)}>
+  CR-1130 is streaming. Terminating drops the turn.
+</CrModal>
+```
+
+- **MUST** open with `showModal()` (not the `open` attribute) so the backdrop and
+  focus-trap engage; the component does this for you.
+- **MUST** name the dialog — `title` becomes `aria-label`; the `✕` is labelled
+  `Close`.
+- The `::backdrop` is `--mass` at 72% — the black *is* the scrim (Law 1), never a
+  blur.
+- **NEVER** round the frame or nest a second modal; one blocking surface at a time.
+
+## Toast
+
+A transient status readout **keyed to a machine signal** (Law 2) — the fill is the
+signal colour, so a toast asserts the same state vocabulary as a StatusDot or a
+Hero. Errors announce assertively; everything else is polite.
+
+```html
+<div class="cr-toast cr-toast--done" role="status">
+  <span class="cr-toast__msg">3 sessions cleared</span>
+  <button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button>
+</div>
+<div class="cr-toast cr-toast--err" role="alert">
+  <span class="cr-toast__msg">Endpoint unreachable</span>
+</div>
+```
+```tsx
+<CrToast signal="err" message="Endpoint unreachable" duration={6000} onClose={dismiss} />
+```
+
+- **MUST** map the fill to a real signal (`work`/`wait`/`done`/`err`) — a toast is
+  state, not chrome. `err` uses `--on-err` text; the rest use `--on-sig`.
+- **MUST** use `role="alert"` + `aria-live="assertive"` for `err`, `role="status"`
+  + `polite` otherwise — the component picks this from `signal`.
+- **SHOULD** auto-dismiss non-critical toasts (`duration`); keep errors sticky so
+  they can't be missed.
+
+## Tooltip
+
+A hint bubble revealed on hover **and** keyboard focus, wired to its trigger with
+`aria-describedby` so it's announced without stealing focus. The reveal is **pure
+CSS** (`:hover` / `:focus-within`) — no JS state, no positioning library — so it
+works in a server-rendered page with no component at all.
+
+```html
+<span class="cr-tooltip">
+  <span class="cr-tooltip__trigger" tabindex="0" aria-describedby="tt-drift">drifting</span>
+  <span class="cr-tooltip__bubble" role="tooltip" id="tt-drift">latency &gt; SLA for 3 turns</span>
+</span>
+```
+```tsx
+<CrTooltip id="tt-drift" label="latency > SLA for 3 turns">drifting</CrTooltip>
+```
+
+- **MUST** give the trigger `tabindex="0"` (or use a natively focusable element) so
+  the hint is reachable by keyboard, and point `aria-describedby` at the bubble's
+  `id`.
+- **MUST** keep the bubble a **sibling** of the trigger, not a child — nesting folds
+  the hint into the trigger's accessible name.
+- **SHOULD** keep tooltips short; anything longer than a line belongs in a Panel or
+  a Modal, not a hovering bubble.

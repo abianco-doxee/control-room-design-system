@@ -1,5 +1,5 @@
 {
-  "$comment": "Component registry \u2014 the hand-authored source of truth for the catalog. Prose specs live in references/components.md; this is the structured index. Run `npm run build:catalog` to generate catalog/catalog.json. Each component MAY carry an optional `figma` map { fileKey, componentKey, props } for the free Figma bridge (references/figma-bridge.md); absent = not yet mapped. The `button` entry shows the shape (keys null until a Figma kit exists).",
+  "$comment": "Component registry — the hand-authored source of truth for the catalog. Prose specs live in references/components.md; this is the structured index. Run `npm run build:catalog` to generate catalog/catalog.json. Each component MAY carry an optional `figma` map { fileKey, componentKey, props } for the free Figma bridge (references/figma-bridge.md); absent = not yet mapped. The `button` entry shows the shape (keys null until a Figma kit exists).",
   "origin": "control-room",
   "components": [
     {
@@ -8,7 +8,7 @@
       "category": "layout",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "The default container for a group of related data \u2014 the system's workhorse surface.",
+      "description": "The default container for a group of related data — the system's workhorse surface.",
       "spec": "references/components.md#panel",
       "variants": {
         "weight": [
@@ -64,7 +64,7 @@
       "category": "identity",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "The stark title card \u2014 page identity and headline state in the display register; optional drip host.",
+      "description": "The stark title card — page identity and headline state in the display register; optional drip host.",
       "spec": "references/components.md#masthead",
       "variants": {
         "glitch": [
@@ -150,7 +150,7 @@
       "category": "navigation",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Primary navigation \u2014 persistent left chassis; active item keyed to accent, count badge to its state.",
+      "description": "Primary navigation — persistent left chassis; active item keyed to accent, count badge to its state.",
       "spec": "references/components.md#rail--nav",
       "variants": {
         "item": [
@@ -199,7 +199,7 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "One row of a live list \u2014 the densest unit; calm at rest, one-shot glitch on a real state change.",
+      "description": "One row of a live list — the densest unit; calm at rest, one-shot glitch on a real state change.",
       "spec": "references/components.md#sessionrow",
       "variants": {
         "state": [
@@ -242,7 +242,7 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "The smallest state readout \u2014 a square keyed to the signal ramp, with an aria-label naming the state.",
+      "description": "The smallest state readout — a square keyed to the signal ramp, with an aria-label naming the state.",
       "spec": "references/components.md#statusdot",
       "variants": {
         "state": [
@@ -385,7 +385,7 @@
       "category": "layout",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "The only legal host for texture (Law 6) \u2014 a physical instrument enclosing a recessed, halftoned screen.",
+      "description": "The only legal host for texture (Law 6) — a physical instrument enclosing a recessed, halftoned screen.",
       "spec": "references/components.md#bezel--screen",
       "variants": {},
       "tokens": [
@@ -502,7 +502,7 @@
       "category": "primitives",
       "kind": "block",
       "lifecycle": "stable",
-      "description": "Four shapes with four fixed meanings (Law 4): chevron=direction, notch=state, wedge=focus, arrow-rail=sequence. Max 15\u00b0 off-axis.",
+      "description": "Four shapes with four fixed meanings (Law 4): chevron=direction, notch=state, wedge=focus, arrow-rail=sequence. Max 15° off-axis.",
       "spec": "references/components.md#diagonal-primitives-law-4",
       "variants": {
         "shape": [
@@ -573,7 +573,7 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "The house glitch for failure \u2014 vertical downward bleed in --drip over a --sig-err field. Errors only.",
+      "description": "The house glitch for failure — vertical downward bleed in --drip over a --sig-err field. Errors only.",
       "spec": "references/components.md#drip--error-surface-law-3",
       "variants": {},
       "tokens": [
@@ -604,7 +604,7 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Zero-data (calm) and failure (error keying + drip) fallbacks for any panel \u2014 must not look alike.",
+      "description": "Zero-data (calm) and failure (error keying + drip) fallbacks for any panel — must not look alike.",
       "spec": "references/components.md#emptystate--errorstate",
       "variants": {
         "kind": [
@@ -679,7 +679,7 @@
       "category": "layout",
       "kind": "block",
       "lifecycle": "stable",
-      "description": "The dashboard chassis \u2014 composes the nav rail and a board (masthead/hero + panels).",
+      "description": "The dashboard chassis — composes the nav rail and a board (masthead/hero + panels).",
       "spec": "references/components.md#instrument-shell",
       "variants": {},
       "tokens": [
@@ -710,7 +710,7 @@
       "category": "forms",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Label + control + hint/error wrapper; error state shows a non-color \u2717 marker.",
+      "description": "Label + control + hint/error wrapper; error state shows a non-color ✗ marker.",
       "spec": "references/components.md#form-controls",
       "variants": {
         "state": [
@@ -926,6 +926,134 @@
         "switch",
         "toggle",
         "form"
+      ]
+    },
+    {
+      "id": "modal",
+      "name": "Modal",
+      "category": "overlay",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Native <dialog> modal; browser owns focus-trap, Esc, and backdrop.",
+      "spec": "references/components.md#modal",
+      "variants": {
+        "state": [
+          "closed",
+          "open"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "surface"
+        },
+        {
+          "cssVar": "--border",
+          "description": "frame"
+        },
+        {
+          "cssVar": "--shadow-col",
+          "description": "hard offset shadow"
+        },
+        {
+          "cssVar": "--mass",
+          "description": "::backdrop scrim"
+        }
+      ],
+      "keywords": [
+        "modal",
+        "dialog",
+        "overlay",
+        "popup"
+      ]
+    },
+    {
+      "id": "toast",
+      "name": "Toast",
+      "category": "overlay",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Transient status readout keyed to a machine signal; err announces assertively.",
+      "spec": "references/components.md#toast",
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "default / work fill"
+        },
+        {
+          "cssVar": "--sig-done",
+          "description": "done fill"
+        },
+        {
+          "cssVar": "--sig-wait",
+          "description": "wait fill"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "err fill"
+        },
+        {
+          "cssVar": "--on-sig",
+          "description": "text on work/wait/done"
+        },
+        {
+          "cssVar": "--on-err",
+          "description": "text on err"
+        }
+      ],
+      "keywords": [
+        "toast",
+        "notification",
+        "status",
+        "snackbar",
+        "alert"
+      ]
+    },
+    {
+      "id": "tooltip",
+      "name": "Tooltip",
+      "category": "overlay",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Hint bubble revealed on hover/focus; role=tooltip wired via aria-describedby, pure-CSS reveal.",
+      "spec": "references/components.md#tooltip",
+      "variants": {
+        "state": [
+          "hidden",
+          "shown"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "bubble surface"
+        },
+        {
+          "cssVar": "--border",
+          "description": "frame"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "dotted trigger underline"
+        },
+        {
+          "cssVar": "--z-overlay",
+          "description": "stacking"
+        }
+      ],
+      "keywords": [
+        "tooltip",
+        "hint",
+        "popover",
+        "describedby"
       ]
     }
   ]
