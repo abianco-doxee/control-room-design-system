@@ -1,0 +1,42 @@
+/* GENERATED from tokens.json — Tailwind v4 @theme. Do not edit.
+ * Import after "tailwindcss"; colors follow html[data-theme] via the runtime vars
+ * in dist/control-room.css. See references/tailwind.md. */
+@theme {
+  --color-ground: var(--ground);
+  --color-board: var(--board);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-rail: var(--rail);
+  --color-rail-ink: var(--rail-ink);
+  --color-on-sig: var(--on-sig);
+  --color-on-err: var(--on-err);
+  --color-stage: var(--stage);
+  --color-drip: var(--drip);
+  --color-work: var(--sig-work);
+  --color-wait: var(--sig-wait);
+  --color-done: var(--sig-done);
+  --color-err: var(--sig-err);
+  --color-idle: var(--sig-idle);
+  --color-accent: var(--sig-accent);
+  --text-2xs: 10px;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-md: 15px;
+  --text-lg: 19px;
+  --text-xl: clamp(28px, 5.5vw, 52px);
+  --font-sans: "CR Sans", "Archivo", "Arial Black", "Helvetica Neue", system-ui, sans-serif;
+  --font-mono: "CR Mono", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --spacing: 0.25rem;
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+}

@@ -33,7 +33,8 @@ control-room-design-system/
 │   ├── tailwind-preset.cjs        # Tailwind preset (colors resolve to CSS vars)
 │   └── tokens.flat.json           # resolved cssVar → value, per theme
 ├── styles/
-│   └── components.css             # the shipped component layer (.cr-* classes)
+│   ├── components.css             # the shipped component layer (.cr-* classes)
+│   └── tailwind.css               # Tailwind v4 entry (Tailwind-first authoring)
 ├── design-tokens/
 │   └── control-room.tokens.json   # GENERATED — DTCG format (Doxee-hub compatible)
 ├── references/                    # design-language, tokens, components, motion, a11y, seeded-cat
@@ -86,7 +87,8 @@ Use the `cr-` classes from `styles/components.css`; see
 
 ```bash
 npm install
-npm run build:tokens   # tokens.json → dist/ (CSS, Tailwind, flat) + design-tokens/ (DTCG)
+npm run build:tokens   # tokens.json → dist/ (CSS, tw-theme, flat) + design-tokens/ (DTCG)
+npm run build:tw       # tw-theme → dist/utilities.css (prebuilt Tailwind utilities)
 npm run build:catalog  # catalog/registry.json → catalog/catalog.json
 npm run build:gallery  # → public/gallery.html (live, self-contained, all 4 themes)
 npm run dev            # Astro + Starlight docs + gallery locally

@@ -4,6 +4,9 @@ node_modules/
 # Style Dictionary intermediates (dist/ artifacts themselves ARE committed)
 dist/.sd/
 
+# Prebuilt Tailwind utilities — build artifact (npm run build:tw); not committed
+dist/utilities.css
+
 # Astro / Starlight build output & cache (site output goes to site-dist/)
 site-dist/
 .astro/
