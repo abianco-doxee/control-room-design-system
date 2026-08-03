@@ -6,7 +6,21 @@ the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **Docs re-platformed to Astro + Starlight** (from VitePress) to match the Doxee
+  `Design-System-Hub` stack, enabling eventual fold-in. Reference Markdown is
+  generated into Starlight content by `build:content` (source of truth stays in
+  `references/`); a neon-noir skin maps `--sl-*` onto the Control Room tokens.
+  Astro output goes to `site-dist/`; Pages workflow updated accordingly.
+
 ### Added
+
+- **Component catalog** — `catalog/registry.json` (source) → `catalog/catalog.json`
+  (generated, deterministic, drift-gated via `verify:catalog`), plus a rendered
+  catalog page. Mirrors the hub's registry → catalog model.
+- Brand fonts (Archivo, JetBrains Mono) bundled for the docs site.
+
 
 - **DTCG token export** — `design-tokens/control-room.tokens.json` in the Design
   Tokens Community Group format with the `com.doxee.cssVar` extension, mirroring
