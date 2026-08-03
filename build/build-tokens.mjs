@@ -40,9 +40,11 @@ function baseVars() {
       }
     }
   };
+  walk(src.primitive); // global scales (spacing, type, radius, z)
   walk(src.chassis);
   walk(src.typography);
   walk(src.motion);
+  walk(src.component); // component tier (var() refs, theme-independent)
   return out;
 }
 
@@ -223,9 +225,11 @@ function dtcg() {
     walk(obj);
     return g;
   };
+  out.primitive = grp(src.primitive);
   out.chassis = grp(src.chassis);
   out.typography = grp(src.typography);
   out.motion = grp(src.motion);
+  out.component = grp(src.component);
 
   // per-theme color roles, grouped by semantic role (surface/text/line/signal/keyed/texture)
   out.theme = {};

@@ -1,6 +1,203 @@
 {
   "$schema": "https://www.designtokens.org/tr/2025.10/format/",
   "$description": "Control Room design tokens — framework-agnostic (DTCG). Generated from tokens/tokens.json; do not edit by hand.",
+  "primitive": {
+    "space-0": {
+      "$value": "0",
+      "$extensions": {
+        "com.doxee.cssVar": "--space-0"
+      }
+    },
+    "space-1": {
+      "$type": "dimension",
+      "$value": "4px",
+      "$extensions": {
+        "com.doxee.cssVar": "--space-1"
+      }
+    },
+    "space-2": {
+      "$type": "dimension",
+      "$value": "8px",
+      "$extensions": {
+        "com.doxee.cssVar": "--space-2"
+      }
+    },
+    "space-3": {
+      "$type": "dimension",
+      "$value": "12px",
+      "$extensions": {
+        "com.doxee.cssVar": "--space-3"
+      }
+    },
+    "space-4": {
+      "$type": "dimension",
+      "$value": "16px",
+      "$extensions": {
+        "com.doxee.cssVar": "--space-4"
+      }
+    },
+    "space-5": {
+      "$type": "dimension",
+      "$value": "20px",
+      "$extensions": {
+        "com.doxee.cssVar": "--space-5"
+      }
+    },
+    "space-6": {
+      "$type": "dimension",
+      "$value": "24px",
+      "$extensions": {
+        "com.doxee.cssVar": "--space-6"
+      }
+    },
+    "space-8": {
+      "$type": "dimension",
+      "$value": "32px",
+      "$extensions": {
+        "com.doxee.cssVar": "--space-8"
+      }
+    },
+    "space-10": {
+      "$type": "dimension",
+      "$value": "40px",
+      "$extensions": {
+        "com.doxee.cssVar": "--space-10"
+      }
+    },
+    "space-12": {
+      "$type": "dimension",
+      "$value": "48px",
+      "$extensions": {
+        "com.doxee.cssVar": "--space-12"
+      }
+    },
+    "space-16": {
+      "$type": "dimension",
+      "$value": "64px",
+      "$extensions": {
+        "com.doxee.cssVar": "--space-16"
+      }
+    },
+    "space-px": {
+      "$type": "dimension",
+      "$value": "1px",
+      "$extensions": {
+        "com.doxee.cssVar": "--space-px"
+      }
+    },
+    "space-0-5": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$extensions": {
+        "com.doxee.cssVar": "--space-0-5"
+      }
+    },
+    "text-2xs": {
+      "$type": "dimension",
+      "$value": "10px",
+      "$extensions": {
+        "com.doxee.cssVar": "--text-2xs"
+      }
+    },
+    "text-xs": {
+      "$type": "dimension",
+      "$value": "11px",
+      "$extensions": {
+        "com.doxee.cssVar": "--text-xs"
+      }
+    },
+    "text-sm": {
+      "$type": "dimension",
+      "$value": "12px",
+      "$extensions": {
+        "com.doxee.cssVar": "--text-sm"
+      }
+    },
+    "text-base": {
+      "$type": "dimension",
+      "$value": "13px",
+      "$extensions": {
+        "com.doxee.cssVar": "--text-base"
+      }
+    },
+    "text-md": {
+      "$type": "dimension",
+      "$value": "15px",
+      "$extensions": {
+        "com.doxee.cssVar": "--text-md"
+      }
+    },
+    "text-lg": {
+      "$type": "dimension",
+      "$value": "19px",
+      "$extensions": {
+        "com.doxee.cssVar": "--text-lg"
+      }
+    },
+    "text-xl": {
+      "$value": "clamp(28px, 5.5vw, 52px)",
+      "$description": "display / single big number",
+      "$extensions": {
+        "com.doxee.cssVar": "--text-xl"
+      }
+    },
+    "leading-tight": {
+      "$value": "1.05",
+      "$extensions": {
+        "com.doxee.cssVar": "--leading-tight"
+      }
+    },
+    "leading-normal": {
+      "$value": "1.6",
+      "$extensions": {
+        "com.doxee.cssVar": "--leading-normal"
+      }
+    },
+    "leading-display": {
+      "$value": "0.9",
+      "$extensions": {
+        "com.doxee.cssVar": "--leading-display"
+      }
+    },
+    "radius-none": {
+      "$type": "dimension",
+      "$value": "0px",
+      "$description": "always 0 — system law",
+      "$extensions": {
+        "com.doxee.cssVar": "--radius-none"
+      }
+    },
+    "z-base": {
+      "$value": "0",
+      "$extensions": {
+        "com.doxee.cssVar": "--z-base"
+      }
+    },
+    "z-raised": {
+      "$value": "10",
+      "$extensions": {
+        "com.doxee.cssVar": "--z-raised"
+      }
+    },
+    "z-sticky": {
+      "$value": "50",
+      "$extensions": {
+        "com.doxee.cssVar": "--z-sticky"
+      }
+    },
+    "z-overlay": {
+      "$value": "100",
+      "$extensions": {
+        "com.doxee.cssVar": "--z-overlay"
+      }
+    },
+    "z-modal": {
+      "$value": "1000",
+      "$extensions": {
+        "com.doxee.cssVar": "--z-modal"
+      }
+    }
+  },
   "chassis": {
     "brd": {
       "$type": "dimension",
@@ -141,6 +338,122 @@
       "$value": "180ms",
       "$extensions": {
         "com.doxee.cssVar": "--tick-ambient"
+      }
+    }
+  },
+  "component": {
+    "cr-btn-pad-x": {
+      "$value": "var(--space-4)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-btn-pad-x"
+      }
+    },
+    "cr-btn-pad-y": {
+      "$value": "var(--space-2)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-btn-pad-y"
+      }
+    },
+    "cr-btn-gap": {
+      "$value": "var(--space-2)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-btn-gap"
+      }
+    },
+    "cr-btn-bg": {
+      "$value": "var(--sig-wait)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-btn-bg"
+      }
+    },
+    "cr-btn-fg": {
+      "$value": "var(--on-sig)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-btn-fg"
+      }
+    },
+    "cr-btn-size": {
+      "$value": "var(--text-sm)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-btn-size"
+      }
+    },
+    "cr-panel-pad": {
+      "$value": "var(--space-3)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-panel-pad"
+      }
+    },
+    "cr-panel-bg": {
+      "$value": "var(--panel)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-panel-bg"
+      }
+    },
+    "cr-panel-gap": {
+      "$value": "var(--space-3)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-panel-gap"
+      }
+    },
+    "cr-chip-pad-x": {
+      "$value": "var(--space-2)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-chip-pad-x"
+      }
+    },
+    "cr-chip-pad-y": {
+      "$value": "var(--space-0-5)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-chip-pad-y"
+      }
+    },
+    "cr-chip-bg": {
+      "$value": "var(--sig-done)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-chip-bg"
+      }
+    },
+    "cr-chip-fg": {
+      "$value": "var(--on-sig)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-chip-fg"
+      }
+    },
+    "cr-row-pad-y": {
+      "$value": "var(--space-2)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-row-pad-y"
+      }
+    },
+    "cr-row-gap": {
+      "$value": "var(--space-3)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-row-gap"
+      }
+    },
+    "cr-hero-pad": {
+      "$value": "var(--space-4)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-hero-pad"
+      }
+    },
+    "cr-hero-gap": {
+      "$value": "var(--space-4)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-hero-gap"
+      }
+    },
+    "cr-hero-bg": {
+      "$value": "var(--sig-accent)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-hero-bg"
+      }
+    },
+    "cr-hero-fg": {
+      "$value": "var(--on-sig)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-hero-fg"
       }
     }
   },
