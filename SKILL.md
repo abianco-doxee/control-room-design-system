@@ -53,6 +53,7 @@ Detail lives in `references/`. Load only what the task needs.
 | `references/accessibility.md` | The accessibility contract — contrast, focus, ARIA, and how the aesthetic and a11y coexist. |
 | `references/seeded-cat.md` | The seeded pixel-cat: identity-from-seed, pose-is-state, the `paint()` contract. |
 | `references/figma-bridge.md` | Optional, free Figma → code round-trip: the `figma` map, the open-source Figma MCP, secret handling, and the node → component agent workflow. |
+| `references/figma-kit-build.md` | How to create the Figma kit from scratch: file setup, near-automatic token import (DTCG → Variables), the component recipe, and closing the loop back to the catalog. |
 | `tokens/tokens.json` | Machine-readable token source (parse this to generate CSS/Tailwind/JSON). |
 | `dist/control-room.css` | Ready-to-use CSS custom properties for all four themes. Import and go. |
 | `templates/component.md` | The authoring template every new component follows. |

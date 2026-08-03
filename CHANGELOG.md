@@ -16,6 +16,10 @@ the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Figma kit build guide** — `references/figma-kit-build.md`: create the Figma
+  file from scratch, near-automatic token import (DTCG → Figma Variables via
+  Tokens Studio), the neobrutalist component recipe, worked examples, and the
+  loop back to the catalog `figma` map.
 - **Figma token check in CI** — `.github/workflows/figma.yml` (manual
   `workflow_dispatch`) validates `FIGMA_TOKEN` (a repo Actions secret) and can
   list a file's top-level nodes, plus `scripts/figma-pull.mjs` / `npm run

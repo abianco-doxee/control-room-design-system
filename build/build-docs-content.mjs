@@ -29,6 +29,7 @@ const PAGES = [
   ["references/accessibility.md", "reference", "accessibility", "Accessibility"],
   ["references/seeded-cat.md", "reference", "seeded-cat", "Seeded Pixel-Cat"],
   ["references/figma-bridge.md", "reference", "figma-bridge", "Figma Bridge"],
+  ["references/figma-kit-build.md", "reference", "figma-kit-build", "Building the Figma Kit"],
   ["templates/component.md", "build", "component-template", "Component Template"],
   ["checklists/component-checklist.md", "build", "component-checklist", "Ship Checklist"],
 ];
