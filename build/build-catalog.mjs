@@ -32,6 +32,7 @@ const entries = registry.components
     variants: c.variants || {},
     tokens: c.tokens || [],
     keywords: c.keywords || [],
+    ...(c.figma ? { figma: c.figma } : {}), // optional Figma bridge map
   }))
   .sort((a, b) => a.category.localeCompare(b.category) || a.id.localeCompare(b.id));
 

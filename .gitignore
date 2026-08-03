@@ -18,3 +18,13 @@ src/content/docs/build/
 .claude/skills/
 .cursor/skills/
 .opencode/skills/
+
+# Secrets — never commit tokens (Figma PAT etc.).
+# NOTE: kept specific so it never matches the design-token JSON (*.tokens.json).
+.env
+.env.*
+!.env.example
+*.pat
+*.secret
+figma-token*
+*.token.txt

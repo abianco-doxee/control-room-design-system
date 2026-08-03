@@ -1,0 +1,10 @@
+{
+  "$comment": "Optional Figma bridge (see references/figma-bridge.md). Reads a READ-ONLY Figma token from the FIGMA_TOKEN env var — never hardcode it here. Set FIGMA_TOKEN in your Claude Code environment settings or shell; the pull needs egress to api.figma.com.",
+  "mcpServers": {
+    "figma": {
+      "command": "npx",
+      "args": ["-y", "figma-developer-mcp", "--stdio"],
+      "env": { "FIGMA_API_KEY": "${FIGMA_TOKEN}" }
+    }
+  }
+}
