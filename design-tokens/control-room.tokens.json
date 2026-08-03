@@ -451,9 +451,16 @@
       }
     },
     "cr-hero-fg": {
-      "$value": "var(--on-sig)",
+      "$value": "var(--on-accent)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-hero-fg"
+      }
+    },
+    "cr-nav-w": {
+      "$type": "dimension",
+      "$value": "180px",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-nav-w"
       }
     }
   },
@@ -540,6 +547,22 @@
           "$description": "text/icon on an error (--sig-err) fill; white in light, dark elsewhere",
           "$extensions": {
             "com.doxee.cssVar": "--on-err"
+          }
+        },
+        "on-accent": {
+          "$type": "color",
+          "$value": "#050509",
+          "$description": "text/icon on an accent (--sig-accent) fill",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-accent"
+          }
+        },
+        "on-idle": {
+          "$type": "color",
+          "$value": "#ffffff",
+          "$description": "text/icon on an idle (--sig-idle) fill",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-idle"
           }
         }
       },
@@ -732,6 +755,22 @@
           "$extensions": {
             "com.doxee.cssVar": "--on-err"
           }
+        },
+        "on-accent": {
+          "$type": "color",
+          "$value": "#ffffff",
+          "$description": "text/icon on an accent (--sig-accent) fill",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-accent"
+          }
+        },
+        "on-idle": {
+          "$type": "color",
+          "$value": "#0b0b12",
+          "$description": "text/icon on an idle (--sig-idle) fill",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-idle"
+          }
         }
       },
       "line": {
@@ -922,6 +961,22 @@
           "$description": "text/icon on an error (--sig-err) fill; white in light, dark elsewhere",
           "$extensions": {
             "com.doxee.cssVar": "--on-err"
+          }
+        },
+        "on-accent": {
+          "$type": "color",
+          "$value": "#0c0510",
+          "$description": "text/icon on an accent (--sig-accent) fill",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-accent"
+          }
+        },
+        "on-idle": {
+          "$type": "color",
+          "$value": "#0c0510",
+          "$description": "text/icon on an idle (--sig-idle) fill",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-idle"
           }
         }
       },
@@ -1173,6 +1228,22 @@
           "$description": "text/icon on an error (--sig-err) fill; white in light, dark elsewhere",
           "$extensions": {
             "com.doxee.cssVar": "--on-err"
+          }
+        },
+        "on-accent": {
+          "$type": "color",
+          "$value": "#020a04",
+          "$description": "text/icon on an accent (--sig-accent) fill",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-accent"
+          }
+        },
+        "on-idle": {
+          "$type": "color",
+          "$value": "#ffffff",
+          "$description": "text/icon on an idle (--sig-idle) fill",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-idle"
           }
         }
       },

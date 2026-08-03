@@ -134,6 +134,39 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       <h3>Error surface (drip)</h3>
       <div class="cr-drip"><div class="cr-drip__title">connection lost</div><div class="cr-drip__sub">ai-global-chat · SSE closed · retry 3/5</div></div>
     </div>
+    <div style="grid-column:1/-1">
+      <h3>Masthead</h3>
+      <header class="cr-masthead"><p class="cr-masthead__eyebrow">DP Control Room · Phase 0</p><h1 class="cr-masthead__title">14 sessions<br>2 need you</h1></header>
+    </div>
+    <div>
+      <h3>Nav rail</h3>
+      <nav class="cr-nav" style="width:auto">
+        <div class="cr-nav__brand">CONTROL<br>ROOM</div>
+        <ul class="cr-nav__list">
+          <li><a class="cr-nav__item cr-nav__item--active" href="#">◈ Attention <span class="cr-nav__badge">1</span></a></li>
+          <li><a class="cr-nav__item" href="#">◧ Sessions</a></li>
+          <li><a class="cr-nav__item" href="#">▦ Sprint</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div>
+      <h3>Keyed contact sheet</h3>
+      <div class="cr-tiles">
+        <div class="cr-tile cr-tile--work">nova</div><div class="cr-tile cr-tile--wait">atlas</div>
+        <div class="cr-tile cr-tile--done">echo</div><div class="cr-tile cr-tile--err">rhea</div>
+        <div class="cr-tile cr-tile--idle">kite</div><div class="cr-tile cr-tile--stage">calm</div>
+      </div>
+    </div>
+    <div style="grid-column:1/-1">
+      <h3>Table</h3>
+      <table class="cr-table">
+        <thead><tr><th>Session</th><th>Task</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>nova</td><td>PTL-757 chat-turn</td><td>streaming</td></tr>
+          <tr><td>rhea</td><td>rp verify</td><td>2 failing</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 <script>

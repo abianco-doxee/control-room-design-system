@@ -15,6 +15,8 @@ module.exports = {
               "rail-ink": "var(--rail-ink)",
               "on-sig": "var(--on-sig)",
               "on-err": "var(--on-err)",
+              "on-accent": "var(--on-accent)",
+              "on-idle": "var(--on-idle)",
               "border": "var(--border)",
               "mass": "var(--mass)",
               "shadow-col": "var(--shadow-col)",
