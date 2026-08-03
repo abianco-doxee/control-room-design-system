@@ -1,0 +1,25 @@
+{
+  "$comment": "Skill install manifest — mirrors the Doxee Design-System-Hub convention (single source of truth fanned out to every agent provider, gated by a validity/drift check).",
+  "skills": [
+    {
+      "id": "control-room-design-system",
+      "source": ".",
+      "installAs": "control-room-design-system",
+      "include": [
+        "SKILL.md",
+        "references",
+        "templates",
+        "checklists",
+        "tokens/tokens.json",
+        "dist/control-room.css",
+        "dist/tokens.flat.json",
+        "design-tokens/control-room.tokens.json"
+      ]
+    }
+  ],
+  "providers": {
+    "claude": ".claude/skills",
+    "cursor": ".cursor/skills",
+    "opencode": ".opencode/skills"
+  }
+}

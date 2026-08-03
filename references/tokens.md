@@ -5,12 +5,26 @@ The token layer is the contract between the design language and every component.
 raw hex or a `border-radius: 4px` is, by definition, a defect, because it will
 not survive a theme flip and it breaks the single source of truth.
 
-- Runtime source of truth: `tokens/control-room.css`
-- Machine-readable source: `tokens/tokens.json` (parse to generate CSS / Tailwind
-  / Style Dictionary / JSON)
+- **Author** here: `tokens/tokens.json` — the hand-edited source of truth.
+- **Generated** by `npm run build:tokens` (Style Dictionary), committed:
+  - `dist/control-room.css` — runtime CSS custom properties, all four themes
+  - `dist/tailwind-preset.cjs` — Tailwind preset (colors resolve to the CSS vars)
+  - `dist/tokens.flat.json` — resolved `cssVar → value`, per theme
+  - `design-tokens/control-room.tokens.json` — **DTCG** format (see below)
 
-Edit `tokens.json` and mirror into `control-room.css` (or regenerate). Never let
-the two drift.
+Never hand-edit the generated files. `npm run verify:tokens` fails CI if any of
+them drift from `tokens.json`.
+
+## DTCG interop
+
+`design-tokens/control-room.tokens.json` is emitted in the [Design Tokens
+Community Group](https://www.designtokens.org/) format, matching the Doxee
+`Design-System-Hub` convention: each token carries `$type` / `$value` /
+`$description` and a `com.doxee.cssVar` extension naming its CSS variable. This
+makes Control Room tokens consumable by Style Dictionary, Figma token plugins,
+and the Doxee tooling without a bespoke parser. Structure: `chassis`,
+`typography`, `motion`, and a `theme` group (`dark` / `light` / `extreme` /
+`phosphor`) whose colors are grouped by semantic role.
 
 ## How theming works
 
@@ -181,7 +195,7 @@ all themes — they resolve to nothing elsewhere.
 
 1. Add it to `tokens.json` under the right group, with a `cssVar`, a `role`, and
    a value for **all four themes**.
-2. Mirror it into `tokens/control-room.css` (base `:root` + each theme block).
+2. Run `npm run build:tokens` to regenerate dist/ and design-tokens/ (DTCG).
 3. If it is a new signal hue, verify `--on-sig` contrast against it in every
    theme (`references/accessibility.md`).
 4. Reference it from components by variable — never inline the value.

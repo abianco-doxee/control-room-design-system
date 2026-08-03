@@ -24,12 +24,22 @@ control-room-design-system/
 │   ├── accessibility.md           # WCAG 2.1 AA contract for the aesthetic
 │   └── seeded-cat.md              # the identity+state pixel-cat generator (paint() contract)
 ├── tokens/
-│   ├── tokens.json                # machine-readable token source of truth
-│   └── control-room.css           # ready-to-use CSS custom properties, all 4 themes
-├── templates/
-│   └── component.md               # the spec template every new component follows
-└── checklists/
-    └── component-checklist.md      # the ship gate
+│   └── tokens.json                # machine-readable token SOURCE OF TRUTH (author here)
+├── build/
+│   ├── build-tokens.mjs           # Style Dictionary → dist/ + design-tokens/ (DTCG)
+│   └── build-gallery.mjs          # → public/gallery.html (live, self-contained)
+├── dist/                          # GENERATED — do not edit
+│   ├── control-room.css           # ready-to-use CSS custom properties, all 4 themes
+│   ├── tailwind-preset.cjs        # Tailwind preset (colors resolve to CSS vars)
+│   └── tokens.flat.json           # resolved cssVar → value, per theme
+├── design-tokens/
+│   └── control-room.tokens.json   # GENERATED — DTCG format (Doxee-hub compatible)
+├── references/                    # design-language, tokens, components, motion, a11y, seeded-cat
+├── templates/component.md         # the spec template every new component follows
+├── checklists/component-checklist.md  # the ship gate
+├── skills/manifest.json           # skill install manifest (source → providers)
+├── scripts/skills-sync.mjs        # install the skill into .claude / .cursor / .opencode
+└── site/                          # VitePress docs site (publishes the references)
 ```
 
 ## Design approach
@@ -52,12 +62,61 @@ optimized to be *generable*, not just *readable*:
 ## Quick start
 
 ```html
-<link rel="stylesheet" href="tokens/control-room.css" />
+<link rel="stylesheet" href="dist/control-room.css" />
 <html data-theme="dark">   <!-- or light | extreme | phosphor; omit for dark -->
 ```
 
 Then compose from `references/components.md`. Read `references/design-language.md`
 first before building anything new.
+
+## Build & publish
+
+```bash
+npm install
+npm run build:tokens   # tokens.json → dist/ (CSS, Tailwind, flat) + design-tokens/ (DTCG)
+npm run build:gallery  # → public/gallery.html (live, self-contained, all 4 themes)
+npm run dev            # VitePress docs + gallery locally
+npm run build          # full build (tokens + gallery + site)
+npm run verify         # CI gate: token drift + skill validity
+```
+
+The docs site (`site/`, VitePress) and the gallery deploy to GitHub Pages via
+`.github/workflows/deploy.yml` on push to `main` (one-time: Settings → Pages →
+Source → GitHub Actions).
+
+## Install as an agent skill
+
+Control Room is a skill. Install it into every agent provider from the single
+source of truth:
+
+```bash
+npm run skills:sync    # → .claude/skills, .cursor/skills, .opencode/skills
+npm run skills:check   # validity + drift gate (runs in CI)
+```
+
+Providers and the file set are declared in `skills/manifest.json`.
+
+## Interop with the Doxee Design-System-Hub
+
+This package deliberately mirrors the conventions of `Doxee-Product-Management/
+Design-System-Hub` so the two can converge:
+
+- **DTCG tokens** — `design-tokens/control-room.tokens.json` uses the Design
+  Tokens Community Group format with the same `com.doxee.cssVar` extension as the
+  hub's `design-tokens/components/*.tokens.json`.
+- **Generated-and-committed + drift gates** — like the hub's `catalog:check` /
+  `skills:check`, our `verify:tokens` and `skills:check` fail CI on drift rather
+  than regenerating at deploy.
+- **Single-source skill, multi-provider fan-out** — the hub installs skills via a
+  CLI into `.claude` / `.cursor` / `.opencode` / …; `scripts/skills-sync.mjs` is
+  the lightweight equivalent.
+- **GitHub Pages via Actions**, base-path aware — same publishing model.
+
+**Not adopted (intentional):** the hub is an **Astro + Starlight** site built on
+**PrimeVue/Aura** with **IBM Plex** type and a `--brand-*` / `--p-*` token plane.
+Control Room is a distinct **neon-noir** surface (Archivo / JetBrains Mono, the
+neon signal ramp) documented with VitePress. Aligning platform (Starlight) or
+brand (inheriting Doxee brand tokens) are open decisions — see below.
 
 ## Provenance & scope
 

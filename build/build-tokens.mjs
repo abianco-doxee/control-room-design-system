@@ -181,32 +181,109 @@ function flatJson() {
   return JSON.stringify({ $generated: true, source: "tokens/tokens.json", themes: out }, null, 2) + "\n";
 }
 
-/* ── 5. write / check ───────────────────────────────────────────────────── */
+/* ── 5. DTCG export (Design Tokens Community Group format) ────────────────
+ * Mirrors the Doxee Design-System-Hub convention: framework-agnostic tokens
+ * with $type/$value/$description and a com.doxee.cssVar extension, so Control
+ * Room tokens are consumable by the same tooling and the DTCG standard. */
+
+function dtcgType(name, value) {
+  if (typeof value === "number") return name.includes("weight") ? "fontWeight" : "number";
+  if (/^#|^rgb|^hsl/.test(String(value))) return "color";
+  if (name.includes("font-") && /sans|mono/.test(name)) return "fontFamily";
+  if (/^-?\d*\.?\d+(px|rem|em)$/.test(String(value))) return "dimension";
+  if (/^\d+(ms|s)$/.test(String(value))) return "duration";
+  return undefined; // e.g. text-transform, gradient — left untyped, still valid
+}
+const tok = (name, value, desc) => {
+  const t = dtcgType(name, value);
+  return {
+    ...(t ? { $type: t } : {}),
+    $value: value,
+    ...(desc ? { $description: desc } : {}),
+    $extensions: { "com.doxee.cssVar": `--${name}` },
+  };
+};
+
+function dtcg() {
+  const out = {
+    $schema: "https://www.designtokens.org/tr/2025.10/format/",
+    $description:
+      "Control Room design tokens — framework-agnostic (DTCG). Generated from tokens/tokens.json; do not edit by hand.",
+  };
+  // theme-independent groups, keyed by cssVar (minus the leading --)
+  const grp = (obj) => {
+    const g = {};
+    const walk = (node) => {
+      if (node && typeof node === "object") {
+        if (typeof node.cssVar === "string" && "value" in node)
+          g[node.cssVar.replace(/^--/, "")] = tok(node.cssVar.replace(/^--/, ""), node.value, node.use || node.role);
+        else for (const [k, v] of Object.entries(node)) if (!k.startsWith("$")) walk(v);
+      }
+    };
+    walk(obj);
+    return g;
+  };
+  out.chassis = grp(src.chassis);
+  out.typography = grp(src.typography);
+  out.motion = grp(src.motion);
+
+  // per-theme color roles, grouped by semantic role (surface/text/line/signal/keyed/texture)
+  out.theme = {};
+  const GROUPS = ["surface", "text", "line", "signal", "keyed", "texture"];
+  for (const theme of THEMES) {
+    const tvals = src.themes[theme];
+    const themeOut = {};
+    for (const group of GROUPS) {
+      const g = {};
+      for (const v of Object.values(src.semantic[group])) {
+        if (!v || typeof v.cssVar !== "string") continue;
+        const name = v.cssVar.replace(/^--/, "");
+        if (!(name in tvals)) continue;
+        g[name] = tok(name, tvals[name], v.role);
+      }
+      if (Object.keys(g).length) themeOut[group] = g;
+    }
+    if (tvals.$chassisOverride) {
+      themeOut.chassis = {};
+      for (const [k, val] of Object.entries(tvals.$chassisOverride)) themeOut.chassis[k] = tok(k, val, "chassis override");
+    }
+    for (const extra of ["extra-purple", "extra-orange"]) {
+      if (extra in tvals) (themeOut.extra ??= {})[extra] = tok(extra, tvals[extra], "extreme-only extension hue");
+    }
+    out.theme[theme] = themeOut;
+  }
+  return JSON.stringify(out, null, 2) + "\n";
+}
+
+/* ── 6. write / check ───────────────────────────────────────────────────── */
 
 const css = await buildCss();
 const tw = tailwindPreset();
 const flat = flatJson();
+const dtcgJson = dtcg();
 
+// [path relative to repo root, content]
 const targets = [
-  ["control-room.css", css],
-  ["tailwind-preset.cjs", tw],
-  ["tokens.flat.json", flat],
+  ["dist/control-room.css", css],
+  ["dist/tailwind-preset.cjs", tw],
+  ["dist/tokens.flat.json", flat],
+  ["design-tokens/control-room.tokens.json", dtcgJson],
 ];
 
 if (CHECK) {
   let stale = false;
-  for (const [name, content] of targets) {
-    const p = join(DIST, name);
+  for (const [rel, content] of targets) {
+    const p = join(ROOT, rel);
     const cur = existsSync(p) ? readFileSync(p, "utf8") : "";
-    if (cur !== content) { stale = true; console.error(`✗ dist/${name} is out of date`); }
+    if (cur !== content) { stale = true; console.error(`✗ ${rel} is out of date`); }
   }
-  if (stale) { console.error("\nRun: npm run build:tokens, then commit dist/."); process.exit(1); }
-  console.log("✓ dist/ is up to date with tokens/tokens.json");
+  if (stale) { console.error("\nRun: npm run build:tokens, then commit the generated files."); process.exit(1); }
+  console.log("✓ generated token artifacts are up to date with tokens/tokens.json");
   process.exit(0);
 }
 
-mkdirSync(DIST, { recursive: true });
-for (const [name, content] of targets) {
-  writeFileSync(join(DIST, name), content);
-  console.log(`wrote dist/${name}  (${content.length} bytes)`);
+for (const [rel, content] of targets) {
+  mkdirSync(dirname(join(ROOT, rel)), { recursive: true });
+  writeFileSync(join(ROOT, rel), content);
+  console.log(`wrote ${rel}  (${content.length} bytes)`);
 }
