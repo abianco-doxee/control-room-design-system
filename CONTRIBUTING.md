@@ -48,7 +48,7 @@ npm run verify         # token drift + catalog drift + skill validity (the CI ga
    tokens, variants, keywords) and run `npm run build:catalog`. Commit both.
 5. Run it through the ship gate: `checklists/component-checklist.md`. Every box
    must pass in all four themes.
-6. Add a changelog entry (see below).
+6. Add a changeset (`npm run changeset`) — see Versioning below.
 
 ## Commit & PR conventions
 
@@ -109,5 +109,12 @@ The token package follows **semver**:
 - **major** — a renamed/removed token or a changed law that breaks existing
   consumers.
 
-On release, move `## [Unreleased]` entries under a new version heading and bump
-`version` in `package.json`.
+Releases are automated with **Changesets** (`.changeset/`):
+
+1. With your change, run `npm run changeset`, pick the bump, write a one-liner —
+   commit the generated `.changeset/*.md`.
+2. On merge to `main`, the **Release** workflow opens a **"Version Packages"** PR
+   that bumps `version` and updates `CHANGELOG.md` from the changesets.
+3. Merge that PR to cut the release. The package is **private** — no npm publish.
+
+(You no longer hand-edit `CHANGELOG.md`; changesets own it going forward.)
