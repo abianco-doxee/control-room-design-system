@@ -1,0 +1,12 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
+  "changelog": "@changesets/cli/changelog",
+  "commit": false,
+  "fixed": [],
+  "linked": [],
+  "access": "restricted",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": [],
+  "___comment": "Private package — no npm publish. `changeset version` bumps the version + writes CHANGELOG from the changeset files; the release workflow opens a Version Packages PR. access:restricted keeps it from ever being published publicly."
+}
