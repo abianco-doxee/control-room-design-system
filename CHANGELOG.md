@@ -16,6 +16,12 @@ the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Figma token check in CI** — `.github/workflows/figma.yml` (manual
+  `workflow_dispatch`) validates `FIGMA_TOKEN` (a repo Actions secret) and can
+  list a file's top-level nodes, plus `scripts/figma-pull.mjs` / `npm run
+  figma:pull` for the same locally or in the Claude Code environment. No laptop
+  required — the token lives in the Claude Code env settings and/or an Actions
+  secret.
 - **Figma bridge (optional, free)** — `references/figma-bridge.md` + a `.mcp.json`
   wiring the open-source Framelink Figma MCP (reads a read-only `FIGMA_TOKEN` from
   env), an optional `figma` map on catalog entries (passed through by

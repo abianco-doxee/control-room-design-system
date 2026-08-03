@@ -38,13 +38,27 @@ If you do build a kit, create it in this order — cheapest first:
 
 ## Secret handling (read this first)
 
-- **Never** paste the token into chat, a commit, or a file that is tracked.
-- Provide it as an environment variable **`FIGMA_TOKEN`** — via your Claude Code
-  environment settings (injected, never shown) or `export FIGMA_TOKEN=…` locally.
+The token is always the env var **`FIGMA_TOKEN`** — never pasted in chat, a
+commit, or a tracked file. There are exactly two runtimes here, so provide it in
+one (or both) of these places:
+
+1. **Claude Code environment** — add `FIGMA_TOKEN` in your environment's
+   variables/secrets settings; it is injected into the session and never shown in
+   chat. `api.figma.com` is reachable from the environment, so the pull runs
+   here directly. (Docs: https://code.claude.com/docs/en/claude-code-on-the-web)
+2. **GitHub Actions** — repo **Settings → Secrets and variables → Actions → New
+   repository secret**, name `FIGMA_TOKEN`. The `Figma check` workflow
+   (`.github/workflows/figma.yml`, manual `workflow_dispatch`) reads it via
+   `${{ secrets.FIGMA_TOKEN }}`.
+
+A local `.env` also works if you ever run outside those, but no laptop is
+required.
+
 - Use a **read-only, short-lived** token (`file_content:read`,
   `file_dev_resources:read`) and revoke it when done.
-- `.gitignore` already excludes `.env*` and `*token*`. Keep it that way.
-- Note: the design content still reaches whatever LLM the agent uses — fine for
+- `.gitignore` excludes `.env*` / `*.pat` / `*.secret` (kept specific so it never
+  matches the `*.tokens.json` design tokens). Keep it that way.
+- The design content still reaches whatever LLM the agent uses — fine for
   company-provided models, but don't point this at a public model for a
   confidential file.
 
