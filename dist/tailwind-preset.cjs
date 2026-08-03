@@ -14,6 +14,7 @@ module.exports = {
               "muted": "var(--muted)",
               "rail-ink": "var(--rail-ink)",
               "on-sig": "var(--on-sig)",
+              "on-err": "var(--on-err)",
               "border": "var(--border)",
               "mass": "var(--mass)",
               "shadow-col": "var(--shadow-col)",

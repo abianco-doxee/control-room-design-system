@@ -57,6 +57,21 @@ npm run verify         # token drift + catalog drift + skill validity (the CI ga
   confirming the ship checklist passes.
 - Update `CHANGELOG.md` under `## [Unreleased]`.
 
+## Testing
+
+```bash
+npm run test:a11y            # axe-core over the gallery, all 4 themes (hard gate)
+npm run test:visual          # visual regression vs committed baselines
+npm run test:visual:update   # regenerate baselines after intentional visual changes
+npm run test:e2e             # both (builds the gallery first)
+```
+
+- The **a11y gate is a hard CI gate** — a serious/critical WCAG violation blocks
+  the deploy. New/changed components must pass in all four themes.
+- **Visual baselines** (`tests/*-snapshots/`) are committed and platform-suffixed.
+  They're environment-sensitive, so visual is **informational** in CI; regenerate
+  with `test:visual:update` when you intend a visual change, and commit them.
+
 ## Skills
 
 The skill is authored once (repo root: `SKILL.md` + `references/` + `templates/`

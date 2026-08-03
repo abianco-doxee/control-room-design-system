@@ -89,7 +89,9 @@ npm run build:catalog  # catalog/registry.json → catalog/catalog.json
 npm run build:gallery  # → public/gallery.html (live, self-contained, all 4 themes)
 npm run dev            # Astro + Starlight docs + gallery locally
 npm run build          # full build (tokens + catalog + gallery + content + Astro site)
-npm run verify         # CI gate: token drift + catalog drift + skill validity
+npm run verify         # static gate: token drift + catalog drift + skill validity
+npm run test:a11y      # accessibility gate (axe, all 4 themes) — blocks CI
+npm run test:visual    # visual regression vs committed baselines
 ```
 
 The docs site (**Astro + Starlight**, `src/` + `astro.config.mjs`, output to

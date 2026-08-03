@@ -8,9 +8,10 @@ conflict, accessibility wins. These are hard requirements, not suggestions.
 
 - **MUST** meet WCAG 2.1 AA: **4.5:1** for text under 18px (or under 14px bold),
   **3:1** for large text and for meaningful UI/graphic boundaries.
-- **MUST** pair every signal fill with `--on-sig` for text/icons placed on it.
-  The `--on-sig` value is tuned per theme so the pairing clears AA; when you add a
-  signal hue, re-verify the pair in **all four** themes before shipping.
+- **MUST** pair every signal fill with `--on-sig` for text/icons placed on it —
+  except **error** fills (`--sig-err`), which use `--on-err` (white in light, dark
+  elsewhere). Both are tuned per theme to clear AA; when you add a signal hue,
+  re-verify the pair in **all four** themes before shipping.
 - **MUST** keep the near-black `--border` as the boundary between adjacent signal
   fills — it is what keeps a keyed contact sheet legible.
 - **SHOULD** treat the mono `--muted` label color as the floor for secondary
@@ -61,6 +62,15 @@ Corruption is decorative; it must never reach assistive tech.
   (e.g. `aria-label="nova — waiting"`) or mark it `aria-hidden` when an adjacent
   text label already carries that information.
 - **NEVER** rely on the sprite pose as the only indication of state.
+
+## Automated gate
+
+Accessibility is enforced by CI, not just documented. `npm run test:a11y`
+(Playwright + axe-core) loads the living gallery in **all four themes** and fails
+on any **serious/critical** WCAG 2.1 A/AA violation (scoped to the component
+region). It runs on every push (`.github/workflows/deploy.yml`) and blocks the
+deploy. A companion visual-regression check (`npm run test:visual`) snapshots the
+gallery per theme; run `npm run test:visual:update` after intentional changes.
 
 ## Component acceptance (a11y slice)
 
