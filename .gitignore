@@ -8,6 +8,12 @@ dist/.sd/
 site-dist/
 .astro/
 
+# Playwright — reports/results are generated; snapshot BASELINES are committed
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
 # Generated Starlight content — built from the reference Markdown by
 # `npm run build:content`. index.mdx is authored and IS committed.
 src/content/docs/guide/

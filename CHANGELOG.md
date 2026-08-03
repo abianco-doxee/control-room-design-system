@@ -8,6 +8,22 @@ the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Accessibility gate + visual regression (Playwright + axe-core)** —
+  `test:a11y` fails CI on any serious/critical WCAG 2.1 A/AA violation across all
+  four themes (hard gate, blocks deploy); `test:visual` snapshots the gallery per
+  theme (informational; baselines in `tests/*-snapshots/`). Wired into
+  `.github/workflows/deploy.yml`.
+- **`--on-err` token** — contrast-safe foreground for error (`--sig-err`) fills
+  (white in light, dark elsewhere).
+
+### Fixed
+
+- **Contrast (WCAG AA) across all four themes**, found by the new a11y gate:
+  light `--on-sig` corrected from white to dark (black passes on light signals);
+  phosphor `--muted` brightened (`#1f8c42` → `#2fac55`) to clear AA on panels;
+  the drip/error surfaces now use `--on-err` instead of hardcoded `#fff`; removed
+  contrast-eroding opacity on hero/drip sub-text.
+
 - **Shipped component layer** — `styles/components.css`: consumable `cr-`prefixed
   component classes (`.cr-panel`, `.cr-btn`, `.cr-chip`, `.cr-tag`, `.cr-dot`,
   `.cr-row`, `.cr-hero`, `.cr-bezel`, `.cr-rail`, `.cr-drip`) built entirely on

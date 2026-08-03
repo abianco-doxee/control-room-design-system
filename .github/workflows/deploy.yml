@@ -32,6 +32,13 @@ jobs:
         env:
           SITE_URL: https://alebianco.github.io
           BASE_PATH: /control-room-design-system/
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Accessibility gate (axe, all four themes)
+        run: npm run test:a11y
+      - name: Visual regression (informational — baselines are env-specific)
+        run: npm run test:visual
+        continue-on-error: true
       - name: Upload Pages artifact
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v3

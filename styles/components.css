@@ -59,7 +59,7 @@
 .cr-tag--now   { background: var(--sig-done); color: var(--on-sig); }
 .cr-tag--work  { background: var(--sig-work); color: var(--on-sig); }
 .cr-tag--later { background: var(--sig-wait); color: var(--on-sig); }
-.cr-tag--no    { background: var(--sig-err);  color: var(--on-sig); }
+.cr-tag--no    { background: var(--sig-err);  color: var(--on-err); }
 
 /* ── StatusDot (a square — radius 0) ───────────────────────────────────── */
 .cr-dot { display: inline-block; width: 8px; height: 8px; border: 1.5px solid var(--border); }
@@ -81,10 +81,10 @@
   box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col); padding: 16px;
 }
 .cr-hero--wait { background: var(--sig-wait); }
-.cr-hero--err  { background: var(--sig-err); }
+.cr-hero--err  { background: var(--sig-err); color: var(--on-err); }
 .cr-hero--calm { background: var(--stage); color: var(--stage-ink); }
 .cr-hero__big  { font-weight: 900; font-size: 19px; line-height: 1.05; }
-.cr-hero__sub  { font-family: var(--font-mono); font-size: 12px; opacity: 0.82; margin-top: 3px; }
+.cr-hero__sub  { font-family: var(--font-mono); font-size: 12px; margin-top: 3px; }
 
 /* ── Bezel + screen (the only texture host) ────────────────────────────── */
 .cr-bezel {
@@ -110,9 +110,9 @@
 .cr-rail__step--on { background: var(--sig-work); color: var(--on-sig); }
 
 /* ── Drip / error surface (Law 3) ──────────────────────────────────────── */
-.cr-drip { border: var(--brd) solid var(--border); background: var(--sig-err); color: #fff; padding: 16px; }
+.cr-drip { border: var(--brd) solid var(--border); background: var(--sig-err); color: var(--on-err); padding: 16px; }
 .cr-drip__title { font-weight: 900; font-size: 17px; text-transform: uppercase; letter-spacing: -0.02em; }
-.cr-drip__sub { font-family: var(--font-mono); font-size: 11px; opacity: 0.85; margin-top: 3px; }
+.cr-drip__sub { font-family: var(--font-mono); font-size: 11px; margin-top: 3px; }
 
 @media (prefers-reduced-motion: reduce) {
   .cr-btn { transition: none; }
