@@ -1,7 +1,7 @@
 {
   "name": "@control-room/design-system",
   "version": "1.0.0",
-  "description": "Control Room — a neon-noir, neobrutalist design system for dense operational dashboards. Design language (the seven laws), a four-theme token layer, a component library, motion tiers, and an accessibility contract.",
+  "description": "Control Room \u2014 a neon-noir, neobrutalist design system for dense operational dashboards. Design language (the seven laws), a four-theme token layer, a component library, motion tiers, and an accessibility contract.",
   "license": "UNLICENSED",
   "private": true,
   "type": "module",
@@ -26,12 +26,18 @@
     "./tailwind-preset": "./dist/tailwind-preset.cjs",
     "./flat": "./dist/tokens.flat.json",
     "./dtcg": "./design-tokens/control-room.tokens.json",
-    "./catalog": "./catalog/catalog.json"
+    "./catalog": "./catalog/catalog.json",
+    "./react": "./dist/frameworks/react/index.ts",
+    "./vue": "./dist/frameworks/vue/index.ts",
+    "./svelte": "./dist/frameworks/svelte/index.js",
+    "./angular": "./dist/frameworks/angular/index.ts",
+    "./solid": "./dist/frameworks/solid/index.jsx",
+    "./frameworks/*": "./dist/frameworks/*"
   },
   "scripts": {
     "build:tokens": "node build/build-tokens.mjs",
     "build:tw": "tailwindcss -i build/tailwind-input.css -o dist/utilities.css",
-    "build:components": "mitosis build",
+    "build:components": "mitosis build && node build/build-barrels.mjs",
     "build:catalog": "node build/build-catalog.mjs",
     "build:gallery": "node build/build-gallery.mjs",
     "build:content": "node build/build-docs-content.mjs",
