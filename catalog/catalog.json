@@ -1,0 +1,693 @@
+{
+  "$schema": "https://schemas.control-room.dev/catalog/v1",
+  "$description": "Control Room component catalog. GENERATED from catalog/registry.json — do not edit by hand. Deterministic (no timestamps) so it can be drift-checked.",
+  "meta": {
+    "name": "Control Room",
+    "version": "1.0.0",
+    "origin": "control-room",
+    "count": 16,
+    "categories": {
+      "action": 1,
+      "identity": 2,
+      "layout": 3,
+      "media": 1,
+      "navigation": 1,
+      "primitives": 1,
+      "state": 7
+    },
+    "lifecycles": {
+      "stable": 15,
+      "experimental": 1
+    }
+  },
+  "entries": [
+    {
+      "id": "button",
+      "name": "Button",
+      "kind": "component",
+      "category": "action",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Primary action with the signature mechanical snap-press; secondary 'controls' variant for utilities.",
+      "spec": "references/components.md#button",
+      "variants": {
+        "kind": [
+          "primary",
+          "controls"
+        ],
+        "state": [
+          "rest",
+          "active",
+          "kick"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-wait",
+          "description": "primary fill"
+        },
+        {
+          "cssVar": "--panel",
+          "description": "controls fill"
+        },
+        {
+          "cssVar": "--brd-heavy",
+          "description": "primary border"
+        },
+        {
+          "cssVar": "--shadow-off",
+          "description": "press offset"
+        },
+        {
+          "cssVar": "--on-sig",
+          "description": "text"
+        }
+      ],
+      "keywords": [
+        "button",
+        "action",
+        "cta",
+        "press",
+        "snap"
+      ]
+    },
+    {
+      "id": "hero",
+      "name": "Hero",
+      "kind": "component",
+      "category": "identity",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The one region that keys to the state needing attention; keys to --stage when calm.",
+      "spec": "references/components.md#hero-keyed-focal-region",
+      "variants": {
+        "state": [
+          "accent",
+          "wait",
+          "err",
+          "calm"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-accent",
+          "description": "default keyed fill"
+        },
+        {
+          "cssVar": "--sig-wait",
+          "description": "wait state fill"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error state fill"
+        },
+        {
+          "cssVar": "--stage",
+          "description": "calm state fill"
+        },
+        {
+          "cssVar": "--on-sig",
+          "description": "text on fill"
+        }
+      ],
+      "keywords": [
+        "hero",
+        "keyed",
+        "focal",
+        "attention",
+        "state"
+      ]
+    },
+    {
+      "id": "masthead",
+      "name": "Masthead",
+      "kind": "component",
+      "category": "identity",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The stark title card — page identity and headline state in the display register; optional drip host.",
+      "spec": "references/components.md#masthead",
+      "variants": {
+        "glitch": [
+          "off",
+          "drip"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "fill"
+        },
+        {
+          "cssVar": "--brd-heavy",
+          "description": "border weight"
+        },
+        {
+          "cssVar": "--shadow-off-lg",
+          "description": "large offset shadow"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "eyebrow (or --stage when calm)"
+        }
+      ],
+      "keywords": [
+        "masthead",
+        "title",
+        "header",
+        "hero-title",
+        "display"
+      ]
+    },
+    {
+      "id": "bezel",
+      "name": "Bezel + Screen",
+      "kind": "component",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The only legal host for texture (Law 6) — a physical instrument enclosing a recessed, halftoned screen.",
+      "spec": "references/components.md#bezel--screen",
+      "variants": {},
+      "tokens": [
+        {
+          "cssVar": "--brd-brush",
+          "description": "casing"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "casing fill"
+        },
+        {
+          "cssVar": "--board",
+          "description": "screen fill"
+        },
+        {
+          "cssVar": "--halftone",
+          "description": "screen texture"
+        },
+        {
+          "cssVar": "--halftone-size",
+          "description": "texture cell"
+        }
+      ],
+      "keywords": [
+        "bezel",
+        "screen",
+        "crt",
+        "texture",
+        "halftone",
+        "instrument"
+      ]
+    },
+    {
+      "id": "panel",
+      "name": "Panel",
+      "kind": "component",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The default container for a group of related data — the system's workhorse surface.",
+      "spec": "references/components.md#panel",
+      "variants": {
+        "weight": [
+          "default",
+          "major"
+        ],
+        "inset": [
+          "false",
+          "true"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "surface fill"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "inset variant fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "contour"
+        },
+        {
+          "cssVar": "--brd",
+          "description": "border weight (default)"
+        },
+        {
+          "cssVar": "--brd-heavy",
+          "description": "border weight (major)"
+        },
+        {
+          "cssVar": "--shadow-off",
+          "description": "hard offset shadow"
+        },
+        {
+          "cssVar": "--shadow-col",
+          "description": "shadow color"
+        }
+      ],
+      "keywords": [
+        "panel",
+        "card",
+        "container",
+        "surface",
+        "box"
+      ]
+    },
+    {
+      "id": "table",
+      "name": "Table",
+      "kind": "component",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Dense tabular data on the same chassis as a panel; mono/label headers, data-register cells.",
+      "spec": "references/components.md#table",
+      "variants": {},
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "outer border"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "header text"
+        }
+      ],
+      "keywords": [
+        "table",
+        "grid",
+        "data",
+        "rows",
+        "columns"
+      ]
+    },
+    {
+      "id": "seeded-cat",
+      "name": "Seeded pixel-cat",
+      "kind": "component",
+      "category": "media",
+      "lifecycle": "experimental",
+      "origin": "control-room",
+      "description": "Identity+state sprite: fur/markings from the session id, pose from state; deterministic paint() to canvas.",
+      "spec": "references/seeded-cat.md",
+      "variants": {
+        "state": [
+          "working",
+          "waiting",
+          "idle",
+          "error",
+          "done"
+        ],
+        "frame": [
+          "0",
+          "1",
+          "2",
+          "3"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "eye color by state (via stateHex)"
+        }
+      ],
+      "keywords": [
+        "cat",
+        "sprite",
+        "seeded",
+        "identity",
+        "pixel",
+        "canvas",
+        "avatar"
+      ]
+    },
+    {
+      "id": "rail",
+      "name": "Rail + Nav",
+      "kind": "component",
+      "category": "navigation",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Primary navigation — persistent left chassis; active item keyed to accent, count badge to its state.",
+      "spec": "references/components.md#rail--nav",
+      "variants": {
+        "item": [
+          "default",
+          "active"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--rail",
+          "description": "rail background"
+        },
+        {
+          "cssVar": "--rail-ink",
+          "description": "rail text"
+        },
+        {
+          "cssVar": "--sig-accent",
+          "description": "active item"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "attention badge"
+        },
+        {
+          "cssVar": "--brd-heavy",
+          "description": "right border"
+        }
+      ],
+      "keywords": [
+        "rail",
+        "nav",
+        "navigation",
+        "sidebar",
+        "menu",
+        "badge"
+      ]
+    },
+    {
+      "id": "diagonal-primitives",
+      "name": "Diagonal primitives",
+      "kind": "block",
+      "category": "primitives",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Four shapes with four fixed meanings (Law 4): chevron=direction, notch=state, wedge=focus, arrow-rail=sequence. Max 15° off-axis.",
+      "spec": "references/components.md#diagonal-primitives-law-4",
+      "variants": {
+        "shape": [
+          "chevron",
+          "notch",
+          "wedge",
+          "arrow-rail"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "chevron / active step"
+        },
+        {
+          "cssVar": "--sig-wait",
+          "description": "notch"
+        },
+        {
+          "cssVar": "--sig-accent",
+          "description": "wedge"
+        },
+        {
+          "cssVar": "--border",
+          "description": "edges"
+        }
+      ],
+      "keywords": [
+        "chevron",
+        "notch",
+        "wedge",
+        "arrow",
+        "rail",
+        "sequence",
+        "diagonal"
+      ]
+    },
+    {
+      "id": "chip",
+      "name": "Chip",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A compact standalone tag/label; default keys to done, alt to work; stamp-in when added.",
+      "spec": "references/components.md#chip",
+      "variants": {
+        "tone": [
+          "done",
+          "alt"
+        ],
+        "stamp": [
+          "off",
+          "on"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-done",
+          "description": "default fill"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "alt fill"
+        },
+        {
+          "cssVar": "--on-sig",
+          "description": "text"
+        },
+        {
+          "cssVar": "--border",
+          "description": "outline"
+        }
+      ],
+      "keywords": [
+        "chip",
+        "tag",
+        "label",
+        "token",
+        "pill"
+      ]
+    },
+    {
+      "id": "drip",
+      "name": "Drip / error surface",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The house glitch for failure — vertical downward bleed in --drip over a --sig-err field. Errors only.",
+      "spec": "references/components.md#drip--error-surface-law-3",
+      "variants": {},
+      "tokens": [
+        {
+          "cssVar": "--sig-err",
+          "description": "field"
+        },
+        {
+          "cssVar": "--drip",
+          "description": "bleed hue"
+        },
+        {
+          "cssVar": "--border",
+          "description": "outline"
+        }
+      ],
+      "keywords": [
+        "drip",
+        "error",
+        "glitch",
+        "failure",
+        "decay"
+      ]
+    },
+    {
+      "id": "empty-error-state",
+      "name": "EmptyState / ErrorState",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Zero-data (calm) and failure (error keying + drip) fallbacks for any panel — must not look alike.",
+      "spec": "references/components.md#emptystate--errorstate",
+      "variants": {
+        "kind": [
+          "empty",
+          "error"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--muted",
+          "description": "empty text"
+        },
+        {
+          "cssVar": "--stage",
+          "description": "empty calm accent"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error keying"
+        }
+      ],
+      "keywords": [
+        "empty",
+        "error",
+        "state",
+        "fallback",
+        "zero-data"
+      ]
+    },
+    {
+      "id": "keyed-contact-sheet",
+      "name": "Keyed contact sheet",
+      "kind": "block",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A grid of uniform state-keyed tiles that reads as one instrument, not competing stages (Law 2).",
+      "spec": "references/components.md#keyed-contact-sheet-law-2",
+      "variants": {},
+      "tokens": [
+        {
+          "cssVar": "--brd-brush",
+          "description": "sheet border"
+        },
+        {
+          "cssVar": "--border",
+          "description": "tile dividers"
+        }
+      ],
+      "keywords": [
+        "tiles",
+        "grid",
+        "contact-sheet",
+        "keyed",
+        "roster"
+      ]
+    },
+    {
+      "id": "session-row",
+      "name": "SessionRow",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "One row of a live list — the densest unit; calm at rest, one-shot glitch on a real state change.",
+      "spec": "references/components.md#sessionrow",
+      "variants": {
+        "state": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle"
+        ],
+        "event": [
+          "off",
+          "on"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--ink",
+          "description": "name"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "status"
+        },
+        {
+          "cssVar": "--border",
+          "description": "divider"
+        }
+      ],
+      "keywords": [
+        "row",
+        "session",
+        "list-item",
+        "live",
+        "status"
+      ]
+    },
+    {
+      "id": "status-dot",
+      "name": "StatusDot",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The smallest state readout — a square keyed to the signal ramp, with an aria-label naming the state.",
+      "spec": "references/components.md#statusdot",
+      "variants": {
+        "state": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "state fill (example)"
+        },
+        {
+          "cssVar": "--border",
+          "description": "outline"
+        }
+      ],
+      "keywords": [
+        "dot",
+        "status",
+        "indicator",
+        "state",
+        "square"
+      ]
+    },
+    {
+      "id": "tag",
+      "name": "Tag",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Inline status label inside dense content; variants map to the signal ramp.",
+      "spec": "references/components.md#tag",
+      "variants": {
+        "tone": [
+          "now",
+          "work",
+          "later",
+          "no"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-done",
+          "description": "now/shipped"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "work"
+        },
+        {
+          "cssVar": "--sig-wait",
+          "description": "later/pending"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "no/ruled-out"
+        },
+        {
+          "cssVar": "--on-sig",
+          "description": "text"
+        }
+      ],
+      "keywords": [
+        "tag",
+        "badge",
+        "status",
+        "inline",
+        "label"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+/* Control Room — Starlight theme skin.
+ * Maps Starlight's --sl-* tokens onto the Control Room token layer so the docs
+ * chrome reads as the system (neon-noir, neobrutalist) and follows the theme
+ * toggle: Starlight sets html[data-theme=dark|light], which is exactly what the
+ * Control Room token layer keys off — so both stay in sync automatically. */
+
+/* brand fonts (real rendering; the token stacks fall back to these) */
+@import "@fontsource/archivo/400.css";
+@import "@fontsource/archivo/700.css";
+@import "@fontsource/archivo/900.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/700.css";
+
+/* the generated token layer (all four themes) */
+@import "../../dist/control-room.css";
+
+:root {
+  /* type */
+  --sl-font: var(--font-sans);
+  --sl-font-mono: var(--font-mono);
+
+  /* accent = the attention/magenta signal */
+  --sl-color-accent: var(--sig-accent);
+  --sl-color-accent-low: color-mix(in srgb, var(--sig-accent) 22%, var(--ground));
+  --sl-color-accent-high: var(--sig-accent);
+  --sl-color-text-accent: var(--sig-accent);
+
+  /* surfaces */
+  --sl-color-bg: var(--ground);
+  --sl-color-bg-nav: var(--board);
+  --sl-color-bg-sidebar: var(--rail);
+  --sl-color-bg-inline-code: var(--panel-2);
+  --sl-color-bg-gutter: var(--board);
+
+  /* lines */
+  --sl-color-hairline: color-mix(in srgb, var(--border) 40%, transparent);
+  --sl-color-hairline-light: color-mix(in srgb, var(--border) 24%, transparent);
+  --sl-color-hairline-shade: var(--border);
+
+  /* zero radius everywhere — system law */
+  --sl-radius: 0px;
+  --sl-radius-small: 0px;
+  --sl-radius-medium: 0px;
+  --sl-radius-large: 0px;
+}
+
+/* neobrutalist chrome touches — square, inked, hard-edged */
+.card,
+starlight-tabs,
+.sl-markdown-content :is(pre, table),
+.starlight-aside {
+  border: var(--brd, 2px) solid var(--border) !important;
+  border-radius: 0 !important;
+  box-shadow: var(--shadow-off, 4px) var(--shadow-off, 4px) 0 var(--shadow-col, #000);
+}
+
+/* headings in the display register */
+.sl-markdown-content :is(h1, h2) {
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+/* the site title in the header, mono + uppercase like the rail brand */
+.site-title {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* keep the system's focus signal */
+:where(a, button, [tabindex]):focus-visible {
+  outline: 3px solid var(--sig-work);
+  outline-offset: 2px;
+}

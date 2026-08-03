@@ -1,0 +1,35 @@
+---
+title: Control Room
+description: A neon-noir, neobrutalist design system for dense operational dashboards.
+template: splash
+hero:
+  tagline: A neobrutalist design system for dense operational dashboards. Black is a mass; one hue keys the scene and it means something; decay is information.
+---
+
+import { Card, CardGrid, LinkButton } from '@astrojs/starlight/components';
+
+<div style="display:flex;gap:.75rem;flex-wrap:wrap;margin:0 0 1.5rem">
+  <LinkButton href={`${import.meta.env.BASE_URL}reference/design-language/`} variant="primary" icon="right-arrow">The seven laws</LinkButton>
+  <LinkButton href={`${import.meta.env.BASE_URL}reference/components/`} variant="minimal">Component library</LinkButton>
+  <LinkButton href={`${import.meta.env.BASE_URL}gallery.html`} target="_self" variant="secondary" icon="external">Live gallery — all four themes</LinkButton>
+</div>
+
+<CardGrid>
+  <Card title="Design language, not vibes">
+    Seven research-grounded laws, each a decision procedure with explicit MUST /
+    SHOULD / NEVER — so the next component doesn't need a taste debate.
+  </Card>
+  <Card title="Token-first, four themes">
+    One machine-readable source drives dark / light / extreme / phosphor. Any
+    component built from tokens survives a theme flip with zero per-theme code.
+  </Card>
+  <Card title="A spec'd component library">
+    Each component has an anatomy, token list, variants, copy-ready markup,
+    motion, and accessibility notes — plus a template, a catalog, and a ship
+    checklist so new ones stay consistent.
+  </Card>
+  <Card title="AI-native">
+    Published as a skill and installed into every agent provider. DTCG tokens and
+    a queryable catalog make it consumable by tooling, not just people.
+  </Card>
+</CardGrid>

@@ -37,9 +37,14 @@ control-room-design-system/
 ├── references/                    # design-language, tokens, components, motion, a11y, seeded-cat
 ├── templates/component.md         # the spec template every new component follows
 ├── checklists/component-checklist.md  # the ship gate
+├── catalog/
+│   ├── registry.json              # component registry — SOURCE OF TRUTH
+│   └── catalog.json               # GENERATED — queryable, hub-compatible catalog
 ├── skills/manifest.json           # skill install manifest (source → providers)
 ├── scripts/skills-sync.mjs        # install the skill into .claude / .cursor / .opencode
-└── site/                          # VitePress docs site (publishes the references)
+├── astro.config.mjs               # Astro + Starlight docs site (repo root)
+├── src/                           # Starlight content (generated from references) + theme
+└── public/gallery.html            # GENERATED — live, self-contained gallery
 ```
 
 ## Design approach
@@ -74,15 +79,18 @@ first before building anything new.
 ```bash
 npm install
 npm run build:tokens   # tokens.json → dist/ (CSS, Tailwind, flat) + design-tokens/ (DTCG)
+npm run build:catalog  # catalog/registry.json → catalog/catalog.json
 npm run build:gallery  # → public/gallery.html (live, self-contained, all 4 themes)
-npm run dev            # VitePress docs + gallery locally
-npm run build          # full build (tokens + gallery + site)
-npm run verify         # CI gate: token drift + skill validity
+npm run dev            # Astro + Starlight docs + gallery locally
+npm run build          # full build (tokens + catalog + gallery + content + Astro site)
+npm run verify         # CI gate: token drift + catalog drift + skill validity
 ```
 
-The docs site (`site/`, VitePress) and the gallery deploy to GitHub Pages via
+The docs site (**Astro + Starlight**, `src/` + `astro.config.mjs`, output to
+`site-dist/`) and the gallery deploy to GitHub Pages via
 `.github/workflows/deploy.yml` on push to `main` (one-time: Settings → Pages →
-Source → GitHub Actions).
+Source → GitHub Actions). Reference pages are generated from the source Markdown
+by `npm run build:content`, so `references/` stays the single source of truth.
 
 ## Install as an agent skill
 
@@ -101,22 +109,28 @@ Providers and the file set are declared in `skills/manifest.json`.
 This package deliberately mirrors the conventions of `Doxee-Product-Management/
 Design-System-Hub` so the two can converge:
 
+- **Astro + Starlight** — same docs platform and Vue-less static build, so
+  Control Room can later fold into the hub as a section. Reference Markdown is
+  generated into Starlight content; a neon-noir skin maps the `--sl-*` tokens
+  onto the Control Room token layer.
 - **DTCG tokens** — `design-tokens/control-room.tokens.json` uses the Design
   Tokens Community Group format with the same `com.doxee.cssVar` extension as the
   hub's `design-tokens/components/*.tokens.json`.
+- **Generated JSON catalog** — `catalog/registry.json` → `catalog/catalog.json`,
+  the hub's registry → catalog model, rendered as a queryable catalog page.
 - **Generated-and-committed + drift gates** — like the hub's `catalog:check` /
-  `skills:check`, our `verify:tokens` and `skills:check` fail CI on drift rather
-  than regenerating at deploy.
+  `skills:check`, our `verify:tokens`, `verify:catalog`, and `skills:check` fail
+  CI on drift rather than regenerating at deploy.
 - **Single-source skill, multi-provider fan-out** — the hub installs skills via a
   CLI into `.claude` / `.cursor` / `.opencode` / …; `scripts/skills-sync.mjs` is
   the lightweight equivalent.
 - **GitHub Pages via Actions**, base-path aware — same publishing model.
 
-**Not adopted (intentional):** the hub is an **Astro + Starlight** site built on
-**PrimeVue/Aura** with **IBM Plex** type and a `--brand-*` / `--p-*` token plane.
-Control Room is a distinct **neon-noir** surface (Archivo / JetBrains Mono, the
-neon signal ramp) documented with VitePress. Aligning platform (Starlight) or
-brand (inheriting Doxee brand tokens) are open decisions — see below.
+**Intentionally distinct — brand.** The hub is built on **PrimeVue/Aura** with
+**IBM Plex** type and a `--brand-*` / `--p-*` token plane. Control Room keeps its
+own **neon-noir** identity (Archivo / JetBrains Mono, the neon signal ramp): it is
+a separate operator surface, not the general Doxee UI kit. The conventions above
+let the two interoperate without collapsing that distinction.
 
 ## Provenance & scope
 

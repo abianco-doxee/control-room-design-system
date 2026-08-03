@@ -20,9 +20,11 @@ proposing anything visual — most questions are already answered there.
 
 ```bash
 npm install
-npm run build:tokens   # regenerate dist/ from tokens/tokens.json
-npm run dev            # live docs + gallery at localhost
-npm run build          # full build: tokens + gallery + site
+npm run build:tokens   # regenerate dist/ + design-tokens/ from tokens/tokens.json
+npm run build:catalog  # regenerate catalog/catalog.json from catalog/registry.json
+npm run dev            # Astro + Starlight docs + gallery at localhost
+npm run build          # full build: tokens + catalog + gallery + content + site
+npm run verify         # token drift + catalog drift + skill validity (the CI gate)
 ```
 
 ## Changing tokens
@@ -42,9 +44,11 @@ npm run build          # full build: tokens + gallery + site
 2. Build it from tokens only (no raw hex, no `border-radius`, hard shadow only).
 3. Add a live demo to the gallery (`build/build-gallery.mjs`) so it is visible
    across all four themes.
-4. Run it through the ship gate: `checklists/component-checklist.md`. Every box
+4. Register it in `catalog/registry.json` (id, category, kind, lifecycle,
+   tokens, variants, keywords) and run `npm run build:catalog`. Commit both.
+5. Run it through the ship gate: `checklists/component-checklist.md`. Every box
    must pass in all four themes.
-5. Add a changelog entry (see below).
+6. Add a changelog entry (see below).
 
 ## Commit & PR conventions
 
