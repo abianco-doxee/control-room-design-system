@@ -50,6 +50,7 @@ export default defineConfig({
             { label: "Component Library", link: "/reference/components/" },
             { label: "Component Catalog", link: "/reference/catalog/" },
             { label: "Seeded Pixel-Cat", link: "/reference/seeded-cat/" },
+          { label: "Framework Components", link: "/reference/frameworks/" },
             { label: "Figma Bridge (optional)", link: "/reference/figma-bridge/" },
             { label: "Building the Figma Kit", link: "/reference/figma-kit-build/" },
             { label: "Component Template", link: "/build/component-template/" },

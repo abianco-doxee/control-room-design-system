@@ -55,7 +55,7 @@ npm run verify         # token drift + catalog drift + skill validity (the CI ga
 - Small, focused commits. Reference the law/component you touched.
 - PR description states: what changed, which laws/tokens it touches, and a note
   confirming the ship checklist passes.
-- Update `CHANGELOG.md` under `## [Unreleased]`.
+- Add a changeset (`npm run changeset`); don't hand-edit `CHANGELOG.md`.
 
 ## Testing
 
@@ -71,6 +71,14 @@ npm run test:e2e             # both (builds the gallery first)
 - **Visual baselines** (`tests/*-snapshots/`) are committed and platform-suffixed.
   They're environment-sensitive, so visual is **informational** in CI; regenerate
   with `test:visual:update` when you intend a visual change, and commit them.
+
+## Interactive components (Mitosis)
+
+Static components ship as `cr-` CSS classes (framework-agnostic). Components with
+real state/logic/ARIA are authored once as Mitosis `.lite.tsx` in `components/`
+and compiled to React/Vue/Svelte/Angular/Solid (`npm run build:components`). They
+apply `cr-` classes and carry no styling. See `references/frameworks.md`. CI
+compiles all targets so sources can't silently break.
 
 ## Skills
 

@@ -7,6 +7,9 @@ dist/.sd/
 # Prebuilt Tailwind utilities — build artifact (npm run build:tw); not committed
 dist/utilities.css
 
+# Mitosis framework output — build artifact (npm run build:components)
+dist/frameworks/
+
 # Astro / Starlight build output & cache (site output goes to site-dist/)
 site-dist/
 .astro/
