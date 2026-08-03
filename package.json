@@ -35,6 +35,7 @@
     "verify:catalog": "node build/build-catalog.mjs --check",
     "skills:sync": "node scripts/skills-sync.mjs",
     "skills:check": "node scripts/skills-sync.mjs --check",
+    "figma:pull": "node scripts/figma-pull.mjs",
     "verify": "npm run verify:tokens && npm run verify:catalog && npm run skills:check"
   },
   "devDependencies": {
