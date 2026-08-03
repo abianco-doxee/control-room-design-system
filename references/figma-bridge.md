@@ -74,6 +74,20 @@ env so it never appears in config:
   — run the pull where Figma is reachable (your machine, or a suitably
   configured environment).
 
+### Verify the token (no secret in chat)
+
+Provide `FIGMA_TOKEN` via a git-ignored `.env` (copy `.env.example`), an exported
+shell var, or your Claude Code environment settings — then:
+
+```bash
+npm run figma:pull                 # validates the token via /v1/me (never prints it)
+npm run figma:pull -- <fileKey>    # also lists a file's top-level nodes
+```
+
+The `<fileKey>` is the segment in a file URL: `figma.com/file/<fileKey>/…`. A
+read-only token can read any file your account can open, including private
+drafts.
+
 ## The `figma` map (in `catalog/registry.json`)
 
 Optional per component. Absent = not yet mapped. Shape:
