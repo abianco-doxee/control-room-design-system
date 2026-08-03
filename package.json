@@ -1,0 +1,35 @@
+{
+  "name": "@control-room/design-system",
+  "version": "1.0.0",
+  "description": "Control Room — a neon-noir, neobrutalist design system for dense operational dashboards. Design language (the seven laws), a four-theme token layer, a component library, motion tiers, and an accessibility contract.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "files": [
+    "tokens",
+    "dist",
+    "references",
+    "templates",
+    "checklists",
+    "SKILL.md",
+    "README.md"
+  ],
+  "exports": {
+    "./tokens.json": "./tokens/tokens.json",
+    "./css": "./dist/control-room.css",
+    "./tailwind": "./dist/tailwind-preset.cjs",
+    "./flat": "./dist/tokens.flat.json"
+  },
+  "scripts": {
+    "build:tokens": "node build/build-tokens.mjs",
+    "build:site": "vitepress build site",
+    "build": "npm run build:tokens && npm run build:site",
+    "dev": "vitepress dev site",
+    "preview": "vitepress preview site",
+    "verify:tokens": "node build/build-tokens.mjs --check"
+  },
+  "devDependencies": {
+    "style-dictionary": "^4.3.0",
+    "vitepress": "^1.6.3"
+  }
+}

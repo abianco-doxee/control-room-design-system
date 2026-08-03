@@ -1,3 +1,9 @@
 node_modules/
 .DS_Store
-dist/
+
+# Style Dictionary intermediates (dist/ artifacts themselves ARE committed)
+dist/.sd/
+
+# VitePress build output & cache
+site/.vitepress/dist/
+site/.vitepress/cache/
