@@ -6,6 +6,14 @@ the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Shipped component layer** — `styles/components.css`: consumable `cr-`prefixed
+  component classes (`.cr-panel`, `.cr-btn`, `.cr-chip`, `.cr-tag`, `.cr-dot`,
+  `.cr-row`, `.cr-hero`, `.cr-bezel`, `.cr-rail`, `.cr-drip`) built entirely on
+  the token layer. Exposed via the `./components` package export; the living
+  gallery now consumes this exact file (single source — no separate demo CSS).
+
 ### Changed
 
 - **Docs re-platformed to Astro + Starlight** (from VitePress) to match the Doxee

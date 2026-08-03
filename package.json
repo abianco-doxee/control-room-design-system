@@ -8,6 +8,9 @@
   "files": [
     "tokens",
     "dist",
+    "styles",
+    "design-tokens",
+    "catalog",
     "references",
     "templates",
     "checklists",
@@ -17,9 +20,11 @@
   "exports": {
     "./tokens.json": "./tokens/tokens.json",
     "./css": "./dist/control-room.css",
+    "./components": "./styles/components.css",
     "./tailwind": "./dist/tailwind-preset.cjs",
     "./flat": "./dist/tokens.flat.json",
-    "./dtcg": "./design-tokens/control-room.tokens.json"
+    "./dtcg": "./design-tokens/control-room.tokens.json",
+    "./catalog": "./catalog/catalog.json"
   },
   "scripts": {
     "build:tokens": "node build/build-tokens.mjs",
