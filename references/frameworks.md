@@ -7,17 +7,21 @@ framework-native components (not a foreign runtime).
 
 Targets: **React, Vue, Svelte, Angular, Solid** (`mitosis.config.cjs`).
 
-## Why only *some* components are here
+## Coverage
 
-Styling and layout live in CSS (`styles/components.css`) and are already
-framework-agnostic — a `cr-` class works in any framework or server-rendered
-page. So the **static** components (Panel, Chip, Tag, Table, …) need no
-compilation; you just apply the class.
+**Every component** is authored in Mitosis (`components/*.lite.tsx`) — Panel,
+Button, Chip, Tag, StatusDot, SessionRow, Hero, Bezel, ArrowRail, Drip, Masthead,
+Nav, Table, Tiles, Field, Input, Textarea, Select, Choice (checkbox/radio),
+Switch, Instrument, EmptyState, and the seeded pixel-**Cat** (an imperative
+`<canvas>`, painted in `onMount` — Mitosis resolves the ref correctly per target:
+`canvasRef.current` in React, `bind:this` in Svelte, etc.).
 
-Mitosis is reserved for the **interactive** components that carry props / state /
-ARIA logic worth writing once: currently `CrButton`, `CrSwitch`, `CrField`
-(more as overlays land). They render `cr-` classes and contain **no styling** —
-so there is nothing to diverge across targets.
+Components apply the `cr-` classes and contain **no styling**, so all five
+targets are identical and the token/CSS layer stays the single source.
+
+**You can still skip the components entirely.** The static pieces are just `cr-`
+classes, so in a server-rendered page or a framework you don't compile for, apply
+the class directly — the compiled components are a convenience, not a requirement.
 
 ## Author
 
