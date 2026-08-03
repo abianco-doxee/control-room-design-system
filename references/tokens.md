@@ -26,6 +26,38 @@ and the Doxee tooling without a bespoke parser. Structure: `chassis`,
 `typography`, `motion`, and a `theme` group (`dark` / `light` / `extreme` /
 `phosphor`) whose colors are grouped by semantic role.
 
+## Token tiers (global → semantic → component)
+
+Control Room uses the standard three-tier token model, so nothing hardcodes a
+raw value:
+
+1. **Primitive / global** (`primitive` in `tokens.json`) — context-free scales,
+   named by what they *are*: the **spacing scale** (`--space-*`, 4px base — step
+   n = 4n, matching Tailwind), the **type scale** (`--text-2xs … --text-xl`),
+   line-heights (`--leading-*`), radius (`--radius-none`, always 0), and z-index
+   (`--z-*`). Plus the chassis primitives (`--brd*`, `--shadow-off*`).
+2. **Semantic** (`semantic`) — named by what they're *for*: `--panel`, `--ink`,
+   `--sig-work`, `--on-err`, … Values differ per theme; meaning does not.
+3. **Component** (`component`) — per-component tokens referencing the tiers
+   above: `--cr-btn-bg`, `--cr-btn-pad-x`, `--cr-panel-pad`, … Restyle a
+   component by overriding its `--cr-*` tokens; you never edit its CSS.
+
+Rule of thumb: **components consume component tokens; component tokens reference
+semantic + primitive; semantic references primitive/theme values.** No layer
+reaches past the one below it, and no CSS uses a raw px or hex.
+
+### Primitive scales
+
+Spacing (`--space-*`): `0, px(1), 0-5(2), 1(4), 2(8), 3(12), 4(16), 5(20),
+6(24), 8(32), 10(40), 12(48), 16(64)` px. Type (`--text-*`): `2xs(10), xs(11),
+sm(12), base(13), md(15), lg(19), xl(clamp display)`. Use these — never a literal.
+
+### Component tokens
+
+Each component exposes tokens (see `component` in `tokens.json`), e.g. Button:
+`--cr-btn-bg`, `--cr-btn-fg`, `--cr-btn-pad-x`, `--cr-btn-pad-y`, `--cr-btn-size`.
+Variants are just token overrides — e.g. `.cr-btn--sm { --cr-btn-pad-x: var(--space-3); }`.
+
 ## How theming works
 
 Themes are selected by `html[data-theme]`:
