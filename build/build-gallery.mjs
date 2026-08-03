@@ -167,6 +167,55 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         </tbody>
       </table>
     </div>
+    <div style="grid-column:1/-1">
+      <h3>Form controls</h3>
+      <div style="display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))">
+        <div class="cr-field">
+          <label class="cr-field__label" for="g-in">Session name</label>
+          <input id="g-in" class="cr-input" placeholder="nova-01" />
+          <span class="cr-field__hint">lowercase, no spaces</span>
+        </div>
+        <div class="cr-field cr-field--error">
+          <label class="cr-field__label" for="g-in2">Endpoint</label>
+          <input id="g-in2" class="cr-input" value="bad url" aria-invalid="true" />
+          <span class="cr-field__error">must be a valid URL</span>
+        </div>
+        <div class="cr-field">
+          <label class="cr-field__label" for="g-sel">Theme</label>
+          <select id="g-sel" class="cr-select"><option>dark</option><option>light</option><option>extreme</option><option>phosphor</option></select>
+        </div>
+        <div class="cr-field">
+          <label class="cr-field__label" for="g-ta">Notes</label>
+          <textarea id="g-ta" class="cr-textarea" placeholder="scan notes…"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;align-items:center">
+        <label class="cr-check"><input type="checkbox" checked /> Auto-scan</label>
+        <label class="cr-check"><input type="radio" name="g-r" checked /> Cyan</label>
+        <label class="cr-check"><input type="radio" name="g-r" /> Magenta</label>
+        <button type="button" role="switch" aria-checked="true" class="cr-switch"><span class="cr-switch__track" aria-hidden="true"></span> Live</button>
+      </div>
+    </div>
+    <div style="grid-column:1/-1">
+      <h3>Instrument shell (rail + masthead + panels)</h3>
+      <div class="cr-instrument">
+        <nav class="cr-nav" style="width:150px" aria-label="Primary">
+          <div class="cr-nav__brand">CONTROL<br>ROOM</div>
+          <ul class="cr-nav__list">
+            <li><a class="cr-nav__item cr-nav__item--active" href="#">◈ Attention <span class="cr-nav__badge">2</span></a></li>
+            <li><a class="cr-nav__item" href="#">◧ Sessions</a></li>
+            <li><a class="cr-nav__item" href="#">▦ Sprint</a></li>
+          </ul>
+        </nav>
+        <div class="cr-instrument__board">
+          <div class="cr-hero cr-hero--wait"><div><div class="cr-hero__big">nova needs you</div><div class="cr-hero__sub">CR-1130 · paused · 6m</div></div></div>
+          <section class="cr-panel"><h4 class="cr-panel__title">Sessions</h4>
+            <div class="cr-row"><span class="cr-dot" style="background:var(--sig-work)"></span><span class="cr-row__name">PTL-757 chat-turn</span><span class="cr-row__status">streaming</span></div>
+            <div class="cr-row"><span class="cr-dot" style="background:var(--sig-err)"></span><span class="cr-row__name">rp verify</span><span class="cr-row__status">2 failing</span></div>
+          </section>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 <script>

@@ -672,6 +672,261 @@
         "canvas",
         "avatar"
       ]
+    },
+    {
+      "id": "instrument",
+      "name": "Instrument shell",
+      "category": "layout",
+      "kind": "block",
+      "lifecycle": "stable",
+      "description": "The dashboard chassis \u2014 composes the nav rail and a board (masthead/hero + panels).",
+      "spec": "references/components.md#instrument-shell",
+      "variants": {},
+      "tokens": [
+        {
+          "cssVar": "--brd-brush",
+          "description": "outer chassis"
+        },
+        {
+          "cssVar": "--board",
+          "description": "board fill"
+        },
+        {
+          "cssVar": "--shadow-off-lg",
+          "description": "chassis shadow"
+        }
+      ],
+      "keywords": [
+        "instrument",
+        "shell",
+        "layout",
+        "dashboard",
+        "app-frame"
+      ]
+    },
+    {
+      "id": "form-field",
+      "name": "Form Field",
+      "category": "forms",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Label + control + hint/error wrapper; error state shows a non-color \u2717 marker.",
+      "spec": "references/components.md#form-controls",
+      "variants": {
+        "state": [
+          "default",
+          "error"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--ink",
+          "description": "label"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "hint"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error border/marker"
+        }
+      ],
+      "keywords": [
+        "field",
+        "form",
+        "label",
+        "hint",
+        "error"
+      ]
+    },
+    {
+      "id": "input",
+      "name": "Text Input",
+      "category": "forms",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Single-line text input on a recessed board surface; square, inked, focus-ringed.",
+      "spec": "references/components.md#form-controls",
+      "variants": {
+        "state": [
+          "rest",
+          "focus",
+          "disabled",
+          "error"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "border"
+        },
+        {
+          "cssVar": "--ink",
+          "description": "text"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "placeholder"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "focus ring"
+        }
+      ],
+      "keywords": [
+        "input",
+        "text",
+        "field",
+        "form"
+      ]
+    },
+    {
+      "id": "textarea",
+      "name": "Textarea",
+      "category": "forms",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Multi-line text input; vertically resizable.",
+      "spec": "references/components.md#form-controls",
+      "variants": {
+        "state": [
+          "rest",
+          "focus",
+          "disabled",
+          "error"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "fill"
+        },
+        {
+          "cssVar": "--ink",
+          "description": "text"
+        }
+      ],
+      "keywords": [
+        "textarea",
+        "multiline",
+        "form"
+      ]
+    },
+    {
+      "id": "select",
+      "name": "Select",
+      "category": "forms",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Native select styled to the chassis.",
+      "spec": "references/components.md#form-controls",
+      "variants": {
+        "state": [
+          "rest",
+          "focus",
+          "disabled",
+          "error"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "fill"
+        },
+        {
+          "cssVar": "--ink",
+          "description": "text"
+        }
+      ],
+      "keywords": [
+        "select",
+        "dropdown",
+        "form"
+      ]
+    },
+    {
+      "id": "checkbox",
+      "name": "Checkbox / Radio",
+      "category": "forms",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Square checkbox and radio (radius 0); checked fills to --sig-work with an --on-sig mark.",
+      "spec": "references/components.md#form-controls",
+      "variants": {
+        "kind": [
+          "checkbox",
+          "radio"
+        ],
+        "state": [
+          "unchecked",
+          "checked",
+          "disabled"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "fill"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "checked fill"
+        },
+        {
+          "cssVar": "--on-sig",
+          "description": "mark"
+        }
+      ],
+      "keywords": [
+        "checkbox",
+        "radio",
+        "choice",
+        "form"
+      ]
+    },
+    {
+      "id": "switch",
+      "name": "Switch",
+      "category": "forms",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "button[role=switch] toggle; on = --sig-done track.",
+      "spec": "references/components.md#form-controls",
+      "variants": {
+        "state": [
+          "off",
+          "on",
+          "disabled"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "off track"
+        },
+        {
+          "cssVar": "--sig-done",
+          "description": "on track"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "off knob"
+        },
+        {
+          "cssVar": "--on-sig",
+          "description": "on knob"
+        }
+      ],
+      "keywords": [
+        "switch",
+        "toggle",
+        "form"
+      ]
     }
   ]
 }
