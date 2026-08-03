@@ -6,7 +6,7 @@ of the system until it has a spec in this shape and passes
 
 ---
 
-## <ComponentName>
+## &lt;ComponentName&gt;
 
 **Purpose.** One sentence: what it is and the single job it does.
 

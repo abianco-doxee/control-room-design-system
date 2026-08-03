@@ -1,0 +1,153 @@
+/* ============================================================================
+ * CONTROL ROOM — Design System Tokens  (GENERATED — do not edit by hand)
+ * Source of truth: tokens/tokens.json  ·  Regenerate: npm run build:tokens
+ * Themes select via html[data-theme]: dark (default) | light | extreme | phosphor
+ * ==========================================================================*/
+
+:root, :root[data-theme="dark"] {
+  color-scheme: dark;
+  --brd: 2px;
+  --brd-heavy: 3px;
+  --brd-brush: 5px;
+  --shadow-off: 4px;
+  --shadow-off-lg: 6px;
+  --radius: 0px;
+  --halftone-size: 7px;
+  --font-sans: "CR Sans", "Archivo", "Arial Black", "Helvetica Neue", system-ui, sans-serif;
+  --font-mono: "CR Mono", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --type-display-weight: 900;
+  --type-display-tracking: -0.038em;
+  --type-display-leading: 0.9;
+  --type-display-transform: uppercase;
+  --type-data-size: 13px;
+  --type-data-size-sm: 11px;
+  --type-label-tracking: 0.07em;
+  --type-label-transform: uppercase;
+  --dur-press: 120ms;
+  --tick-ambient: 180ms;
+  --ground: #0a0a12;
+  --board: #0e0e18;
+  --panel: #14141f;
+  --panel-2: #191926;
+  --ink: #e6e6f2;
+  --muted: #8a8aa6;
+  --border: #000000;
+  --rail: #050509;
+  --rail-ink: #c8c8de;
+  --sig-work: #22d3ee;
+  --sig-accent: #ff2e97;
+  --sig-done: #5eead4;
+  --sig-wait: #fde047;
+  --sig-err: #ff3b6b;
+  --sig-idle: #6b6b8a;
+  --on-sig: #050509;
+  --shadow-col: #000000;
+  --mass: #000000;
+  --stage: #00b34a;
+  --stage-ink: #04140a;
+  --drip: #4affc8;
+  --halftone: radial-gradient(circle at center, rgba(255,255,255,.05) 1.1px, transparent 1.4px);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --ground: #ecebe3;
+  --board: #e4e3d9;
+  --panel: #ffffff;
+  --panel-2: #f6f5ef;
+  --ink: #0b0b12;
+  --muted: #55556b;
+  --border: #000000;
+  --rail: #0b0b12;
+  --rail-ink: #ecebe3;
+  --sig-work: #0891b2;
+  --sig-accent: #e60076;
+  --sig-done: #0d9488;
+  --sig-wait: #d97706;
+  --sig-err: #e11d48;
+  --sig-idle: #7e7e94;
+  --on-sig: #ffffff;
+  --shadow-col: #000000;
+  --mass: #0b0b12;
+  --stage: #00a344;
+  --stage-ink: #04140a;
+  --drip: #0a7f5c;
+  --halftone: radial-gradient(circle at center, rgba(0,0,0,.075) 1.1px, transparent 1.4px);
+}
+
+:root[data-theme="extreme"] {
+  color-scheme: dark;
+  --ground: #0c0510;
+  --board: #12061a;
+  --panel: #18091f;
+  --panel-2: #210c2b;
+  --ink: #fdf0ff;
+  --muted: #c79ad6;
+  --border: #000000;
+  --rail: #ff2e97;
+  --rail-ink: #0c0510;
+  --sig-work: #00f0ff;
+  --sig-accent: #ff2e97;
+  --sig-done: #c6ff00;
+  --sig-wait: #ffd400;
+  --sig-err: #ff4d6d;
+  --sig-idle: #9a7aab;
+  --on-sig: #0c0510;
+  --extra-purple: #a855f7;
+  --extra-orange: #ff6b35;
+  --shadow-col: #000000;
+  --mass: #000000;
+  --stage: #c6ff00;
+  --stage-ink: #12061a;
+  --drip: #00f0ff;
+  --halftone: radial-gradient(circle at center, rgba(255,255,255,.07) 1.2px, transparent 1.5px);
+  --brd: 3px;
+  --brd-heavy: 4px;
+  --brd-brush: 6px;
+  --shadow-off: 6px;
+  --shadow-off-lg: 9px;
+}
+
+:root[data-theme="phosphor"] {
+  color-scheme: dark;
+  --ground: #020a04;
+  --board: #041207;
+  --panel: #06180a;
+  --panel-2: #0a2210;
+  --ink: #43ff7a;
+  --muted: #1f8c42;
+  --border: #031a08;
+  --rail: #020a04;
+  --rail-ink: #43ff7a;
+  --sig-work: #43ff7a;
+  --sig-accent: #b6ff00;
+  --sig-done: #00e05a;
+  --sig-wait: #a8ff3e;
+  --sig-err: #eaff40;
+  --sig-idle: #12602c;
+  --on-sig: #020a04;
+  --shadow-col: #031a08;
+  --mass: #010603;
+  --stage: #0d7a34;
+  --stage-ink: #d9ffe6;
+  --drip: #43ff7a;
+  --halftone: radial-gradient(circle at center, rgba(67,255,122,.09) 1.1px, transparent 1.4px);
+}
+
+/* ── GLOBAL BASELINE ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+/* Focus is a first-class signal, not an afterthought. */
+*:focus-visible { outline: 3px solid var(--sig-work); outline-offset: 2px; }
+/* Motion is opt-out at the system level. */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
