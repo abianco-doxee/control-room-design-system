@@ -12,7 +12,8 @@ Targets: **React, Vue, Svelte, Angular, Solid** (`mitosis.config.cjs`).
 **Every component** is authored in Mitosis (`components/*.lite.tsx`) — Panel,
 Button, Chip, Tag, StatusDot, SessionRow, Hero, Bezel, ArrowRail, Drip, Masthead,
 Nav, Table, Tiles, Field, Input, Textarea, Select, Choice (checkbox/radio),
-Switch, Instrument, EmptyState, and the seeded pixel-**Cat** (an imperative
+Switch, Instrument, EmptyState, the overlays (Modal on the native `<dialog>`,
+Toast, Tooltip), and the seeded pixel-**Cat** (an imperative
 `<canvas>`, painted in `onMount` — Mitosis resolves the ref correctly per target:
 `canvasRef.current` in React, `bind:this` in Svelte, etc.).
 

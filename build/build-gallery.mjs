@@ -197,6 +197,38 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       </div>
     </div>
     <div style="grid-column:1/-1">
+      <h3>Overlays — Modal · Toast · Tooltip</h3>
+      <div style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));align-items:start">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-bottom:8px">Modal (native &lt;dialog&gt;, shown open)</div>
+          <dialog class="cr-modal" open style="position:static;margin:0">
+            <div class="cr-modal__head">
+              <h2 class="cr-modal__title">Kill session?</h2>
+              <button type="button" class="cr-modal__close" aria-label="Close">✕</button>
+            </div>
+            <div class="cr-modal__body">CR-1130 is streaming. Terminating drops the turn and cannot be undone.</div>
+          </dialog>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-bottom:8px">Toasts (keyed to signal)</div>
+          <div style="display:grid;gap:8px">
+            <div class="cr-toast" role="status"><span class="cr-toast__msg">Scan started</span><button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button></div>
+            <div class="cr-toast cr-toast--done" role="status"><span class="cr-toast__msg">3 sessions cleared</span><button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button></div>
+            <div class="cr-toast cr-toast--wait" role="status"><span class="cr-toast__msg">Waiting on CR-1130</span><button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button></div>
+            <div class="cr-toast cr-toast--err" role="alert"><span class="cr-toast__msg">Endpoint unreachable</span><button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-bottom:8px">Tooltip (hover / focus the term)</div>
+          <p style="font-family:var(--font-mono);font-size:13px;color:var(--ink);line-height:1.7">
+            The session is
+            <span class="cr-tooltip"><span class="cr-tooltip__trigger" tabindex="0" aria-describedby="tt-drift">drifting</span><span class="cr-tooltip__bubble" role="tooltip" id="tt-drift">latency &gt; SLA for 3 consecutive turns</span></span>
+            and needs a look.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div style="grid-column:1/-1">
       <h3>Instrument shell (rail + masthead + panels)</h3>
       <div class="cr-instrument">
         <nav class="cr-nav" style="width:150px" aria-label="Primary">
