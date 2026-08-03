@@ -18,15 +18,20 @@
     "./tokens.json": "./tokens/tokens.json",
     "./css": "./dist/control-room.css",
     "./tailwind": "./dist/tailwind-preset.cjs",
-    "./flat": "./dist/tokens.flat.json"
+    "./flat": "./dist/tokens.flat.json",
+    "./dtcg": "./design-tokens/control-room.tokens.json"
   },
   "scripts": {
     "build:tokens": "node build/build-tokens.mjs",
+    "build:gallery": "node build/build-gallery.mjs",
     "build:site": "vitepress build site",
-    "build": "npm run build:tokens && npm run build:site",
+    "build": "npm run build:tokens && npm run build:gallery && npm run build:site",
     "dev": "vitepress dev site",
     "preview": "vitepress preview site",
-    "verify:tokens": "node build/build-tokens.mjs --check"
+    "verify:tokens": "node build/build-tokens.mjs --check",
+    "skills:sync": "node scripts/skills-sync.mjs",
+    "skills:check": "node scripts/skills-sync.mjs --check",
+    "verify": "npm run verify:tokens && npm run skills:check"
   },
   "devDependencies": {
     "style-dictionary": "^4.3.0",

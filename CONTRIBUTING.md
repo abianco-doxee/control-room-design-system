@@ -29,9 +29,10 @@ npm run build          # full build: tokens + gallery + site
 
 1. Edit `tokens/tokens.json` — add/adjust the value for **all four themes**.
 2. `npm run build:tokens` to regenerate `dist/control-room.css`,
-   `dist/tailwind-preset.cjs`, and `dist/tokens.flat.json`.
-3. Commit `tokens/tokens.json` **and** the regenerated `dist/`.
-4. CI runs `npm run verify:tokens` and fails the PR if `dist/` is stale.
+   `dist/tailwind-preset.cjs`, `dist/tokens.flat.json`, and the DTCG export
+   `design-tokens/control-room.tokens.json`.
+3. Commit `tokens/tokens.json` **and** the regenerated `dist/` + `design-tokens/`.
+4. CI runs `npm run verify:tokens` and fails the PR if any generated file is stale.
 5. New signal hue? Verify `--on-sig` contrast against it in every theme
    (`references/accessibility.md`).
 
@@ -51,6 +52,20 @@ npm run build          # full build: tokens + gallery + site
 - PR description states: what changed, which laws/tokens it touches, and a note
   confirming the ship checklist passes.
 - Update `CHANGELOG.md` under `## [Unreleased]`.
+
+## Skills
+
+The skill is authored once (repo root: `SKILL.md` + `references/` + `templates/`
++ `checklists/` + the generated token artifacts) and installed into every agent
+provider from `skills/manifest.json`:
+
+```bash
+npm run skills:sync    # install into .claude / .cursor / .opencode
+npm run skills:check   # validate the source + fail on install drift (CI)
+```
+
+Provider installs are generated and git-ignored — never edit them by hand; edit
+the root files and re-sync.
 
 ## Versioning
 

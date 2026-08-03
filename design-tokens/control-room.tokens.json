@@ -1,0 +1,941 @@
+{
+  "$schema": "https://www.designtokens.org/tr/2025.10/format/",
+  "$description": "Control Room design tokens — framework-agnostic (DTCG). Generated from tokens/tokens.json; do not edit by hand.",
+  "chassis": {
+    "brd": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "internal dividers, minor panels",
+      "$extensions": {
+        "com.doxee.cssVar": "--brd"
+      }
+    },
+    "brd-heavy": {
+      "$type": "dimension",
+      "$value": "3px",
+      "$description": "major panels, mastheads, primary buttons",
+      "$extensions": {
+        "com.doxee.cssVar": "--brd-heavy"
+      }
+    },
+    "brd-brush": {
+      "$type": "dimension",
+      "$value": "5px",
+      "$description": "outer chassis, bezels",
+      "$extensions": {
+        "com.doxee.cssVar": "--brd-brush"
+      }
+    },
+    "shadow-off": {
+      "$type": "dimension",
+      "$value": "4px",
+      "$description": "standard hard drop offset",
+      "$extensions": {
+        "com.doxee.cssVar": "--shadow-off"
+      }
+    },
+    "shadow-off-lg": {
+      "$type": "dimension",
+      "$value": "6px",
+      "$description": "mastheads, live instruments",
+      "$extensions": {
+        "com.doxee.cssVar": "--shadow-off-lg"
+      }
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "0px",
+      "$extensions": {
+        "com.doxee.cssVar": "--radius"
+      }
+    },
+    "halftone-size": {
+      "$type": "dimension",
+      "$value": "7px",
+      "$extensions": {
+        "com.doxee.cssVar": "--halftone-size"
+      }
+    }
+  },
+  "typography": {
+    "font-sans": {
+      "$type": "fontFamily",
+      "$value": "\"CR Sans\", \"Archivo\", \"Arial Black\", \"Helvetica Neue\", system-ui, sans-serif",
+      "$extensions": {
+        "com.doxee.cssVar": "--font-sans"
+      }
+    },
+    "font-mono": {
+      "$type": "fontFamily",
+      "$value": "\"CR Mono\", \"JetBrains Mono\", ui-monospace, \"SF Mono\", Menlo, monospace",
+      "$extensions": {
+        "com.doxee.cssVar": "--font-mono"
+      }
+    },
+    "type-display-weight": {
+      "$type": "fontWeight",
+      "$value": 900,
+      "$extensions": {
+        "com.doxee.cssVar": "--type-display-weight"
+      }
+    },
+    "type-display-tracking": {
+      "$type": "dimension",
+      "$value": "-0.038em",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-display-tracking"
+      }
+    },
+    "type-display-leading": {
+      "$type": "number",
+      "$value": 0.9,
+      "$extensions": {
+        "com.doxee.cssVar": "--type-display-leading"
+      }
+    },
+    "type-display-transform": {
+      "$value": "uppercase",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-display-transform"
+      }
+    },
+    "type-data-size": {
+      "$type": "dimension",
+      "$value": "13px",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-data-size"
+      }
+    },
+    "type-data-size-sm": {
+      "$type": "dimension",
+      "$value": "11px",
+      "$description": "labels, chrome",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-data-size-sm"
+      }
+    },
+    "type-label-tracking": {
+      "$type": "dimension",
+      "$value": "0.07em",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-label-tracking"
+      }
+    },
+    "type-label-transform": {
+      "$value": "uppercase",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-label-transform"
+      }
+    }
+  },
+  "motion": {
+    "dur-press": {
+      "$type": "duration",
+      "$value": "120ms",
+      "$extensions": {
+        "com.doxee.cssVar": "--dur-press"
+      }
+    },
+    "tick-ambient": {
+      "$type": "duration",
+      "$value": "180ms",
+      "$extensions": {
+        "com.doxee.cssVar": "--tick-ambient"
+      }
+    }
+  },
+  "theme": {
+    "dark": {
+      "surface": {
+        "ground": {
+          "$type": "color",
+          "$value": "#0a0a12",
+          "$description": "page background, furthest back",
+          "$extensions": {
+            "com.doxee.cssVar": "--ground"
+          }
+        },
+        "board": {
+          "$type": "color",
+          "$value": "#0e0e18",
+          "$description": "instrument / work surface",
+          "$extensions": {
+            "com.doxee.cssVar": "--board"
+          }
+        },
+        "panel": {
+          "$type": "color",
+          "$value": "#14141f",
+          "$description": "raised card / panel",
+          "$extensions": {
+            "com.doxee.cssVar": "--panel"
+          }
+        },
+        "panel-2": {
+          "$type": "color",
+          "$value": "#191926",
+          "$description": "recessed / inset region",
+          "$extensions": {
+            "com.doxee.cssVar": "--panel-2"
+          }
+        },
+        "rail": {
+          "$type": "color",
+          "$value": "#050509",
+          "$description": "navigation rail background",
+          "$extensions": {
+            "com.doxee.cssVar": "--rail"
+          }
+        }
+      },
+      "text": {
+        "ink": {
+          "$type": "color",
+          "$value": "#e6e6f2",
+          "$description": "primary text",
+          "$extensions": {
+            "com.doxee.cssVar": "--ink"
+          }
+        },
+        "muted": {
+          "$type": "color",
+          "$value": "#8a8aa6",
+          "$description": "secondary / label text",
+          "$extensions": {
+            "com.doxee.cssVar": "--muted"
+          }
+        },
+        "rail-ink": {
+          "$type": "color",
+          "$value": "#c8c8de",
+          "$description": "text on the rail",
+          "$extensions": {
+            "com.doxee.cssVar": "--rail-ink"
+          }
+        },
+        "on-sig": {
+          "$type": "color",
+          "$value": "#050509",
+          "$description": "text/icon placed on a signal fill",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-sig"
+          }
+        }
+      },
+      "line": {
+        "border": {
+          "$type": "color",
+          "$value": "#000000",
+          "$description": "contour / outline (near-black)",
+          "$extensions": {
+            "com.doxee.cssVar": "--border"
+          }
+        },
+        "mass": {
+          "$type": "color",
+          "$value": "#000000",
+          "$description": "black as a large fill area (Law 1)",
+          "$extensions": {
+            "com.doxee.cssVar": "--mass"
+          }
+        },
+        "shadow-col": {
+          "$type": "color",
+          "$value": "#000000",
+          "$description": "hard offset shadow color",
+          "$extensions": {
+            "com.doxee.cssVar": "--shadow-col"
+          }
+        }
+      },
+      "signal": {
+        "sig-work": {
+          "$type": "color",
+          "$value": "#22d3ee",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-work"
+          }
+        },
+        "sig-wait": {
+          "$type": "color",
+          "$value": "#fde047",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-wait"
+          }
+        },
+        "sig-done": {
+          "$type": "color",
+          "$value": "#5eead4",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-done"
+          }
+        },
+        "sig-err": {
+          "$type": "color",
+          "$value": "#ff3b6b",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-err"
+          }
+        },
+        "sig-idle": {
+          "$type": "color",
+          "$value": "#6b6b8a",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-idle"
+          }
+        },
+        "sig-accent": {
+          "$type": "color",
+          "$value": "#ff2e97",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-accent"
+          }
+        }
+      },
+      "keyed": {
+        "stage": {
+          "$type": "color",
+          "$value": "#00b34a",
+          "$description": "calm/nominal keyed stage flood (Law 2)",
+          "$extensions": {
+            "com.doxee.cssVar": "--stage"
+          }
+        },
+        "stage-ink": {
+          "$type": "color",
+          "$value": "#04140a",
+          "$description": "text on the stage flood",
+          "$extensions": {
+            "com.doxee.cssVar": "--stage-ink"
+          }
+        },
+        "drip": {
+          "$type": "color",
+          "$value": "#4affc8",
+          "$description": "house glitch / decay hue (Law 3)",
+          "$extensions": {
+            "com.doxee.cssVar": "--drip"
+          }
+        }
+      },
+      "texture": {
+        "halftone": {
+          "$value": "radial-gradient(circle at center, rgba(255,255,255,.05) 1.1px, transparent 1.4px)",
+          "$description": "hardware texture; legal inside a bezel only (Law 6)",
+          "$extensions": {
+            "com.doxee.cssVar": "--halftone"
+          }
+        }
+      }
+    },
+    "light": {
+      "surface": {
+        "ground": {
+          "$type": "color",
+          "$value": "#ecebe3",
+          "$description": "page background, furthest back",
+          "$extensions": {
+            "com.doxee.cssVar": "--ground"
+          }
+        },
+        "board": {
+          "$type": "color",
+          "$value": "#e4e3d9",
+          "$description": "instrument / work surface",
+          "$extensions": {
+            "com.doxee.cssVar": "--board"
+          }
+        },
+        "panel": {
+          "$type": "color",
+          "$value": "#ffffff",
+          "$description": "raised card / panel",
+          "$extensions": {
+            "com.doxee.cssVar": "--panel"
+          }
+        },
+        "panel-2": {
+          "$type": "color",
+          "$value": "#f6f5ef",
+          "$description": "recessed / inset region",
+          "$extensions": {
+            "com.doxee.cssVar": "--panel-2"
+          }
+        },
+        "rail": {
+          "$type": "color",
+          "$value": "#0b0b12",
+          "$description": "navigation rail background",
+          "$extensions": {
+            "com.doxee.cssVar": "--rail"
+          }
+        }
+      },
+      "text": {
+        "ink": {
+          "$type": "color",
+          "$value": "#0b0b12",
+          "$description": "primary text",
+          "$extensions": {
+            "com.doxee.cssVar": "--ink"
+          }
+        },
+        "muted": {
+          "$type": "color",
+          "$value": "#55556b",
+          "$description": "secondary / label text",
+          "$extensions": {
+            "com.doxee.cssVar": "--muted"
+          }
+        },
+        "rail-ink": {
+          "$type": "color",
+          "$value": "#ecebe3",
+          "$description": "text on the rail",
+          "$extensions": {
+            "com.doxee.cssVar": "--rail-ink"
+          }
+        },
+        "on-sig": {
+          "$type": "color",
+          "$value": "#ffffff",
+          "$description": "text/icon placed on a signal fill",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-sig"
+          }
+        }
+      },
+      "line": {
+        "border": {
+          "$type": "color",
+          "$value": "#000000",
+          "$description": "contour / outline (near-black)",
+          "$extensions": {
+            "com.doxee.cssVar": "--border"
+          }
+        },
+        "mass": {
+          "$type": "color",
+          "$value": "#0b0b12",
+          "$description": "black as a large fill area (Law 1)",
+          "$extensions": {
+            "com.doxee.cssVar": "--mass"
+          }
+        },
+        "shadow-col": {
+          "$type": "color",
+          "$value": "#000000",
+          "$description": "hard offset shadow color",
+          "$extensions": {
+            "com.doxee.cssVar": "--shadow-col"
+          }
+        }
+      },
+      "signal": {
+        "sig-work": {
+          "$type": "color",
+          "$value": "#0891b2",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-work"
+          }
+        },
+        "sig-wait": {
+          "$type": "color",
+          "$value": "#d97706",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-wait"
+          }
+        },
+        "sig-done": {
+          "$type": "color",
+          "$value": "#0d9488",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-done"
+          }
+        },
+        "sig-err": {
+          "$type": "color",
+          "$value": "#e11d48",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-err"
+          }
+        },
+        "sig-idle": {
+          "$type": "color",
+          "$value": "#7e7e94",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-idle"
+          }
+        },
+        "sig-accent": {
+          "$type": "color",
+          "$value": "#e60076",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-accent"
+          }
+        }
+      },
+      "keyed": {
+        "stage": {
+          "$type": "color",
+          "$value": "#00a344",
+          "$description": "calm/nominal keyed stage flood (Law 2)",
+          "$extensions": {
+            "com.doxee.cssVar": "--stage"
+          }
+        },
+        "stage-ink": {
+          "$type": "color",
+          "$value": "#04140a",
+          "$description": "text on the stage flood",
+          "$extensions": {
+            "com.doxee.cssVar": "--stage-ink"
+          }
+        },
+        "drip": {
+          "$type": "color",
+          "$value": "#0a7f5c",
+          "$description": "house glitch / decay hue (Law 3)",
+          "$extensions": {
+            "com.doxee.cssVar": "--drip"
+          }
+        }
+      },
+      "texture": {
+        "halftone": {
+          "$value": "radial-gradient(circle at center, rgba(0,0,0,.075) 1.1px, transparent 1.4px)",
+          "$description": "hardware texture; legal inside a bezel only (Law 6)",
+          "$extensions": {
+            "com.doxee.cssVar": "--halftone"
+          }
+        }
+      }
+    },
+    "extreme": {
+      "surface": {
+        "ground": {
+          "$type": "color",
+          "$value": "#0c0510",
+          "$description": "page background, furthest back",
+          "$extensions": {
+            "com.doxee.cssVar": "--ground"
+          }
+        },
+        "board": {
+          "$type": "color",
+          "$value": "#12061a",
+          "$description": "instrument / work surface",
+          "$extensions": {
+            "com.doxee.cssVar": "--board"
+          }
+        },
+        "panel": {
+          "$type": "color",
+          "$value": "#18091f",
+          "$description": "raised card / panel",
+          "$extensions": {
+            "com.doxee.cssVar": "--panel"
+          }
+        },
+        "panel-2": {
+          "$type": "color",
+          "$value": "#210c2b",
+          "$description": "recessed / inset region",
+          "$extensions": {
+            "com.doxee.cssVar": "--panel-2"
+          }
+        },
+        "rail": {
+          "$type": "color",
+          "$value": "#ff2e97",
+          "$description": "navigation rail background",
+          "$extensions": {
+            "com.doxee.cssVar": "--rail"
+          }
+        }
+      },
+      "text": {
+        "ink": {
+          "$type": "color",
+          "$value": "#fdf0ff",
+          "$description": "primary text",
+          "$extensions": {
+            "com.doxee.cssVar": "--ink"
+          }
+        },
+        "muted": {
+          "$type": "color",
+          "$value": "#c79ad6",
+          "$description": "secondary / label text",
+          "$extensions": {
+            "com.doxee.cssVar": "--muted"
+          }
+        },
+        "rail-ink": {
+          "$type": "color",
+          "$value": "#0c0510",
+          "$description": "text on the rail",
+          "$extensions": {
+            "com.doxee.cssVar": "--rail-ink"
+          }
+        },
+        "on-sig": {
+          "$type": "color",
+          "$value": "#0c0510",
+          "$description": "text/icon placed on a signal fill",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-sig"
+          }
+        }
+      },
+      "line": {
+        "border": {
+          "$type": "color",
+          "$value": "#000000",
+          "$description": "contour / outline (near-black)",
+          "$extensions": {
+            "com.doxee.cssVar": "--border"
+          }
+        },
+        "mass": {
+          "$type": "color",
+          "$value": "#000000",
+          "$description": "black as a large fill area (Law 1)",
+          "$extensions": {
+            "com.doxee.cssVar": "--mass"
+          }
+        },
+        "shadow-col": {
+          "$type": "color",
+          "$value": "#000000",
+          "$description": "hard offset shadow color",
+          "$extensions": {
+            "com.doxee.cssVar": "--shadow-col"
+          }
+        }
+      },
+      "signal": {
+        "sig-work": {
+          "$type": "color",
+          "$value": "#00f0ff",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-work"
+          }
+        },
+        "sig-wait": {
+          "$type": "color",
+          "$value": "#ffd400",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-wait"
+          }
+        },
+        "sig-done": {
+          "$type": "color",
+          "$value": "#c6ff00",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-done"
+          }
+        },
+        "sig-err": {
+          "$type": "color",
+          "$value": "#ff4d6d",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-err"
+          }
+        },
+        "sig-idle": {
+          "$type": "color",
+          "$value": "#9a7aab",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-idle"
+          }
+        },
+        "sig-accent": {
+          "$type": "color",
+          "$value": "#ff2e97",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-accent"
+          }
+        }
+      },
+      "keyed": {
+        "stage": {
+          "$type": "color",
+          "$value": "#c6ff00",
+          "$description": "calm/nominal keyed stage flood (Law 2)",
+          "$extensions": {
+            "com.doxee.cssVar": "--stage"
+          }
+        },
+        "stage-ink": {
+          "$type": "color",
+          "$value": "#12061a",
+          "$description": "text on the stage flood",
+          "$extensions": {
+            "com.doxee.cssVar": "--stage-ink"
+          }
+        },
+        "drip": {
+          "$type": "color",
+          "$value": "#00f0ff",
+          "$description": "house glitch / decay hue (Law 3)",
+          "$extensions": {
+            "com.doxee.cssVar": "--drip"
+          }
+        }
+      },
+      "texture": {
+        "halftone": {
+          "$value": "radial-gradient(circle at center, rgba(255,255,255,.07) 1.2px, transparent 1.5px)",
+          "$description": "hardware texture; legal inside a bezel only (Law 6)",
+          "$extensions": {
+            "com.doxee.cssVar": "--halftone"
+          }
+        }
+      },
+      "chassis": {
+        "brd": {
+          "$type": "dimension",
+          "$value": "3px",
+          "$description": "chassis override",
+          "$extensions": {
+            "com.doxee.cssVar": "--brd"
+          }
+        },
+        "brd-heavy": {
+          "$type": "dimension",
+          "$value": "4px",
+          "$description": "chassis override",
+          "$extensions": {
+            "com.doxee.cssVar": "--brd-heavy"
+          }
+        },
+        "brd-brush": {
+          "$type": "dimension",
+          "$value": "6px",
+          "$description": "chassis override",
+          "$extensions": {
+            "com.doxee.cssVar": "--brd-brush"
+          }
+        },
+        "shadow-off": {
+          "$type": "dimension",
+          "$value": "6px",
+          "$description": "chassis override",
+          "$extensions": {
+            "com.doxee.cssVar": "--shadow-off"
+          }
+        },
+        "shadow-off-lg": {
+          "$type": "dimension",
+          "$value": "9px",
+          "$description": "chassis override",
+          "$extensions": {
+            "com.doxee.cssVar": "--shadow-off-lg"
+          }
+        }
+      },
+      "extra": {
+        "extra-purple": {
+          "$type": "color",
+          "$value": "#a855f7",
+          "$description": "extreme-only extension hue",
+          "$extensions": {
+            "com.doxee.cssVar": "--extra-purple"
+          }
+        },
+        "extra-orange": {
+          "$type": "color",
+          "$value": "#ff6b35",
+          "$description": "extreme-only extension hue",
+          "$extensions": {
+            "com.doxee.cssVar": "--extra-orange"
+          }
+        }
+      }
+    },
+    "phosphor": {
+      "surface": {
+        "ground": {
+          "$type": "color",
+          "$value": "#020a04",
+          "$description": "page background, furthest back",
+          "$extensions": {
+            "com.doxee.cssVar": "--ground"
+          }
+        },
+        "board": {
+          "$type": "color",
+          "$value": "#041207",
+          "$description": "instrument / work surface",
+          "$extensions": {
+            "com.doxee.cssVar": "--board"
+          }
+        },
+        "panel": {
+          "$type": "color",
+          "$value": "#06180a",
+          "$description": "raised card / panel",
+          "$extensions": {
+            "com.doxee.cssVar": "--panel"
+          }
+        },
+        "panel-2": {
+          "$type": "color",
+          "$value": "#0a2210",
+          "$description": "recessed / inset region",
+          "$extensions": {
+            "com.doxee.cssVar": "--panel-2"
+          }
+        },
+        "rail": {
+          "$type": "color",
+          "$value": "#020a04",
+          "$description": "navigation rail background",
+          "$extensions": {
+            "com.doxee.cssVar": "--rail"
+          }
+        }
+      },
+      "text": {
+        "ink": {
+          "$type": "color",
+          "$value": "#43ff7a",
+          "$description": "primary text",
+          "$extensions": {
+            "com.doxee.cssVar": "--ink"
+          }
+        },
+        "muted": {
+          "$type": "color",
+          "$value": "#1f8c42",
+          "$description": "secondary / label text",
+          "$extensions": {
+            "com.doxee.cssVar": "--muted"
+          }
+        },
+        "rail-ink": {
+          "$type": "color",
+          "$value": "#43ff7a",
+          "$description": "text on the rail",
+          "$extensions": {
+            "com.doxee.cssVar": "--rail-ink"
+          }
+        },
+        "on-sig": {
+          "$type": "color",
+          "$value": "#020a04",
+          "$description": "text/icon placed on a signal fill",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-sig"
+          }
+        }
+      },
+      "line": {
+        "border": {
+          "$type": "color",
+          "$value": "#031a08",
+          "$description": "contour / outline (near-black)",
+          "$extensions": {
+            "com.doxee.cssVar": "--border"
+          }
+        },
+        "mass": {
+          "$type": "color",
+          "$value": "#010603",
+          "$description": "black as a large fill area (Law 1)",
+          "$extensions": {
+            "com.doxee.cssVar": "--mass"
+          }
+        },
+        "shadow-col": {
+          "$type": "color",
+          "$value": "#031a08",
+          "$description": "hard offset shadow color",
+          "$extensions": {
+            "com.doxee.cssVar": "--shadow-col"
+          }
+        }
+      },
+      "signal": {
+        "sig-work": {
+          "$type": "color",
+          "$value": "#43ff7a",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-work"
+          }
+        },
+        "sig-wait": {
+          "$type": "color",
+          "$value": "#a8ff3e",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-wait"
+          }
+        },
+        "sig-done": {
+          "$type": "color",
+          "$value": "#00e05a",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-done"
+          }
+        },
+        "sig-err": {
+          "$type": "color",
+          "$value": "#eaff40",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-err"
+          }
+        },
+        "sig-idle": {
+          "$type": "color",
+          "$value": "#12602c",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-idle"
+          }
+        },
+        "sig-accent": {
+          "$type": "color",
+          "$value": "#b6ff00",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-accent"
+          }
+        }
+      },
+      "keyed": {
+        "stage": {
+          "$type": "color",
+          "$value": "#0d7a34",
+          "$description": "calm/nominal keyed stage flood (Law 2)",
+          "$extensions": {
+            "com.doxee.cssVar": "--stage"
+          }
+        },
+        "stage-ink": {
+          "$type": "color",
+          "$value": "#d9ffe6",
+          "$description": "text on the stage flood",
+          "$extensions": {
+            "com.doxee.cssVar": "--stage-ink"
+          }
+        },
+        "drip": {
+          "$type": "color",
+          "$value": "#43ff7a",
+          "$description": "house glitch / decay hue (Law 3)",
+          "$extensions": {
+            "com.doxee.cssVar": "--drip"
+          }
+        }
+      },
+      "texture": {
+        "halftone": {
+          "$value": "radial-gradient(circle at center, rgba(67,255,122,.09) 1.1px, transparent 1.4px)",
+          "$description": "hardware texture; legal inside a bezel only (Law 6)",
+          "$extensions": {
+            "com.doxee.cssVar": "--halftone"
+          }
+        }
+      }
+    }
+  }
+}

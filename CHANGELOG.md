@@ -6,6 +6,24 @@ the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **DTCG token export** — `design-tokens/control-room.tokens.json` in the Design
+  Tokens Community Group format with the `com.doxee.cssVar` extension, mirroring
+  the Doxee `Design-System-Hub` convention. Emitted by `build:tokens` and covered
+  by the `verify:tokens` drift gate.
+- **Multi-provider skill install** — `skills/manifest.json` +
+  `scripts/skills-sync.mjs` (`skills:sync` / `skills:check`) install the skill
+  into `.claude` / `.cursor` / `.opencode` from a single source, with a
+  validity/drift gate wired into CI.
+- `metadata` (version / license / bundle) on the SKILL.md frontmatter.
+
+### Changed
+
+- `dist/control-room.css` is now the generated runtime stylesheet; the
+  hand-written `tokens/control-room.css` was removed to keep one source of truth.
+  Consumers now load `dist/control-room.css`.
+
 ## [1.0.0] — 2026-08-03
 
 ### Added
