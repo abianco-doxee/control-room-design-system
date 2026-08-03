@@ -33,7 +33,14 @@
       "variants": {
         "kind": [
           "primary",
-          "controls"
+          "controls",
+          "work",
+          "accent",
+          "err"
+        ],
+        "size": [
+          "md",
+          "sm"
         ],
         "state": [
           "rest",
@@ -350,6 +357,10 @@
         "item": [
           "default",
           "active"
+        ],
+        "badge": [
+          "off",
+          "on"
         ]
       },
       "tokens": [
