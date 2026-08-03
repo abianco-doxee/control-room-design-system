@@ -28,6 +28,7 @@ const PAGES = [
   ["references/motion.md", "reference", "motion", "Motion"],
   ["references/accessibility.md", "reference", "accessibility", "Accessibility"],
   ["references/seeded-cat.md", "reference", "seeded-cat", "Seeded Pixel-Cat"],
+  ["references/figma-bridge.md", "reference", "figma-bridge", "Figma Bridge"],
   ["templates/component.md", "build", "component-template", "Component Template"],
   ["checklists/component-checklist.md", "build", "component-checklist", "Ship Checklist"],
 ];
