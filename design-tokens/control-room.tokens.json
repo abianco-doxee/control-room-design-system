@@ -220,6 +220,14 @@
           "$extensions": {
             "com.doxee.cssVar": "--on-sig"
           }
+        },
+        "on-err": {
+          "$type": "color",
+          "$value": "#050509",
+          "$description": "text/icon on an error (--sig-err) fill; white in light, dark elsewhere",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-err"
+          }
         }
       },
       "line": {
@@ -398,10 +406,18 @@
         },
         "on-sig": {
           "$type": "color",
-          "$value": "#ffffff",
+          "$value": "#0b0b12",
           "$description": "text/icon placed on a signal fill",
           "$extensions": {
             "com.doxee.cssVar": "--on-sig"
+          }
+        },
+        "on-err": {
+          "$type": "color",
+          "$value": "#ffffff",
+          "$description": "text/icon on an error (--sig-err) fill; white in light, dark elsewhere",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-err"
           }
         }
       },
@@ -585,6 +601,14 @@
           "$description": "text/icon placed on a signal fill",
           "$extensions": {
             "com.doxee.cssVar": "--on-sig"
+          }
+        },
+        "on-err": {
+          "$type": "color",
+          "$value": "#0c0510",
+          "$description": "text/icon on an error (--sig-err) fill; white in light, dark elsewhere",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-err"
           }
         }
       },
@@ -808,7 +832,7 @@
         },
         "muted": {
           "$type": "color",
-          "$value": "#1f8c42",
+          "$value": "#2fac55",
           "$description": "secondary / label text",
           "$extensions": {
             "com.doxee.cssVar": "--muted"
@@ -828,6 +852,14 @@
           "$description": "text/icon placed on a signal fill",
           "$extensions": {
             "com.doxee.cssVar": "--on-sig"
+          }
+        },
+        "on-err": {
+          "$type": "color",
+          "$value": "#020a04",
+          "$description": "text/icon on an error (--sig-err) fill; white in light, dark elsewhere",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-err"
           }
         }
       },

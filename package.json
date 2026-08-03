@@ -41,9 +41,16 @@
     "skills:sync": "node scripts/skills-sync.mjs",
     "skills:check": "node scripts/skills-sync.mjs --check",
     "figma:pull": "node scripts/figma-pull.mjs",
+    "pretest:e2e": "npm run build:tokens && npm run build:gallery",
+    "test:e2e": "playwright test",
+    "test:a11y": "playwright test tests/a11y.spec.mjs",
+    "test:visual": "playwright test tests/visual.spec.mjs",
+    "test:visual:update": "playwright test tests/visual.spec.mjs --update-snapshots",
     "verify": "npm run verify:tokens && npm run verify:catalog && npm run skills:check"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.62.1",
     "style-dictionary": "^4.3.0",
     "undici": "^8.10.0"
   },

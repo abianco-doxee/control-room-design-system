@@ -121,7 +121,8 @@ from raw values.
 | `--ink` | primary text |
 | `--muted` | secondary / label text |
 | `--rail-ink` | text on the rail |
-| `--on-sig` | text/icon placed on a signal fill |
+| `--on-sig` | text/icon placed on a signal fill (contrast-safe per theme) |
+| `--on-err` | text/icon on an error (`--sig-err`) fill — white in light, dark elsewhere |
 
 ### Line & mass
 
@@ -174,7 +175,7 @@ all themes — they resolve to nothing elsewhere.
 | `--panel` | `#14141f` | `#ffffff` | `#18091f` | `#06180a` |
 | `--panel-2` | `#191926` | `#f6f5ef` | `#210c2b` | `#0a2210` |
 | `--ink` | `#e6e6f2` | `#0b0b12` | `#fdf0ff` | `#43ff7a` |
-| `--muted` | `#8a8aa6` | `#55556b` | `#c79ad6` | `#1f8c42` |
+| `--muted` | `#8a8aa6` | `#55556b` | `#c79ad6` | `#2fac55` |
 | `--border` | `#000000` | `#000000` | `#000000` | `#031a08` |
 | `--rail` | `#050509` | `#0b0b12` | `#ff2e97` | `#020a04` |
 | `--rail-ink` | `#c8c8de` | `#ecebe3` | `#0c0510` | `#43ff7a` |
@@ -184,7 +185,8 @@ all themes — they resolve to nothing elsewhere.
 | `--sig-wait` | `#fde047` | `#d97706` | `#ffd400` | `#a8ff3e` |
 | `--sig-err` | `#ff3b6b` | `#e11d48` | `#ff4d6d` | `#eaff40` |
 | `--sig-idle` | `#6b6b8a` | `#7e7e94` | `#9a7aab` | `#12602c` |
-| `--on-sig` | `#050509` | `#ffffff` | `#0c0510` | `#020a04` |
+| `--on-sig` | `#050509` | `#0b0b12` | `#0c0510` | `#020a04` |
+| `--on-err` | `#050509` | `#ffffff` | `#0c0510` | `#020a04` |
 | `--shadow-col` | `#000000` | `#000000` | `#000000` | `#031a08` |
 | `--mass` | `#000000` | `#0b0b12` | `#000000` | `#010603` |
 | `--stage` | `#00b34a` | `#00a344` | `#c6ff00` | `#0d7a34` |
