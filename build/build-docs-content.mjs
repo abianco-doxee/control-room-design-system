@@ -24,6 +24,7 @@ const PAGES = [
   ["CHANGELOG.md", "guide", "changelog", "Changelog"],
   ["references/design-language.md", "reference", "design-language", "Design Language — the Seven Laws"],
   ["references/tokens.md", "reference", "tokens", "Tokens"],
+  ["references/tailwind.md", "reference", "tailwind", "Tailwind-first"],
   ["references/components.md", "reference", "components", "Component Library"],
   ["references/motion.md", "reference", "motion", "Motion"],
   ["references/accessibility.md", "reference", "accessibility", "Accessibility"],
