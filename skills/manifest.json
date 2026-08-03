@@ -13,7 +13,9 @@
         "tokens/tokens.json",
         "dist/control-room.css",
         "dist/tokens.flat.json",
-        "design-tokens/control-room.tokens.json"
+        "design-tokens/control-room.tokens.json",
+        "styles/components.css",
+        "catalog/catalog.json"
       ]
     }
   ],

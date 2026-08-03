@@ -32,6 +32,8 @@ control-room-design-system/
 │   ├── control-room.css           # ready-to-use CSS custom properties, all 4 themes
 │   ├── tailwind-preset.cjs        # Tailwind preset (colors resolve to CSS vars)
 │   └── tokens.flat.json           # resolved cssVar → value, per theme
+├── styles/
+│   └── components.css             # the shipped component layer (.cr-* classes)
 ├── design-tokens/
 │   └── control-room.tokens.json   # GENERATED — DTCG format (Doxee-hub compatible)
 ├── references/                    # design-language, tokens, components, motion, a11y, seeded-cat
@@ -67,12 +69,16 @@ optimized to be *generable*, not just *readable*:
 ## Quick start
 
 ```html
-<link rel="stylesheet" href="dist/control-room.css" />
+<link rel="stylesheet" href="dist/control-room.css" />   <!-- tokens (first) -->
+<link rel="stylesheet" href="styles/components.css" />    <!-- components -->
 <html data-theme="dark">   <!-- or light | extreme | phosphor; omit for dark -->
+
+<button class="cr-btn">RUN SCAN</button>
 ```
 
-Then compose from `references/components.md`. Read `references/design-language.md`
-first before building anything new.
+Use the `cr-` classes from `styles/components.css`; see
+`references/components.md` for anatomy/variants and read
+`references/design-language.md` first before building anything new.
 
 ## Build & publish
 
