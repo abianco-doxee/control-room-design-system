@@ -1,0 +1,119 @@
+/* ============================================================================
+ * CONTROL ROOM — Component layer
+ *
+ * Consumable component classes, built ENTIRELY on the token layer. Import both,
+ * token layer first:
+ *   <link rel="stylesheet" href="dist/control-room.css">   <!-- tokens -->
+ *   <link rel="stylesheet" href="styles/components.css">    <!-- this file -->
+ *
+ * All classes are `cr-` prefixed (BEM-ish: block, block__element, block--modifier).
+ * Prose specs + anatomy: references/components.md. Every rule here uses only
+ * var(--…) tokens — no raw hex, radius 0, hard offset shadow only.
+ * ==========================================================================*/
+
+/* shared idiom */
+.cr-panel,
+.cr-btn,
+.cr-hero,
+.cr-bezel,
+.cr-drip { border-radius: 0; }
+
+/* ── Panel ─────────────────────────────────────────────────────────────── */
+.cr-panel {
+  background: var(--panel);
+  border: var(--brd) solid var(--border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  padding: 13px;
+}
+.cr-panel--major { border-width: var(--brd-heavy); }
+.cr-panel--inset { background: var(--panel-2); box-shadow: none; }
+.cr-panel__title {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink); margin: 0 0 10px;
+}
+
+/* ── Button (snap-press) ───────────────────────────────────────────────── */
+.cr-btn {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 800; letter-spacing: 0.03em;
+  padding: 9px 15px; cursor: pointer;
+  background: var(--sig-wait); color: var(--on-sig);
+  border: var(--brd-heavy) solid var(--border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  transition: transform 0.05s, box-shadow 0.05s;
+}
+.cr-btn:active { transform: translate(var(--shadow-off), var(--shadow-off)); box-shadow: 0 0 0 var(--shadow-col); }
+.cr-btn--controls { background: var(--panel); color: var(--muted); border-width: var(--brd); box-shadow: 3px 3px 0 var(--border); }
+
+/* ── Chip ──────────────────────────────────────────────────────────────── */
+.cr-chip {
+  display: inline-block; font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  padding: 3px 9px; background: var(--sig-done); color: var(--on-sig); border: var(--brd) solid var(--border);
+}
+.cr-chip--alt { background: var(--sig-work); }
+
+/* ── Tag (inline status) ───────────────────────────────────────────────── */
+.cr-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: 10px; font-weight: 800;
+  padding: 2px 7px; border: 1.5px solid var(--border); text-transform: uppercase; letter-spacing: 0.04em;
+}
+.cr-tag--now   { background: var(--sig-done); color: var(--on-sig); }
+.cr-tag--work  { background: var(--sig-work); color: var(--on-sig); }
+.cr-tag--later { background: var(--sig-wait); color: var(--on-sig); }
+.cr-tag--no    { background: var(--sig-err);  color: var(--on-sig); }
+
+/* ── StatusDot (a square — radius 0) ───────────────────────────────────── */
+.cr-dot { display: inline-block; width: 8px; height: 8px; border: 1.5px solid var(--border); }
+
+/* ── SessionRow ────────────────────────────────────────────────────────── */
+.cr-row {
+  display: flex; align-items: center; gap: 11px; padding: 7px 0;
+  border-bottom: 1.5px solid color-mix(in srgb, var(--border) 18%, transparent);
+}
+.cr-row:last-child { border-bottom: none; }
+.cr-row__name { flex: 1; font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--ink); }
+.cr-row__status { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+
+/* ── Hero (keyed focal region) ─────────────────────────────────────────── */
+.cr-hero {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--sig-accent); color: var(--on-sig);
+  border: var(--brd) solid var(--border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col); padding: 16px;
+}
+.cr-hero--wait { background: var(--sig-wait); }
+.cr-hero--err  { background: var(--sig-err); }
+.cr-hero--calm { background: var(--stage); color: var(--stage-ink); }
+.cr-hero__big  { font-weight: 900; font-size: 19px; line-height: 1.05; }
+.cr-hero__sub  { font-family: var(--font-mono); font-size: 12px; opacity: 0.82; margin-top: 3px; }
+
+/* ── Bezel + screen (the only texture host) ────────────────────────────── */
+.cr-bezel {
+  border: var(--brd-brush) solid var(--border); background: var(--panel-2); padding: 11px;
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+}
+.cr-bezel__rivets { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.cr-bezel__rivets i { width: 7px; height: 7px; background: var(--border); display: block; }
+.cr-bezel__screen {
+  background: var(--board); border: var(--brd) solid var(--border); padding: 16px;
+  background-image: var(--halftone); background-size: var(--halftone-size) var(--halftone-size);
+  font-family: var(--font-mono); font-size: 12px; color: var(--ink);
+}
+
+/* ── Arrow-rail (sequence, Law 4) ──────────────────────────────────────── */
+.cr-rail { display: flex; }
+.cr-rail__step {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700; padding: 7px 15px 7px 21px;
+  background: var(--panel); color: var(--ink); border: var(--brd) solid var(--border); margin-left: -10px;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%, 10px 50%);
+}
+.cr-rail__step:first-child { margin-left: 0; }
+.cr-rail__step--on { background: var(--sig-work); color: var(--on-sig); }
+
+/* ── Drip / error surface (Law 3) ──────────────────────────────────────── */
+.cr-drip { border: var(--brd) solid var(--border); background: var(--sig-err); color: #fff; padding: 16px; }
+.cr-drip__title { font-weight: 900; font-size: 17px; text-transform: uppercase; letter-spacing: -0.02em; }
+.cr-drip__sub { font-family: var(--font-mono); font-size: 11px; opacity: 0.85; margin-top: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cr-btn { transition: none; }
+}

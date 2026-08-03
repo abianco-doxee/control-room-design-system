@@ -10,9 +10,11 @@ laws (`references/design-language.md`) — the rules here are the laws made
 concrete per component. Before shipping any component, run it through
 `checklists/component-checklist.md`.
 
-**Naming.** Class names use the `cr-` prefix in production to avoid collisions;
-the artifact prototypes used bare names (`.panel`, `.btn`). This reference uses
-bare names for readability — prefix them when you ship.
+**Naming.** This reference uses bare names (`.panel`, `.btn`) for readability, but
+the **shipped** classes are `cr-`prefixed (`.cr-panel`, `.cr-btn`, …) and live in
+`styles/components.css` — import that after `dist/control-room.css` and use the
+`cr-` classes directly rather than copying the CSS below. The snippets here are
+the anatomy/spec; `styles/components.css` is the implementation.
 
 ---
 

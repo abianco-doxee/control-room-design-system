@@ -55,7 +55,8 @@ Detail lives in `references/`. Load only what the task needs.
 | `references/figma-bridge.md` | Optional, free Figma → code round-trip: the `figma` map, the open-source Figma MCP, secret handling, and the node → component agent workflow. |
 | `references/figma-kit-build.md` | How to create the Figma kit from scratch: file setup, near-automatic token import (DTCG → Variables), the component recipe, and closing the loop back to the catalog. |
 | `tokens/tokens.json` | Machine-readable token source (parse this to generate CSS/Tailwind/JSON). |
-| `dist/control-room.css` | Ready-to-use CSS custom properties for all four themes. Import and go. |
+| `dist/control-room.css` | Ready-to-use CSS custom properties for all four themes. Import first. |
+| `styles/components.css` | The shipped component layer — `cr-`prefixed classes (`.cr-panel`, `.cr-btn`, …) built on the tokens. Import after the tokens. |
 | `templates/component.md` | The authoring template every new component follows. |
 | `checklists/component-checklist.md` | The ship gate. A component is not done until it passes. |
 
@@ -99,26 +100,23 @@ The irreducible rules. Each expands in the references.
 ## Quick start
 
 ```html
-<!-- 1. Load the token layer once, at the root. -->
+<!-- 1. Load the token layer, then the component layer (order matters). -->
 <link rel="stylesheet" href="dist/control-room.css" />
+<link rel="stylesheet" href="styles/components.css" />
 
 <!-- 2. Set a theme on <html>. Omit for dark. -->
 <html data-theme="dark">
 
-<!-- 3. Compose from tokens. This Panel is already correct in all four themes. -->
-<section style="
-  background: var(--panel);
-  border: var(--brd-heavy) solid var(--border);
-  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
-  padding: 16px;">
-  <h4 style="
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: var(--type-label-tracking);
-    color: var(--ink); margin: 0 0 12px;">Sessions</h4>
-  <!-- rows … -->
+<!-- 3. Use the shipped classes — correct in all four themes, zero inline CSS. -->
+<section class="cr-panel cr-panel--major">
+  <h4 class="cr-panel__title">Sessions</h4>
+  <div class="cr-row">
+    <span class="cr-dot" style="background: var(--sig-work)"></span>
+    <span class="cr-row__name">PTL-757 chat-turn</span>
+    <span class="cr-row__status">streaming</span>
+  </div>
 </section>
 ```
 
-For the canonical, copy-ready markup of every component, see
-`references/components.md`.
+For the full anatomy, variants, and token bindings of every component, see
+`references/components.md`; the class list lives in `styles/components.css`.
