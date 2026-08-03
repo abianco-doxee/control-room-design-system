@@ -2,7 +2,7 @@
 
 Control Room is a **constraint-based** system: the value is in everything staying
 consistent. Contributions are welcome, but they go through the same gates every
-component does. Read `references/design-language.md` (the seven laws) before
+component does. Read `references/design-language.md` (the eight laws) before
 proposing anything visual — most questions are already answered there.
 
 ## Ground rules

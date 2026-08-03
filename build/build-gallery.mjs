@@ -136,7 +136,7 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
     </div>
     <div style="grid-column:1/-1">
       <h3>Masthead</h3>
-      <header class="cr-masthead"><p class="cr-masthead__eyebrow">DP Control Room · Phase 0</p><h1 class="cr-masthead__title">14 sessions<br>2 need you</h1></header>
+      <header class="cr-masthead cr-mark"><p class="cr-masthead__eyebrow">DP Control Room · Phase 0</p><h1 class="cr-masthead__title">14 sessions<br>2 need you</h1></header>
     </div>
     <div>
       <h3>Nav rail</h3>
