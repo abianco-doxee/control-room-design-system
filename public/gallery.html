@@ -446,6 +446,76 @@ body {
   .cr-row--event, .cr-chip--stamp, .cr-btn--kick::after { animation: none; }
 }
 
+/* ── Instrument shell (composes rail + board) ──────────────────────────── */
+.cr-instrument {
+  display: flex; border: var(--brd-brush) solid var(--border);
+  box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
+  background: var(--board); overflow: hidden;
+}
+.cr-instrument__board {
+  flex: 1; min-width: 0; padding: var(--space-4);
+  display: flex; flex-direction: column; gap: var(--space-4);
+}
+
+/* ── Form field wrapper ────────────────────────────────────────────────── */
+.cr-field { display: flex; flex-direction: column; gap: var(--space-1); }
+.cr-field__label {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
+  text-transform: uppercase; letter-spacing: var(--type-label-tracking); color: var(--ink);
+}
+.cr-field__hint { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); }
+.cr-field__error { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--ink); }
+.cr-field__error::before { content: "\2717 "; color: var(--sig-err); font-weight: 800; }
+
+/* ── Text input / textarea / select ────────────────────────────────────── */
+.cr-input, .cr-textarea, .cr-select {
+  width: 100%; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink);
+  background: var(--board); border: var(--brd) solid var(--border); border-radius: var(--radius-none);
+  padding: var(--space-2) var(--space-3);
+}
+.cr-input::placeholder, .cr-textarea::placeholder { color: var(--muted); }
+.cr-textarea { min-height: var(--space-16); resize: vertical; }
+.cr-input:disabled, .cr-textarea:disabled, .cr-select:disabled { opacity: 0.5; cursor: not-allowed; }
+.cr-field--error .cr-input,
+.cr-field--error .cr-textarea,
+.cr-field--error .cr-select { border-color: var(--sig-err); border-width: var(--brd-heavy); }
+
+/* ── Checkbox / radio (square — Law 1) ─────────────────────────────────── */
+.cr-check {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); cursor: pointer;
+}
+.cr-check input {
+  appearance: none; -webkit-appearance: none; margin: 0;
+  width: var(--space-4); height: var(--space-4); flex-shrink: 0;
+  border: var(--brd) solid var(--border); background: var(--board);
+  display: inline-grid; place-content: center; cursor: pointer;
+}
+.cr-check input:checked { background: var(--sig-work); }
+.cr-check input:checked::after {
+  content: ""; width: var(--space-2); height: var(--space-2); background: var(--on-sig);
+}
+.cr-check input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Switch (button[role=switch]) ──────────────────────────────────────── */
+.cr-switch {
+  display: inline-flex; align-items: center; gap: var(--space-2); cursor: pointer;
+  font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 700; color: var(--ink);
+  background: none; border: none; padding: 0;
+}
+.cr-switch__track {
+  position: relative; display: inline-block; width: var(--space-8); height: var(--space-4);
+  background: var(--panel-2); border: var(--brd) solid var(--border);
+}
+.cr-switch__track::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: var(--space-4);
+  background: var(--muted); transition: left 0.08s, background 0.08s;
+}
+.cr-switch[aria-checked="true"] .cr-switch__track { background: var(--sig-done); }
+.cr-switch[aria-checked="true"] .cr-switch__track::after { left: calc(100% - var(--space-4)); background: var(--on-sig); }
+
+@media (prefers-reduced-motion: reduce) { .cr-switch__track::after { transition: none; } }
+
 
 /* gallery chrome only (not part of the system) */
 .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 100px;}
@@ -657,6 +727,55 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
           <tr><td>rhea</td><td>rp verify</td><td>2 failing</td></tr>
         </tbody>
       </table>
+    </div>
+    <div style="grid-column:1/-1">
+      <h3>Form controls</h3>
+      <div style="display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))">
+        <div class="cr-field">
+          <label class="cr-field__label" for="g-in">Session name</label>
+          <input id="g-in" class="cr-input" placeholder="nova-01" />
+          <span class="cr-field__hint">lowercase, no spaces</span>
+        </div>
+        <div class="cr-field cr-field--error">
+          <label class="cr-field__label" for="g-in2">Endpoint</label>
+          <input id="g-in2" class="cr-input" value="bad url" aria-invalid="true" />
+          <span class="cr-field__error">must be a valid URL</span>
+        </div>
+        <div class="cr-field">
+          <label class="cr-field__label" for="g-sel">Theme</label>
+          <select id="g-sel" class="cr-select"><option>dark</option><option>light</option><option>extreme</option><option>phosphor</option></select>
+        </div>
+        <div class="cr-field">
+          <label class="cr-field__label" for="g-ta">Notes</label>
+          <textarea id="g-ta" class="cr-textarea" placeholder="scan notes…"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;align-items:center">
+        <label class="cr-check"><input type="checkbox" checked /> Auto-scan</label>
+        <label class="cr-check"><input type="radio" name="g-r" checked /> Cyan</label>
+        <label class="cr-check"><input type="radio" name="g-r" /> Magenta</label>
+        <button type="button" role="switch" aria-checked="true" class="cr-switch"><span class="cr-switch__track" aria-hidden="true"></span> Live</button>
+      </div>
+    </div>
+    <div style="grid-column:1/-1">
+      <h3>Instrument shell (rail + masthead + panels)</h3>
+      <div class="cr-instrument">
+        <nav class="cr-nav" style="width:150px" aria-label="Primary">
+          <div class="cr-nav__brand">CONTROL<br>ROOM</div>
+          <ul class="cr-nav__list">
+            <li><a class="cr-nav__item cr-nav__item--active" href="#">◈ Attention <span class="cr-nav__badge">2</span></a></li>
+            <li><a class="cr-nav__item" href="#">◧ Sessions</a></li>
+            <li><a class="cr-nav__item" href="#">▦ Sprint</a></li>
+          </ul>
+        </nav>
+        <div class="cr-instrument__board">
+          <div class="cr-hero cr-hero--wait"><div><div class="cr-hero__big">nova needs you</div><div class="cr-hero__sub">CR-1130 · paused · 6m</div></div></div>
+          <section class="cr-panel"><h4 class="cr-panel__title">Sessions</h4>
+            <div class="cr-row"><span class="cr-dot" style="background:var(--sig-work)"></span><span class="cr-row__name">PTL-757 chat-turn</span><span class="cr-row__status">streaming</span></div>
+            <div class="cr-row"><span class="cr-dot" style="background:var(--sig-err)"></span><span class="cr-row__name">rp verify</span><span class="cr-row__status">2 failing</span></div>
+          </section>
+        </div>
+      </div>
     </div>
   </div>
 </div>

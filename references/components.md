@@ -505,3 +505,72 @@ of `SessionRow`s, wrapped in the outer instrument chassis.
   background: var(--board); overflow: hidden; }
 .board { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
 ```
+
+---
+
+## Form controls
+
+Neobrutalist inputs on the recessed board surface — square, inked, mono, with the
+system focus ring. Every control needs an associated label; error state is shown
+with a non-color `✗` marker as well as the `--sig-err` border (never color alone).
+
+**Field wrapper** — label + control + hint/error.
+
+```html
+<div class="cr-field">
+  <label class="cr-field__label" for="name">Session name</label>
+  <input id="name" class="cr-input" placeholder="nova-01" />
+  <span class="cr-field__hint">lowercase, no spaces</span>
+</div>
+
+<div class="cr-field cr-field--error">
+  <label class="cr-field__label" for="ep">Endpoint</label>
+  <input id="ep" class="cr-input" aria-invalid="true" />
+  <span class="cr-field__error">must be a valid URL</span>
+</div>
+```
+
+**Input / textarea / select** — `.cr-input`, `.cr-textarea`, `.cr-select`.
+**Checkbox / radio** — square (radius 0); checked fills `--sig-work` with an
+`--on-sig` mark:
+
+```html
+<label class="cr-check"><input type="checkbox" checked /> Auto-scan</label>
+<label class="cr-check"><input type="radio" name="hue" checked /> Cyan</label>
+```
+
+**Switch** — a real `button[role="switch"]` so it's keyboard-operable and named:
+
+```html
+<button type="button" role="switch" aria-checked="true" class="cr-switch">
+  <span class="cr-switch__track" aria-hidden="true"></span> Live
+</button>
+```
+
+- **MUST** give every control a label (`<label for>` or a wrapping `<label>`).
+- **MUST** signal error with the `✗` marker + border, not color alone.
+- **NEVER** round a control; disabled uses opacity, not a new color.
+
+## Instrument shell
+
+`cr-instrument` is the dashboard chassis: a `--brd-brush` frame with a hard
+shadow, composing the **Nav rail** and a **board** (masthead/hero + panels).
+
+```html
+<div class="cr-instrument">
+  <nav class="cr-nav" aria-label="Primary">
+    <div class="cr-nav__brand">CONTROL<br>ROOM</div>
+    <ul class="cr-nav__list">
+      <li><a class="cr-nav__item cr-nav__item--active" href="#">◈ Attention <span class="cr-nav__badge">2</span></a></li>
+      <li><a class="cr-nav__item" href="#">◧ Sessions</a></li>
+    </ul>
+  </nav>
+  <div class="cr-instrument__board">
+    <div class="cr-hero cr-hero--wait">…</div>
+    <section class="cr-panel"><h4 class="cr-panel__title">Sessions</h4>…</section>
+  </div>
+</div>
+```
+
+- **MUST** keep one keyed focal region (Law 2) in the board — one Hero, not many.
+- **SHOULD** let the board scroll; the rail stays fixed-width (`--cr-nav-w`).
