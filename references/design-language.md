@@ -1,19 +1,41 @@
-# Design Language — The Seven Laws
+# Design Language — The Eight Laws
 
-The visual language of Control Room is not a mood board. It is seven decision
+The visual language of Control Room is not a mood board. It is eight decision
 procedures, each grounded in what real productions are *documented* to do (not
 in what their marketing posters look like), and each written so the next
 component doesn't need a taste debate.
 
 Read this file first when building anything new. Given a component, these laws
-should settle the visual questions before you write a line of CSS. They are
-ordered by how often you will invoke them.
+should settle the visual — and verbal — questions before you write a line of CSS.
+Laws 1–7 govern how a surface *looks*; Law 8 governs how it *speaks*, and it runs
+through all of them.
 
 **Research note.** Researching the references overturned two laws that were
 originally written from images alone and added one that was missed entirely. The
 corrections are flagged inline. A promotional poster is a marketing artifact and
 not always the work's actual direction — so the laws cite the mechanism, not the
 poster.
+
+---
+
+## The stance — an operator's instrument
+
+Before the laws, the posture they all serve. **Control Room is addressed to one
+operator, under load, scanning for the one thing that needs them.** It is not a
+site to browse, a brand to admire, or a canvas — it is an *instrument*: the panel
+in front of someone who is responsible for machines that are running right now.
+
+Every law falls out of that stance. The black mass (Law 1) is the unlit hardware.
+The single key (Law 2) is the one stage light that turns on when a machine changes
+state. Decay (Law 3) is a gauge, not a filter. Two type registers (Law 5) are a
+readout, not a document. Texture (Law 6) is on the glass because there is real
+glass. Motion (Law 7) is calm until something happens. And the voice (Law 8) is a
+machine reporting its own state to the person watching it.
+
+So the test for anything new is not "is this beautiful" but **"would this help an
+operator find the one thing that needs them, faster?"** If a decoration doesn't
+survive that question, it isn't Control Room — it's an admin template wearing the
+colors.
 
 ---
 
@@ -244,6 +266,95 @@ See `references/motion.md` for the full four-tier motion architecture.
 
 ---
 
+## Law 8 — The machine reports; it does not chat.
+
+The most characteristic thing about Control Room is not a color — it's the
+**voice**. Every reference here is an instrument that narrates its own state to an
+operator: the Pip-Boy prints terse diegetic readouts, NERV's HUDs in *Evangelion*
+are dense telemetry (`PATTERN BLUE`, `A.T. FIELD`, countdown clocks), a terminal
+log states what happened and stops. None of them make small talk. So Control Room
+writes like a machine reporting to the person responsible for it: **present tense,
+no subject, no apology, no adjective that isn't a measurement.**
+
+> Evidence: the Pip-Boy is framed as a diegetic *status readout* on aging
+> infrastructure; the Evangelion/NERV interface lineage is defined by *stark,
+> information-dense telemetry* as on-screen language; neobrutalism calls for
+> *no-nonsense* copy where the text is functional, not persuasive.
+
+**The register**
+
+| Write | Not |
+| --- | --- |
+| `streaming` · `2 failing` · `paused · 6m` | `Your session is currently streaming!` |
+| `nova needs you` | `Attention required` / `Oops!` |
+| `endpoint unreachable` | `Something went wrong` |
+| `3 sessions cleared` | `Successfully cleared 3 sessions 🎉` |
+| `kill session?` | `Are you sure you want to proceed?` |
+
+**Rules**
+
+- **MUST** write status in the **present tense, third-person-dropped** — the state
+  of the machine, not a sentence about it (`2 failing`, not "There are 2 tests
+  that are failing").
+- **MUST** lead with the **datum**: the number, the state word, the identifier.
+  Labels are uppercase mono (Law 5's data register); values are the point.
+- **MUST** name a failure by **what broke**, concretely (`endpoint unreachable`),
+  never with a generic apology (`Something went wrong`) — an operator needs the
+  fault, not the sympathy.
+- **SHOULD** keep any single readout to a **line**. If it needs a sentence, it's
+  documentation, and documentation doesn't live on the instrument.
+- **SHOULD** phrase a destructive confirm as the **stakes in the operator's
+  words** (`kill session?` → "CR-1130 is streaming. Terminating drops the turn."),
+  not as a politeness ritual.
+- **NEVER** use exclamation marks, emoji, mascots-as-punctuation, or celebratory
+  copy. `done` is done; it does not cheer. (The seeded cat carries personality so
+  the *words* don't have to — see `references/seeded-cat.md`.)
+- **NEVER** address the product in the first person ("I've cleared your
+  sessions"). The machine reports; it is not a companion.
+
+*Sources: Pip-Boy · Evangelion/NERV HUD · neobrutalism spec.*
+
+---
+
+## Signatures — the tells
+
+The laws are the *why*. These are the **tells**: the concrete marks that, present
+together, make a screen unmistakably Control Room — and whose absence means it
+isn't, whatever the palette. Use this as the identity checklist.
+
+1. **The hard offset shadow.** Every raised surface casts the same solid,
+   un-blurred shadow at one fixed offset (`--shadow-off`), and pressing a control
+   *moves into* it (`:active` translates by the offset, shadow to zero). No other
+   shadow exists. This one detail reads as "Control Room" before the color does.
+2. **Absolute square.** `--radius` is `0` everywhere, forever. A single rounded
+   corner breaks the spell.
+3. **Color is state, never chrome.** A hue on screen is a machine state or a
+   primary action — never a mood, a zebra-stripe, or a brand flourish (Law 2).
+4. **Two registers, no middle.** Archivo-900 display for the one big thing; mono
+   12–13px for everything operational. The absent 18–24px "body" register is a
+   tell in the negative (Law 5).
+5. **Texture only on hardware.** Halftone / scanlines / CRT wash appear *only*
+   inside a bezel, with corner rivets and a visibly inset screen. A flat content
+   field is never textured (Law 6).
+6. **Geometric-glyph iconography.** Icons are hard geometric glyphs from the mono
+   font (`◈ ◧ ▦ ▸ ✕ ◆`), not a rounded icon-font set. It costs nothing, never
+   de-syncs from a CDN, and reads as instrument etching. **NEVER** pull in
+   Lucide/Heroicons/Font-Awesome — a soft icon set fights every other tell.
+7. **Registration marks.** The industrial framing tick — a `--border`-weight
+   crop mark at opposite corners of a title surface (`.cr-mark`) — is structure,
+   not signal, and marks "this is the primary readout." Ink weight only; **never**
+   a signal hue (that would fake a state).
+8. **The drip and the arrow-rail.** Corruption drips *downward* in `--drip` on
+   error/masthead surfaces only (Law 3); sequence is carried by the chevron-cut
+   arrow-rail (Law 4). Both are house shapes with one fixed meaning each.
+9. **The seeded pixel-cat.** Identity-from-seed, pose-is-state — the system's one
+   sanctioned piece of warmth, and the reason the *copy* stays cold (Law 8).
+
+If a screen has the palette but none of tells 1, 2, 5, and 6, it is cosplaying
+Control Room. If it has all nine, it could carry no logo and still be recognized.
+
+---
+
 ## Applying the laws to a new component
 
 1. **Law 1** — Two tones, hard boundary, correct border weight. No gradient, no
@@ -257,6 +368,12 @@ See `references/motion.md` for the full four-tier motion architecture.
    never on data.
 7. **Law 7** — Ambient calm; event-driven eruption; always settles;
    reduced-motion respected.
+8. **Law 8** — Every string reports state in the machine voice: present tense,
+   datum first, no apology, no cheer.
+
+Then run the screen against **Signatures — the tells** above: it should carry the
+hard offset shadow, square corners, color-as-state, and two registers at minimum,
+or it isn't Control Room yet.
 
 If a decision isn't covered here, it belongs in the token layer or the component
 spec — not in improvisation. Add the rule; don't freelance it.

@@ -368,6 +368,18 @@ body {
   letter-spacing: -0.038em; text-transform: uppercase; margin: 0; color: var(--ink);
 }
 
+/* ── Registration marks (signature — structure, never a signal) ─────────────
+ * Industrial crop/registration ticks at opposite corners of a primary readout.
+ * Ink weight only; NEVER a signal hue (Law 2). See design-language.md#signatures. */
+.cr-mark { position: relative; }
+.cr-mark::before,
+.cr-mark::after {
+  content: ""; position: absolute; width: var(--space-3); height: var(--space-3);
+  border: var(--brd) solid var(--border); pointer-events: none;
+}
+.cr-mark::before { top: calc(var(--space-2) * -1); left: calc(var(--space-2) * -1); border-right: 0; border-bottom: 0; }
+.cr-mark::after  { bottom: calc(var(--space-2) * -1); right: calc(var(--space-2) * -1); border-left: 0; border-top: 0; }
+
 /* ── Nav rail ───────────────────────────────────────────────────────────── */
 .cr-nav {
   width: var(--cr-nav-w); flex-shrink: 0; background: var(--rail);
@@ -747,7 +759,7 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
     </div>
     <div style="grid-column:1/-1">
       <h3>Masthead</h3>
-      <header class="cr-masthead"><p class="cr-masthead__eyebrow">DP Control Room · Phase 0</p><h1 class="cr-masthead__title">14 sessions<br>2 need you</h1></header>
+      <header class="cr-masthead cr-mark"><p class="cr-masthead__eyebrow">DP Control Room · Phase 0</p><h1 class="cr-masthead__title">14 sessions<br>2 need you</h1></header>
     </div>
     <div>
       <h3>Nav rail</h3>

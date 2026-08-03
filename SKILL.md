@@ -4,10 +4,10 @@ description: >-
   The Control Room design system — a neon-noir, neobrutalist instrument for
   dense operational dashboards (session monitors, sprint boards, agent control
   rooms). Use whenever building, restyling, or reviewing any UI that should
-  match Control Room: its design language (the seven laws), design tokens
+  match Control Room: its design language (the eight laws), design tokens
   (four themes on an intensity dial), component library, motion tiers, the
   seeded pixel-cat, and its accessibility contract. Triggers include "control
-  room", "sprint dashboard", "neon-noir dashboard", "the seven laws", building
+  room", "sprint dashboard", "neon-noir dashboard", "the eight laws", building
   a Panel/Chip/Button/StatusDot/SessionRow/Bezel in this style, adding a theme,
   or generating a component that must read as part of this system.
 metadata:
@@ -46,7 +46,7 @@ Detail lives in `references/`. Load only what the task needs.
 
 | File | Read it when you need… |
 | --- | --- |
-| `references/design-language.md` | The **seven laws** — the *why* and the do/don't for every visual decision. Read this first for any new component. |
+| `references/design-language.md` | The **eight laws** — the *why* and the do/don't for every visual decision. Read this first for any new component. |
 | `references/tokens.md` | The full token reference — every variable, every theme, and how to consume them. |
 | `references/components.md` | The **component library** — formal spec + API for each component (Panel, Button, Chip, StatusDot, SessionRow, Rail, Hero, Bezel, Table, Tag, diagonal primitives, keyed tiles, drip, form controls, instrument shell, and the overlays — Modal / Toast / Tooltip). |
 | `references/motion.md` | The four motion tiers, the glitch/CRT vocabulary, and the reduced-motion contract. |
@@ -98,6 +98,15 @@ The irreducible rules. Each expands in the references.
 - **MUST** meet the accessibility contract (`references/accessibility.md`):
   visible focus, reduced-motion honored, decorative corruption `aria-hidden`
   with the clean string owning the accessible name.
+- **MUST** write in the machine voice (Law 8): present tense, datum first, one
+  line, no apology, no cheer, no emoji (`2 failing`, not "Oops — something went
+  wrong!"). **NEVER** address the operator in the first person.
+
+The **tells** — the marks that make a screen unmistakably Control Room: the one
+hard offset shadow (and press-into-shadow `:active`), absolute-square corners,
+color-as-state, two type registers, texture only on bezel hardware,
+geometric-glyph icons (no icon font), the `.cr-mark` registration ticks, the drip
++ arrow-rail, and the seeded cat. See `references/design-language.md#signatures`.
 
 ## Quick start
 

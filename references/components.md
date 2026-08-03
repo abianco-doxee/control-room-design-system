@@ -5,7 +5,7 @@ anatomy → tokens → states/variants → copy-ready markup → rules**. Markup
 framework-agnostic HTML + CSS custom properties; port to React/Vue/Svelte by
 mapping props to the variants listed.
 
-All components assume `dist/control-room.css` is loaded. All obey the seven
+All components assume `dist/control-room.css` is loaded. All obey the eight
 laws (`references/design-language.md`) — the rules here are the laws made
 concrete per component. Before shipping any component, run it through
 `checklists/component-checklist.md`.
@@ -102,6 +102,10 @@ display `h1` · optional lede in the data register · optional ambient scanline.
 
 - **MUST** keep `h1` in the display register only.
 - **SHOULD** set the eyebrow in `--sig-work` (or `--stage` when calm).
+- **SHOULD** add `.cr-mark` to the primary readout for the signature registration
+  ticks (industrial crop marks at opposite corners — structure, not a signal; see
+  `design-language.md#signatures`). Ink weight only; **never** on a signal-keyed
+  surface where the ticks would read as state.
 - **NEVER** put body prose in the masthead — that is a mid-register violation.
 
 ---

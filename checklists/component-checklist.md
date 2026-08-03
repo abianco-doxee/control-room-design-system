@@ -13,7 +13,7 @@ A component is done when it passes every gate below in **all four themes**
 - [ ] No gradient on any content surface.
 - [ ] Survives a theme flip with **zero per-theme overrides**.
 
-## Design language (the seven laws)
+## Design language (the eight laws)
 
 - [ ] **L1** — surfaces use two tones + hard boundary; correct border-weight
       hierarchy (`--brd` / `--brd-heavy` / `--brd-brush`); no mid-tone.
@@ -27,6 +27,15 @@ A component is done when it passes every gate below in **all four themes**
 - [ ] **L6** — texture (halftone/scanline/grain) lives inside a bezel only; no
       nested bezels.
 - [ ] **L7** — calm at rest, event-driven eruption, always settles.
+- [ ] **L8** — every string is machine voice: present tense, datum first, one
+      line, no apology/cheer/emoji, never first-person.
+
+## Signatures (the tells)
+
+- [ ] Carries the identity marks that apply: the one hard offset shadow, square
+      corners, color-as-state, two registers — and where relevant geometric-glyph
+      icons (no icon font), `.cr-mark` registration ticks on a primary readout,
+      drip/arrow-rail with their fixed meanings. See `design-language.md#signatures`.
 
 ## Motion
 
