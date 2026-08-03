@@ -1,0 +1,15 @@
+/* Build input for the PREBUILT utility layer (dist/utilities.css) — for
+ * consumers who want a ready utility file without running Tailwind themselves.
+ * The @source inline safelist emits a bounded, token-driven utility set.
+ * Consumers running their own Tailwind should import styles/tailwind.css and let
+ * Tailwind scan their content instead. Regenerate: npm run build:tw */
+@import "tailwindcss";
+@import "../dist/tw-theme.css";
+
+@source inline("flex inline-flex grid block inline-block hidden");
+@source inline("items-{start,center,end,baseline} justify-{start,center,between,end} flex-{row,col,wrap}");
+@source inline("font-{sans,mono} font-{bold,extrabold,black} uppercase tracking-{tight,wide,widest} text-{left,center,right}");
+@source inline("text-{2xs,xs,sm,base,md,lg,xl}");
+@source inline("{bg,text,border}-{ground,board,panel,panel-2,ink,muted,border,rail,rail-ink,on-sig,on-err,work,wait,done,err,idle,accent,stage,drip}");
+@source inline("{p,px,py,pt,pr,pb,pl,m,mx,my,mt,mr,mb,ml,gap,gap-x,gap-y,w,h}-{0,0.5,1,2,3,4,5,6,8,10,12,16}");
+@source inline("border border-2 rounded-none");

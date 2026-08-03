@@ -57,6 +57,7 @@ Detail lives in `references/`. Load only what the task needs.
 | `tokens/tokens.json` | Machine-readable token source (parse this to generate CSS/Tailwind/JSON). |
 | `dist/control-room.css` | Ready-to-use CSS custom properties for all four themes. Import first. |
 | `styles/components.css` | The shipped component layer — `cr-`prefixed classes (`.cr-panel`, `.cr-btn`, …) built on the tokens. Import after the tokens. |
+| `references/tailwind.md` | Tailwind-first authoring — the token-driven Tailwind v4 `@theme`, utility→token map, and theme-reactive utilities. |
 | `templates/component.md` | The authoring template every new component follows. |
 | `checklists/component-checklist.md` | The ship gate. A component is not done until it passes. |
 

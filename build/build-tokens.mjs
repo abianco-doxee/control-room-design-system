@@ -259,17 +259,44 @@ function dtcg() {
   return JSON.stringify(out, null, 2) + "\n";
 }
 
+/* ── 6b. Tailwind v4 @theme (generated from tokens) ──────────────────────
+ * Colors reference the runtime CSS vars so utilities follow html[data-theme];
+ * scales/fonts are literal. Import after "tailwindcss" (see styles/tailwind.css). */
+function twTheme() {
+  const colorMap = {
+    ground: "--ground", board: "--board", panel: "--panel", "panel-2": "--panel-2",
+    ink: "--ink", muted: "--muted", border: "--border", rail: "--rail", "rail-ink": "--rail-ink",
+    "on-sig": "--on-sig", "on-err": "--on-err", stage: "--stage", drip: "--drip",
+    work: "--sig-work", wait: "--sig-wait", done: "--sig-done", err: "--sig-err",
+    idle: "--sig-idle", accent: "--sig-accent",
+  };
+  const L = [];
+  for (const [name, v] of Object.entries(colorMap)) L.push(`  --color-${name}: var(${v});`);
+  for (const [k, t] of Object.entries(src.primitive.text)) if (t.cssVar) L.push(`  --text-${k}: ${t.value};`);
+  L.push(`  --font-sans: ${src.typography.family.sans.value};`);
+  L.push(`  --font-mono: ${src.typography.family.mono.value};`);
+  L.push(`  --spacing: 0.25rem;`); // 4px base → p-1=4px … matches --space-*
+  for (const r of ["xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl"]) L.push(`  --radius-${r}: 0px;`);
+  return (
+    `/* GENERATED from tokens.json — Tailwind v4 @theme. Do not edit.\n` +
+    ` * Import after "tailwindcss"; colors follow html[data-theme] via the runtime vars\n` +
+    ` * in dist/control-room.css. See references/tailwind.md. */\n@theme {\n${L.join("\n")}\n}\n`
+  );
+}
+
 /* ── 6. write / check ───────────────────────────────────────────────────── */
 
 const css = await buildCss();
 const tw = tailwindPreset();
 const flat = flatJson();
 const dtcgJson = dtcg();
+const twThemeCss = twTheme();
 
 // [path relative to repo root, content]
 const targets = [
   ["dist/control-room.css", css],
   ["dist/tailwind-preset.cjs", tw],
+  ["dist/tw-theme.css", twThemeCss],
   ["dist/tokens.flat.json", flat],
   ["design-tokens/control-room.tokens.json", dtcgJson],
 ];
