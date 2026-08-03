@@ -22,7 +22,7 @@ const PAGES = [
   ["SKILL.md", "guide", "skill", "What is Control Room"],
   ["CONTRIBUTING.md", "guide", "contributing", "Contributing"],
   ["CHANGELOG.md", "guide", "changelog", "Changelog"],
-  ["references/design-language.md", "reference", "design-language", "Design Language — the Seven Laws"],
+  ["references/design-language.md", "reference", "design-language", "Design Language — the Eight Laws"],
   ["references/tokens.md", "reference", "tokens", "Tokens"],
   ["references/tailwind.md", "reference", "tailwind", "Tailwind-first"],
   ["references/components.md", "reference", "components", "Component Library"],

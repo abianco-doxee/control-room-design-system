@@ -17,7 +17,7 @@ control-room-design-system/
 ├── SKILL.md                       # entry point — when to use, index, one-screen ruleset
 ├── README.md                      # this file
 ├── references/
-│   ├── design-language.md         # the SEVEN LAWS — the why + do/don't for every decision
+│   ├── design-language.md         # the EIGHT LAWS — the why + do/don't for every decision
 │   ├── tokens.md                  # full token reference (4 themes) + how to consume
 │   ├── components.md              # component library — spec + copy-ready markup per component
 │   ├── motion.md                  # four motion tiers, glitch/CRT vocabulary, reduced-motion
@@ -59,7 +59,7 @@ optimized to be *generable*, not just *readable*:
 
 - **Constraint hierarchy.** Every rule is tagged `MUST` / `SHOULD` / `NEVER`, so
   an agent can obey it mechanically rather than interpreting prose.
-- **Research-grounded language.** The seven laws cite what real productions are
+- **Research-grounded language.** The eight laws cite what real productions are
   *documented* to do (Redline, Dandadan, Fallout's Pip-Boy, Evangelion/Khara,
   Edgerunners, neobrutalism) — decisions, not vibes.
 - **Token-first.** A single token layer (`tokens/`) drives four themes on an
