@@ -1666,6 +1666,96 @@
         "search",
         "shortcuts"
       ]
+    },
+    {
+      "id": "alert",
+      "name": "Alert",
+      "category": "state",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Inline callout keyed to a signal (info/wait/done/err) — a left brush-bar in the signal hue, optional dismiss. err announces assertively (role=alert).",
+      "spec": "references/components.md#alert",
+      "variants": { "signal": ["info", "wait", "done", "err"] },
+      "tokens": [
+        { "cssVar": "--sig-work", "description": "info key" },
+        { "cssVar": "--sig-err", "description": "error key" },
+        { "cssVar": "--panel", "description": "fill" }
+      ],
+      "keywords": ["alert", "callout", "banner", "message", "notice", "inline"]
+    },
+    {
+      "id": "radio-group",
+      "name": "Radio group",
+      "category": "forms",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Single-choice group (role=radiogroup) with roving tabindex + arrow-key nav. Square radios (radius 0) — a filled inner square marks the choice.",
+      "spec": "references/components.md#radio-group",
+      "variants": { "prop": ["value", "row"] },
+      "tokens": [
+        { "cssVar": "--sig-work", "description": "checked mark" },
+        { "cssVar": "--panel-2", "description": "box fill" },
+        { "cssVar": "--border", "description": "box border" }
+      ],
+      "keywords": ["radio", "radiogroup", "choice", "option", "single-select", "form"]
+    },
+    {
+      "id": "slider",
+      "name": "Slider",
+      "category": "forms",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Styled native range input — square track + thumb, keyboard for free (arrows, Home/End, PageUp/Down).",
+      "spec": "references/components.md#slider",
+      "variants": { "prop": ["value", "min", "max", "step"] },
+      "tokens": [
+        { "cssVar": "--sig-work", "description": "thumb" },
+        { "cssVar": "--panel-2", "description": "track" },
+        { "cssVar": "--border", "description": "track/thumb border" }
+      ],
+      "keywords": ["slider", "range", "threshold", "input", "numeric", "form"]
+    },
+    {
+      "id": "progress",
+      "name": "Progress",
+      "category": "state",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Task progress (role=progressbar) — determinate fills to value/max; indeterminate runs an animated hazard sweep. Distinct from Meter (a static capacity reading).",
+      "spec": "references/components.md#progress",
+      "variants": { "tone": ["work", "wait", "done", "err"] },
+      "tokens": [
+        { "cssVar": "--sig-work", "description": "fill" },
+        { "cssVar": "--panel-2", "description": "track" }
+      ],
+      "keywords": ["progress", "progressbar", "loading", "task", "indeterminate", "bar"]
+    },
+    {
+      "id": "skeleton",
+      "name": "Skeleton",
+      "category": "state",
+      "kind": "utility",
+      "lifecycle": "stable",
+      "description": "Loading placeholder — a blocky pulse (never rounded). Sizes: --line, --text, --block; give it a width inline.",
+      "spec": "references/components.md#skeleton",
+      "variants": { "class": ["cr-skeleton--line", "cr-skeleton--text", "cr-skeleton--block"] },
+      "tokens": [{ "cssVar": "--panel-2", "description": "placeholder fill" }],
+      "keywords": ["skeleton", "loading", "placeholder", "shimmer", "pulse", "ghost"]
+    },
+    {
+      "id": "data-list",
+      "name": "Data list",
+      "category": "layout",
+      "kind": "utility",
+      "lifecycle": "stable",
+      "description": "Key → value readout (dl/dt/dd) on a two-column grid — mono/label keys, data-register values. For detail panels.",
+      "spec": "references/components.md#data-list",
+      "variants": { "class": ["cr-dl", "cr-dl__k", "cr-dl__v"] },
+      "tokens": [
+        { "cssVar": "--muted", "description": "keys" },
+        { "cssVar": "--ink", "description": "values" }
+      ],
+      "keywords": ["data", "list", "description", "definition", "key-value", "detail"]
     }
   ]
 }

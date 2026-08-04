@@ -5,21 +5,21 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 41,
+    "count": 47,
     "categories": {
       "action": 1,
       "behavior": 1,
-      "forms": 6,
+      "forms": 8,
       "identity": 2,
-      "layout": 5,
+      "layout": 6,
       "media": 6,
       "navigation": 3,
       "overlay": 6,
       "primitives": 2,
-      "state": 9
+      "state": 12
     },
     "lifecycles": {
-      "stable": 40,
+      "stable": 46,
       "experimental": 1
     }
   },
@@ -230,6 +230,44 @@
       ]
     },
     {
+      "id": "radio-group",
+      "name": "Radio group",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Single-choice group (role=radiogroup) with roving tabindex + arrow-key nav. Square radios (radius 0) — a filled inner square marks the choice.",
+      "spec": "references/components.md#radio-group",
+      "variants": {
+        "prop": [
+          "value",
+          "row"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "checked mark"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "box fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "box border"
+        }
+      ],
+      "keywords": [
+        "radio",
+        "radiogroup",
+        "choice",
+        "option",
+        "single-select",
+        "form"
+      ]
+    },
+    {
       "id": "select",
       "name": "Select",
       "kind": "component",
@@ -259,6 +297,46 @@
       "keywords": [
         "select",
         "dropdown",
+        "form"
+      ]
+    },
+    {
+      "id": "slider",
+      "name": "Slider",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Styled native range input — square track + thumb, keyboard for free (arrows, Home/End, PageUp/Down).",
+      "spec": "references/components.md#slider",
+      "variants": {
+        "prop": [
+          "value",
+          "min",
+          "max",
+          "step"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "thumb"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "track"
+        },
+        {
+          "cssVar": "--border",
+          "description": "track/thumb border"
+        }
+      ],
+      "keywords": [
+        "slider",
+        "range",
+        "threshold",
+        "input",
+        "numeric",
         "form"
       ]
     },
@@ -515,6 +593,41 @@
         "spotlight",
         "law-9",
         "milestone"
+      ]
+    },
+    {
+      "id": "data-list",
+      "name": "Data list",
+      "kind": "utility",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Key → value readout (dl/dt/dd) on a two-column grid — mono/label keys, data-register values. For detail panels.",
+      "spec": "references/components.md#data-list",
+      "variants": {
+        "class": [
+          "cr-dl",
+          "cr-dl__k",
+          "cr-dl__v"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--muted",
+          "description": "keys"
+        },
+        {
+          "cssVar": "--ink",
+          "description": "values"
+        }
+      ],
+      "keywords": [
+        "data",
+        "list",
+        "description",
+        "definition",
+        "key-value",
+        "detail"
       ]
     },
     {
@@ -1370,6 +1483,46 @@
       ]
     },
     {
+      "id": "alert",
+      "name": "Alert",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Inline callout keyed to a signal (info/wait/done/err) — a left brush-bar in the signal hue, optional dismiss. err announces assertively (role=alert).",
+      "spec": "references/components.md#alert",
+      "variants": {
+        "signal": [
+          "info",
+          "wait",
+          "done",
+          "err"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "info key"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error key"
+        },
+        {
+          "cssVar": "--panel",
+          "description": "fill"
+        }
+      ],
+      "keywords": [
+        "alert",
+        "callout",
+        "banner",
+        "message",
+        "notice",
+        "inline"
+      ]
+    },
+    {
       "id": "chip",
       "name": "Chip",
       "kind": "component",
@@ -1553,6 +1706,42 @@
       ]
     },
     {
+      "id": "progress",
+      "name": "Progress",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Task progress (role=progressbar) — determinate fills to value/max; indeterminate runs an animated hazard sweep. Distinct from Meter (a static capacity reading).",
+      "spec": "references/components.md#progress",
+      "variants": {
+        "tone": [
+          "work",
+          "wait",
+          "done",
+          "err"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "fill"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "track"
+        }
+      ],
+      "keywords": [
+        "progress",
+        "progressbar",
+        "loading",
+        "task",
+        "indeterminate",
+        "bar"
+      ]
+    },
+    {
       "id": "session-row",
       "name": "SessionRow",
       "kind": "component",
@@ -1645,6 +1834,37 @@
         "danger",
         "non-color",
         "a11y"
+      ]
+    },
+    {
+      "id": "skeleton",
+      "name": "Skeleton",
+      "kind": "utility",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Loading placeholder — a blocky pulse (never rounded). Sizes: --line, --text, --block; give it a width inline.",
+      "spec": "references/components.md#skeleton",
+      "variants": {
+        "class": [
+          "cr-skeleton--line",
+          "cr-skeleton--text",
+          "cr-skeleton--block"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "placeholder fill"
+        }
+      ],
+      "keywords": [
+        "skeleton",
+        "loading",
+        "placeholder",
+        "shimmer",
+        "pulse",
+        "ghost"
       ]
     },
     {
