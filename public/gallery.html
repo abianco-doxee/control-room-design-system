@@ -320,8 +320,16 @@ body {
   padding: var(--space-0-5) var(--space-2); border: 1.5px solid var(--border);
   text-transform: uppercase; letter-spacing: 0.04em;
 }
+/* Canonical tone vocabulary — matches the signal ramp (Law 2), the same words a
+ * StatusDot / Toast / Chip asserts: done · work · wait · err · idle · accent. */
+.cr-tag--done   { background: var(--sig-done); color: var(--on-sig); }
+.cr-tag--work   { background: var(--sig-work); color: var(--on-sig); }
+.cr-tag--wait   { background: var(--sig-wait); color: var(--on-sig); }
+.cr-tag--err    { background: var(--sig-err);  color: var(--on-err); }
+.cr-tag--idle   { background: var(--sig-idle); color: var(--on-sig); }
+.cr-tag--accent { background: var(--sig-accent); color: var(--on-accent); }
+/* Legacy tell-time aliases (kept — nothing is lost): now→done, later→wait, no→err. */
 .cr-tag--now   { background: var(--sig-done); color: var(--on-sig); }
-.cr-tag--work  { background: var(--sig-work); color: var(--on-sig); }
 .cr-tag--later { background: var(--sig-wait); color: var(--on-sig); }
 .cr-tag--no    { background: var(--sig-err);  color: var(--on-err); }
 
@@ -363,6 +371,27 @@ body {
   font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink);
 }
 
+/* ── Diagonal primitives (Law 4 — shape carries meaning, never decoration) ──
+ * Four shapes, four fixed meanings, max 15° off-axis. The arrow-rail below is
+ * the fourth (sequence). See references/components.md#diagonal-primitives. */
+.cr-chev { position: relative; padding-left: var(--space-6); }
+.cr-chev::before {
+  content: ""; position: absolute; left: var(--space-2); top: 50%; transform: translateY(-50%);
+  width: 0; height: 0; border-left: 9px solid var(--cr-chev-c, var(--sig-work));
+  border-top: 6px solid transparent; border-bottom: 6px solid transparent; pointer-events: none;
+}
+.cr-notch {
+  background: var(--sig-wait); color: var(--on-sig);
+  padding: var(--space-2) var(--space-3); border: var(--brd) solid var(--border);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 11px), calc(100% - 11px) 100%, 0 100%);
+}
+.cr-wedge { position: relative; }
+.cr-wedge::after {
+  content: ""; position: absolute; top: 0; right: 0; width: var(--space-3); height: 100%;
+  background: var(--cr-wedge-c, var(--sig-work)); pointer-events: none;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
 /* ── Arrow-rail (sequence, Law 4) ──────────────────────────────────────── */
 .cr-rail { display: flex; }
 .cr-rail__step {
@@ -399,17 +428,9 @@ body {
   letter-spacing: -0.038em; text-transform: uppercase; margin: 0; color: var(--ink);
 }
 
-/* ── Registration marks (signature — structure, never a signal) ─────────────
- * Industrial crop/registration ticks at opposite corners of a primary readout.
- * Ink weight only; NEVER a signal hue (Law 2). See design-language.md#signatures. */
-.cr-mark { position: relative; }
-.cr-mark::before,
-.cr-mark::after {
-  content: ""; position: absolute; width: var(--space-3); height: var(--space-3);
-  border: var(--brd) solid var(--border); pointer-events: none;
-}
-.cr-mark::before { top: calc(var(--space-2) * -1); left: calc(var(--space-2) * -1); border-right: 0; border-bottom: 0; }
-.cr-mark::after  { bottom: calc(var(--space-2) * -1); right: calc(var(--space-2) * -1); border-left: 0; border-top: 0; }
+/* Registration marks: .cr-mark is the ink-weight corner-tick preset of .cr-trim
+ * (structure, never a signal — Law 2). The shared implementation lives with
+ * .cr-trim in the decoration section. See design-language.md#signatures. */
 
 /* ── Nav rail ───────────────────────────────────────────────────────────── */
 .cr-nav {
@@ -552,7 +573,7 @@ body {
 }
 .cr-switch__track::after {
   content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: var(--space-4);
-  background: var(--muted); transition: left 0.08s, background 0.08s;
+  background: var(--muted); transition: left var(--dur-press), background var(--dur-press);
 }
 .cr-switch[aria-checked="true"] .cr-switch__track { background: var(--sig-done); }
 .cr-switch[aria-checked="true"] .cr-switch__track::after { left: calc(100% - var(--space-4)); background: var(--on-sig); }
@@ -603,7 +624,7 @@ body {
   background: var(--panel-2); color: var(--ink); border: var(--brd) solid var(--border);
   box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
   padding: var(--space-1) var(--space-2); font-family: var(--font-mono); font-size: var(--text-xs);
-  opacity: 0; visibility: hidden; transition: opacity 0.08s;
+  opacity: 0; visibility: hidden; transition: opacity var(--dur-press);
 }
 .cr-tooltip:hover .cr-tooltip__bubble,
 .cr-tooltip:focus-within .cr-tooltip__bubble { opacity: 1; visibility: visible; }
@@ -803,14 +824,19 @@ body {
 .cr-ascii--mask-r    { -webkit-mask-image: linear-gradient(90deg, #000 38%, transparent); mask-image: linear-gradient(90deg, #000 38%, transparent); }
 .cr-ascii--mask-edge { -webkit-mask-image: radial-gradient(120% 120% at 50% 50%, #000 38%, transparent 86%); mask-image: radial-gradient(120% 120% at 50% 50%, #000 38%, transparent 86%); }
 
-/* telemetry frame trim — 4 corner brackets on any surface (structure, not signal) */
-.cr-trim { --cr-trim-c: var(--muted); --cr-trim-sz: 12px; --cr-trim-w: 2px; position: relative; }
-.cr-trim::before, .cr-trim::after {
+/* telemetry frame trim — corner brackets on any surface (structure, not signal).
+ * .cr-mark is the ink-weight preset used for registration ticks on a primary
+ * readout (structure, never a signal — Law 2); it is the same primitive with a
+ * heavier border and a wider offset, so the two share one implementation. */
+.cr-trim { --cr-trim-c: var(--muted); --cr-trim-sz: 12px; --cr-trim-w: 2px; --cr-trim-off: calc(var(--cr-trim-w) * -1); position: relative; }
+.cr-mark { --cr-trim-c: var(--border); --cr-trim-sz: var(--space-3); --cr-trim-w: var(--brd); --cr-trim-off: calc(var(--space-2) * -1); position: relative; }
+.cr-trim::before, .cr-trim::after,
+.cr-mark::before, .cr-mark::after {
   content: ""; position: absolute; width: var(--cr-trim-sz); height: var(--cr-trim-sz);
   border: var(--cr-trim-w) solid var(--cr-trim-c); pointer-events: none;
 }
-.cr-trim::before { top: calc(var(--cr-trim-w) * -1); left: calc(var(--cr-trim-w) * -1); border-right: 0; border-bottom: 0; }
-.cr-trim::after  { bottom: calc(var(--cr-trim-w) * -1); right: calc(var(--cr-trim-w) * -1); border-left: 0; border-top: 0; }
+.cr-trim::before, .cr-mark::before { top: var(--cr-trim-off); left: var(--cr-trim-off); border-right: 0; border-bottom: 0; }
+.cr-trim::after,  .cr-mark::after  { bottom: var(--cr-trim-off); right: var(--cr-trim-off); border-left: 0; border-top: 0; }
 /* opt into all four corners (adds TR + BL via a background of L-marks) */
 .cr-trim--4 {
   background-image:
@@ -1100,6 +1126,12 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       </div>
       <h3 style="margin-top:16px">Arrow-rail (sequence)</h3>
       <div class="cr-rail"><span class="cr-rail__step cr-rail__step--on">scan</span><span class="cr-rail__step">triage</span><span class="cr-rail__step">fix</span><span class="cr-rail__step">verify</span></div>
+      <h3 style="margin-top:16px">Diagonal primitives (shape = meaning)</h3>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <span class="cr-chev" style="font-family:var(--font-mono);font-size:var(--text-sm);color:var(--ink)">route</span>
+        <span class="cr-notch" style="font-family:var(--font-mono);font-size:var(--text-2xs);font-weight:800;text-transform:uppercase">held</span>
+        <span class="cr-wedge cr-panel" style="padding:8px 20px 8px 12px;font-family:var(--font-mono);font-size:var(--text-sm)">active panel</span>
+      </div>
     </div>
     <div>
       <h3>Error surface (drip)</h3>

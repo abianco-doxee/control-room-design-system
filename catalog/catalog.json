@@ -5,20 +5,20 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 32,
+    "count": 33,
     "categories": {
       "action": 1,
       "forms": 6,
       "identity": 2,
       "layout": 5,
-      "media": 5,
+      "media": 6,
       "navigation": 1,
       "overlay": 3,
       "primitives": 1,
       "state": 8
     },
     "lifecycles": {
-      "stable": 31,
+      "stable": 32,
       "experimental": 1
     }
   },
@@ -685,6 +685,60 @@
         "led",
         "pixel",
         "wear"
+      ]
+    },
+    {
+      "id": "decoration-utilities",
+      "name": "Decoration utilities",
+      "kind": "utility",
+      "category": "media",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The FUI/decoration utility layer for dead space and chassis edges: styled scrollbar, tick-ruler edge, whisper drafting field, hazard stripe, and the Breach blur-blob. All aria-hidden, non-interactive, whisper contrast — never on a content field.",
+      "spec": "references/decoration.md",
+      "variants": {
+        "class": [
+          "cr-scrollbar",
+          "cr-scrollbar--local",
+          "cr-ruler",
+          "cr-bg--field",
+          "cr-stripe",
+          "cr-blob",
+          "cr-trim",
+          "cr-trim--4",
+          "cr-mark"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--muted",
+          "description": "ruler ticks, trim brackets"
+        },
+        {
+          "cssVar": "--field",
+          "description": "drafting-field background"
+        },
+        {
+          "cssVar": "--sig-wait",
+          "description": "hazard stripe hue"
+        },
+        {
+          "cssVar": "--border",
+          "description": "registration-mark ink"
+        }
+      ],
+      "keywords": [
+        "scrollbar",
+        "ruler",
+        "field",
+        "stripe",
+        "blob",
+        "trim",
+        "mark",
+        "registration",
+        "fui",
+        "decoration",
+        "dead-space"
       ]
     },
     {
