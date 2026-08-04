@@ -17,27 +17,39 @@ control-room-design-system/
 ├── SKILL.md                       # entry point — when to use, index, one-screen ruleset
 ├── README.md                      # this file
 ├── references/
-│   ├── design-language.md         # the EIGHT LAWS — the why + do/don't for every decision
-│   ├── tokens.md                  # full token reference (4 themes) + how to consume
+│   ├── design-language.md         # the NINE LAWS — the why + do/don't for every decision
+│   ├── tokens.md                  # token reference + OKLCH generation + how to consume
 │   ├── components.md              # component library — spec + copy-ready markup per component
-│   ├── motion.md                  # four motion tiers, glitch/CRT vocabulary, reduced-motion
+│   ├── motion.md                  # motion tiers, glitch/CRT vocabulary, scroll-bound, reduced-motion
 │   ├── accessibility.md           # WCAG 2.1 AA contract for the aesthetic
-│   └── seeded-cat.md              # the identity+state pixel-cat generator (paint() contract)
+│   ├── seeded-cat.md              # the identity+state pixel-cat generator (paint() contract)
+│   ├── seeded-sigil.md            # the seeded cyber-sigil pixel glyph
+│   ├── decoration.md             # ASCII/pixel decoration for dead space (the decorative-only contract)
+│   ├── frameworks.md             # Mitosis compile-to-many + the cn() helper
+│   ├── tailwind.md               # Tailwind-first authoring (v4 @theme)
+│   ├── figma-bridge.md           # optional Figma → code bridge
+│   └── figma-kit-build.md        # optional Figma kit build guide
+├── components/                    # Mitosis .lite.tsx SOURCES (author interactive components here)
 ├── tokens/
 │   └── tokens.json                # machine-readable token SOURCE OF TRUTH (author here)
 ├── build/
-│   ├── build-tokens.mjs           # Style Dictionary → dist/ + design-tokens/ (DTCG)
-│   └── build-gallery.mjs          # → public/gallery.html (live, self-contained)
+│   ├── build-tokens.mjs           # tokens.json → dist/ + design-tokens/ (DTCG) + Tailwind
+│   ├── build-palette.mjs          # OKLCH palette generator (→ tokens/palette.generated.json)
+│   ├── build-catalog.mjs          # registry.json → catalog.json
+│   ├── build-barrels.mjs          # per-framework export barrels
+│   ├── build-gallery.mjs          # → public/gallery.html (live, self-contained)
+│   └── build-docs-content.mjs     # references/ → Starlight content
 ├── dist/                          # GENERATED — do not edit
 │   ├── control-room.css           # ready-to-use CSS custom properties, all 4 themes
-│   ├── tailwind-preset.cjs        # Tailwind preset (colors resolve to CSS vars)
-│   └── tokens.flat.json           # resolved cssVar → value, per theme
+│   ├── tw-theme.css               # Tailwind v4 @theme (colors resolve to CSS vars)
+│   ├── tokens.flat.json           # resolved cssVar → value, per theme
+│   └── frameworks/                # compiled React/Vue/Svelte/Angular/Solid components
 ├── styles/
 │   ├── components.css             # the shipped component layer (.cr-* classes)
 │   └── tailwind.css               # Tailwind v4 entry (Tailwind-first authoring)
+├── utils/cn.js                    # cn() class-merge helper (clsx + tailwind-merge)
 ├── design-tokens/
 │   └── control-room.tokens.json   # GENERATED — DTCG format (Doxee-hub compatible)
-├── references/                    # design-language, tokens, components, motion, a11y, seeded-cat
 ├── templates/component.md         # the spec template every new component follows
 ├── checklists/component-checklist.md  # the ship gate
 ├── catalog/

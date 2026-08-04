@@ -7,7 +7,7 @@ export default function CrChoice(props: CrChoiceProps) {
         name={props.name}
         checked={props.checked}
         disabled={props.disabled}
-        onChange={() => props.onChange && props.onChange(!props.checked)}
+        onChange={(event) => props.onChange && props.onChange(event.target.checked)}
       />
       <span>{props.label}</span>
     </label>

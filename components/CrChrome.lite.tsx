@@ -30,9 +30,12 @@ export default function CrChrome(props: CrChromeProps) {
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
     const rng = mulberry32(hashSeed(props.seed));
-    const LED = ["#00d3fb", "#f9ad00", "#9ad335", "#f45058", "#ff1a9d"];
-    // metal palette
-    const HI = "#3a3550", MID = "#2a2740", LO = "#17141f", EDGE = "#000", SCR = "#4a4560";
+    const cv = (name: string, fb: string) => {
+      try { const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim(); return v || fb; } catch (e) { return fb; }
+    };
+    const LED = [cv("--sig-work", "#00d3fb"), cv("--sig-wait", "#f9ad00"), cv("--sig-accent-2", "#9ad335"), cv("--sig-err", "#f45058"), cv("--sig-accent", "#ff1a9d")];
+    /* metal palette derived from theme surfaces so the strip themes with the system */
+    const HI = cv("--rail-ink", "#3a3550"), MID = cv("--panel-2", "#2a2740"), LO = cv("--rail", "#17141f"), EDGE = cv("--border", "#000000"), SCR = cv("--muted", "#4a4560");
 
     const node: any = canvasRef;
     if (!node || !node.getContext) return;

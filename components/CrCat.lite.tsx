@@ -25,8 +25,11 @@ export default function CrCat(props: CrCatProps) {
       t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
-    const FUR = ["#22d3ee", "#ff2e97", "#5eead4", "#fde047", "#a855f7", "#ff6b35", "#ff3b6b", "#c6ff00", "#89b4fa"];
-    const eyeMap: any = { working: "#22d3ee", waiting: "#fde047", idle: "#8a8aa6", error: "#ff3b6b", done: "#c6ff00" };
+    const cv = (name: string, fb: string) => {
+      try { const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim(); return v || fb; } catch (e) { return fb; }
+    };
+    const FUR = [cv("--sig-work", "#22d3ee"), cv("--sig-accent", "#ff2e97"), cv("--sig-done", "#5eead4"), cv("--sig-wait", "#fde047"), cv("--sig-accent-2", "#c6ff00"), cv("--sig-err", "#ff3b6b")];
+    const eyeMap: any = { working: cv("--sig-work", "#22d3ee"), waiting: cv("--sig-wait", "#fde047"), idle: cv("--sig-idle", "#8a8aa6"), error: cv("--sig-err", "#ff3b6b"), done: cv("--sig-accent-2", "#c6ff00") };
     const rng = mulberry32(hashSeed(props.seed));
     const fur = FUR[Math.floor(rng() * FUR.length)];
     const eye = eyeMap[props.state];

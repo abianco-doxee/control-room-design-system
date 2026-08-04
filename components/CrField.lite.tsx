@@ -7,6 +7,7 @@ export interface CrFieldProps {
   placeholder?: string;
   hint?: string;
   error?: string;
+  onChange?: (value: string) => void;
 }
 
 /** Control Room text Field (label + input + hint/error). Styling from .cr-field. */
@@ -22,6 +23,7 @@ export default function CrField(props: CrFieldProps) {
         value={props.value}
         placeholder={props.placeholder}
         aria-invalid={props.error ? "true" : "false"}
+        onChange={(event) => props.onChange && props.onChange(event.target.value)}
       />
       <Show when={props.hint && !props.error}>
         <span class="cr-field__hint">{props.hint}</span>
