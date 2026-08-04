@@ -19,6 +19,17 @@ const componentsCss = readFileSync(join(ROOT, "styles", "components.css"), "utf8
 const flat = JSON.parse(readFileSync(join(ROOT, "dist", "tokens.flat.json"), "utf8"));
 const dark = flat.themes.dark;
 
+// Inline the condensed display face (Saira Condensed 800) as "CR Display" — the
+// first name in --font-display — so the standalone gallery shows the real
+// condensed register instead of a system fallback. One weight, data-URI'd.
+let displayFace = "";
+try {
+  const woff2 = readFileSync(
+    join(ROOT, "node_modules", "@fontsource", "saira-condensed", "files", "saira-condensed-latin-800-normal.woff2"),
+  ).toString("base64");
+  displayFace = `@font-face{font-family:"CR Display";font-style:normal;font-weight:800;font-display:swap;src:url(data:font/woff2;base64,${woff2}) format("woff2");}`;
+} catch { /* font not installed — falls back to the rest of the --font-display stack */ }
+
 const THEMES = ["dark", "light", "extreme", "phosphor"];
 
 const GROUPS = [
@@ -48,6 +59,7 @@ const html = `<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control Room — Living Gallery</title>
 <style>
+${displayFace}
 ${tokensCss}
 
 /* the shipped component layer — exactly what a consumer imports */
@@ -207,6 +219,35 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         <label class="cr-check"><input type="radio" name="g-r" checked /> Cyan</label>
         <label class="cr-check"><input type="radio" name="g-r" /> Magenta</label>
         <button type="button" role="switch" aria-checked="true" class="cr-switch"><span class="cr-switch__track" aria-hidden="true"></span> Live</button>
+      </div>
+    </div>
+    <div style="grid-column:1/-1">
+      <h3>Severity shapes — sides ∝ 1/danger (a channel beside colour)</h3>
+      <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-end;font-family:var(--font-mono);font-size:10px;color:var(--muted)">
+        <span style="display:flex;flex-direction:column;gap:6px;align-items:center"><span class="cr-sev cr-sev--crit" role="img" aria-label="critical"></span>crit · ▲3</span>
+        <span style="display:flex;flex-direction:column;gap:6px;align-items:center"><span class="cr-sev cr-sev--warn" role="img" aria-label="warning"></span>warn · ◆4</span>
+        <span style="display:flex;flex-direction:column;gap:6px;align-items:center"><span class="cr-sev cr-sev--work" role="img" aria-label="working"></span>work · ⬠5</span>
+        <span style="display:flex;flex-direction:column;gap:6px;align-items:center"><span class="cr-sev cr-sev--ok" role="img" aria-label="nominal"></span>ok · ⬡6</span>
+        <span style="display:flex;flex-direction:column;gap:6px;align-items:center"><span class="cr-sev cr-sev--idle" role="img" aria-label="idle"></span>idle · ●∞</span>
+        <span style="color:var(--muted);max-width:34ch;line-height:1.5">Shape reads the severity even with no colour — survives the phosphor CRT and colour-blindness.</span>
+      </div>
+      <h3 style="margin-top:18px">Hardware chrome vocabulary (bezel detail only)</h3>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;background:var(--panel-2);border:2px solid var(--border);padding:12px">
+        <i class="cr-rivet" aria-hidden="true"></i>
+        <i class="cr-rivet cr-rivet--hex" aria-hidden="true"></i>
+        <i class="cr-rivet cr-rivet--slot" aria-hidden="true"></i>
+        <i class="cr-vent" aria-hidden="true"></i>
+        <i class="cr-port" aria-hidden="true"></i>
+        <span class="cr-stripe" style="width:64px" aria-hidden="true"></span>
+        <span class="cr-tally">▐▐▐ ▌</span>
+        <span class="cr-plate">UNIT · CR-00 · REV.C</span>
+      </div>
+      <h3 style="margin-top:18px">Texture — beyond dots: crosshatch (×) &amp; duotone (cross-colours)</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;font-family:var(--font-mono);font-size:10px;color:var(--muted)">
+        <div class="cr-panel cr-panel--inset cr-tex--halftone" style="min-height:52px;padding:8px">halftone · dots</div>
+        <div class="cr-panel cr-panel--inset cr-tex--cross" style="min-height:52px;padding:8px">crosshatch · ×</div>
+        <div class="cr-panel cr-panel--inset cr-tex--duo" style="min-height:52px;padding:8px">duotone · cross-colours</div>
+        <div class="cr-panel cr-panel--inset cr-tex--scan" style="min-height:52px;padding:8px">scanlines</div>
       </div>
     </div>
     <div style="grid-column:1/-1">

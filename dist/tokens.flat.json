@@ -40,6 +40,7 @@
       "--radius": "0px",
       "--halftone-size": "7px",
       "--font-sans": "\"CR Sans\", \"Archivo\", \"Arial Black\", \"Helvetica Neue\", system-ui, sans-serif",
+      "--font-display": "\"CR Display\", \"Saira Condensed\", \"Archivo Narrow\", \"Oswald\", var(--font-sans)",
       "--font-mono": "\"CR Mono\", \"JetBrains Mono\", ui-monospace, \"SF Mono\", Menlo, monospace",
       "--type-display-weight": 900,
       "--type-display-tracking": "-0.038em",
@@ -99,7 +100,8 @@
       "--drip": "#4affc8",
       "--halftone": "radial-gradient(circle at center, rgba(255,255,255,.05) 1.1px, transparent 1.4px)",
       "--dither": "repeating-conic-gradient(rgba(255,255,255,.05) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px",
-      "--scanline": "repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0 1px, transparent 1px 3px)"
+      "--scanline": "repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0 1px, transparent 1px 3px)",
+      "--crosshatch": "repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,.06) 0 1px, transparent 1px 6px)"
     },
     "light": {
       "--ground": "#ecebe3",
@@ -130,7 +132,8 @@
       "--drip": "#0a7f5c",
       "--halftone": "radial-gradient(circle at center, rgba(0,0,0,.075) 1.1px, transparent 1.4px)",
       "--dither": "repeating-conic-gradient(rgba(0,0,0,.06) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px",
-      "--scanline": "repeating-linear-gradient(0deg, rgba(0,0,0,.05) 0 1px, transparent 1px 3px)"
+      "--scanline": "repeating-linear-gradient(0deg, rgba(0,0,0,.05) 0 1px, transparent 1px 3px)",
+      "--crosshatch": "repeating-linear-gradient(45deg, rgba(0,0,0,.07) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,.07) 0 1px, transparent 1px 6px)"
     },
     "extreme": {
       "--ground": "#0d0016",
@@ -164,6 +167,7 @@
       "--halftone": "radial-gradient(circle at center, rgba(255,255,255,.07) 1.2px, transparent 1.5px)",
       "--dither": "repeating-conic-gradient(rgba(255,255,255,.08) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px",
       "--scanline": "repeating-linear-gradient(0deg, rgba(0,240,255,.06) 0 1px, transparent 1px 3px)",
+      "--crosshatch": "repeating-linear-gradient(45deg, rgba(0,240,255,.08) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,240,255,.08) 0 1px, transparent 1px 6px)",
       "--brd": "3px",
       "--brd-heavy": "4px",
       "--brd-brush": "6px",
@@ -199,7 +203,8 @@
       "--drip": "#43ff7a",
       "--halftone": "radial-gradient(circle at center, rgba(67,255,122,.09) 1.1px, transparent 1.4px)",
       "--dither": "repeating-conic-gradient(rgba(67,255,122,.09) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px",
-      "--scanline": "repeating-linear-gradient(0deg, rgba(67,255,122,.08) 0 1px, transparent 1px 3px)"
+      "--scanline": "repeating-linear-gradient(0deg, rgba(67,255,122,.08) 0 1px, transparent 1px 3px)",
+      "--crosshatch": "repeating-linear-gradient(45deg, rgba(67,255,122,.10) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(67,255,122,.10) 0 1px, transparent 1px 6px)"
     }
   }
 }

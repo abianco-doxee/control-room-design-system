@@ -272,6 +272,56 @@
       ]
     },
     {
+      "id": "shape",
+      "name": "Shape",
+      "category": "state",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Severity glyph — polygon side-count encodes danger/focus (fewer sides = more urgent); a shape channel beside colour (Law 4).",
+      "spec": "references/components.md#severity-shapes",
+      "variants": {
+        "severity": [
+          "crit",
+          "warn",
+          "work",
+          "ok",
+          "idle"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-err",
+          "description": "crit (triangle) fill"
+        },
+        {
+          "cssVar": "--sig-wait",
+          "description": "warn (diamond) fill"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "work (pentagon) fill"
+        },
+        {
+          "cssVar": "--sig-done",
+          "description": "ok (hexagon) fill"
+        },
+        {
+          "cssVar": "--sig-idle",
+          "description": "idle (circle) fill"
+        }
+      ],
+      "keywords": [
+        "shape",
+        "severity",
+        "polygon",
+        "triangle",
+        "focus",
+        "danger",
+        "non-color",
+        "a11y"
+      ]
+    },
+    {
       "id": "chip",
       "name": "Chip",
       "category": "state",
