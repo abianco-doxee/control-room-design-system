@@ -1,5 +1,6 @@
-import { component$, useStore, useOnDocument, $ } from "@builder.io/qwik";
+import { component$, useStore, useComputed$, useOnDocument, $ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
+import { describeCron } from "../cron";
 
 /* Consume the Mitosis-compiled Qwik components straight from the built barrel.
  * (In a downstream app this is `@control-room/design-system/qwik`.)
@@ -34,6 +35,10 @@ import {
   CrSegmented,
   CrCombobox,
   CrNumberField,
+  CrHoverCard,
+  CrTree,
+  CrDateTime,
+  CrCronField,
 } from "../../../../dist/frameworks/qwik";
 
 type Sev = "crit" | "warn" | "work" | "ok" | "idle";
@@ -59,7 +64,26 @@ const SESSIONS: Session[] = [
 const THEMES = ["dark", "light", "extreme", "phosphor"] as const;
 
 export default component$(() => {
-  const ui = useStore({ theme: "dark", modal: false, page: 1, palette: false, density: "cozy", refresh: 30, drawer: false, scope: "all", worker: "", retries: 5 });
+  const ui = useStore({ theme: "dark", modal: false, page: 1, palette: false, density: "cozy", refresh: 30, drawer: false, scope: "all", worker: "", retries: 5, cron: "0 2 * * *", startAt: "" });
+
+  const FLEET = [
+    {
+      id: "nova",
+      label: "nova (pool)",
+      children: [
+        { id: "nova-01", label: "nova-01 · streaming" },
+        { id: "nova-02", label: "nova-02 · idle" },
+      ],
+    },
+    {
+      id: "ail",
+      label: "ail (pool)",
+      children: [
+        { id: "ail-chat", label: "ail-chat · waiting" },
+        { id: "rp-verify", label: "rp-verify · done" },
+      ],
+    },
+  ];
   const live = useStore<Record<string, boolean>>({ "nova-01": true, "ptl-757": false });
   const toasts = useStore<{ list: { id: number; signal: string; message: string }[]; seq: number }>({
     list: [],
@@ -83,6 +107,9 @@ export default component$(() => {
     { id: "theme:extreme", label: "Theme: Extreme", hint: "3", group: "theme" },
     { id: "theme:phosphor", label: "Theme: Phosphor", hint: "4", group: "theme" },
   ];
+
+  /* cronstrue translation, recomputed reactively when ui.cron changes */
+  const cronDesc = useComputed$(() => describeCron(ui.cron));
 
   const runCommand = $((id: string) => {
     ui.palette = false;
@@ -166,6 +193,13 @@ export default component$(() => {
           <div style="display:flex;gap:var(--space-2);margin-top:var(--space-3);flex-wrap:wrap;align-items:center">
             <span class="cr-tag cr-tag--wait">2 waiting</span>
             <span class="cr-tag cr-tag--err">1 failing</span>
+            <CrHoverCard label="health" title="Fleet health">
+              <dl class="cr-dl">
+                <dt class="cr-dl__k">workers</dt><dd class="cr-dl__v">4 online</dd>
+                <dt class="cr-dl__k">throughput</dt><dd class="cr-dl__v">128 turns/min</dd>
+                <dt class="cr-dl__k">error rate</dt><dd class="cr-dl__v">1.2%</dd>
+              </dl>
+            </CrHoverCard>
             <CrButton size="sm" kind="controls" keyshortcuts="Meta+K Control+K" onClick={$(() => (ui.palette = true))}>
               commands
               <CrKbd keys="⌘K" />
@@ -355,6 +389,29 @@ export default component$(() => {
           </div>
         </section>
 
+        {/* maintenance schedule — cron (translated live by cronstrue) + a start time */}
+        <section class="cr-panel" style="padding:var(--space-4);display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-4);align-items:start">
+          <div>
+            <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">restart schedule (cron)</p>
+            <CrCronField
+              value={ui.cron}
+              description={cronDesc.value.text}
+              invalid={cronDesc.value.bad}
+              onChange={$((v: string) => (ui.cron = v))}
+              presets={[
+                { label: "hourly", cron: "0 * * * *" },
+                { label: "nightly 2am", cron: "0 2 * * *" },
+                { label: "weekdays 9am", cron: "0 9 * * 1-5" },
+                { label: "every 15m", cron: "*/15 * * * *" },
+              ]}
+            />
+          </div>
+          <div>
+            <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">first run at</p>
+            <CrDateTime value={ui.startAt} label="First run" onChange={$((v: string) => (ui.startAt = v))} />
+          </div>
+        </section>
+
         <footer style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
           <CrChip tone="done">v1.0.0</CrChip>
           <span class="cr-telemetry">SYS 0x7F · 41ms · ▁▂▃▅▇▅▃▂</span>
@@ -370,6 +427,9 @@ export default component$(() => {
           <div class="cr-leader"><span class="cr-leader__k">region</span><span class="cr-leader__fill"></span><span class="cr-leader__v">eu-west-1</span></div>
           <div class="cr-leader"><span class="cr-leader__k">retries</span><span class="cr-leader__fill"></span><span class="cr-leader__v">3 / 5</span></div>
         </div>
+
+        <p class="cr-sep-label">fleet</p>
+        <CrTree label="Worker fleet" nodes={FLEET} defaultExpanded={["nova"]} />
 
         <p class="cr-sep-label">recent events</p>
         {/* ascii-marker list */}
