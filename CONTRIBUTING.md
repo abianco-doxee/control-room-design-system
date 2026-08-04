@@ -31,7 +31,7 @@ npm run verify         # token drift + catalog drift + skill validity (the CI ga
 
 1. Edit `tokens/tokens.json` — add/adjust the value for **all four themes**.
 2. `npm run build:tokens` to regenerate `dist/control-room.css`,
-   `dist/tailwind-preset.cjs`, `dist/tokens.flat.json`, and the DTCG export
+   `dist/tw-theme.css`, `dist/tokens.flat.json`, and the DTCG export
    `design-tokens/control-room.tokens.json`.
 3. Commit `tokens/tokens.json` **and** the regenerated `dist/` + `design-tokens/`.
 4. CI runs `npm run verify:tokens` and fails the PR if any generated file is stale.
@@ -93,20 +93,6 @@ npm run skills:check   # validate the source + fail on install drift (CI)
 
 Provider installs are generated and git-ignored — never edit them by hand; edit
 the root files and re-sync.
-
-## Figma bridge (optional)
-
-The system is code-first; Figma is optional. If you use the free Figma → code
-bridge (`references/figma-bridge.md`):
-
-- Provide the Figma token **only** as the `FIGMA_TOKEN` env var (Claude Code
-  environment settings or a git-ignored `.env`). Read-only, short-lived, revoked
-  when done. **Never** paste it in chat, a commit, or a tracked file — `.gitignore`
-  blocks `.env*` / `*.pat` / `*.secret`, but the real guard is not committing it.
-- Map Figma components in each entry's `figma` field in `catalog/registry.json`,
-  then `npm run build:catalog`. The map is optional and fills incrementally.
-- Confidential file? Only point the bridge at a company-approved model — the
-  design content reaches whatever LLM the agent uses.
 
 ## Versioning
 

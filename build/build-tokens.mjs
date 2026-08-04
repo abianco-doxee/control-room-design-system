@@ -8,13 +8,12 @@
  * selectors and writes the runtime artifacts:
  *
  *   dist/control-room.css     — all four themes + global baseline
- *   dist/tailwind-preset.cjs  — Tailwind colors/spacing mapped to the CSS vars
+ *   dist/tw-theme.css         — Tailwind v4 @theme (colors resolve to CSS vars)
  *   dist/tokens.flat.json     — resolved cssVar -> value, per theme
  *
  * Run:   node build/build-tokens.mjs
  * Check: node build/build-tokens.mjs --check   (fails if dist/ is stale)
  */
-import StyleDictionary from "style-dictionary";
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -67,32 +66,14 @@ const base = baseVars();
 const dictFor = (theme) =>
   theme === src.meta.defaultTheme ? { ...base, ...themeVars(theme) } : themeVars(theme);
 
-/* ── 2. use Style Dictionary to emit the variable declarations ───────────── */
+/* ── 2. emit the variable declarations ───────────────────────────────────── */
+// Token names in the flat map are already kebab cssVar names, so this is a
+// plain join — no build framework needed.
 
-StyleDictionary.registerFormat({
-  name: "cr/vars-body",
-  format: ({ dictionary }) =>
-    dictionary.allTokens.map((t) => `  --${t.name}: ${t.value};`).join("\n"),
-});
-
-async function varsBody(theme) {
-  // wrap each flat value as a Style Dictionary token: { name: { value } }
-  const tokens = Object.fromEntries(
-    Object.entries(dictFor(theme)).map(([name, value]) => [name, { value }]),
-  );
-  const sd = new StyleDictionary({
-    tokens,
-    log: { verbosity: "silent" },
-    platforms: {
-      css: {
-        transforms: ["name/kebab"],
-        buildPath: join(DIST, ".sd", theme) + "/",
-        files: [{ destination: "vars.css", format: "cr/vars-body" }],
-      },
-    },
-  });
-  await sd.buildAllPlatforms();
-  return readFileSync(join(DIST, ".sd", theme, "vars.css"), "utf8");
+function varsBody(theme) {
+  return Object.entries(dictFor(theme))
+    .map(([name, value]) => `  --${name}: ${value};`)
+    .join("\n");
 }
 
 /* ── 3. assemble control-room.css ───────────────────────────────────────── */
@@ -141,38 +122,7 @@ async function buildCss() {
   return css;
 }
 
-/* ── 4. tailwind preset + flat json ─────────────────────────────────────── */
-
-function tailwindPreset() {
-  const ref = (n) => `var(--${n})`;
-  // expose the semantic color roles by their token name; utilities resolve to
-  // the CSS vars, so they follow html[data-theme] automatically.
-  const colorRoles = {};
-  for (const group of ["surface", "text", "line", "signal", "keyed"]) {
-    for (const v of Object.values(src.semantic[group])) {
-      if (!v || typeof v.cssVar !== "string") continue; // skip $comment etc.
-      const name = v.cssVar.replace(/^--/, "");
-      colorRoles[name] = ref(name);
-    }
-  }
-  return `/* GENERATED — do not edit. Source: tokens/tokens.json */
-/* Tailwind preset. Colors resolve to CSS custom properties, so utilities
-   follow html[data-theme] automatically. Usage: presets: [require('./dist/tailwind-preset.cjs')] */
-module.exports = {
-  theme: {
-    extend: {
-      colors: ${JSON.stringify(colorRoles, null, 8).replace(/\n/g, "\n      ")},
-      borderRadius: { none: "0px", DEFAULT: "0px" },
-      fontFamily: {
-        sans: ["var(--font-sans)"],
-        mono: ["var(--font-mono)"]
-      }
-    }
-  },
-  corePlugins: { /* radius stays 0 by system law */ }
-};
-`;
-}
+/* ── 4. flat json ────────────────────────────────────────────────────────── */
 
 function flatJson() {
   const out = {};
@@ -289,7 +239,6 @@ function twTheme() {
 /* ── 6. write / check ───────────────────────────────────────────────────── */
 
 const css = await buildCss();
-const tw = tailwindPreset();
 const flat = flatJson();
 const dtcgJson = dtcg();
 const twThemeCss = twTheme();
@@ -297,7 +246,6 @@ const twThemeCss = twTheme();
 // [path relative to repo root, content]
 const targets = [
   ["dist/control-room.css", css],
-  ["dist/tailwind-preset.cjs", tw],
   ["dist/tw-theme.css", twThemeCss],
   ["dist/tokens.flat.json", flat],
   ["design-tokens/control-room.tokens.json", dtcgJson],

@@ -6,9 +6,9 @@ raw hex or a `border-radius: 4px` is, by definition, a defect, because it will
 not survive a theme flip and it breaks the single source of truth.
 
 - **Author** here: `tokens/tokens.json` — the hand-edited source of truth.
-- **Generated** by `npm run build:tokens` (Style Dictionary), committed:
+- **Generated** by `npm run build:tokens`, committed:
   - `dist/control-room.css` — runtime CSS custom properties, all four themes
-  - `dist/tailwind-preset.cjs` — Tailwind preset (colors resolve to the CSS vars)
+  - `dist/tw-theme.css` — Tailwind v4 `@theme` (colors resolve to the CSS vars)
   - `dist/tokens.flat.json` — resolved `cssVar → value`, per theme
   - `design-tokens/control-room.tokens.json` — **DTCG** format (see below)
 

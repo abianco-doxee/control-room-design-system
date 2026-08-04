@@ -24,7 +24,6 @@
     "./components": "./styles/components.css",
     "./tailwind.css": "./styles/tailwind.css",
     "./tw-theme.css": "./dist/tw-theme.css",
-    "./tailwind-preset": "./dist/tailwind-preset.cjs",
     "./flat": "./dist/tokens.flat.json",
     "./dtcg": "./design-tokens/control-room.tokens.json",
     "./catalog": "./catalog/catalog.json",
@@ -57,7 +56,6 @@
     "verify:palette": "node build/build-palette.mjs --check",
     "skills:sync": "node scripts/skills-sync.mjs",
     "skills:check": "node scripts/skills-sync.mjs --check",
-    "figma:pull": "node scripts/figma-pull.mjs",
     "pretest:e2e": "npm run build:tokens && npm run build:gallery",
     "test:e2e": "playwright test",
     "test:a11y": "playwright test tests/a11y.spec.mjs",
@@ -76,7 +74,6 @@
     "@playwright/test": "^1.62.1",
     "@tailwindcss/cli": "^4.3.3",
     "culori": "^4.0.2",
-    "style-dictionary": "^4.3.0",
     "tailwindcss": "^4.3.3",
     "undici": "^8.10.0"
   },
