@@ -116,6 +116,7 @@
   --dither: repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
   --scanline: repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);
   --crosshatch: repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);
+  --field: repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
 }
 
 :root[data-theme="light"] {
@@ -150,6 +151,7 @@
   --dither: repeating-conic-gradient(rgba(0,0,0,0.11) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
   --scanline: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0 1px, transparent 1px 3px);
   --crosshatch: repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px);
+  --field: repeating-conic-gradient(rgba(0,0,0,0.045) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
 }
 
 :root[data-theme="extreme"] {
@@ -186,6 +188,7 @@
   --dither: repeating-conic-gradient(rgba(255,255,255,0.15) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
   --scanline: repeating-linear-gradient(0deg, rgba(0,240,255,0.12) 0 1px, transparent 1px 3px);
   --crosshatch: repeating-linear-gradient(45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 6px);
+  --field: repeating-conic-gradient(rgba(255,255,255,0.05) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
   --brd: 3px;
   --brd-heavy: 4px;
   --brd-brush: 6px;
@@ -225,6 +228,7 @@
   --dither: repeating-conic-gradient(rgba(67,255,122,0.14) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
   --scanline: repeating-linear-gradient(0deg, rgba(67,255,122,0.13) 0 1px, transparent 1px 3px);
   --crosshatch: repeating-linear-gradient(45deg, rgba(67,255,122,0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(67,255,122,0.16) 0 1px, transparent 1px 6px);
+  --field: repeating-conic-gradient(rgba(67,255,122,0.05) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
 }
 
 /* ── GLOBAL BASELINE ──────────────────────────────────────────────────── */
@@ -784,6 +788,59 @@ body {
  * rail at empty — so hide it rather than leave a stuck bar. */
 @media (prefers-reduced-motion: reduce) { .cr-scrollbar { display: none; } }
 
+/* ── ASCII / pixel decoration for DEAD SPACE (never touches content) ─────────
+ * Everything here is decoration: aria-hidden, non-interactive, whisper contrast,
+ * mask-faded away from text. Give the host `position: relative` and put real
+ * content above with `position: relative; z-index: 1`. See references/decoration.md. */
+
+/* seeded density field (the CrAscii canvas) — sits behind, faded off the text */
+.cr-ascii {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; user-select: none;
+  opacity: 0.5; overflow: hidden;
+}
+.cr-ascii > canvas { display: block; width: 100%; height: 100%; }
+.cr-ascii--mask-l    { -webkit-mask-image: linear-gradient(90deg, transparent, #000 62%); mask-image: linear-gradient(90deg, transparent, #000 62%); }
+.cr-ascii--mask-r    { -webkit-mask-image: linear-gradient(90deg, #000 38%, transparent); mask-image: linear-gradient(90deg, #000 38%, transparent); }
+.cr-ascii--mask-edge { -webkit-mask-image: radial-gradient(120% 120% at 50% 50%, #000 38%, transparent 86%); mask-image: radial-gradient(120% 120% at 50% 50%, #000 38%, transparent 86%); }
+
+/* telemetry frame trim — 4 corner brackets on any surface (structure, not signal) */
+.cr-trim { --cr-trim-c: var(--muted); --cr-trim-sz: 12px; --cr-trim-w: 2px; position: relative; }
+.cr-trim::before, .cr-trim::after {
+  content: ""; position: absolute; width: var(--cr-trim-sz); height: var(--cr-trim-sz);
+  border: var(--cr-trim-w) solid var(--cr-trim-c); pointer-events: none;
+}
+.cr-trim::before { top: calc(var(--cr-trim-w) * -1); left: calc(var(--cr-trim-w) * -1); border-right: 0; border-bottom: 0; }
+.cr-trim::after  { bottom: calc(var(--cr-trim-w) * -1); right: calc(var(--cr-trim-w) * -1); border-left: 0; border-top: 0; }
+/* opt into all four corners (adds TR + BL via a background of L-marks) */
+.cr-trim--4 {
+  background-image:
+    linear-gradient(var(--cr-trim-c), var(--cr-trim-c)), linear-gradient(var(--cr-trim-c), var(--cr-trim-c)),
+    linear-gradient(var(--cr-trim-c), var(--cr-trim-c)), linear-gradient(var(--cr-trim-c), var(--cr-trim-c));
+  background-repeat: no-repeat;
+  background-size:
+    var(--cr-trim-sz) var(--cr-trim-w), var(--cr-trim-w) var(--cr-trim-sz),
+    var(--cr-trim-sz) var(--cr-trim-w), var(--cr-trim-w) var(--cr-trim-sz);
+  background-position: top right, top right, bottom left, bottom left;
+}
+
+/* a fine tick-ruler edge (FUI) — short ticks every 8px, tall every 40px */
+.cr-ruler {
+  height: var(--space-2); pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, var(--muted) 0 1px, transparent 1px 40px) bottom / 100% 100% no-repeat,
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--muted) 55%, transparent) 0 1px, transparent 1px 8px) bottom / 100% 55% no-repeat;
+  opacity: 0.7;
+}
+
+/* seeded decorative telemetry string (CrTelemetry) */
+.cr-telemetry {
+  font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: 0.12em;
+  color: var(--muted); user-select: none; white-space: nowrap;
+}
+
+/* whisper drafting field for large dead background regions */
+.cr-bg--field { background-image: var(--field); background-repeat: repeat; }
+
 @media (prefers-reduced-motion: reduce) { .cr-breach--alive { animation: none; } }
 
 
@@ -959,9 +1016,11 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
           </ul>
         </nav>
         <div class="cr-instrument__board">
-          <header class="cr-masthead cr-mark">
-            <p class="cr-masthead__eyebrow">DP Control Room · Phase 0</p>
-            <h1 class="cr-masthead__title">14 sessions<br>2 need you</h1>
+          <header class="cr-masthead cr-mark" style="overflow:hidden">
+            <div class="cr-ascii cr-ascii--mask-l" aria-hidden="true"><canvas class="crascii" width="380" height="130" data-seed="cr-mast" data-variant="braille"></canvas></div>
+            <p class="cr-masthead__eyebrow" style="position:relative;z-index:1">DP Control Room · Phase 0</p>
+            <h1 class="cr-masthead__title" style="position:relative;z-index:1">14 sessions<br>2 need you</h1>
+            <span class="cr-telemetry" aria-hidden="true" style="position:absolute;right:14px;bottom:10px;z-index:1">SEED 2E7A · 0x4F · 12ms ▮▮▮▯▯</span>
           </header>
           <div class="cr-hero cr-hero--wait">
             <div><div class="cr-hero__big">nova needs you</div><div class="cr-hero__sub">CR-1130 · paused for input · 6m</div></div>
@@ -1150,6 +1209,33 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       </div>
     </div>
     <div style="grid-column:1/-1">
+      <h3>Decoration — ASCII/pixel in dead space (seeded · aria-hidden · whisper)</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+        <div class="cr-panel cr-panel--inset" style="position:relative;height:120px;overflow:hidden">
+          <div class="cr-ascii cr-ascii--mask-edge" aria-hidden="true"><canvas class="crascii" width="260" height="120" data-seed="nova" data-variant="braille"></canvas></div>
+          <span style="position:relative;z-index:1;font-family:var(--font-mono);font-size:10px;color:var(--muted)">braille field</span>
+        </div>
+        <div class="cr-panel cr-panel--inset" style="position:relative;height:120px;overflow:hidden">
+          <div class="cr-ascii cr-ascii--mask-edge" aria-hidden="true"><canvas class="crascii" width="260" height="120" data-seed="atlas" data-variant="block"></canvas></div>
+          <span style="position:relative;z-index:1;font-family:var(--font-mono);font-size:10px;color:var(--muted)">block field ░▒▓</span>
+        </div>
+        <div class="cr-panel cr-panel--inset" style="position:relative;height:120px;overflow:hidden">
+          <div class="cr-ascii cr-ascii--mask-edge" aria-hidden="true"><canvas class="crascii" width="260" height="120" data-seed="rhea" data-variant="ramp"></canvas></div>
+          <span style="position:relative;z-index:1;font-family:var(--font-mono);font-size:10px;color:var(--muted)">ascii ramp</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:12px">
+        <div class="cr-panel cr-trim cr-trim--4" style="padding:16px 20px;font-family:var(--font-mono);font-size:11px;color:var(--muted)">telemetry frame trim · 4 corners</div>
+        <span class="cr-telemetry">SEED A3F9 · 0x2E · 18ms ▮▮▮▮▯</span>
+      </div>
+      <div class="cr-ruler" style="margin-top:12px" aria-hidden="true"></div>
+      <div class="cr-panel cr-bg--field" style="margin-top:12px;padding:14px;font-family:var(--font-mono);font-size:11px;color:var(--muted)">background drafting field — a whisper block-shade grid behind dead space</div>
+      <div style="margin-top:12px;border:2px dashed var(--line-soft, var(--border));position:relative;height:110px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+        <div class="cr-ascii cr-ascii--mask-edge" aria-hidden="true"><canvas class="crascii" width="360" height="110" data-seed="empty" data-variant="braille"></canvas></div>
+        <span style="position:relative;z-index:1;font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:.12em">░ NO SIGNAL ░</span>
+      </div>
+    </div>
+    <div style="grid-column:1/-1">
       <h3>The Breach (Law 9) — one sanctioned rule-break per screen</h3>
       <div style="display:flex;gap:26px;flex-wrap:wrap;align-items:center;padding:16px 4px">
         <div class="cr-breach cr-breach--wash cr-breach--alive" style="max-width:340px;padding:20px;background-color:var(--panel)">
@@ -1276,6 +1362,20 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
     for(var s=0;s<seams;s++){var sx=Math.round(pad+rng()*(W-pad*2));ctx.fillStyle=EDGE;ctx.fillRect(sx,2,1,H-4);ctx.fillStyle=HI;ctx.fillRect(sx+1,2,1,H-4);}
     var led=LED[Math.floor(rng()*LED.length)],lx=rng()>0.5?W-8:8;
     ctx.fillStyle=EDGE;ctx.fillRect(lx-3,H/2-3,6,6);ctx.fillStyle=led;ctx.fillRect(lx-2,H/2-2,4,4);ctx.fillStyle="#fff";ctx.globalAlpha=0.6;ctx.fillRect(lx-2,H/2-2,1,1);ctx.globalAlpha=1;
+  });
+
+  // Seeded ASCII/Unicode density field (dead-space decoration).
+  var RAMPS={block:[" ","░","▒","▓","█"],ramp:[" ",".",":","-","=","+","*","#","%","@"],braille:[" ","⠁","⠃","⠇","⡇","⣇","⣧","⣿"]};
+  document.querySelectorAll(".crascii").forEach(function(cv){
+    var W=cv.width,H=cv.height,rng=mb32(hashSeed(cv.dataset.seed)),variant=cv.dataset.variant||"braille";
+    var ramp=RAMPS[variant]||RAMPS.braille;
+    var lobes=[];for(var i=0;i<3;i++){lobes.push({fx:0.4+rng()*1.6,fy:0.4+rng()*1.6,px:rng()*6.283,py:rng()*6.283});}
+    function dens(u,v){var s=0;for(var j=0;j<lobes.length;j++){var l=lobes[j];s+=Math.sin(u*l.fx*6.283+l.px)*Math.cos(v*l.fy*6.283+l.py);}return (s/lobes.length+1)/2;}
+    var ctx=cv.getContext("2d");ctx.clearRect(0,0,W,H);
+    var cw=variant==="braille"?7:9,ch=12;ctx.font="12px 'JetBrains Mono',ui-monospace,monospace";ctx.textBaseline="top";ctx.fillStyle="#8a86ad";
+    var cols=Math.ceil(W/cw),rows=Math.ceil(H/ch);
+    for(var r=0;r<rows;r++){for(var c=0;c<cols;c++){var d=dens(c/cols,r/rows)*(0.6+rng()*0.4);var gi=Math.min(ramp.length-1,Math.floor(d*ramp.length));var g=ramp[gi];if(g===" ")continue;ctx.globalAlpha=0.12+d*0.16;ctx.fillText(g,c*cw,r*ch);}}
+    ctx.globalAlpha=1;
   });
 </script>
 </body>

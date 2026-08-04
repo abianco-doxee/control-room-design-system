@@ -136,9 +136,11 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
           </ul>
         </nav>
         <div class="cr-instrument__board">
-          <header class="cr-masthead cr-mark">
-            <p class="cr-masthead__eyebrow">DP Control Room · Phase 0</p>
-            <h1 class="cr-masthead__title">14 sessions<br>2 need you</h1>
+          <header class="cr-masthead cr-mark" style="overflow:hidden">
+            <div class="cr-ascii cr-ascii--mask-l" aria-hidden="true"><canvas class="crascii" width="380" height="130" data-seed="cr-mast" data-variant="braille"></canvas></div>
+            <p class="cr-masthead__eyebrow" style="position:relative;z-index:1">DP Control Room · Phase 0</p>
+            <h1 class="cr-masthead__title" style="position:relative;z-index:1">14 sessions<br>2 need you</h1>
+            <span class="cr-telemetry" aria-hidden="true" style="position:absolute;right:14px;bottom:10px;z-index:1">SEED 2E7A · 0x4F · 12ms ▮▮▮▯▯</span>
           </header>
           <div class="cr-hero cr-hero--wait">
             <div><div class="cr-hero__big">nova needs you</div><div class="cr-hero__sub">CR-1130 · paused for input · 6m</div></div>
@@ -327,6 +329,33 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       </div>
     </div>
     <div style="grid-column:1/-1">
+      <h3>Decoration — ASCII/pixel in dead space (seeded · aria-hidden · whisper)</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+        <div class="cr-panel cr-panel--inset" style="position:relative;height:120px;overflow:hidden">
+          <div class="cr-ascii cr-ascii--mask-edge" aria-hidden="true"><canvas class="crascii" width="260" height="120" data-seed="nova" data-variant="braille"></canvas></div>
+          <span style="position:relative;z-index:1;font-family:var(--font-mono);font-size:10px;color:var(--muted)">braille field</span>
+        </div>
+        <div class="cr-panel cr-panel--inset" style="position:relative;height:120px;overflow:hidden">
+          <div class="cr-ascii cr-ascii--mask-edge" aria-hidden="true"><canvas class="crascii" width="260" height="120" data-seed="atlas" data-variant="block"></canvas></div>
+          <span style="position:relative;z-index:1;font-family:var(--font-mono);font-size:10px;color:var(--muted)">block field ░▒▓</span>
+        </div>
+        <div class="cr-panel cr-panel--inset" style="position:relative;height:120px;overflow:hidden">
+          <div class="cr-ascii cr-ascii--mask-edge" aria-hidden="true"><canvas class="crascii" width="260" height="120" data-seed="rhea" data-variant="ramp"></canvas></div>
+          <span style="position:relative;z-index:1;font-family:var(--font-mono);font-size:10px;color:var(--muted)">ascii ramp</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:12px">
+        <div class="cr-panel cr-trim cr-trim--4" style="padding:16px 20px;font-family:var(--font-mono);font-size:11px;color:var(--muted)">telemetry frame trim · 4 corners</div>
+        <span class="cr-telemetry">SEED A3F9 · 0x2E · 18ms ▮▮▮▮▯</span>
+      </div>
+      <div class="cr-ruler" style="margin-top:12px" aria-hidden="true"></div>
+      <div class="cr-panel cr-bg--field" style="margin-top:12px;padding:14px;font-family:var(--font-mono);font-size:11px;color:var(--muted)">background drafting field — a whisper block-shade grid behind dead space</div>
+      <div style="margin-top:12px;border:2px dashed var(--line-soft, var(--border));position:relative;height:110px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+        <div class="cr-ascii cr-ascii--mask-edge" aria-hidden="true"><canvas class="crascii" width="360" height="110" data-seed="empty" data-variant="braille"></canvas></div>
+        <span style="position:relative;z-index:1;font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:.12em">░ NO SIGNAL ░</span>
+      </div>
+    </div>
+    <div style="grid-column:1/-1">
       <h3>The Breach (Law 9) — one sanctioned rule-break per screen</h3>
       <div style="display:flex;gap:26px;flex-wrap:wrap;align-items:center;padding:16px 4px">
         <div class="cr-breach cr-breach--wash cr-breach--alive" style="max-width:340px;padding:20px;background-color:var(--panel)">
@@ -453,6 +482,20 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
     for(var s=0;s<seams;s++){var sx=Math.round(pad+rng()*(W-pad*2));ctx.fillStyle=EDGE;ctx.fillRect(sx,2,1,H-4);ctx.fillStyle=HI;ctx.fillRect(sx+1,2,1,H-4);}
     var led=LED[Math.floor(rng()*LED.length)],lx=rng()>0.5?W-8:8;
     ctx.fillStyle=EDGE;ctx.fillRect(lx-3,H/2-3,6,6);ctx.fillStyle=led;ctx.fillRect(lx-2,H/2-2,4,4);ctx.fillStyle="#fff";ctx.globalAlpha=0.6;ctx.fillRect(lx-2,H/2-2,1,1);ctx.globalAlpha=1;
+  });
+
+  // Seeded ASCII/Unicode density field (dead-space decoration).
+  var RAMPS={block:[" ","░","▒","▓","█"],ramp:[" ",".",":","-","=","+","*","#","%","@"],braille:[" ","⠁","⠃","⠇","⡇","⣇","⣧","⣿"]};
+  document.querySelectorAll(".crascii").forEach(function(cv){
+    var W=cv.width,H=cv.height,rng=mb32(hashSeed(cv.dataset.seed)),variant=cv.dataset.variant||"braille";
+    var ramp=RAMPS[variant]||RAMPS.braille;
+    var lobes=[];for(var i=0;i<3;i++){lobes.push({fx:0.4+rng()*1.6,fy:0.4+rng()*1.6,px:rng()*6.283,py:rng()*6.283});}
+    function dens(u,v){var s=0;for(var j=0;j<lobes.length;j++){var l=lobes[j];s+=Math.sin(u*l.fx*6.283+l.px)*Math.cos(v*l.fy*6.283+l.py);}return (s/lobes.length+1)/2;}
+    var ctx=cv.getContext("2d");ctx.clearRect(0,0,W,H);
+    var cw=variant==="braille"?7:9,ch=12;ctx.font="12px 'JetBrains Mono',ui-monospace,monospace";ctx.textBaseline="top";ctx.fillStyle="#8a86ad";
+    var cols=Math.ceil(W/cw),rows=Math.ceil(H/ch);
+    for(var r=0;r<rows;r++){for(var c=0;c<cols;c++){var d=dens(c/cols,r/rows)*(0.6+rng()*0.4);var gi=Math.min(ramp.length-1,Math.floor(d*ramp.length));var g=ramp[gi];if(g===" ")continue;ctx.globalAlpha=0.12+d*0.16;ctx.fillText(g,c*cw,r*ch);}}
+    ctx.globalAlpha=1;
   });
 </script>
 </body>

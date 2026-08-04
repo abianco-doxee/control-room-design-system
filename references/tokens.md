@@ -274,10 +274,13 @@ Three theme-keyed texture backgrounds for **hardware surfaces only** (Law 6):
 | `--halftone` | neo-print dot pattern |
 | `--dither` | ordered 1-bit checker (50% dither) |
 | `--scanline` | CRT scanlines |
+| `--crosshatch` | ±45° cross-hatch |
+| `--field` | whisper block-shade drafting field (dead background space) |
 
 Apply via the `.cr-tex--halftone` / `.cr-tex--dither` / `.cr-tex--scan` /
-`.cr-tex--glass` utilities (see `references/components.md`) — never on a flat
-content field.
+`.cr-tex--cross` / `.cr-tex--glass` utilities on hardware, and `.cr-bg--field` for
+dead background space (see `references/components.md` and `references/decoration.md`)
+— never on a flat content field.
 
 ## Adding a token
 

@@ -535,4 +535,57 @@
  * rail at empty — so hide it rather than leave a stuck bar. */
 @media (prefers-reduced-motion: reduce) { .cr-scrollbar { display: none; } }
 
+/* ── ASCII / pixel decoration for DEAD SPACE (never touches content) ─────────
+ * Everything here is decoration: aria-hidden, non-interactive, whisper contrast,
+ * mask-faded away from text. Give the host `position: relative` and put real
+ * content above with `position: relative; z-index: 1`. See references/decoration.md. */
+
+/* seeded density field (the CrAscii canvas) — sits behind, faded off the text */
+.cr-ascii {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; user-select: none;
+  opacity: 0.5; overflow: hidden;
+}
+.cr-ascii > canvas { display: block; width: 100%; height: 100%; }
+.cr-ascii--mask-l    { -webkit-mask-image: linear-gradient(90deg, transparent, #000 62%); mask-image: linear-gradient(90deg, transparent, #000 62%); }
+.cr-ascii--mask-r    { -webkit-mask-image: linear-gradient(90deg, #000 38%, transparent); mask-image: linear-gradient(90deg, #000 38%, transparent); }
+.cr-ascii--mask-edge { -webkit-mask-image: radial-gradient(120% 120% at 50% 50%, #000 38%, transparent 86%); mask-image: radial-gradient(120% 120% at 50% 50%, #000 38%, transparent 86%); }
+
+/* telemetry frame trim — 4 corner brackets on any surface (structure, not signal) */
+.cr-trim { --cr-trim-c: var(--muted); --cr-trim-sz: 12px; --cr-trim-w: 2px; position: relative; }
+.cr-trim::before, .cr-trim::after {
+  content: ""; position: absolute; width: var(--cr-trim-sz); height: var(--cr-trim-sz);
+  border: var(--cr-trim-w) solid var(--cr-trim-c); pointer-events: none;
+}
+.cr-trim::before { top: calc(var(--cr-trim-w) * -1); left: calc(var(--cr-trim-w) * -1); border-right: 0; border-bottom: 0; }
+.cr-trim::after  { bottom: calc(var(--cr-trim-w) * -1); right: calc(var(--cr-trim-w) * -1); border-left: 0; border-top: 0; }
+/* opt into all four corners (adds TR + BL via a background of L-marks) */
+.cr-trim--4 {
+  background-image:
+    linear-gradient(var(--cr-trim-c), var(--cr-trim-c)), linear-gradient(var(--cr-trim-c), var(--cr-trim-c)),
+    linear-gradient(var(--cr-trim-c), var(--cr-trim-c)), linear-gradient(var(--cr-trim-c), var(--cr-trim-c));
+  background-repeat: no-repeat;
+  background-size:
+    var(--cr-trim-sz) var(--cr-trim-w), var(--cr-trim-w) var(--cr-trim-sz),
+    var(--cr-trim-sz) var(--cr-trim-w), var(--cr-trim-w) var(--cr-trim-sz);
+  background-position: top right, top right, bottom left, bottom left;
+}
+
+/* a fine tick-ruler edge (FUI) — short ticks every 8px, tall every 40px */
+.cr-ruler {
+  height: var(--space-2); pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, var(--muted) 0 1px, transparent 1px 40px) bottom / 100% 100% no-repeat,
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--muted) 55%, transparent) 0 1px, transparent 1px 8px) bottom / 100% 55% no-repeat;
+  opacity: 0.7;
+}
+
+/* seeded decorative telemetry string (CrTelemetry) */
+.cr-telemetry {
+  font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: 0.12em;
+  color: var(--muted); user-select: none; white-space: nowrap;
+}
+
+/* whisper drafting field for large dead background regions */
+.cr-bg--field { background-image: var(--field); background-repeat: repeat; }
+
 @media (prefers-reduced-motion: reduce) { .cr-breach--alive { animation: none; } }
