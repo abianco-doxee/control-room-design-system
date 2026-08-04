@@ -228,10 +228,9 @@ const DEMOS = {
     render: (s, set) => h(CrSwitch, { checked: s.checked, disabled: s.disabled, label: s.checked ? "Auto-scale on" : "Auto-scale off", onChange: (v) => set("checked", v) }),
   },
   select: {
-    tag: "CrSelect", defs: [T("boolean", "disabled", false)],
-    render: (s) => h("div", { style: { display: "flex", flexDirection: "column", gap: "4px" } },
-      h("label", { htmlFor: "isl-select", style: { fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--muted)" } }, "Region"),
-      h(CrSelect, { id: "isl-select", options: ["eu-west-1", "us-east-1", "ap-south-1"], disabled: s.disabled })),
+    tag: "CrSelect",
+    defs: [T("text", "label", "Region"), T("boolean", "disabled", false)],
+    render: (s) => h(CrSelect, { label: s.label, options: ["eu-west-1", "us-east-1", "ap-south-1"], disabled: s.disabled }),
   },
   tooltip: {
     tag: "CrTooltip", defs: [T("text", "label", "Reaps sessions idle > 30m")],
@@ -333,17 +332,13 @@ const DEMOS = {
   },
   input: {
     tag: "CrInput",
-    defs: [T("text", "placeholder", "search sessions…"), T("boolean", "disabled", false), T("boolean", "invalid", false)],
-    render: (s) => h("div", { style: { display: "flex", flexDirection: "column", gap: "4px" } },
-      h("label", { htmlFor: "isl-input", style: { fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--muted)" } }, "Filter"),
-      h(CrInput, { id: "isl-input", placeholder: s.placeholder, disabled: s.disabled, invalid: s.invalid })),
+    defs: [T("text", "label", "Filter"), T("text", "placeholder", "search sessions…"), T("boolean", "disabled", false), T("boolean", "invalid", false)],
+    render: (s) => h(CrInput, { label: s.label, placeholder: s.placeholder, disabled: s.disabled, invalid: s.invalid }),
   },
   textarea: {
     tag: "CrTextarea",
-    defs: [T("text", "placeholder", "notes…"), T("boolean", "disabled", false), T("boolean", "invalid", false)],
-    render: (s) => h("div", { style: { display: "flex", flexDirection: "column", gap: "4px" } },
-      h("label", { htmlFor: "isl-textarea", style: { fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--muted)" } }, "Notes"),
-      h(CrTextarea, { id: "isl-textarea", placeholder: s.placeholder, disabled: s.disabled, invalid: s.invalid })),
+    defs: [T("text", "label", "Notes"), T("text", "placeholder", "notes…"), T("boolean", "disabled", false), T("boolean", "invalid", false)],
+    render: (s) => h(CrTextarea, { label: s.label, placeholder: s.placeholder, disabled: s.disabled, invalid: s.invalid }),
   },
   "form-field": {
     tag: "CrField",
