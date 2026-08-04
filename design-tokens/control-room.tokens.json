@@ -262,6 +262,12 @@
         "com.doxee.cssVar": "--font-sans"
       }
     },
+    "font-display": {
+      "$value": "\"CR Display\", \"Saira Condensed\", \"Archivo Narrow\", \"Oswald\", var(--font-sans)",
+      "$extensions": {
+        "com.doxee.cssVar": "--font-display"
+      }
+    },
     "font-mono": {
       "$type": "fontFamily",
       "$value": "\"CR Mono\", \"JetBrains Mono\", ui-monospace, \"SF Mono\", Menlo, monospace",
@@ -698,6 +704,13 @@
           "$extensions": {
             "com.doxee.cssVar": "--scanline"
           }
+        },
+        "crosshatch": {
+          "$value": "repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,.06) 0 1px, transparent 1px 6px)",
+          "$description": "±45° cross-hatch (hardware only, Law 4/6)",
+          "$extensions": {
+            "com.doxee.cssVar": "--crosshatch"
+          }
         }
       }
     },
@@ -934,6 +947,13 @@
           "$extensions": {
             "com.doxee.cssVar": "--scanline"
           }
+        },
+        "crosshatch": {
+          "$value": "repeating-linear-gradient(45deg, rgba(0,0,0,.07) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,.07) 0 1px, transparent 1px 6px)",
+          "$description": "±45° cross-hatch (hardware only, Law 4/6)",
+          "$extensions": {
+            "com.doxee.cssVar": "--crosshatch"
+          }
         }
       }
     },
@@ -1169,6 +1189,13 @@
           "$description": "CRT scanlines (hardware only)",
           "$extensions": {
             "com.doxee.cssVar": "--scanline"
+          }
+        },
+        "crosshatch": {
+          "$value": "repeating-linear-gradient(45deg, rgba(0,240,255,.08) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,240,255,.08) 0 1px, transparent 1px 6px)",
+          "$description": "±45° cross-hatch (hardware only, Law 4/6)",
+          "$extensions": {
+            "com.doxee.cssVar": "--crosshatch"
           }
         }
       },
@@ -1465,6 +1492,13 @@
           "$description": "CRT scanlines (hardware only)",
           "$extensions": {
             "com.doxee.cssVar": "--scanline"
+          }
+        },
+        "crosshatch": {
+          "$value": "repeating-linear-gradient(45deg, rgba(67,255,122,.10) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(67,255,122,.10) 0 1px, transparent 1px 6px)",
+          "$description": "±45° cross-hatch (hardware only, Law 4/6)",
+          "$extensions": {
+            "com.doxee.cssVar": "--crosshatch"
           }
         }
       }

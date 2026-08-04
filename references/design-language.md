@@ -179,12 +179,36 @@ fixed meaning or it does not ship.
 | wedge | active-panel focus |
 | arrow-rail | sequence / pipeline step |
 
+**The severity scale — a shape channel beside the colour channel.** A regular
+polygon's **side-count encodes danger/focus, inversely**: fewer sides = more
+urgent. This is the second reading of "shape carries meaning" — where Law 2's
+colour says *what* state a thing is in, the shape says *how much it needs you*,
+and the two are orthogonal (a red triangle and a red circle are both errors, but
+one is on fire).
+
+| Sides | Shape | Severity | Default key |
+| --- | --- | --- | --- |
+| 3 | triangle ▲ | **critical — act now** | `--sig-err` |
+| 4 | diamond ◆ | attend | `--sig-wait` |
+| 5 | pentagon ⬠ | working | `--sig-work` |
+| 6 | hexagon ⬡ | nominal | `--sig-done` |
+| ∞ | circle ● | at rest / idle | `--sig-idle` |
+
+Because the meaning lives in the *geometry*, it survives the phosphor CRT (one
+colour) and colour-blindness — the shape **is** the non-colour backup the
+accessibility contract demands. Shipped as `.cr-sev--crit/-warn/-work/-ok/-idle`
+(`references/components.md`).
+
 **Rules**
 
-- **MUST** give every diagonal one of the four meanings above. Four shapes, four
-  meanings, no exceptions.
+- **MUST** give every diagonal one of the four primitive meanings *or* a severity
+  step above — no free-floating triangles.
+- **MUST** read fewer-sides-as-more-danger consistently: a triangle is never
+  "calm", a circle is never "critical".
 - **MUST** keep large shapes within **15°** off-axis — the orthogonal grid must
   still visibly govern. Koike's deformation works *because* it is anchored.
+- **SHOULD** pair the shape with its natural signal colour, but **MAY** decouple
+  them (`--cr-sev-fill`) when colour is already carrying a different reading.
 - **SHOULD** signal speed by cutting a shape away (negative space) rather than by
   adding motion lines.
 - **NEVER** add a decorative triangle. If it does not encode direction, state,
@@ -207,8 +231,12 @@ contrast from eroding as components accumulate.
 
 **The two registers:**
 
-- **Display** — Archivo 900, uppercase, `-0.038em` tracking, `0.88–0.92`
-  leading. Headers and single big numbers only.
+- **Display** — a **condensed** heavy grotesque (`--font-display`: Saira Condensed
+  900, with Archivo Narrow / Oswald as fallbacks), uppercase, `-0.038em` tracking,
+  `0.88–0.92` leading. Headers and single big numbers only. The condensed cut is
+  deliberate: it reads as *instrument stencil / vertical telemetry*, not a rounded
+  brand headline, and it packs a big number into a narrow column. (A rounder face
+  makes the whole system read softer than it is.)
 - **Data** — JetBrains Mono, 12–13px; labels uppercase at `0.07em`. Everything
   operational. Prose lives here at sentence case.
 

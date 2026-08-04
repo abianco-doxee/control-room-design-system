@@ -1,7 +1,7 @@
 {
   "name": "@control-room/design-system",
   "version": "1.0.0",
-  "description": "Control Room \u2014 a neon-noir, neobrutalist design system for dense operational dashboards. Design language (the eight laws), a four-theme token layer, a component library, motion tiers, and an accessibility contract.",
+  "description": "Control Room — a neon-noir, neobrutalist design system for dense operational dashboards. Design language (the eight laws), a four-theme token layer, a component library, motion tiers, and an accessibility contract.",
   "license": "UNLICENSED",
   "private": true,
   "type": "module",
@@ -71,6 +71,7 @@
     "@builder.io/mitosis": "^0.14.0",
     "@builder.io/mitosis-cli": "^0.14.0",
     "@changesets/cli": "^2.31.1",
+    "@fontsource/saira-condensed": "^5.3.0",
     "@playwright/test": "^1.62.1",
     "@tailwindcss/cli": "^4.3.3",
     "culori": "^4.0.2",

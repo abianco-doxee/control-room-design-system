@@ -5,7 +5,7 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 27,
+    "count": 28,
     "categories": {
       "action": 1,
       "forms": 6,
@@ -15,10 +15,10 @@
       "navigation": 1,
       "overlay": 3,
       "primitives": 1,
-      "state": 7
+      "state": 8
     },
     "lifecycles": {
-      "stable": 26,
+      "stable": 27,
       "experimental": 1
     }
   },
@@ -1064,6 +1064,57 @@
         "list-item",
         "live",
         "status"
+      ]
+    },
+    {
+      "id": "shape",
+      "name": "Shape",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Severity glyph — polygon side-count encodes danger/focus (fewer sides = more urgent); a shape channel beside colour (Law 4).",
+      "spec": "references/components.md#severity-shapes",
+      "variants": {
+        "severity": [
+          "crit",
+          "warn",
+          "work",
+          "ok",
+          "idle"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-err",
+          "description": "crit (triangle) fill"
+        },
+        {
+          "cssVar": "--sig-wait",
+          "description": "warn (diamond) fill"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "work (pentagon) fill"
+        },
+        {
+          "cssVar": "--sig-done",
+          "description": "ok (hexagon) fill"
+        },
+        {
+          "cssVar": "--sig-idle",
+          "description": "idle (circle) fill"
+        }
+      ],
+      "keywords": [
+        "shape",
+        "severity",
+        "polygon",
+        "triangle",
+        "focus",
+        "danger",
+        "non-color",
+        "a11y"
       ]
     },
     {

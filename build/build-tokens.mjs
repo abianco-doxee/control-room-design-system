@@ -275,6 +275,7 @@ function twTheme() {
   for (const [name, v] of Object.entries(colorMap)) L.push(`  --color-${name}: var(${v});`);
   for (const [k, t] of Object.entries(src.primitive.text)) if (t.cssVar) L.push(`  --text-${k}: ${t.value};`);
   L.push(`  --font-sans: ${src.typography.family.sans.value};`);
+  L.push(`  --font-display: ${src.typography.family.display.value};`);
   L.push(`  --font-mono: ${src.typography.family.mono.value};`);
   L.push(`  --spacing: 0.25rem;`); // 4px base → p-1=4px … matches --space-*
   for (const r of ["xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl"]) L.push(`  --radius-${r}: 0px;`);

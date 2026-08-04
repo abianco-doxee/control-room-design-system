@@ -705,3 +705,56 @@ import { CrSigil } from "@control-room/design-system/react";
 - **MUST** key the hue to a signal (Law 2); the glyph is identity + state.
 - **NEVER** use it as the only affordance for an action — it is a mark, not a
   button.
+
+## Severity shapes {#severity-shapes}
+
+A **shape channel** beside the colour channel (Law 4): a regular polygon's
+side-count encodes danger/focus *inversely* — fewer sides = more urgent. Colour
+says *what* state; shape says *how much it needs you*. Crucially the meaning is in
+the geometry, so it reads in the phosphor CRT (one colour) and for colour-blind
+operators — it **is** the non-colour backup the a11y contract requires.
+
+```html
+<span class="cr-sev cr-sev--crit" role="img" aria-label="critical"></span>  <!-- ▲ 3 -->
+<span class="cr-sev cr-sev--warn" role="img" aria-label="attend"></span>    <!-- ◆ 4 -->
+<span class="cr-sev cr-sev--work" role="img" aria-label="working"></span>   <!-- ⬠ 5 -->
+<span class="cr-sev cr-sev--ok"   role="img" aria-label="nominal"></span>   <!-- ⬡ 6 -->
+<span class="cr-sev cr-sev--idle" role="img" aria-label="idle"></span>      <!-- ● ∞ -->
+```
+```tsx
+import { CrShape } from "@control-room/design-system/react";
+<CrShape severity="crit" label="build failing" />
+```
+
+- **MUST** give it an accessible `label` — shape/colour is never the only carrier.
+- **MUST** keep the scale monotonic: triangle is never calm, circle never critical.
+- Colour defaults to the matching signal; override with `--cr-sev-fill` to decouple
+  the two channels.
+
+## Hardware chrome
+
+Industrial detail that proves there is real hardware (Law 6) — apply on a bezel,
+rail, or masthead, **never** on a flat data field, and keep it `aria-hidden`
+(it carries nothing a label doesn't).
+
+| Class | Part |
+| --- | --- |
+| `.cr-rivet` · `--hex` · `--slot` | round rivet · hex bolt · slot screw |
+| `.cr-vent` | louvred vent |
+| `.cr-port` | connector port |
+| `.cr-stripe` | hazard tape (`--sig-wait` diagonal) |
+| `.cr-seam` | panel seam (a hairline groove) |
+| `.cr-plate` | stamped ID plate (`UNIT · CR-00 · REV.C`) |
+| `.cr-tally` | tally-mark count readout |
+
+- **MUST** confine chrome to hardware surfaces; a riveted flat panel is noise.
+- **SHOULD** use it sparingly — one plate, a few rivets. Chrome is seasoning.
+
+## Richer textures
+
+Beyond the halftone dots: `.cr-tex--cross` is a ±45° **crosshatch** (Law 4
+diagonals as grain), and `.cr-tex--duo` is a **duotone** ordered dither mixing two
+signals (`--cr-duo-a` / `--cr-duo-b`, default accent + accent-2) — "cross-colours".
+Both are hardware-only like the rest of the `.cr-tex--*` family. For freeform
+**symbol / ASCII dithering**, paint it on a `<canvas>` (the seeded-cat / sigil
+engine) — CSS covers the regular patterns; canvas covers the generative ones.

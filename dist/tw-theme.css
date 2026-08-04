@@ -32,6 +32,7 @@
   --text-lg: 19px;
   --text-xl: clamp(28px, 5.5vw, 52px);
   --font-sans: "CR Sans", "Archivo", "Arial Black", "Helvetica Neue", system-ui, sans-serif;
+  --font-display: "CR Display", "Saira Condensed", "Archivo Narrow", "Oswald", var(--font-sans);
   --font-mono: "CR Mono", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --spacing: 0.25rem;
   --radius-xs: 0px;
