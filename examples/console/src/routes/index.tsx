@@ -23,6 +23,10 @@ import {
   CrKbd,
   CrKeyHints,
   CrPalette,
+  CrAlert,
+  CrRadioGroup,
+  CrSlider,
+  CrProgress,
 } from "../../../../dist/frameworks/qwik";
 
 type Sev = "crit" | "warn" | "work" | "ok" | "idle";
@@ -48,7 +52,7 @@ const SESSIONS: Session[] = [
 const THEMES = ["dark", "light", "extreme", "phosphor"] as const;
 
 export default component$(() => {
-  const ui = useStore({ theme: "dark", modal: false, page: 1, palette: false });
+  const ui = useStore({ theme: "dark", modal: false, page: 1, palette: false, density: "cozy", refresh: 30 });
   const live = useStore<Record<string, boolean>>({ "nova-01": true, "ptl-757": false });
   const toasts = useStore<{ list: { id: number; signal: string; message: string }[]; seq: number }>({
     list: [],
@@ -182,6 +186,13 @@ export default component$(() => {
           </div>
         </header>
 
+        <CrAlert
+          signal="wait"
+          title="Scheduled maintenance"
+          message="Workers restart at 02:00 UTC — in-flight jobs will resume automatically."
+          dismissible
+        />
+
         {/* the one item that needs attention — the sanctioned Breach (Law 9) */}
         <div class="cr-breach cr-breach--err cr-breach--alive" style="padding:var(--space-4)">
           <div style="position:relative;z-index:1">
@@ -259,6 +270,31 @@ export default component$(() => {
               notify
               <CrKbd keys="N" />
             </CrButton>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--space-4);align-items:start">
+            <div>
+              <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">density</p>
+              <CrRadioGroup
+                label="Row density"
+                value={ui.density}
+                row
+                options={[
+                  { value: "cozy", label: "cozy" },
+                  { value: "compact", label: "compact" },
+                ]}
+                onChange={$((v: string) => (ui.density = v))}
+              />
+            </div>
+            <div>
+              <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">refresh · {ui.refresh}s</p>
+              <CrSlider value={ui.refresh} min={5} max={120} step={5} label="Refresh interval seconds" onChange={$((v: number) => (ui.refresh = v))} />
+            </div>
+            <div>
+              <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">indexing</p>
+              <CrProgress value={64} label="Indexing 64%" />
+              <div style="height:var(--space-2)"></div>
+              <CrProgress indeterminate tone="wait" label="Syncing" />
+            </div>
           </div>
         </section>
 
