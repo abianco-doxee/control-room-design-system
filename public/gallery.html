@@ -86,10 +86,10 @@
   --cr-hero-bg: var(--sig-accent);
   --cr-hero-fg: var(--on-accent);
   --cr-nav-w: 180px;
-  --ground: #090413;
-  --board: #0f0819;
-  --panel: #161021;
-  --panel-2: #1e182a;
+  --ground: #0f0327;
+  --board: #15092f;
+  --panel: #1d133a;
+  --panel-2: #271d45;
   --ink: #e6e6f2;
   --muted: #8a8aa6;
   --border: #000000;
@@ -120,17 +120,17 @@
 
 :root[data-theme="light"] {
   color-scheme: light;
-  --ground: #ecebe3;
-  --board: #e4e3d9;
-  --panel: #ffffff;
-  --panel-2: #f6f5ef;
+  --ground: #eaeaf2;
+  --board: #e2e2e9;
+  --panel: #fbfbff;
+  --panel-2: #f2f3fa;
   --ink: #0b0b12;
   --muted: #55556b;
   --border: #000000;
   --rail: #0b0b12;
   --rail-ink: #ecebe3;
   --sig-work: #0891b2;
-  --sig-accent: #e60076;
+  --sig-accent: #cf007e;
   --sig-accent-2: #663e9e;
   --sig-done: #0d9488;
   --sig-wait: #d97706;
@@ -154,10 +154,10 @@
 
 :root[data-theme="extreme"] {
   color-scheme: dark;
-  --ground: #0d0016;
-  --board: #13031d;
-  --panel: #1d0a27;
-  --panel-2: #271432;
+  --ground: #150021;
+  --board: #20012e;
+  --panel: #2b0b3a;
+  --panel-2: #361747;
   --ink: #fdf0ff;
   --muted: #c79ad6;
   --border: #000000;
@@ -299,6 +299,7 @@ body {
 /* signal variants — override just the bg/fg tokens */
 .cr-btn--work { --cr-btn-bg: var(--sig-work); }
 .cr-btn--accent { --cr-btn-bg: var(--sig-accent); --cr-btn-fg: var(--on-accent); }
+.cr-btn--accent2 { --cr-btn-bg: var(--sig-accent-2); --cr-btn-fg: var(--on-accent-2); }
 .cr-btn--err { --cr-btn-bg: var(--sig-err); --cr-btn-fg: var(--on-err); }
 
 /* ── Chip ──────────────────────────────────────────────────────────────── */
@@ -691,35 +692,41 @@ body {
  * everything around it is hard-edged. Rare by contract: one breach per screen.
  * Colour keys to a signal (default accent); set --cr-breach to re-key. */
 .cr-breach {
-  position: relative; isolation: isolate;
+  --cr-breach: var(--sig-accent);         /* primary neon hue  */
+  --cr-breach-2: var(--sig-accent-2);     /* the paired hue (acid) — the neon pairing */
+  --cr-breach-fill: var(--panel);         /* interior; --wash swaps this for a tint */
+  position: relative;
   border-radius: var(--breach-radius);                                  /* the soft corner   */
-  box-shadow: 0 0 var(--breach-glow-size)                               /* the soft glow     */
-    color-mix(in srgb, var(--cr-breach, var(--sig-accent)) 55%, transparent);
+  border: 3px solid transparent;
+  /* rounded neon gradient RIM via padding-box/border-box; interior stays opaque
+   * and legible (no over-painting pseudo-elements). */
+  background:
+    linear-gradient(var(--cr-breach-fill), var(--cr-breach-fill)) padding-box,
+    linear-gradient(135deg, var(--cr-breach), var(--cr-breach-2) 88%) border-box;
+  /* dual-hue neon glow halo — magenta near, acid far (box-shadow stays outside) */
+  box-shadow:
+    0 0 calc(var(--breach-glow-size) * 0.9) color-mix(in srgb, var(--cr-breach) 70%, transparent),
+    0 0 calc(var(--breach-glow-size) * 2.4) color-mix(in srgb, var(--cr-breach-2) 42%, transparent);
 }
-.cr-breach::before {                                                    /* the blurred blob  */
-  content: ""; position: absolute; inset: -18%; z-index: -1; pointer-events: none;
-  border-radius: inherit;
-  background: radial-gradient(closest-side,
-    color-mix(in srgb, var(--cr-breach, var(--sig-accent)) 85%, transparent), transparent 72%);
-  filter: blur(var(--breach-blur)); opacity: 0.55;
-}
-/* re-key the glow to a signal (default is accent) */
-.cr-breach--work   { --cr-breach: var(--sig-work); }
-.cr-breach--wait   { --cr-breach: var(--sig-wait); }
-.cr-breach--done   { --cr-breach: var(--sig-done); }
-.cr-breach--err    { --cr-breach: var(--sig-err); }
-.cr-breach--accent2{ --cr-breach: var(--sig-accent-2); }
-/* subtle gradient wash over the surface — dark-keyed so --ink text stays legible */
+/* re-key the primary hue to a signal (the pair stays acid unless overridden) */
+.cr-breach--work   { --cr-breach: var(--sig-work);  --cr-breach-2: var(--sig-accent); }
+.cr-breach--wait   { --cr-breach: var(--sig-wait);  --cr-breach-2: var(--sig-accent); }
+.cr-breach--done   { --cr-breach: var(--sig-done);  --cr-breach-2: var(--sig-accent-2); }
+.cr-breach--err    { --cr-breach: var(--sig-err);   --cr-breach-2: var(--sig-accent); }
+.cr-breach--accent2{ --cr-breach: var(--sig-accent-2); --cr-breach-2: var(--sig-accent); }
+/* subtle interior tint — the strike is the rim + glow, so text stays legible */
 .cr-breach--wash {
-  background-image: linear-gradient(135deg,
-    color-mix(in srgb, var(--cr-breach, var(--sig-accent)) 26%, var(--panel)),
-    color-mix(in srgb, var(--sig-accent-2) 16%, var(--panel)));
+  --cr-breach-fill: color-mix(in srgb, var(--cr-breach) 16%, var(--panel));
 }
-/* a slow living glow — opt-in, off under reduced motion */
+/* a slow living dual-hue glow — opt-in, off under reduced motion */
 .cr-breach--alive { animation: cr-breath 3.6s ease-in-out infinite; }
 @keyframes cr-breath {
-  0%, 100% { box-shadow: 0 0 calc(var(--breach-glow-size) * 0.7) color-mix(in srgb, var(--cr-breach, var(--sig-accent)) 45%, transparent); }
-  50%      { box-shadow: 0 0 calc(var(--breach-glow-size) * 1.4) color-mix(in srgb, var(--cr-breach, var(--sig-accent)) 70%, transparent); }
+  0%, 100% { box-shadow:
+    0 0 calc(var(--breach-glow-size) * 0.7) color-mix(in srgb, var(--cr-breach) 55%, transparent),
+    0 0 calc(var(--breach-glow-size) * 1.6) color-mix(in srgb, var(--cr-breach-2) 35%, transparent); }
+  50%      { box-shadow:
+    0 0 calc(var(--breach-glow-size) * 1.3) color-mix(in srgb, var(--cr-breach) 85%, transparent),
+    0 0 calc(var(--breach-glow-size) * 3) color-mix(in srgb, var(--cr-breach-2) 60%, transparent); }
 }
 
 /* a standalone soft luminous accent — the antithesis of the hard pixel.
@@ -783,19 +790,19 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
   <div class="swgrid">
   <div class="sw">
     <div class="chipcolor" style="background:var(--ground)"></div>
-    <code>--ground</code><span class="hex">#090413</span>
+    <code>--ground</code><span class="hex">#0f0327</span>
   </div>
   <div class="sw">
     <div class="chipcolor" style="background:var(--board)"></div>
-    <code>--board</code><span class="hex">#0f0819</span>
+    <code>--board</code><span class="hex">#15092f</span>
   </div>
   <div class="sw">
     <div class="chipcolor" style="background:var(--panel)"></div>
-    <code>--panel</code><span class="hex">#161021</span>
+    <code>--panel</code><span class="hex">#1d133a</span>
   </div>
   <div class="sw">
     <div class="chipcolor" style="background:var(--panel-2)"></div>
-    <code>--panel-2</code><span class="hex">#1e182a</span>
+    <code>--panel-2</code><span class="hex">#271d45</span>
   </div>
   <div class="sw">
     <div class="chipcolor" style="background:var(--rail)"></div>
@@ -919,6 +926,7 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
               <div class="cr-row"><span class="cr-sev cr-sev--warn" role="img" aria-label="attend"></span><canvas class="crsig" width="20" height="20" data-seed="cr-1130" data-state="waiting"></canvas><span class="cr-row__name">CR-1130 picker</span><span class="cr-row__status">needs input</span></div>
               <div class="cr-row"><span class="cr-sev cr-sev--crit" role="img" aria-label="critical"></span><canvas class="crsig" width="20" height="20" data-seed="rp-verify" data-state="error"></canvas><span class="cr-row__name">rp verify</span><span class="cr-row__status">2 failing</span></div>
               <div class="cr-row"><span class="cr-sev cr-sev--ok" role="img" aria-label="nominal"></span><canvas class="crsig" width="20" height="20" data-seed="atlas" data-state="done"></canvas><span class="cr-row__name">atlas deploy</span><span class="cr-row__status">merged</span></div>
+              <div style="display:flex;gap:8px;margin-top:12px"><button class="cr-btn cr-btn--sm cr-btn--accent" type="button">Escalate</button><button class="cr-btn cr-btn--sm cr-btn--accent2" type="button">Approve all</button></div>
             </section>
             <section class="cr-panel">
               <h4 class="cr-panel__title">Pipeline</h4>
@@ -956,7 +964,11 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       <h3>Hero (keyed focal)</h3>
       <div class="cr-hero cr-hero--wait"><div><div class="cr-hero__big">nova needs you</div><div class="cr-hero__sub">CR-1130 · paused · 6m</div></div></div>
       <h3 style="margin-top:16px">Button · Chip · Tag</h3>
-      <button class="cr-btn" type="button">RUN SCAN</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="cr-btn" type="button">RUN SCAN</button>
+        <button class="cr-btn cr-btn--accent" type="button">Escalate</button>
+        <button class="cr-btn cr-btn--accent2" type="button">Approve</button>
+      </div>
       <div style="margin-top:10px;display:flex;gap:7px;flex-wrap:wrap;align-items:center">
         <span class="cr-chip">PTL-757</span><span class="cr-chip cr-chip--alt">ui-kit</span>
         <span class="cr-tag cr-tag--now">shipped</span><span class="cr-tag cr-tag--no">ruled out</span>

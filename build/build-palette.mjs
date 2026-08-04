@@ -30,25 +30,30 @@ const hex = (l, c, h) => formatHex(clampChroma({ mode: "oklch", l, c, h }, "oklc
 // Per-theme spec. `sig` = default fill lightness/chroma; per-signal overrides
 // tune err (darker/desaturated) and idle (grey). `ground` builds the 4 surface
 // steps by stepping L at a fixed near-black hue/chroma.
+// Per theme: emit `ground` (4 surface steps) when a ground block is present,
+// `sig` signals when a sig block is present, and `accent2` when present. So a
+// theme can regenerate grounds only, signals only, or everything.
 const THEMES = {
-  // Fully generated — the vibrant, chromatic-black shift lands here first.
+  // Fully generated. Grounds are a LIFTED deep violet-charcoal (more lightness
+  // AND more chroma than a dead near-black) so the dark theme reads as a rich
+  // surface, not a void — while staying dark enough for text contrast.
   dark: {
-    emit: "full",
-    ground: { h: 300, c: 0.035, steps: [0.13, 0.155, 0.19, 0.225] },
+    ground: { h: 292, c: 0.072, steps: [0.155, 0.185, 0.225, 0.265] },
     sig:    { l: 0.80, c: 0.19 },
     // accent stays a HOT magenta (low-L keeps it saturated, not pale pink)
     over:   { err: { l: 0.66, c: 0.20 }, accent: { l: 0.66, c: 0.28 }, idle: { l: 0.62, c: 0.026, h: HUE.idle } },
+    accent2: {},
   },
   extreme: {
-    emit: "full",
-    ground: { h: 312, c: 0.06, steps: [0.12, 0.15, 0.19, 0.235] },
+    ground: { h: 312, c: 0.09, steps: [0.15, 0.185, 0.23, 0.275] },
     sig:    { l: 0.84, c: 0.23 },
     over:   { err: { l: 0.66, c: 0.22 }, accent: { l: 0.67, c: 0.29 }, idle: { l: 0.62, c: 0.05, h: 300 } },
+    accent2: {},
   },
-  // Existing hand-tuned grounds/signals stay (character + already AA); we only
-  // mint the NEW second accent key for these.
-  light:    { emit: "accent2", accent2: { l: 0.46, c: 0.15, h: HUE.violet } },
-  phosphor: { emit: "accent2", accent2: { l: 0.82, c: 0.20, h: 165 } },
+  // Light keeps its hand-tuned signals (character + AA), but the paper is
+  // regenerated COOL (violet-grey, not warm cream) to sit with the neon signals.
+  light:    { ground: { h: 285, c: 0.01, steps: [0.94, 0.915, 0.99, 0.965] }, accent2: { l: 0.46, c: 0.15, h: HUE.violet } },
+  phosphor: { accent2: { l: 0.82, c: 0.20, h: 165 } },
 };
 
 const NEAR_BLACK = "#06050c";
@@ -68,26 +73,39 @@ const check = (name, s, value) => {
   return on;
 };
 
-for (const [name, spec] of Object.entries(THEMES)) {
-  if (spec.emit === "accent2") {
-    // only the new second accent for this theme (rest stays hand-tuned)
-    const { l, c, h } = spec.accent2;
-    const value = hex(l, c, h);
-    out[name] = { signals: { accent2: value }, on: { accent2: check(name, "accent2", value) } };
-    continue;
-  }
-  const t = { grounds: {}, signals: {}, on: {} };
-  const gs = ["ground", "board", "panel", "panel-2"];
-  spec.ground.steps.forEach((l, i) => { t.grounds[gs[i]] = hex(l, spec.ground.c, spec.ground.h); });
+const SIG_ONLY = SIGNALS.filter((s) => s !== "accent2"); // accent2 handled separately
 
-  for (const s of SIGNALS) {
-    const o = spec.over?.[s] || {};
-    const l = o.l ?? spec.sig.l;
-    const c = o.c ?? spec.sig.c;
-    const h = spec.sig.forceHue ?? o.h ?? HUE[s];
+for (const [name, spec] of Object.entries(THEMES)) {
+  const t = {};
+  // grounds — 4 surface steps at a fixed near-ground hue/chroma
+  if (spec.ground) {
+    t.grounds = {};
+    const gs = ["ground", "board", "panel", "panel-2"];
+    spec.ground.steps.forEach((l, i) => { t.grounds[gs[i]] = hex(l, spec.ground.c, spec.ground.h); });
+  }
+  // signals — the full state ramp
+  if (spec.sig) {
+    t.signals = t.signals || {}; t.on = t.on || {};
+    for (const s of SIG_ONLY) {
+      const o = spec.over?.[s] || {};
+      const l = o.l ?? spec.sig.l;
+      const c = o.c ?? spec.sig.c;
+      const h = spec.sig.forceHue ?? o.h ?? HUE[s];
+      const value = hex(l, c, h);
+      t.signals[s] = value;
+      t.on[s] = check(name, s, value);
+    }
+  }
+  // second accent — explicit L/C/H, or derived from the signal spec when "full"
+  if (spec.accent2) {
+    t.signals = t.signals || {}; t.on = t.on || {};
+    const a2 = spec.accent2;
+    const l = a2.l ?? spec.sig.l;
+    const c = a2.c ?? spec.sig.c;
+    const h = a2.h ?? HUE.accent2;
     const value = hex(l, c, h);
-    t.signals[s] = value;
-    t.on[s] = check(name, s, value);
+    t.signals.accent2 = value;
+    t.on.accent2 = check(name, "accent2", value);
   }
   out[name] = t;
 }

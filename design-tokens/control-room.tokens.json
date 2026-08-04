@@ -499,7 +499,7 @@
       "surface": {
         "ground": {
           "$type": "color",
-          "$value": "#090413",
+          "$value": "#0f0327",
           "$description": "page background, furthest back",
           "$extensions": {
             "com.doxee.cssVar": "--ground"
@@ -507,7 +507,7 @@
         },
         "board": {
           "$type": "color",
-          "$value": "#0f0819",
+          "$value": "#15092f",
           "$description": "instrument / work surface",
           "$extensions": {
             "com.doxee.cssVar": "--board"
@@ -515,7 +515,7 @@
         },
         "panel": {
           "$type": "color",
-          "$value": "#161021",
+          "$value": "#1d133a",
           "$description": "raised card / panel",
           "$extensions": {
             "com.doxee.cssVar": "--panel"
@@ -523,7 +523,7 @@
         },
         "panel-2": {
           "$type": "color",
-          "$value": "#1e182a",
+          "$value": "#271d45",
           "$description": "recessed / inset region",
           "$extensions": {
             "com.doxee.cssVar": "--panel-2"
@@ -742,7 +742,7 @@
       "surface": {
         "ground": {
           "$type": "color",
-          "$value": "#ecebe3",
+          "$value": "#eaeaf2",
           "$description": "page background, furthest back",
           "$extensions": {
             "com.doxee.cssVar": "--ground"
@@ -750,7 +750,7 @@
         },
         "board": {
           "$type": "color",
-          "$value": "#e4e3d9",
+          "$value": "#e2e2e9",
           "$description": "instrument / work surface",
           "$extensions": {
             "com.doxee.cssVar": "--board"
@@ -758,7 +758,7 @@
         },
         "panel": {
           "$type": "color",
-          "$value": "#ffffff",
+          "$value": "#fbfbff",
           "$description": "raised card / panel",
           "$extensions": {
             "com.doxee.cssVar": "--panel"
@@ -766,7 +766,7 @@
         },
         "panel-2": {
           "$type": "color",
-          "$value": "#f6f5ef",
+          "$value": "#f2f3fa",
           "$description": "recessed / inset region",
           "$extensions": {
             "com.doxee.cssVar": "--panel-2"
@@ -911,7 +911,7 @@
         },
         "sig-accent": {
           "$type": "color",
-          "$value": "#e60076",
+          "$value": "#cf007e",
           "$extensions": {
             "com.doxee.cssVar": "--sig-accent"
           }
@@ -985,7 +985,7 @@
       "surface": {
         "ground": {
           "$type": "color",
-          "$value": "#0d0016",
+          "$value": "#150021",
           "$description": "page background, furthest back",
           "$extensions": {
             "com.doxee.cssVar": "--ground"
@@ -993,7 +993,7 @@
         },
         "board": {
           "$type": "color",
-          "$value": "#13031d",
+          "$value": "#20012e",
           "$description": "instrument / work surface",
           "$extensions": {
             "com.doxee.cssVar": "--board"
@@ -1001,7 +1001,7 @@
         },
         "panel": {
           "$type": "color",
-          "$value": "#1d0a27",
+          "$value": "#2b0b3a",
           "$description": "raised card / panel",
           "$extensions": {
             "com.doxee.cssVar": "--panel"
@@ -1009,7 +1009,7 @@
         },
         "panel-2": {
           "$type": "color",
-          "$value": "#271432",
+          "$value": "#361747",
           "$description": "recessed / inset region",
           "$extensions": {
             "com.doxee.cssVar": "--panel-2"

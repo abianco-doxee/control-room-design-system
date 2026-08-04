@@ -50,6 +50,7 @@
 /* signal variants — override just the bg/fg tokens */
 .cr-btn--work { --cr-btn-bg: var(--sig-work); }
 .cr-btn--accent { --cr-btn-bg: var(--sig-accent); --cr-btn-fg: var(--on-accent); }
+.cr-btn--accent2 { --cr-btn-bg: var(--sig-accent-2); --cr-btn-fg: var(--on-accent-2); }
 .cr-btn--err { --cr-btn-bg: var(--sig-err); --cr-btn-fg: var(--on-err); }
 
 /* ── Chip ──────────────────────────────────────────────────────────────── */
@@ -442,35 +443,42 @@
  * everything around it is hard-edged. Rare by contract: one breach per screen.
  * Colour keys to a signal (default accent); set --cr-breach to re-key. */
 .cr-breach {
-  position: relative; isolation: isolate;
+  --cr-breach: var(--sig-accent);         /* primary neon hue  */
+  --cr-breach-2: var(--sig-accent-2);     /* the paired hue (acid) — the neon pairing */
+  --cr-breach-fill: var(--panel);         /* interior; --wash swaps this for a tint */
+  position: relative;
   border-radius: var(--breach-radius);                                  /* the soft corner   */
-  box-shadow: 0 0 var(--breach-glow-size)                               /* the soft glow     */
-    color-mix(in srgb, var(--cr-breach, var(--sig-accent)) 55%, transparent);
+  border: 3px solid transparent;
+  /* rounded neon gradient RIM via padding-box/border-box; interior stays opaque
+   * and legible (no over-painting pseudo-elements). */
+  background:
+    linear-gradient(var(--cr-breach-fill), var(--cr-breach-fill)) padding-box,
+    linear-gradient(135deg, var(--cr-breach), var(--cr-breach-2) 88%) border-box;
+  background-color: var(--cr-breach-fill);  /* explicit opaque interior for contrast tooling */
+  /* dual-hue neon glow halo — magenta near, acid far (box-shadow stays outside) */
+  box-shadow:
+    0 0 calc(var(--breach-glow-size) * 0.9) color-mix(in srgb, var(--cr-breach) 70%, transparent),
+    0 0 calc(var(--breach-glow-size) * 2.4) color-mix(in srgb, var(--cr-breach-2) 42%, transparent);
 }
-.cr-breach::before {                                                    /* the blurred blob  */
-  content: ""; position: absolute; inset: -18%; z-index: -1; pointer-events: none;
-  border-radius: inherit;
-  background: radial-gradient(closest-side,
-    color-mix(in srgb, var(--cr-breach, var(--sig-accent)) 85%, transparent), transparent 72%);
-  filter: blur(var(--breach-blur)); opacity: 0.55;
-}
-/* re-key the glow to a signal (default is accent) */
-.cr-breach--work   { --cr-breach: var(--sig-work); }
-.cr-breach--wait   { --cr-breach: var(--sig-wait); }
-.cr-breach--done   { --cr-breach: var(--sig-done); }
-.cr-breach--err    { --cr-breach: var(--sig-err); }
-.cr-breach--accent2{ --cr-breach: var(--sig-accent-2); }
-/* subtle gradient wash over the surface — dark-keyed so --ink text stays legible */
+/* re-key the primary hue to a signal (the pair stays acid unless overridden) */
+.cr-breach--work   { --cr-breach: var(--sig-work);  --cr-breach-2: var(--sig-accent); }
+.cr-breach--wait   { --cr-breach: var(--sig-wait);  --cr-breach-2: var(--sig-accent); }
+.cr-breach--done   { --cr-breach: var(--sig-done);  --cr-breach-2: var(--sig-accent-2); }
+.cr-breach--err    { --cr-breach: var(--sig-err);   --cr-breach-2: var(--sig-accent); }
+.cr-breach--accent2{ --cr-breach: var(--sig-accent-2); --cr-breach-2: var(--sig-accent); }
+/* subtle interior tint — the strike is the rim + glow, so text stays legible */
 .cr-breach--wash {
-  background-image: linear-gradient(135deg,
-    color-mix(in srgb, var(--cr-breach, var(--sig-accent)) 26%, var(--panel)),
-    color-mix(in srgb, var(--sig-accent-2) 16%, var(--panel)));
+  --cr-breach-fill: color-mix(in srgb, var(--cr-breach) 16%, var(--panel));
 }
-/* a slow living glow — opt-in, off under reduced motion */
+/* a slow living dual-hue glow — opt-in, off under reduced motion */
 .cr-breach--alive { animation: cr-breath 3.6s ease-in-out infinite; }
 @keyframes cr-breath {
-  0%, 100% { box-shadow: 0 0 calc(var(--breach-glow-size) * 0.7) color-mix(in srgb, var(--cr-breach, var(--sig-accent)) 45%, transparent); }
-  50%      { box-shadow: 0 0 calc(var(--breach-glow-size) * 1.4) color-mix(in srgb, var(--cr-breach, var(--sig-accent)) 70%, transparent); }
+  0%, 100% { box-shadow:
+    0 0 calc(var(--breach-glow-size) * 0.7) color-mix(in srgb, var(--cr-breach) 55%, transparent),
+    0 0 calc(var(--breach-glow-size) * 1.6) color-mix(in srgb, var(--cr-breach-2) 35%, transparent); }
+  50%      { box-shadow:
+    0 0 calc(var(--breach-glow-size) * 1.3) color-mix(in srgb, var(--cr-breach) 85%, transparent),
+    0 0 calc(var(--breach-glow-size) * 3) color-mix(in srgb, var(--cr-breach-2) 60%, transparent); }
 }
 
 /* a standalone soft luminous accent — the antithesis of the hard pixel.
