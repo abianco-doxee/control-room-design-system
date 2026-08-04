@@ -363,17 +363,23 @@ td b { color: var(--ink); } td .mono { font-family: var(--font-mono); font-size:
 **Purpose.** Inline status label inside dense content (distinct from Chip, which
 is a standalone token). Variants map to the signal ramp.
 
+**Tone vocabulary.** Prefer the **canonical ramp words** — the same vocabulary a
+StatusDot, Toast, or Chip asserts (Law 2): `done · work · wait · err · idle ·
+accent`. The older tell-time aliases (`now`→done, `later`→wait, `no`→err) are
+kept so nothing breaks, but new markup should use the canonical names.
+
 ```html
-<span class="tag now">Phase 0</span>
+<span class="cr-tag cr-tag--done">Phase 0</span>
 ```
 ```css
-.tag { font-family: var(--font-mono); font-size: 10px; font-weight: 800;
-  padding: 2px 7px; border: 1.5px solid var(--border);
+.cr-tag { font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 800;
+  padding: var(--space-0-5) var(--space-2); border: 1.5px solid var(--border);
   text-transform: uppercase; letter-spacing: .04em; }
-.tag.now  { background: var(--sig-done); color: var(--on-sig); } /* shipped   */
-.tag.work { background: var(--sig-work); color: var(--on-sig); }
-.tag.later{ background: var(--sig-wait); color: var(--on-sig); } /* pending   */
-.tag.no   { background: var(--sig-err);  color: var(--on-sig); } /* ruled out */
+.cr-tag--done { background: var(--sig-done); color: var(--on-sig); }
+.cr-tag--work { background: var(--sig-work); color: var(--on-sig); }
+.cr-tag--wait { background: var(--sig-wait); color: var(--on-sig); }
+.cr-tag--err  { background: var(--sig-err);  color: var(--on-err); }
+/* legacy aliases (retained): .cr-tag--now .cr-tag--later .cr-tag--no */
 ```
 
 ---
