@@ -359,11 +359,15 @@
 /* ── Texture utilities (hardware only — Law 6) ─────────────────────────────
  * Apply to a bezel/screen/hardware surface, NEVER a flat content field. All
  * three read as the neo-print / CRT grain; theme-keyed via the texture tokens. */
-.cr-tex--halftone { background-image: var(--halftone); background-size: var(--halftone-size, 6px 6px); }
+/* All fill edge-to-edge (repeat, from the origin). Pair with a background-color. */
+.cr-tex--halftone, .cr-tex--dither, .cr-tex--scan, .cr-tex--cross, .cr-tex--glass {
+  background-repeat: repeat; background-position: 0 0; background-attachment: local;
+}
+.cr-tex--halftone { background-image: var(--halftone); background-size: var(--halftone-size) var(--halftone-size); }
 .cr-tex--dither   { background-image: var(--dither); }
 .cr-tex--scan     { background-image: var(--scanline); }
 /* a stacked "aged glass" — halftone + scanlines together, the house hardware wash */
-.cr-tex--glass    { background-image: var(--scanline), var(--halftone); background-size: auto, var(--halftone-size, 6px 6px); }
+.cr-tex--glass    { background-image: var(--scanline), var(--halftone); background-size: auto, var(--halftone-size) var(--halftone-size); }
 
 /* ── Ambient loops (Law 7 — alive at rest; low-fps, hardware-bound) ─────────
  * Opt-in classes. All are OFF under prefers-reduced-motion (global rule in
@@ -424,6 +428,19 @@
 .cr-plate  { display: inline-block; font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: 0.14em;
              text-transform: uppercase; color: var(--muted); border: 1px solid var(--rail-ink); padding: 1px var(--space-2); }
 .cr-tally  { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.24em; color: var(--ink); }
+/* more fasteners + indicators (variance for hand-composed chrome) */
+.cr-screw  { width: var(--space-3); height: var(--space-3); border-radius: 50%; background: var(--rail-ink);
+             border: 1.5px solid var(--border); position: relative; }
+.cr-screw::after { content: ""; position: absolute; inset: 44% 18%; background: var(--border); }   /* single slot */
+.cr-screw--x::before { content: ""; position: absolute; inset: 18% 44%; background: var(--border); }/* + cross slot */
+.cr-bolt   { width: var(--space-3); height: var(--space-3); background: var(--rail-ink); border: 1.5px solid var(--border); }
+.cr-led    { width: var(--space-2); height: var(--space-2); border-radius: 50%; border: 1px solid var(--border);
+             background: var(--cr-led, var(--sig-work));
+             box-shadow: inset 0 0 0 1px color-mix(in srgb, #fff 35%, transparent); }  /* solid indicator, no glow */
+.cr-led--wait { --cr-led: var(--sig-wait); } .cr-led--done { --cr-led: var(--sig-done); }
+.cr-led--err { --cr-led: var(--sig-err); }   .cr-led--idle { --cr-led: var(--sig-idle); }
+.cr-grille { width: var(--space-6); height: var(--space-5); border: 1.5px solid var(--border);
+             background: repeating-linear-gradient(90deg, var(--rail-ink) 0 1.5px, var(--mass) 1.5px 3px); }  /* vertical grille */
 
 /* ── Richer texture — crosshatch (× diagonals) + duotone (cross-colours) ────
  * Answers "not just dots": cross-hatching from ±45° diagonals (Law 4 energy),
@@ -442,6 +459,9 @@
  * a gradient — to mark the ONE most exceptional thing. It only reads because
  * everything around it is hard-edged. Rare by contract: one breach per screen.
  * Colour keys to a signal (default accent); set --cr-breach to re-key. */
+/* the rim angle is a registered property so the conic gradient can interpolate */
+@property --cr-breach-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
 .cr-breach {
   --cr-breach: var(--sig-accent);         /* primary neon hue  */
   --cr-breach-2: var(--sig-accent-2);     /* the paired hue (acid) — the neon pairing */
@@ -449,17 +469,25 @@
   position: relative;
   border-radius: var(--breach-radius);                                  /* the soft corner   */
   border: 3px solid transparent;
-  /* rounded neon gradient RIM via padding-box/border-box; interior stays opaque
-   * and legible (no over-painting pseudo-elements). */
+  /* Layered backgrounds (top → bottom): opaque interior clipped to padding-box;
+   * bright SPOTS riding the border (counter-rotating); the rotating neon RIM.
+   * Both conic layers show only in the 3px border ring — the fill covers the
+   * interior, so text stays legible. */
   background:
     linear-gradient(var(--cr-breach-fill), var(--cr-breach-fill)) padding-box,
-    linear-gradient(135deg, var(--cr-breach), var(--cr-breach-2) 88%) border-box;
+    conic-gradient(from calc(var(--cr-breach-angle) * -1.7),
+      transparent 0 3%, #fff 3% 5%, transparent 5% 36%, #fff 36% 38%,
+      transparent 38% 69%, #fff 69% 71%, transparent 71%) border-box,
+    conic-gradient(from var(--cr-breach-angle),
+      var(--cr-breach), var(--cr-breach-2), var(--cr-breach)) border-box;
   background-color: var(--cr-breach-fill);  /* explicit opaque interior for contrast tooling */
   /* dual-hue neon glow halo — magenta near, acid far (box-shadow stays outside) */
   box-shadow:
     0 0 calc(var(--breach-glow-size) * 0.9) color-mix(in srgb, var(--cr-breach) 70%, transparent),
     0 0 calc(var(--breach-glow-size) * 2.4) color-mix(in srgb, var(--cr-breach-2) 42%, transparent);
+  animation: cr-breach-spin var(--breach-spin, 9s) linear infinite;     /* the rim rotates   */
 }
+@keyframes cr-breach-spin { to { --cr-breach-angle: 360deg; } }
 /* re-key the primary hue to a signal (the pair stays acid unless overridden) */
 .cr-breach--work   { --cr-breach: var(--sig-work);  --cr-breach-2: var(--sig-accent); }
 .cr-breach--wait   { --cr-breach: var(--sig-wait);  --cr-breach-2: var(--sig-accent); }
@@ -470,8 +498,8 @@
 .cr-breach--wash {
   --cr-breach-fill: color-mix(in srgb, var(--cr-breach) 16%, var(--panel));
 }
-/* a slow living dual-hue glow — opt-in, off under reduced motion */
-.cr-breach--alive { animation: cr-breath 3.6s ease-in-out infinite; }
+/* a living dual-hue glow on top of the rotating rim — opt-in */
+.cr-breach--alive { animation: cr-breach-spin var(--breach-spin, 9s) linear infinite, cr-breath 3.6s ease-in-out infinite; }
 @keyframes cr-breath {
   0%, 100% { box-shadow:
     0 0 calc(var(--breach-glow-size) * 0.7) color-mix(in srgb, var(--cr-breach) 55%, transparent),
@@ -480,6 +508,7 @@
     0 0 calc(var(--breach-glow-size) * 1.3) color-mix(in srgb, var(--cr-breach) 85%, transparent),
     0 0 calc(var(--breach-glow-size) * 3) color-mix(in srgb, var(--cr-breach-2) 60%, transparent); }
 }
+@media (prefers-reduced-motion: reduce) { .cr-breach, .cr-breach--alive { animation: none; } }
 
 /* a standalone soft luminous accent — the antithesis of the hard pixel.
  * Purely decorative (aria-hidden); use to underline a single distinctive item. */
@@ -488,5 +517,22 @@
   background: radial-gradient(closest-side, var(--cr-breach, var(--sig-accent)), transparent 70%);
   filter: blur(calc(var(--breach-blur) * 0.5)); pointer-events: none;
 }
+
+/* ── Scroll-bound progress rail (pure-CSS scroll-driven animation) ──────────
+ * Width is bound to scroll position via `animation-timeline: scroll()` — no JS,
+ * no scroll listener. Default binds to the document; add .cr-scrollbar--local on
+ * an element inside a scroll container to bind to the NEAREST scroller instead. */
+.cr-scrollbar {
+  position: fixed; inset: 0 0 auto 0; height: 3px; z-index: var(--z-overlay);
+  transform: scaleX(0); transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--sig-accent), var(--sig-accent-2));
+  animation: cr-scrollfill linear both;
+  animation-timeline: scroll(root block);
+}
+.cr-scrollbar--local { position: sticky; animation-timeline: scroll(nearest block); }
+@keyframes cr-scrollfill { to { transform: scaleX(1); } }
+/* the global reduced-motion rule sets `animation: none`, which would freeze the
+ * rail at empty — so hide it rather than leave a stuck bar. */
+@media (prefers-reduced-motion: reduce) { .cr-scrollbar { display: none; } }
 
 @media (prefers-reduced-motion: reduce) { .cr-breach--alive { animation: none; } }

@@ -97,6 +97,7 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
 </style>
 </head>
 <body>
+<div class="cr-scrollbar" aria-hidden="true"></div>
 <div class="wrap">
   <div class="bar">
     <h1>Control Room · Living Gallery</h1>
@@ -294,16 +295,28 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         <span style="display:flex;flex-direction:column;gap:6px;align-items:center"><span class="cr-sev cr-sev--idle" role="img" aria-label="idle"></span>idle · ●∞</span>
         <span style="color:var(--muted);max-width:34ch;line-height:1.5">Shape reads the severity even with no colour — survives the phosphor CRT and colour-blindness.</span>
       </div>
-      <h3 style="margin-top:18px">Hardware chrome vocabulary (bezel detail only)</h3>
+      <h3 style="margin-top:18px">Hardware chrome — kit + seeded strips (same seed → same strip)</h3>
       <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;background:var(--panel-2);border:2px solid var(--border);padding:12px">
         <i class="cr-rivet" aria-hidden="true"></i>
         <i class="cr-rivet cr-rivet--hex" aria-hidden="true"></i>
         <i class="cr-rivet cr-rivet--slot" aria-hidden="true"></i>
+        <i class="cr-screw" aria-hidden="true"></i>
+        <i class="cr-screw cr-screw--x" aria-hidden="true"></i>
+        <i class="cr-bolt" aria-hidden="true"></i>
+        <i class="cr-led" aria-hidden="true"></i>
+        <i class="cr-led cr-led--wait" aria-hidden="true"></i>
+        <i class="cr-led cr-led--err" aria-hidden="true"></i>
         <i class="cr-vent" aria-hidden="true"></i>
+        <i class="cr-grille" aria-hidden="true"></i>
         <i class="cr-port" aria-hidden="true"></i>
         <span class="cr-stripe" style="width:64px" aria-hidden="true"></span>
         <span class="cr-tally">▐▐▐ ▌</span>
         <span class="cr-plate">UNIT · CR-00 · REV.C</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+        <canvas class="crchrome" width="440" height="26" data-seed="cr-00"></canvas>
+        <canvas class="crchrome" width="440" height="26" data-seed="nova-rack"></canvas>
+        <canvas class="crchrome" width="440" height="26" data-seed="rp-verify-07"></canvas>
       </div>
       <h3 style="margin-top:18px">Texture — beyond dots: crosshatch (×) &amp; duotone (cross-colours)</h3>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;font-family:var(--font-mono);font-size:10px;color:var(--muted)">
@@ -413,6 +426,33 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
     for(var gy=cell;gy<cv.height;gy+=cell*2){for(var gx=cell;gx<cv.width;gx+=cell*2){ctx.fillRect(gx,gy,1,1);}}
     ctx.globalAlpha=1;
     for(var ry=0;ry<G;ry++){for(var rx=0;rx<G;rx++){if(m[ry][rx]){ctx.fillStyle=ink;ctx.fillRect(rx*cell,ry*cell,cell,cell);}}}
+  });
+
+  // Seeded hardware chrome strips (deterministic variance).
+  document.querySelectorAll(".crchrome").forEach(function(cv){
+    var W=cv.width,H=cv.height,rng=mb32(hashSeed(cv.dataset.seed));
+    var LED=["#00d3fb","#f9ad00","#9ad335","#f45058","#ff1a9d"];
+    var HI="#3a3550",MID="#2a2740",LO="#17141f",EDGE="#000",SCR="#4a4560";
+    var ctx=cv.getContext("2d");ctx.imageSmoothingEnabled=false;
+    ctx.fillStyle=MID;ctx.fillRect(0,0,W,H);
+    ctx.fillStyle=HI;ctx.fillRect(0,0,W,2);
+    ctx.fillStyle=LO;ctx.fillRect(0,H-Math.round(H*0.42),W,Math.round(H*0.42));
+    ctx.fillStyle=EDGE;ctx.fillRect(0,0,W,1);ctx.fillRect(0,H-1,W,1);
+    var sc=2+Math.floor(rng()*3);ctx.strokeStyle=SCR;ctx.lineWidth=1;
+    for(var i=0;i<sc;i++){var x=Math.floor(rng()*W),len=6+Math.floor(rng()*16);ctx.globalAlpha=0.4+rng()*0.3;ctx.beginPath();ctx.moveTo(x,4+rng()*(H-10));ctx.lineTo(x+len,4+rng()*(H-10));ctx.stroke();}
+    ctx.globalAlpha=1;
+    function fastener(cx,cy,kind){var r=4;
+      function disc(){ctx.fillStyle=EDGE;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.fill();ctx.fillStyle=HI;ctx.beginPath();ctx.arc(cx,cy,r-1,0,7);ctx.fill();ctx.fillStyle=MID;ctx.beginPath();ctx.arc(cx+0.6,cy+0.6,r-1.6,0,7);ctx.fill();}
+      if(kind===0){disc();}
+      else if(kind===1){ctx.fillStyle=EDGE;ctx.beginPath();for(var a=0;a<6;a++){var ang=Math.PI/3*a,px=cx+Math.cos(ang)*r,py=cy+Math.sin(ang)*r;a?ctx.lineTo(px,py):ctx.moveTo(px,py);}ctx.closePath();ctx.fill();ctx.fillStyle=HI;ctx.beginPath();for(var b=0;b<6;b++){var an=Math.PI/3*b,qx=cx+Math.cos(an)*(r-1.4),qy=cy+Math.sin(an)*(r-1.4);b?ctx.lineTo(qx,qy):ctx.moveTo(qx,qy);}ctx.closePath();ctx.fill();}
+      else if(kind===2){disc();ctx.fillStyle=EDGE;ctx.fillRect(cx-r+1,cy-0.5,(r-1)*2,1);}
+      else{disc();ctx.fillStyle=EDGE;ctx.fillRect(cx-r+1,cy-0.5,(r-1)*2,1);ctx.fillRect(cx-0.5,cy-r+1,1,(r-1)*2);}}
+    var n=Math.max(3,Math.round(W/(34+rng()*20))),pad=12;
+    for(var k=0;k<n;k++){var cx=Math.round(pad+k*(W-pad*2)/(n-1));fastener(cx,Math.round(H/2),Math.floor(rng()*4));}
+    var seams=Math.floor(rng()*3);
+    for(var s=0;s<seams;s++){var sx=Math.round(pad+rng()*(W-pad*2));ctx.fillStyle=EDGE;ctx.fillRect(sx,2,1,H-4);ctx.fillStyle=HI;ctx.fillRect(sx+1,2,1,H-4);}
+    var led=LED[Math.floor(rng()*LED.length)],lx=rng()>0.5?W-8:8;
+    ctx.fillStyle=EDGE;ctx.fillRect(lx-3,H/2-3,6,6);ctx.fillStyle=led;ctx.fillRect(lx-2,H/2-2,4,4);ctx.fillStyle="#fff";ctx.globalAlpha=0.6;ctx.fillRect(lx-2,H/2-2,1,1);ctx.globalAlpha=1;
   });
 </script>
 </body>

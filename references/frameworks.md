@@ -14,7 +14,8 @@ Button, Chip, Tag, StatusDot, SessionRow, Hero, Bezel, ArrowRail, Drip, Masthead
 Nav, Table, Tiles, Field, Input, Textarea, Select, Choice (checkbox/radio),
 Switch, Instrument, EmptyState, the severity **Shape**, the **Breach** (Law 9),
 the overlays (Modal on the native `<dialog>`, Toast, Tooltip), the seeded
-pixel-**Cat** and the seeded cyber-**Sigil** (both imperative
+pixel-**Cat**, the seeded cyber-**Sigil**, and the seeded hardware **Chrome**
+strip (imperative
 `<canvas>`, painted in `onMount` — Mitosis resolves the ref correctly per target:
 `canvasRef.current` in React, `bind:this` in Svelte, etc.).
 
