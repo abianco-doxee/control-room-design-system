@@ -249,9 +249,16 @@ node build/build-palette.mjs --report  # report only
 ```
 
 Its output is folded into `tokens/tokens.json` (the hand-editable source of
-truth); the generator is provenance + a tuning surface. Dark and extreme are fully
-generated (the vibrant, chromatic-near-black shift lives there); light and
-phosphor keep their hand-tuned character and only take the new second accent.
+truth); the generator is provenance + a tuning surface. Per theme it can emit
+grounds, signals, and/or the second accent independently:
+
+- **dark / extreme** — grounds + signals generated. The grounds are a **lifted
+  deep-violet charcoal** (more lightness *and* more chroma than a dead near-black),
+  so the dark theme reads as a rich surface with real colour presence, not a void.
+- **light** — signals stay hand-tuned, but the paper is regenerated **cool**
+  (violet-grey, `h ≈ 285`) rather than warm cream, so it sits with the neon
+  signals instead of fighting them.
+- **phosphor** — keeps its green channel; takes only the second accent.
 
 **`--sig-accent-2`** is a **second action key** (acid lime in dark/extreme, a deep
 violet on light, an aqua-green in phosphor) with `--on-accent-2`. It is a

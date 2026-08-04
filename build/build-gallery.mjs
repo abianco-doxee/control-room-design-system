@@ -150,6 +150,7 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
               <div class="cr-row"><span class="cr-sev cr-sev--warn" role="img" aria-label="attend"></span><canvas class="crsig" width="20" height="20" data-seed="cr-1130" data-state="waiting"></canvas><span class="cr-row__name">CR-1130 picker</span><span class="cr-row__status">needs input</span></div>
               <div class="cr-row"><span class="cr-sev cr-sev--crit" role="img" aria-label="critical"></span><canvas class="crsig" width="20" height="20" data-seed="rp-verify" data-state="error"></canvas><span class="cr-row__name">rp verify</span><span class="cr-row__status">2 failing</span></div>
               <div class="cr-row"><span class="cr-sev cr-sev--ok" role="img" aria-label="nominal"></span><canvas class="crsig" width="20" height="20" data-seed="atlas" data-state="done"></canvas><span class="cr-row__name">atlas deploy</span><span class="cr-row__status">merged</span></div>
+              <div style="display:flex;gap:8px;margin-top:12px"><button class="cr-btn cr-btn--sm cr-btn--accent" type="button">Escalate</button><button class="cr-btn cr-btn--sm cr-btn--accent2" type="button">Approve all</button></div>
             </section>
             <section class="cr-panel">
               <h4 class="cr-panel__title">Pipeline</h4>
@@ -187,7 +188,11 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       <h3>Hero (keyed focal)</h3>
       <div class="cr-hero cr-hero--wait"><div><div class="cr-hero__big">nova needs you</div><div class="cr-hero__sub">CR-1130 · paused · 6m</div></div></div>
       <h3 style="margin-top:16px">Button · Chip · Tag</h3>
-      <button class="cr-btn" type="button">RUN SCAN</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="cr-btn" type="button">RUN SCAN</button>
+        <button class="cr-btn cr-btn--accent" type="button">Escalate</button>
+        <button class="cr-btn cr-btn--accent2" type="button">Approve</button>
+      </div>
       <div style="margin-top:10px;display:flex;gap:7px;flex-wrap:wrap;align-items:center">
         <span class="cr-chip">PTL-757</span><span class="cr-chip cr-chip--alt">ui-kit</span>
         <span class="cr-tag cr-tag--now">shipped</span><span class="cr-tag cr-tag--no">ruled out</span>
