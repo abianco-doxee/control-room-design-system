@@ -5,20 +5,21 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 38,
+    "count": 40,
     "categories": {
       "action": 1,
+      "behavior": 1,
       "forms": 6,
       "identity": 2,
       "layout": 5,
       "media": 6,
       "navigation": 3,
       "overlay": 5,
-      "primitives": 1,
+      "primitives": 2,
       "state": 9
     },
     "lifecycles": {
-      "stable": 37,
+      "stable": 39,
       "experimental": 1
     }
   },
@@ -78,6 +79,30 @@
         "cta",
         "press",
         "snap"
+      ]
+    },
+    {
+      "id": "key-hints",
+      "name": "Key hints (peek)",
+      "kind": "component",
+      "category": "behavior",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Headless behavior — while the reveal key (default Alt) is held, sets data-cr-keys on the root so every secondary key hint fades in at once (a peek-all-shortcuts gesture). Renders nothing visible.",
+      "spec": "references/components.md#key-hint",
+      "variants": {
+        "prop": [
+          "revealKey"
+        ]
+      },
+      "tokens": [],
+      "keywords": [
+        "keyboard",
+        "shortcuts",
+        "peek",
+        "reveal",
+        "headless",
+        "behavior"
       ]
     },
     {
@@ -1259,6 +1284,44 @@
         "rail",
         "sequence",
         "diagonal"
+      ]
+    },
+    {
+      "id": "kbd",
+      "name": "Key hint",
+      "kind": "component",
+      "category": "primitives",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A keycap badge for a keyboard shortcut. Decorative (aria-hidden) — the real binding rides aria-keyshortcuts on the action. Main actions show it always; secondary use the hint variant, revealed on host hover/focus or a global peek.",
+      "spec": "references/components.md#key-hint",
+      "variants": {
+        "flag": [
+          "hint",
+          "on"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "keycap fill"
+        },
+        {
+          "cssVar": "--brd-hair",
+          "description": "keycap border"
+        },
+        {
+          "cssVar": "--shadow-off-sm",
+          "description": "keycap depth"
+        }
+      ],
+      "keywords": [
+        "kbd",
+        "keycap",
+        "shortcut",
+        "hotkey",
+        "hint",
+        "accelerator"
       ]
     },
     {

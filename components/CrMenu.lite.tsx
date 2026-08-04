@@ -1,4 +1,4 @@
-import { useStore, Show, For } from "@builder.io/mitosis";
+import { useStore, useRef, Show, For } from "@builder.io/mitosis";
 
 export interface CrMenuItem {
   label: string;
@@ -15,10 +15,13 @@ export interface CrMenuProps {
   onSelect?: (index: number) => void;
 }
 
-/* Dropdown menu. A trigger button toggles a role=menu panel; a transparent
- * full-viewport scrim closes it on outside click (no global listeners, so it
- * behaves identically across targets). Styling via .cr-menu. */
+/* Dropdown menu with full keyboard support: the trigger opens on click or ↓;
+ * once open, ↑/↓ move between items, Home/End jump, Esc closes and returns focus
+ * to the trigger. A transparent full-viewport scrim closes it on outside click
+ * (no global listeners — identical across targets). Styling via .cr-menu. */
 export default function CrMenu(props: CrMenuProps) {
+  const rootRef = useRef(null);
+
   const state = useStore({
     open: false,
     toggle() {
@@ -27,20 +30,69 @@ export default function CrMenu(props: CrMenuProps) {
     close() {
       state.open = false;
     },
+    focusTrigger() {
+      const root: any = rootRef;
+      if (root) {
+        const t = root.querySelector('[aria-haspopup="menu"]');
+        if (t) t.focus();
+      }
+    },
+    focusFirst(tries: number) {
+      /* the panel renders a tick after open flips; retry briefly until it exists */
+      const root: any = rootRef;
+      const first = root ? root.querySelector('[role="menuitem"]') : null;
+      if (first) {
+        first.focus();
+        return;
+      }
+      if ((tries || 0) < 6) setTimeout(() => state.focusFirst((tries || 0) + 1), 16);
+    },
     pick(i: number) {
       state.open = false;
+      state.focusTrigger();
       if (props.onSelect) props.onSelect(i);
+    },
+    onTriggerKey(e: KeyboardEvent) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        state.open = true;
+        state.focusFirst(0);
+      }
+    },
+    onPanelKey(e: KeyboardEvent) {
+      const root: any = rootRef;
+      if (!root) return;
+      const items = Array.from(root.querySelectorAll('[role="menuitem"]'));
+      const i = items.indexOf(document.activeElement);
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        ((items[i + 1] || items[0]) as HTMLElement).focus();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        ((items[i - 1] || items[items.length - 1]) as HTMLElement).focus();
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        (items[0] as HTMLElement).focus();
+      } else if (e.key === "End") {
+        e.preventDefault();
+        (items[items.length - 1] as HTMLElement).focus();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        state.open = false;
+        state.focusTrigger();
+      }
     },
   });
 
   return (
-    <div class="cr-menu">
+    <div class="cr-menu" ref={rootRef}>
       <button
         type="button"
         class="cr-btn cr-btn--controls cr-btn--sm"
         aria-haspopup="menu"
         aria-expanded={state.open ? "true" : "false"}
         onClick={() => state.toggle()}
+        onKeyDown={(event) => state.onTriggerKey(event)}
       >
         {props.label}
       </button>
@@ -55,6 +107,7 @@ export default function CrMenu(props: CrMenuProps) {
         <div
           class={"cr-menu__panel" + (props.align === "right" ? " cr-menu__panel--right" : "")}
           role="menu"
+          onKeyDown={(event) => state.onPanelKey(event)}
         >
           <For each={props.items}>
             {(item: CrMenuItem, i: number) => (

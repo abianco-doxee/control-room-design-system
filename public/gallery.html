@@ -481,8 +481,13 @@ body {
 .cr-table td { color: var(--ink); }
 /* sticky header (opt-in) — wrap the table in a scroll box for it to bite */
 .cr-table--sticky thead th { position: sticky; top: 0; z-index: 1; background: var(--panel); }
-/* sortable header */
-.cr-table__sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+/* sortable header — a real <button> inside the <th> (keyboard-operable) */
+.cr-table__sortable {
+  display: inline-flex; align-items: center; gap: var(--space-1); width: 100%;
+  background: transparent; border: 0; padding: 0; cursor: pointer; user-select: none;
+  white-space: nowrap; font: inherit; color: inherit; text-transform: inherit;
+  letter-spacing: inherit; text-align: left;
+}
 .cr-table__sortable:hover { color: var(--ink); }
 .cr-table__ind { color: var(--sig-work); font-weight: 900; margin-left: var(--space-1); }
 /* row hover + selection */
@@ -706,6 +711,32 @@ body {
 .cr-pager__btn--on { background: var(--sig-work); color: var(--on-sig); border-color: var(--border); }
 .cr-pager__btn[disabled] { opacity: var(--state-disabled-op); cursor: not-allowed; }
 .cr-pager__ellipsis { color: var(--muted); padding: 0 var(--space-1); }
+
+/* ── Key-hint badges (keycaps) ──────────────────────────────────────────────
+ * A tiny hard-edged keycap for a keyboard shortcut. Decorative (aria-hidden) —
+ * the actual binding is announced via aria-keyshortcuts on the action. Main
+ * actions show a keycap always; secondary ones use --hint, revealed on hover /
+ * focus of a `.cr-keys-host`, or globally when the root is "peeking"
+ * (`:root[data-cr-keys="on"]` — see the CrKeyHints hold-to-reveal behavior). */
+.cr-kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: var(--space-4); height: var(--space-4); padding: 0 var(--space-1);
+  margin-left: var(--space-1); font-family: var(--font-mono); font-size: var(--text-2xs);
+  font-weight: 800; text-transform: uppercase; line-height: 1; white-space: nowrap;
+  background: var(--panel-2); color: var(--muted); border: var(--brd-hair) solid var(--border);
+  box-shadow: var(--space-px) var(--brd-hair) 0 var(--shadow-col);
+}
+/* on a signal-filled surface (inside a filled button) — key off currentColor */
+.cr-kbd--on {
+  background: color-mix(in srgb, currentColor 16%, transparent); color: inherit;
+  border-color: currentColor; box-shadow: none;
+}
+/* secondary — hidden until revealed (no layout shift: opacity, not display) */
+.cr-kbd--hint { opacity: 0; transition: opacity var(--dur-press); }
+.cr-keys-host:hover .cr-kbd--hint,
+.cr-keys-host:focus-within .cr-kbd--hint,
+:root[data-cr-keys="on"] .cr-kbd--hint { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .cr-kbd--hint { transition: none; } }
 
 /* ── Tooltip (CSS reveal on hover/focus; role=tooltip + aria-describedby) ─ */
 .cr-tooltip { position: relative; display: inline-flex; }
@@ -1302,6 +1333,15 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       <div style="display:flex;flex-direction:column;gap:8px;max-width:340px">
         <div class="cr-toast cr-toast--done" role="status" aria-live="polite"><span class="cr-toast__msg">queue drained</span><button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button></div>
         <div class="cr-toast cr-toast--err" role="alert" aria-live="assertive"><span class="cr-toast__msg">killed all workers</span><button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button></div>
+      </div>
+      <h3 style="margin-top:16px">Key hints (main = always · secondary = on hover / hold Alt)</h3>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <button type="button" class="cr-btn cr-btn--err" aria-keyshortcuts="i">open incident <kbd class="cr-kbd cr-kbd--on" aria-hidden="true">I</kbd></button>
+        <div class="cr-keys-host" style="display:flex;gap:8px;align-items:center">
+          <span style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--muted)">hover me →</span>
+          <button type="button" class="cr-btn cr-btn--controls cr-btn--sm" aria-keyshortcuts="1">dark <kbd class="cr-kbd cr-kbd--hint" aria-hidden="true">1</kbd></button>
+          <button type="button" class="cr-btn cr-btn--controls cr-btn--sm" aria-keyshortcuts="2">light <kbd class="cr-kbd cr-kbd--hint" aria-hidden="true">2</kbd></button>
+        </div>
       </div>
     </div>
     <div style="grid-column:1/-1">
