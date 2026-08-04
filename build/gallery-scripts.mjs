@@ -39,31 +39,47 @@ export const browserScript = `
     for(var ry=0;ry<G;ry++){for(var rx=0;rx<G;rx++){if(m[ry][rx]){ctx.fillStyle=ink;ctx.fillRect(rx*cell,ry*cell,cell,cell);}}}
   });
 
-  // Seeded hardware chrome strips (deterministic variance).
+  // Seeded hardware chrome strips (deterministic variance). Brushed-metal body,
+  // beveled edges, high-contrast fasteners, an occasional vent, and a glowing LED.
   document.querySelectorAll(".crchrome").forEach(function(cv){
     var W=cv.width,H=cv.height,rng=mb32(hashSeed(cv.dataset.seed));
     var LED=[cvar('--sig-work','#00d3fb'),cvar('--sig-wait','#f9ad00'),cvar('--sig-accent-2','#9ad335'),cvar('--sig-err','#f45058'),cvar('--sig-accent','#ff1a9d')];
-    var HI=cvar('--rail-ink','#3a3550'),MID=cvar('--panel-2','#2a2740'),LO=cvar('--rail','#17141f'),EDGE=cvar('--border','#000'),SCR=cvar('--muted','#4a4560');
+    var HI=cvar('--rail-ink','#c8c8de'),MID=cvar('--panel-2','#271d45'),LO=cvar('--rail','#050509'),EDGE=cvar('--border','#000');
     var ctx=cv.getContext("2d");ctx.imageSmoothingEnabled=false;
-    ctx.fillStyle=MID;ctx.fillRect(0,0,W,H);
-    ctx.fillStyle=HI;ctx.fillRect(0,0,W,2);
-    ctx.fillStyle=LO;ctx.fillRect(0,H-Math.round(H*0.42),W,Math.round(H*0.42));
-    ctx.fillStyle=EDGE;ctx.fillRect(0,0,W,1);ctx.fillRect(0,H-1,W,1);
-    var sc=2+Math.floor(rng()*3);ctx.strokeStyle=SCR;ctx.lineWidth=1;
-    for(var i=0;i<sc;i++){var x=Math.floor(rng()*W),len=6+Math.floor(rng()*16);ctx.globalAlpha=0.4+rng()*0.3;ctx.beginPath();ctx.moveTo(x,4+rng()*(H-10));ctx.lineTo(x+len,4+rng()*(H-10));ctx.stroke();}
+    // brushed-metal body: a vertical sheen (light top → mid → dark base)
+    var g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,HI);g.addColorStop(0.12,MID);g.addColorStop(0.6,MID);g.addColorStop(1,LO);
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    // fine vertical brushing
+    for(var v=0;v<W;v+=2){ctx.globalAlpha=rng()*0.06;ctx.fillStyle=rng()>0.5?"#fff":"#000";ctx.fillRect(v,3,1,H-6);}
     ctx.globalAlpha=1;
-    function fastener(cx,cy,kind){var r=4;
-      function disc(){ctx.fillStyle=EDGE;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.fill();ctx.fillStyle=HI;ctx.beginPath();ctx.arc(cx,cy,r-1,0,7);ctx.fill();ctx.fillStyle=MID;ctx.beginPath();ctx.arc(cx+0.6,cy+0.6,r-1.6,0,7);ctx.fill();}
+    // top bevel highlight + hard top/bottom edges
+    ctx.globalAlpha=0.22;ctx.fillStyle="#fff";ctx.fillRect(0,1,W,1);ctx.globalAlpha=1;
+    ctx.fillStyle=EDGE;ctx.fillRect(0,0,W,1);ctx.fillRect(0,H-1,W,1);
+    // scratches (light + dark, angled)
+    var sc=3+Math.floor(rng()*3);ctx.lineWidth=1;
+    for(var i=0;i<sc;i++){var x=Math.floor(rng()*W),len=8+Math.floor(rng()*20),yy=4+rng()*(H-10);ctx.globalAlpha=0.14+rng()*0.24;ctx.strokeStyle=rng()>0.5?"#fff":"#000";ctx.beginPath();ctx.moveTo(x,yy);ctx.lineTo(x+len,yy-1);ctx.stroke();}
+    ctx.globalAlpha=1;
+    function fastener(cx,cy,kind){var r=5;
+      function disc(){ctx.fillStyle=EDGE;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.fill();
+        var rg=ctx.createRadialGradient(cx-1.6,cy-1.6,0.4,cx,cy,r-0.4);rg.addColorStop(0,"#fff");rg.addColorStop(0.3,HI);rg.addColorStop(1,MID);
+        ctx.fillStyle=rg;ctx.beginPath();ctx.arc(cx,cy,r-1.4,0,7);ctx.fill();}
       if(kind===0){disc();}
-      else if(kind===1){ctx.fillStyle=EDGE;ctx.beginPath();for(var a=0;a<6;a++){var ang=Math.PI/3*a,px=cx+Math.cos(ang)*r,py=cy+Math.sin(ang)*r;a?ctx.lineTo(px,py):ctx.moveTo(px,py);}ctx.closePath();ctx.fill();ctx.fillStyle=HI;ctx.beginPath();for(var b=0;b<6;b++){var an=Math.PI/3*b,qx=cx+Math.cos(an)*(r-1.4),qy=cy+Math.sin(an)*(r-1.4);b?ctx.lineTo(qx,qy):ctx.moveTo(qx,qy);}ctx.closePath();ctx.fill();}
-      else if(kind===2){disc();ctx.fillStyle=EDGE;ctx.fillRect(cx-r+1,cy-0.5,(r-1)*2,1);}
-      else{disc();ctx.fillStyle=EDGE;ctx.fillRect(cx-r+1,cy-0.5,(r-1)*2,1);ctx.fillRect(cx-0.5,cy-r+1,1,(r-1)*2);}}
-    var n=Math.max(3,Math.round(W/(34+rng()*20))),pad=12;
+      else if(kind===1){ctx.fillStyle=EDGE;ctx.beginPath();for(var a=0;a<6;a++){var ang=Math.PI/3*a+0.5,px=cx+Math.cos(ang)*r,py=cy+Math.sin(ang)*r;a?ctx.lineTo(px,py):ctx.moveTo(px,py);}ctx.closePath();ctx.fill();ctx.fillStyle=HI;ctx.beginPath();for(var b=0;b<6;b++){var an=Math.PI/3*b+0.5,qx=cx+Math.cos(an)*(r-1.6),qy=cy+Math.sin(an)*(r-1.6);b?ctx.lineTo(qx,qy):ctx.moveTo(qx,qy);}ctx.closePath();ctx.fill();}
+      else if(kind===2){disc();ctx.fillStyle=EDGE;ctx.fillRect(cx-r+1.5,cy-0.75,(r-1.5)*2,1.5);}
+      else{disc();ctx.fillStyle=EDGE;ctx.fillRect(cx-r+1.5,cy-0.75,(r-1.5)*2,1.5);ctx.fillRect(cx-0.75,cy-r+1.5,1.5,(r-1.5)*2);}}
+    var n=Math.max(3,Math.round(W/(40+rng()*22))),pad=13;
     for(var k=0;k<n;k++){var cx=Math.round(pad+k*(W-pad*2)/(n-1));fastener(cx,Math.round(H/2),Math.floor(rng()*4));}
-    var seams=Math.floor(rng()*3);
-    for(var s=0;s<seams;s++){var sx=Math.round(pad+rng()*(W-pad*2));ctx.fillStyle=EDGE;ctx.fillRect(sx,2,1,H-4);ctx.fillStyle=HI;ctx.fillRect(sx+1,2,1,H-4);}
-    var led=LED[Math.floor(rng()*LED.length)],lx=rng()>0.5?W-8:8;
-    ctx.fillStyle=EDGE;ctx.fillRect(lx-3,H/2-3,6,6);ctx.fillStyle=led;ctx.fillRect(lx-2,H/2-2,4,4);ctx.fillStyle="#fff";ctx.globalAlpha=0.6;ctx.fillRect(lx-2,H/2-2,1,1);ctx.globalAlpha=1;
+    // occasional vent/grille — a stack of recessed slots
+    if(rng()>0.45){var gx=Math.round(pad+rng()*(W-pad*2-30)),slots=3+Math.floor(rng()*3),gy0=Math.round(H/2-slots*1.5);
+      for(var gs=0;gs<slots;gs++){var gy=gy0+gs*3;ctx.fillStyle=EDGE;ctx.fillRect(gx,gy,22,1.5);ctx.globalAlpha=0.12;ctx.fillStyle="#fff";ctx.fillRect(gx,gy+1.5,22,1);ctx.globalAlpha=1;}}
+    // panel seams — hard edge + highlight
+    var seams=1+Math.floor(rng()*2);
+    for(var s=0;s<seams;s++){var sx=Math.round(pad+rng()*(W-pad*2));ctx.fillStyle=EDGE;ctx.fillRect(sx,2,1.5,H-4);ctx.globalAlpha=0.16;ctx.fillStyle="#fff";ctx.fillRect(sx+1.5,2,1,H-4);ctx.globalAlpha=1;}
+    // status LED with a soft glow halo
+    var led=LED[Math.floor(rng()*LED.length)],lx=rng()>0.5?W-9:9,ly=Math.round(H/2);
+    var lg=ctx.createRadialGradient(lx,ly,0,lx,ly,8);lg.addColorStop(0,led);lg.addColorStop(1,"rgba(0,0,0,0)");ctx.globalAlpha=0.75;ctx.fillStyle=lg;ctx.beginPath();ctx.arc(lx,ly,8,0,7);ctx.fill();ctx.globalAlpha=1;
+    ctx.fillStyle=EDGE;ctx.fillRect(lx-3,ly-3,6,6);ctx.fillStyle=led;ctx.fillRect(lx-2,ly-2,4,4);ctx.fillStyle="#fff";ctx.globalAlpha=0.75;ctx.fillRect(lx-2,ly-2,1,1);ctx.globalAlpha=1;
   });
 
   // Seeded ASCII/Unicode density field (dead-space decoration).
