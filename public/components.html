@@ -318,6 +318,11 @@ body {
   transition: transform 0.05s, box-shadow 0.05s;
 }
 .cr-btn:active { transform: translate(var(--shadow-off), var(--shadow-off)); box-shadow: 0 0 0 var(--shadow-col); }
+/* disabled: flatten off the surface (drop the hard shadow), dim, block the press */
+.cr-btn:disabled, .cr-btn[disabled] {
+  opacity: var(--state-disabled-op); cursor: not-allowed;
+  box-shadow: none; transform: none; filter: saturate(0.5);
+}
 .cr-btn--sm { --cr-btn-pad-x: var(--space-3); --cr-btn-pad-y: var(--space-1); --cr-btn-size: var(--text-xs); }
 .cr-btn--controls { --cr-btn-bg: var(--panel); --cr-btn-fg: var(--muted); border-width: var(--brd); box-shadow: 3px 3px 0 var(--border); }
 /* signal variants — override just the bg/fg tokens */
@@ -1050,17 +1055,21 @@ body {
 /* ── Ambient loops (Law 7 — alive at rest; low-fps, hardware-bound) ─────────
  * Opt-in classes. All are OFF under prefers-reduced-motion (global rule in
  * control-room.css already kills animations; these add the keyframes). */
-@keyframes cr-scan  { to { transform: translateY(100%); } }
+@keyframes cr-scan  { from { top: -18px; } to { top: 100%; } }
 @keyframes cr-pulse { 0% { box-shadow: 0 0 0 0 var(--_pulse, var(--sig-work)); } 100% { box-shadow: 0 0 0 12px transparent; } }
 @keyframes cr-drift { to { background-position: var(--halftone-size, 6px 6px); } }
 @keyframes cr-flick { 50% { opacity: 0.45; } }
 
 /* a thin CRT sweep bar; host must be position:relative + overflow:hidden */
-.cr-anim-scan { position: relative; }
+.cr-anim-scan { position: relative; overflow: hidden; }
+/* travels the FULL height: `top` is a %-of-container, so from -18px to 100% sweeps
+ * the whole element (translateY(100%) only moved the 18px stripe by its own height).
+ * Subtler by default and follows the loudness dial. */
 .cr-anim-scan::after {
-  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 14px;
-  background: linear-gradient(var(--sig-work), transparent); opacity: 0.4;
-  transform: translateY(-14px); animation: cr-scan 3.2s linear infinite; pointer-events: none;
+  content: ""; position: absolute; left: 0; right: 0; top: -18px; height: 18px;
+  background: linear-gradient(var(--sig-work), transparent);
+  opacity: calc(0.16 * var(--decoration-intensity, 1));
+  animation: cr-scan 3.6s linear infinite; pointer-events: none;
 }
 /* a slow expanding ring on a signal dot; set --_pulse to a signal to re-key */
 .cr-anim-pulse { animation: cr-pulse 2.4s ease-out infinite; }
