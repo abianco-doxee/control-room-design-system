@@ -176,3 +176,39 @@ the global reduced-motion rule.
   reads as noise and erases the contrast that makes a real event legible.
 - **NEVER** loop data, numerals, or labels; **NEVER** ambient-animate the whole
   screen at once.
+
+The **breach** (Law 9) is the one exception that ambient-animates its own frame:
+its neon rim rotates and bright spots ride the border (`@property --cr-breach-angle`
+→ a rotating conic gradient). That is licensed precisely because the breach is the
+single exceptional element — the same one-per-screen discipline as the eruption.
+
+## Scroll-bound motion (pure CSS)
+
+Motion can be tied to **scroll position** with zero JavaScript via CSS
+scroll-driven animations — an `animation` whose `animation-timeline` is a scroll
+progress, not the clock. The shipped `.cr-scrollbar` is a fixed progress rail
+bound to the document scroller:
+
+```html
+<div class="cr-scrollbar" aria-hidden="true"></div>
+```
+```css
+.cr-scrollbar {
+  position: fixed; inset: 0 0 auto 0; height: 3px; transform: scaleX(0); transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--sig-accent), var(--sig-accent-2));
+  animation: cr-scrollfill linear both; animation-timeline: scroll(root block);
+}
+@keyframes cr-scrollfill { to { transform: scaleX(1); } }
+```
+
+- Use `scroll(root block)` to bind to the page; add `.cr-scrollbar--local` (which
+  switches to `scroll(nearest block)`) on an element inside a scroll container to
+  bind to *that* container instead. `view()` timelines bind to an element entering
+  the viewport.
+- **MUST** account for the global reduced-motion rule: it sets `animation: none`,
+  which would freeze a scroll animation at its start frame — so the rail is
+  `display:none` under `prefers-reduced-motion` rather than left stuck at empty.
+  Scroll-linked motion is user-driven (not autonomous), but a frozen indicator is
+  worse than none.
+- **SHOULD** reserve scroll-binding for progress/orientation cues, not for moving
+  content around as the operator scrolls.
