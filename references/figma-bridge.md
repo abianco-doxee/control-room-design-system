@@ -138,7 +138,7 @@ When asked to build from a Figma design:
    registry's `variants`.
 4. **Enforce the laws.** The generated output must still pass
    `checklists/component-checklist.md` — tokens only, radius 0, hard shadow, two
-   type registers, color = state. The design is an input; the eight laws win.
+   type registers, color = state. The design is an input; the nine laws win.
 5. **Tokens.** Prefer resolving colors/spacing to Control Room CSS variables
    (via `dist/tokens.flat.json`), not the raw hexes Figma reports.
 

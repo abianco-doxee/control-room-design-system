@@ -1,14 +1,14 @@
-# Design Language — The Eight Laws
+# Design Language — The Nine Laws
 
-The visual language of Control Room is not a mood board. It is eight decision
+The visual language of Control Room is not a mood board. It is nine decision
 procedures, each grounded in what real productions are *documented* to do (not
 in what their marketing posters look like), and each written so the next
 component doesn't need a taste debate.
 
 Read this file first when building anything new. Given a component, these laws
 should settle the visual — and verbal — questions before you write a line of CSS.
-Laws 1–7 govern how a surface *looks*; Law 8 governs how it *speaks*, and it runs
-through all of them.
+Laws 1–7 govern how a surface *looks*; Law 8 governs how it *speaks*; and Law 9
+governs the one time you are allowed to break the rest.
 
 **Research note.** Researching the references overturned two laws that were
 originally written from images alone and added one that was missed entirely. The
@@ -353,6 +353,46 @@ no subject, no apology, no adjective that isn't a measurement.**
 
 ---
 
+## Law 9 — The Breach: break one law, once, on purpose.
+
+Every law above is absolute — until this one. A system this rigid earns the right
+to **one sanctioned transgression**, and the transgression is what makes the rigor
+*felt*. The forbidden vocabulary — a gradient, a blurred **blob** (a soft luminous
+shape, the antithesis of the hard pixel), a rounded corner, a colour **glow** — is
+not banned so much as **rationed**: it is licensed on exactly one element per
+screen, to mark the single most exceptional thing (a milestone, a breakthrough, a
+live anomaly, the one item that transcends the instrument).
+
+This is the same discipline as Law 2 (one key) and Law 7 (one eruption): the
+breach only reads *because everything around it obeys*. Two breaches is zero
+breaches — the spell breaks, and you are left with an inconsistent screen.
+
+> The instinct behind it: a rule is worth as much as the one deliberate,
+> well-placed act of breaking it. Anyone can add a gradient everywhere; the craft
+> is spending it once.
+
+Shipped as `.cr-breach` (soft corner + glow + blurred-blob `::before`, optional
+`--wash` gradient and `--alive` breathing glow) and `.cr-blob` (a standalone soft
+accent) — `references/components.md#breach`.
+
+**Rules**
+
+- **MUST** limit the breach to **one element per screen**. If two things both
+  "deserve" it, neither gets it — pick the one.
+- **MUST** keep the breach keyed to a signal (default accent): even the rule-break
+  means something (Law 2 still holds — the glow's hue is a state or an action).
+- **MUST** keep everything else hard-edged. The breach is a licensed exception,
+  never a licence to soften the field around it.
+- **MUST** keep it accessible — text on a breach still meets contrast, and the
+  `--alive` glow is off under `prefers-reduced-motion`.
+- **NEVER** breach data, a table, a dense list, or routine chrome. The breach is
+  for the exceptional, not the ordinary — glowing the mundane is the fastest way
+  to look like a template that discovered `box-shadow`.
+
+*Sources: the system itself — a constraint is defined by its one exception.*
+
+---
+
 ## Signatures — the tells
 
 The laws are the *why*. These are the **tells**: the concrete marks that, present
@@ -411,6 +451,9 @@ Control Room. If it has all ten, it could carry no logo and still be recognized.
    reduced-motion respected.
 8. **Law 8** — Every string reports state in the machine voice: present tense,
    datum first, no apology, no cheer.
+9. **Law 9** — Is there exactly one breach (or none)? The single most exceptional
+   item *may* break a law with a glow/gradient/soft corner; nothing else may, and
+   never two.
 
 Then run the screen against **Signatures — the tells** above: it should carry the
 hard offset shadow, square corners, color-as-state, and two registers at minimum,

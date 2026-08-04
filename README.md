@@ -59,7 +59,7 @@ optimized to be *generable*, not just *readable*:
 
 - **Constraint hierarchy.** Every rule is tagged `MUST` / `SHOULD` / `NEVER`, so
   an agent can obey it mechanically rather than interpreting prose.
-- **Research-grounded language.** The eight laws cite what real productions are
+- **Research-grounded language.** The nine laws cite what real productions are
   *documented* to do (Redline, Dandadan, Fallout's Pip-Boy, Evangelion/Khara,
   Edgerunners, neobrutalism) — decisions, not vibes.
 - **Token-first.** A single token layer (`tokens/`) drives four themes on an
