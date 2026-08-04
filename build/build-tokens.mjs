@@ -105,7 +105,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 /* Focus is a first-class signal, not an afterthought. */
-*:focus-visible { outline: 3px solid var(--sig-work); outline-offset: 2px; }
+*:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
 /* Motion is opt-out at the system level. */
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }

@@ -75,4 +75,20 @@ test.describe("component browser — live islands", () => {
     // the code snippet reflects the current props
     await expect(slider.locator(".pg__code")).toContainText("disabled");
   });
+
+  test("keyboard focus shows a visible ring", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    // Tab into the page (keyboard focus → :focus-visible applies) and confirm the
+    // tokenized global focus ring actually renders on the focused control.
+    await page.keyboard.press("Tab");
+    const ring = await page.evaluate(() => {
+      const el = document.activeElement;
+      const s = getComputedStyle(el);
+      return { tag: el && el.tagName, style: s.outlineStyle, width: parseFloat(s.outlineWidth) || 0 };
+    });
+    expect(ring.tag, "something is focused").toBeTruthy();
+    expect(ring.style, "outline style").not.toBe("none");
+    expect(ring.width, "outline width > 0").toBeGreaterThan(0);
+  });
 });
