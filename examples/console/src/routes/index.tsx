@@ -22,6 +22,7 @@ import {
   CrToastRegion,
   CrKbd,
   CrKeyHints,
+  CrPalette,
 } from "../../../../dist/frameworks/qwik";
 
 type Sev = "crit" | "warn" | "work" | "ok" | "idle";
@@ -47,7 +48,7 @@ const SESSIONS: Session[] = [
 const THEMES = ["dark", "light", "extreme", "phosphor"] as const;
 
 export default component$(() => {
-  const ui = useStore({ theme: "dark", modal: false, page: 1 });
+  const ui = useStore({ theme: "dark", modal: false, page: 1, palette: false });
   const live = useStore<Record<string, boolean>>({ "nova-01": true, "ptl-757": false });
   const toasts = useStore<{ list: { id: number; signal: string; message: string }[]; seq: number }>({
     list: [],
@@ -62,12 +63,44 @@ export default component$(() => {
     toasts.list = toasts.list.filter((t) => t.id !== id);
   });
 
+  const COMMANDS = [
+    { id: "incident", label: "Open incident", hint: "I", group: "action" },
+    { id: "notify", label: "Notify: queue drained", hint: "N", group: "action" },
+    { id: "restart", label: "Restart failed jobs", group: "action" },
+    { id: "theme:dark", label: "Theme: Dark", hint: "1", group: "theme" },
+    { id: "theme:light", label: "Theme: Light", hint: "2", group: "theme" },
+    { id: "theme:extreme", label: "Theme: Extreme", hint: "3", group: "theme" },
+    { id: "theme:phosphor", label: "Theme: Phosphor", hint: "4", group: "theme" },
+  ];
+
+  const runCommand = $((id: string) => {
+    ui.palette = false;
+    if (id === "incident") ui.modal = true;
+    else if (id === "notify") {
+      toasts.seq = toasts.seq + 1;
+      toasts.list = [...toasts.list, { id: toasts.seq, signal: "done", message: "queue drained" }];
+    } else if (id === "restart") {
+      toasts.seq = toasts.seq + 1;
+      toasts.list = [...toasts.list, { id: toasts.seq, signal: "work", message: "restarting failed jobs" }];
+    } else if (id.indexOf("theme:") === 0) {
+      const t = id.slice(6);
+      ui.theme = t;
+      document.documentElement.setAttribute("data-theme", t);
+    }
+  });
+
   /* App-level keyboard shortcuts. Ignored while typing in a field. Hold Alt to
    * peek every key-hint badge (CrKeyHints, mounted below). */
   useOnDocument(
     "keydown",
     $((e: KeyboardEvent) => {
       const el = e.target as HTMLElement;
+      /* ⌘K / Ctrl+K toggles the command palette — even from a field */
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        ui.palette = !ui.palette;
+        return;
+      }
       if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (e.key === "i") {
@@ -114,6 +147,10 @@ export default component$(() => {
           <div style="display:flex;gap:var(--space-2);margin-top:var(--space-3);flex-wrap:wrap;align-items:center">
             <span class="cr-tag cr-tag--wait">2 waiting</span>
             <span class="cr-tag cr-tag--err">1 failing</span>
+            <CrButton size="sm" kind="controls" keyshortcuts="Meta+K Control+K" onClick={$(() => (ui.palette = true))}>
+              commands
+              <CrKbd keys="⌘K" />
+            </CrButton>
             <CrMenu
               label="actions ▾"
               items={[
@@ -235,6 +272,13 @@ export default component$(() => {
 
       {/* hold Alt to peek every secondary key-hint badge */}
       <CrKeyHints />
+      <CrPalette
+        open={ui.palette}
+        commands={COMMANDS}
+        placeholder="Type a command… (↑↓ to move, ↵ to run)"
+        onRun={runCommand}
+        onClose={$(() => (ui.palette = false))}
+      />
       <CrToastRegion position="br" toasts={toasts.list} onDismiss={dismissToast} />
 
       <CrModal open={ui.modal} title="Incident · cr-1130" onClose={$(() => (ui.modal = false))}>

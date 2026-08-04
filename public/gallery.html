@@ -638,6 +638,32 @@ body {
   padding: 0; max-width: min(92vw, 34rem); border-radius: var(--radius-none);
 }
 .cr-modal::backdrop { background: color-mix(in srgb, var(--mass) 72%, transparent); }
+
+/* ── Command palette (⌘K) ───────────────────────────────────────────────── */
+.cr-palette {
+  padding: 0; width: min(92vw, 34rem); margin: 12vh auto auto; border-radius: var(--radius-none);
+  border: var(--brd-heavy) solid var(--border); background: var(--panel); color: var(--ink);
+  box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
+}
+.cr-palette::backdrop { background: color-mix(in srgb, var(--mass) 72%, transparent); }
+.cr-palette__box { display: flex; flex-direction: column; }
+.cr-palette__input {
+  font-family: var(--font-mono); font-size: var(--text-md); padding: var(--space-3) var(--space-4);
+  background: var(--board); color: var(--ink); border: 0; border-bottom: var(--brd) solid var(--border);
+  outline: none;
+}
+.cr-palette__input::placeholder { color: var(--muted); }
+.cr-palette__list { list-style: none; margin: 0; padding: var(--space-1); max-height: 52vh; overflow: auto; }
+.cr-palette__item {
+  display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-3);
+  font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); cursor: pointer;
+}
+.cr-palette__item--active { background: var(--sig-work); color: var(--on-sig); }
+.cr-palette__item--active .cr-kbd { border-color: currentColor; color: inherit; background: color-mix(in srgb, currentColor 16%, transparent); box-shadow: none; }
+.cr-palette__label { flex: 1; }
+.cr-palette__group { font-size: var(--text-2xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.cr-palette__item--active .cr-palette__group { color: inherit; }
+.cr-palette__empty { padding: var(--space-3) var(--space-4); font-family: var(--font-mono); color: var(--muted); }
 .cr-modal__head {
   display: flex; align-items: center; gap: var(--space-3);
   padding: var(--space-3) var(--space-4); border-bottom: var(--brd) solid var(--border);
@@ -1341,6 +1367,17 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
           <span style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--muted)">hover me →</span>
           <button type="button" class="cr-btn cr-btn--controls cr-btn--sm" aria-keyshortcuts="1">dark <kbd class="cr-kbd cr-kbd--hint" aria-hidden="true">1</kbd></button>
           <button type="button" class="cr-btn cr-btn--controls cr-btn--sm" aria-keyshortcuts="2">light <kbd class="cr-kbd cr-kbd--hint" aria-hidden="true">2</kbd></button>
+        </div>
+      </div>
+      <h3 style="margin-top:16px">Command palette (⌘K)</h3>
+      <div class="cr-palette" style="position:static;margin:0;width:auto;max-width:420px">
+        <div class="cr-palette__box">
+          <input class="cr-palette__input" type="text" role="combobox" aria-expanded="true" aria-controls="g-pal-list" aria-activedescendant="g-cmd-1" aria-autocomplete="list" aria-label="Search commands" value="the" />
+          <ul class="cr-palette__list" id="g-pal-list" role="listbox" aria-label="Commands">
+            <li class="cr-palette__item" id="g-cmd-0" role="option" aria-selected="false"><span class="cr-palette__label">Theme: Dark</span><span class="cr-palette__group">theme</span><kbd class="cr-kbd" aria-hidden="true">1</kbd></li>
+            <li class="cr-palette__item cr-palette__item--active" id="g-cmd-1" role="option" aria-selected="true"><span class="cr-palette__label">Theme: Light</span><span class="cr-palette__group">theme</span><kbd class="cr-kbd" aria-hidden="true">2</kbd></li>
+            <li class="cr-palette__item" id="g-cmd-2" role="option" aria-selected="false"><span class="cr-palette__label">Theme: Extreme</span><span class="cr-palette__group">theme</span><kbd class="cr-kbd" aria-hidden="true">3</kbd></li>
+          </ul>
         </div>
       </div>
     </div>

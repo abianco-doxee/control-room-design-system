@@ -314,6 +314,17 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
           <button type="button" class="cr-btn cr-btn--controls cr-btn--sm" aria-keyshortcuts="2">light <kbd class="cr-kbd cr-kbd--hint" aria-hidden="true">2</kbd></button>
         </div>
       </div>
+      <h3 style="margin-top:16px">Command palette (⌘K)</h3>
+      <div class="cr-palette" style="position:static;margin:0;width:auto;max-width:420px">
+        <div class="cr-palette__box">
+          <input class="cr-palette__input" type="text" role="combobox" aria-expanded="true" aria-controls="g-pal-list" aria-activedescendant="g-cmd-1" aria-autocomplete="list" aria-label="Search commands" value="the" />
+          <ul class="cr-palette__list" id="g-pal-list" role="listbox" aria-label="Commands">
+            <li class="cr-palette__item" id="g-cmd-0" role="option" aria-selected="false"><span class="cr-palette__label">Theme: Dark</span><span class="cr-palette__group">theme</span><kbd class="cr-kbd" aria-hidden="true">1</kbd></li>
+            <li class="cr-palette__item cr-palette__item--active" id="g-cmd-1" role="option" aria-selected="true"><span class="cr-palette__label">Theme: Light</span><span class="cr-palette__group">theme</span><kbd class="cr-kbd" aria-hidden="true">2</kbd></li>
+            <li class="cr-palette__item" id="g-cmd-2" role="option" aria-selected="false"><span class="cr-palette__label">Theme: Extreme</span><span class="cr-palette__group">theme</span><kbd class="cr-kbd" aria-hidden="true">3</kbd></li>
+          </ul>
+        </div>
+      </div>
     </div>
     <div style="grid-column:1/-1">
       <h3>Form controls</h3>

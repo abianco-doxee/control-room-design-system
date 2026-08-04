@@ -884,6 +884,35 @@ registers, matching how prominent the action is:
 
 ---
 
+## Command palette {#command-palette}
+
+**Purpose.** A ⌘K quick-open for every operator action. Built on the native
+`<dialog>` (focus-trap, `Esc`, backdrop). The search field is a **combobox**
+driving a **listbox**: focus stays in the input while `↑`/`↓` move the active
+option (`aria-activedescendant`), `Enter` runs it. Live query filter; each row can
+show a keycap hint.
+
+```tsx
+const commands = [
+  { id: "incident", label: "Open incident", hint: "I", group: "action" },
+  { id: "theme:light", label: "Theme: Light", hint: "2", group: "theme" },
+];
+<CrPalette open={open} commands={commands} onRun={run} onClose={close} />
+```
+```js
+// host binds the opener
+if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); open = !open; }
+```
+
+- **MUST** drive selection with `aria-activedescendant` (focus stays in the input),
+  and give each option `role="option"` + `aria-selected`.
+- **SHOULD** filter on both label and group, and reset the query + active row each
+  time it opens.
+- **NEVER** trap the user — `Esc` and the backdrop always close it (the dialog owns
+  this).
+
+---
+
 ## Keyboard navigation {#keyboard-nav}
 
 The interactive widgets follow the WAI-ARIA patterns, so they work without a mouse:
@@ -893,6 +922,7 @@ The interactive widgets follow the WAI-ARIA patterns, so they work without a mou
 | **Tabs** | roving tabindex — `←`/`→` (and `↑`/`↓`) move, `Home`/`End` jump to ends; only the active tab is in the tab order |
 | **Menu** | trigger opens on click or `↓`; then `↑`/`↓` move, `Home`/`End` jump, `Esc` closes and returns focus to the trigger; `Enter`/`Space` select |
 | **Table** | sortable headers are real `<button>`s (operable with `Enter`/`Space`), selection checkboxes are in the tab order |
+| **Command palette** | `⌘K`/`Ctrl+K` opens; `↑`/`↓`/`Home`/`End` move the active option, `Enter` runs, `Esc` closes (focus stays in the search field) |
 | **Modal / Switch / Pagination** | native focus-trap (dialog), `Space` toggle, `Tab` between page buttons |
 
 Focus is always visible (`*:focus-visible` → a `--sig-work` outline, system-wide).
