@@ -11,7 +11,7 @@
 //
 // The output is provenance + a tuning surface; theme values in tokens/tokens.json
 // are updated from it (see references/tokens.md#oklch).
-import { writeFileSync } from "node:fs";
+import { writeFileSync, readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { oklch, formatHex, clampChroma, wcagContrast } from "culori";
@@ -110,9 +110,39 @@ for (const [name, spec] of Object.entries(THEMES)) {
   out[name] = t;
 }
 
-const write = !process.argv.includes("--report");
-if (write) {
-  writeFileSync(join(ROOT, "tokens", "palette.generated.json"), JSON.stringify(out, null, 2) + "\n");
+const CHECK = process.argv.includes("--check");
+const REPORT = process.argv.includes("--report");
+const serialized = JSON.stringify(out, null, 2) + "\n";
+
+if (CHECK) {
+  // 1) the committed palette.generated.json must match a fresh generation
+  const genPath = join(ROOT, "tokens", "palette.generated.json");
+  const committed = existsSync(genPath) ? readFileSync(genPath, "utf8") : "";
+  let stale = false;
+  if (committed !== serialized) {
+    stale = true;
+    console.error("✗ tokens/palette.generated.json is out of date — run `npm run build:palette`");
+  }
+  // 2) tokens.json themes must actually contain the generated grounds/signals
+  //    (closes the loop: generator output can't silently diverge from the source)
+  const tokens = JSON.parse(readFileSync(join(ROOT, "tokens", "tokens.json"), "utf8"));
+  const SIGMAP = { work: "sig-work", wait: "sig-wait", done: "sig-done", err: "sig-err", idle: "sig-idle", accent: "sig-accent", stage: "stage", accent2: "sig-accent-2" };
+  for (const [name, g] of Object.entries(out)) {
+    const th = tokens.themes[name] || {};
+    if (g.grounds) for (const k of ["ground", "board", "panel", "panel-2"]) {
+      if (th[k] !== g.grounds[k]) { stale = true; console.error(`✗ ${name}.${k}: tokens.json=${th[k]} vs generated=${g.grounds[k]}`); }
+    }
+    if (g.signals) for (const [sk, val] of Object.entries(g.signals)) {
+      const tk = SIGMAP[sk]; if (tk && th[tk] !== val) { stale = true; console.error(`✗ ${name}.${tk}: tokens.json=${th[tk]} vs generated=${val}`); }
+    }
+  }
+  if (stale) { console.error("\nOKLCH generator output has drifted from tokens.json. Re-run the palette merge."); process.exit(1); }
+  console.log("✓ palette.generated.json is current and tokens.json matches the OKLCH generator");
+  process.exit(0);
+}
+
+if (!REPORT) {
+  writeFileSync(join(ROOT, "tokens", "palette.generated.json"), serialized);
   console.log("wrote tokens/palette.generated.json");
 }
 console.log("\nOKLCH palette — contrast report (near-black #06050c / near-white #f4f2ff):");

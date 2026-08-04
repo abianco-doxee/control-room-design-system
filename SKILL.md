@@ -88,9 +88,9 @@ The irreducible rules. Each expands in the references.
   a real machine state (working / waiting / done / error / idle) or a real
   action (accent). **NEVER** flood a region with a hue that doesn't correspond
   to state.
-- **MUST** use exactly two type registers — display (Archivo 900, uppercase,
-  tight) and data (JetBrains Mono, 12–13px). **NEVER** introduce 18–24px sans
-  body text.
+- **MUST** use exactly two type registers — display (`--font-display`: a condensed
+  heavy grotesque, Saira Condensed 900, uppercase, tight) and data (JetBrains
+  Mono, 12–13px). **NEVER** introduce 18–24px sans body text.
 - **MUST** keep texture (halftone, scanlines, grain) on hardware only — inside a
   bezel. **NEVER** put texture on a flat content field.
 - **MUST** keep glitch/decay proportional to severity and off of data. **NEVER**

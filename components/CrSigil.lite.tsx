@@ -29,8 +29,11 @@ export default function CrSigil(props: CrSigilProps) {
       t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
-    const INK = ["#00d3fb", "#ff1a9d", "#9ad335", "#00deaa", "#b061ff", "#f9ad00"];
-    const stateHue: any = { working: "#00d3fb", waiting: "#f9ad00", idle: "#848496", error: "#f45058", done: "#9ad335" };
+    const cv = (name: string, fb: string) => {
+      try { const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim(); return v || fb; } catch (e) { return fb; }
+    };
+    const INK = [cv("--sig-work", "#00d3fb"), cv("--sig-accent", "#ff1a9d"), cv("--sig-accent-2", "#9ad335"), cv("--sig-done", "#00deaa"), cv("--sig-wait", "#f9ad00"), cv("--sig-err", "#f45058")];
+    const stateHue: any = { working: cv("--sig-work", "#00d3fb"), waiting: cv("--sig-wait", "#f9ad00"), idle: cv("--sig-idle", "#848496"), error: cv("--sig-err", "#f45058"), done: cv("--sig-accent-2", "#9ad335") };
     const rng = mulberry32(hashSeed(props.seed));
     const ink = props.state ? stateHue[props.state] : INK[Math.floor(rng() * INK.length)];
 

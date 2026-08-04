@@ -59,7 +59,9 @@ export default function CrAscii(props: CrAsciiProps) {
     const ch = 12;
     ctx.font = "12px 'JetBrains Mono', ui-monospace, monospace";
     ctx.textBaseline = "top";
-    ctx.fillStyle = "#8a86ad";
+    let ink = "#8a86ad";
+    try { const v = getComputedStyle(document.documentElement).getPropertyValue("--muted").trim(); if (v) ink = v; } catch (e) {}
+    ctx.fillStyle = ink;
     const cols = Math.ceil(W / cw), rows = Math.ceil(H / ch);
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {

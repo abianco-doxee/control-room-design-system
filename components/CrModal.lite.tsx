@@ -25,11 +25,11 @@ export default function CrModal(props: CrModalProps) {
     <dialog
       class="cr-modal"
       ref={dialogRef}
-      aria-label={props.title}
+      aria-label={props.title || "Dialog"}
       onClose={() => props.onClose && props.onClose()}
     >
       <div class="cr-modal__head">
-        <h2 class="cr-modal__title">{props.title}</h2>
+        <Show when={props.title}><h2 class="cr-modal__title">{props.title}</h2></Show>
         <button
           type="button"
           class="cr-modal__close"
