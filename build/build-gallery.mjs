@@ -356,6 +356,34 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
           <dt class="cr-dl__k">uptime</dt><dd class="cr-dl__v">41h 12m</dd>
         </dl>
       </div>
+      <h3 style="margin-top:16px">Accordion · Popover</h3>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+        <div class="cr-accordion" style="min-width:280px">
+          <div class="cr-accordion__item">
+            <button type="button" class="cr-accordion__header" aria-expanded="true" aria-controls="g-acc-0" id="g-acc-h0"><span>Stack trace</span><span class="cr-accordion__chevron" aria-hidden="true"></span></button>
+            <div class="cr-accordion__panel" id="g-acc-0" role="region" aria-labelledby="g-acc-h0">SSEError: stream closed at turn 42</div>
+          </div>
+          <div class="cr-accordion__item">
+            <button type="button" class="cr-accordion__header" aria-expanded="false" aria-controls="g-acc-1" id="g-acc-h1"><span>Recent events</span><span class="cr-accordion__chevron" aria-hidden="true"></span></button>
+          </div>
+        </div>
+        <div class="cr-popover" style="position:relative;min-height:170px">
+          <button type="button" class="cr-btn cr-btn--controls cr-btn--sm" aria-haspopup="dialog" aria-expanded="true">filters ▾</button>
+          <div class="cr-popover__panel" role="dialog" aria-label="Queue filters" tabindex="-1">
+            <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 8px">show state</p>
+            <label style="font-family:var(--font-mono);font-size:var(--text-sm);display:flex;gap:8px;align-items:center"><input type="checkbox" class="cr-check" checked /> failing</label>
+          </div>
+        </div>
+      </div>
+      <h3 style="margin-top:16px">Drawer (edge sheet)</h3>
+      <div class="cr-drawer" style="position:static;inset:auto;margin:0;width:auto;max-width:320px;height:auto;border:var(--brd) solid var(--border);box-shadow:var(--shadow-off) var(--shadow-off) 0 var(--shadow-col)">
+        <div class="cr-drawer__box">
+          <div class="cr-drawer__head"><h2 class="cr-drawer__title">cr-1130 · inspect</h2><button type="button" class="cr-drawer__close" aria-label="Close">✕</button></div>
+          <div class="cr-drawer__body">
+            <dl class="cr-dl"><dt class="cr-dl__k">state</dt><dd class="cr-dl__v">failing · SSE closed</dd><dt class="cr-dl__k">retries</dt><dd class="cr-dl__v">3 / 5</dd></dl>
+          </div>
+        </div>
+      </div>
     </div>
     <div style="grid-column:1/-1">
       <h3>Form controls</h3>

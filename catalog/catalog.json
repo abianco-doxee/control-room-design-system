@@ -5,21 +5,21 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 47,
+    "count": 50,
     "categories": {
       "action": 1,
       "behavior": 1,
       "forms": 8,
       "identity": 2,
-      "layout": 6,
+      "layout": 7,
       "media": 6,
       "navigation": 3,
-      "overlay": 6,
+      "overlay": 8,
       "primitives": 2,
       "state": 12
     },
     "lifecycles": {
-      "stable": 46,
+      "stable": 49,
       "experimental": 1
     }
   },
@@ -499,6 +499,44 @@
         "header",
         "hero-title",
         "display"
+      ]
+    },
+    {
+      "id": "accordion",
+      "name": "Accordion",
+      "kind": "component",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Collapsible sections — header buttons (aria-expanded + aria-controls) reveal region panels. single = exclusive; ↑/↓/Home/End move between headers.",
+      "spec": "references/components.md#accordion",
+      "variants": {
+        "prop": [
+          "single",
+          "defaultOpen"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--border",
+          "description": "dividers"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "open chevron"
+        },
+        {
+          "cssVar": "--state-hover-mix",
+          "description": "header hover"
+        }
+      ],
+      "keywords": [
+        "accordion",
+        "collapse",
+        "collapsible",
+        "disclosure",
+        "expander",
+        "sections"
       ]
     },
     {
@@ -1146,6 +1184,44 @@
       ]
     },
     {
+      "id": "drawer",
+      "name": "Drawer",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "An edge sheet on the native dialog (focus-trap + Esc + backdrop) — slides from the left or right, full height. For detail/inspector panels.",
+      "spec": "references/components.md#drawer",
+      "variants": {
+        "side": [
+          "left",
+          "right"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "sheet fill"
+        },
+        {
+          "cssVar": "--brd-brush",
+          "description": "edge border"
+        },
+        {
+          "cssVar": "--shadow-off-lg",
+          "description": "sheet shadow"
+        }
+      ],
+      "keywords": [
+        "drawer",
+        "sheet",
+        "sidebar",
+        "panel",
+        "off-canvas",
+        "inspector"
+      ]
+    },
+    {
       "id": "menu",
       "name": "Menu",
       "kind": "component",
@@ -1270,6 +1346,44 @@
         "combobox",
         "search",
         "shortcuts"
+      ]
+    },
+    {
+      "id": "popover",
+      "name": "Popover",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Generic anchored overlay for arbitrary content — a trigger toggles a floating panel; scrim closes on outside click, Esc closes and returns focus. Use Menu for a list of actions.",
+      "spec": "references/components.md#popover",
+      "variants": {
+        "align": [
+          "left",
+          "right"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "panel fill"
+        },
+        {
+          "cssVar": "--shadow-off",
+          "description": "panel shadow"
+        },
+        {
+          "cssVar": "--z-overlay",
+          "description": "stacking layer"
+        }
+      ],
+      "keywords": [
+        "popover",
+        "overlay",
+        "anchored",
+        "floating",
+        "flyout",
+        "hovercard"
       ]
     },
     {

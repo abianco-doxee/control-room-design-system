@@ -1756,6 +1756,54 @@
         { "cssVar": "--ink", "description": "values" }
       ],
       "keywords": ["data", "list", "description", "definition", "key-value", "detail"]
+    },
+    {
+      "id": "accordion",
+      "name": "Accordion",
+      "category": "layout",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Collapsible sections — header buttons (aria-expanded + aria-controls) reveal region panels. single = exclusive; ↑/↓/Home/End move between headers.",
+      "spec": "references/components.md#accordion",
+      "variants": { "prop": ["single", "defaultOpen"] },
+      "tokens": [
+        { "cssVar": "--border", "description": "dividers" },
+        { "cssVar": "--sig-work", "description": "open chevron" },
+        { "cssVar": "--state-hover-mix", "description": "header hover" }
+      ],
+      "keywords": ["accordion", "collapse", "collapsible", "disclosure", "expander", "sections"]
+    },
+    {
+      "id": "popover",
+      "name": "Popover",
+      "category": "overlay",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Generic anchored overlay for arbitrary content — a trigger toggles a floating panel; scrim closes on outside click, Esc closes and returns focus. Use Menu for a list of actions.",
+      "spec": "references/components.md#popover",
+      "variants": { "align": ["left", "right"] },
+      "tokens": [
+        { "cssVar": "--panel", "description": "panel fill" },
+        { "cssVar": "--shadow-off", "description": "panel shadow" },
+        { "cssVar": "--z-overlay", "description": "stacking layer" }
+      ],
+      "keywords": ["popover", "overlay", "anchored", "floating", "flyout", "hovercard"]
+    },
+    {
+      "id": "drawer",
+      "name": "Drawer",
+      "category": "overlay",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "An edge sheet on the native dialog (focus-trap + Esc + backdrop) — slides from the left or right, full height. For detail/inspector panels.",
+      "spec": "references/components.md#drawer",
+      "variants": { "side": ["left", "right"] },
+      "tokens": [
+        { "cssVar": "--panel", "description": "sheet fill" },
+        { "cssVar": "--brd-brush", "description": "edge border" },
+        { "cssVar": "--shadow-off-lg", "description": "sheet shadow" }
+      ],
+      "keywords": ["drawer", "sheet", "sidebar", "panel", "off-canvas", "inspector"]
     }
   ]
 }
