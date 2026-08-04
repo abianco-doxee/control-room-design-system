@@ -1445,6 +1445,123 @@
         "decoration",
         "dead-space"
       ]
+    },
+    {
+      "id": "menu",
+      "name": "Menu",
+      "category": "overlay",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Dropdown menu — a trigger toggles a role=menu panel; a transparent full-viewport scrim closes it on outside click (no global listeners). Optional danger items.",
+      "spec": "references/components.md#menu",
+      "variants": {
+        "align": [
+          "left",
+          "right"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "panel fill"
+        },
+        {
+          "cssVar": "--shadow-off-sm",
+          "description": "panel shadow"
+        },
+        {
+          "cssVar": "--state-hover-mix",
+          "description": "item hover"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "danger item"
+        }
+      ],
+      "keywords": [
+        "menu",
+        "dropdown",
+        "popover",
+        "actions",
+        "overflow",
+        "kebab"
+      ]
+    },
+    {
+      "id": "pagination",
+      "name": "Pagination",
+      "category": "navigation",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Controlled pager — prev/next plus a windowed run of page numbers with ellipses; current page keyed and aria-current.",
+      "spec": "references/components.md#pagination",
+      "variants": {
+        "prop": [
+          "page",
+          "total"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "button fill"
+        },
+        {
+          "cssVar": "--brd-hair",
+          "description": "button border"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "current page"
+        },
+        {
+          "cssVar": "--state-disabled-op",
+          "description": "disabled prev/next"
+        }
+      ],
+      "keywords": [
+        "pagination",
+        "pager",
+        "pages",
+        "prev",
+        "next",
+        "paginate"
+      ]
+    },
+    {
+      "id": "toast-region",
+      "name": "Toast region",
+      "category": "overlay",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "A fixed screen corner that stacks live toasts (parent owns the list). Each toast is its own live region — err announces assertively — so nothing double-announces. Bottom corners stack newest nearest the edge.",
+      "spec": "references/components.md#toast-region",
+      "variants": {
+        "position": [
+          "tr",
+          "br",
+          "tl",
+          "bl"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--z-overlay",
+          "description": "stacking layer"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error toast fill"
+        }
+      ],
+      "keywords": [
+        "toast",
+        "region",
+        "stack",
+        "notifications",
+        "snackbar",
+        "live"
+      ]
     }
   ]
 }

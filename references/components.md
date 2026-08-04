@@ -784,6 +784,71 @@ Hero. Errors announce assertively; everything else is polite.
 - **SHOULD** auto-dismiss non-critical toasts (`duration`); keep errors sticky so
   they can't be missed.
 
+---
+
+## Toast region {#toast-region}
+
+**Purpose.** A fixed screen corner that **stacks** live toasts. The parent owns
+the list (`CrToastRegion` is presentational); each toast stays its own live region
+so nothing double-announces. Bottom corners stack newest nearest the edge.
+
+```tsx
+<CrToastRegion position="br" toasts={list} onDismiss={remove} />
+```
+```css
+.cr-toast-region { position: fixed; display: flex; flex-direction: column; gap: var(--space-2); }
+.cr-toast-region--br { bottom: var(--space-4); right: var(--space-4); flex-direction: column-reverse; }
+```
+
+- **MUST** keep each toast's own `role`/`aria-live` (don't wrap the region in a
+  second live region — that double-announces).
+- **SHOULD** cap how many stack at once and drop oldest, so a burst can't bury the
+  screen.
+
+---
+
+## Menu {#menu}
+
+**Purpose.** A dropdown of actions. A trigger toggles a `role=menu` panel; a
+transparent full-viewport **scrim** closes it on outside click — no global
+listeners, so every framework target behaves the same.
+
+```tsx
+<CrMenu label="actions ▾" align="right" onSelect={run}
+  items={[{ label: "pause all" }, { label: "kill all", danger: true }]} />
+```
+```css
+.cr-menu__panel { position: absolute; z-index: calc(var(--z-overlay) + 1);
+  box-shadow: var(--shadow-off-sm) var(--shadow-off-sm) 0 var(--shadow-col); }
+.cr-menu__item--danger { color: var(--sig-err); }
+```
+
+- **MUST** set `aria-haspopup="menu"` + `aria-expanded` on the trigger and
+  `role="menuitem"` on each item.
+- **SHOULD** reserve `--danger` for destructive actions only (Law 2).
+
+---
+
+## Pagination {#pagination}
+
+**Purpose.** Move through pages of a table/list. Controlled: it renders from
+`page`/`total` and emits `onChange`; the parent owns the page. Prev/next plus a
+windowed run of numbers with ellipses; the current page is keyed and
+`aria-current="page"`.
+
+```tsx
+<CrPagination page={page} total={9} onChange={setPage} />
+```
+```css
+.cr-pager__btn--on { background: var(--sig-work); color: var(--on-sig); }
+.cr-pager__btn[disabled] { opacity: var(--state-disabled-op); }
+```
+
+- **MUST** disable prev at page 1 and next at the last page, and mark the current
+  page with `aria-current`.
+- **SHOULD** keep the number window small (first · current±1 · last) so the control
+  stays one line at any page count.
+
 ## Tooltip
 
 A hint bubble revealed on hover **and** keyboard focus, wired to its trigger with

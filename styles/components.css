@@ -398,8 +398,54 @@
 .cr-toast__msg { flex: 1; }
 .cr-toast__close {
   font-family: var(--font-mono); cursor: pointer; background: transparent; color: inherit;
-  border: 1.5px solid currentColor; padding: 0 var(--space-1); line-height: 1.4;
+  border: var(--brd-hair) solid currentColor; padding: 0 var(--space-1); line-height: 1.4;
 }
+
+/* ── Toast region (stacks toasts in a screen corner) ────────────────────── */
+.cr-toast-region {
+  position: fixed; z-index: var(--z-overlay); display: flex; flex-direction: column;
+  gap: var(--space-2); max-width: min(92vw, 30rem); pointer-events: none;
+}
+.cr-toast-region > * { pointer-events: auto; }
+.cr-toast-region--tr { top: var(--space-4); right: var(--space-4); }
+.cr-toast-region--br { bottom: var(--space-4); right: var(--space-4); }
+.cr-toast-region--tl { top: var(--space-4); left: var(--space-4); }
+.cr-toast-region--bl { bottom: var(--space-4); left: var(--space-4); }
+/* bottom-anchored regions stack newest nearest the corner */
+.cr-toast-region--br, .cr-toast-region--bl { flex-direction: column-reverse; }
+
+/* ── Menu (dropdown) ────────────────────────────────────────────────────── */
+.cr-menu { position: relative; display: inline-block; }
+.cr-menu__scrim { position: fixed; inset: 0; z-index: var(--z-overlay); background: transparent; border: 0; cursor: default; }
+.cr-menu__panel {
+  position: absolute; top: calc(100% + var(--space-1)); left: 0; z-index: calc(var(--z-overlay) + 1);
+  min-width: 12rem; background: var(--panel); border: var(--brd) solid var(--border);
+  box-shadow: var(--shadow-off-sm) var(--shadow-off-sm) 0 var(--shadow-col);
+  display: flex; flex-direction: column; padding: var(--space-1);
+}
+.cr-menu__panel--right { left: auto; right: 0; }
+.cr-menu__item {
+  font-family: var(--font-mono); font-size: var(--text-sm); text-align: left;
+  background: transparent; border: 0; color: var(--ink); cursor: pointer;
+  padding: var(--space-1) var(--space-2);
+}
+.cr-menu__item:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-menu__item--danger { color: var(--sig-err); }
+.cr-menu__sep { height: var(--brd-hair); background: color-mix(in srgb, var(--border) 30%, transparent); margin: var(--space-1) 0; }
+
+/* ── Pagination ─────────────────────────────────────────────────────────── */
+.cr-pager { display: flex; align-items: center; gap: var(--space-1); font-family: var(--font-mono); }
+.cr-pager__btn {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700;
+  min-width: var(--space-6); padding: var(--space-1) var(--space-2);
+  background: var(--panel); color: var(--ink); border: var(--brd-hair) solid var(--border); cursor: pointer;
+}
+.cr-pager__btn:hover:not([disabled]):not(.cr-pager__btn--on) {
+  background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent);
+}
+.cr-pager__btn--on { background: var(--sig-work); color: var(--on-sig); border-color: var(--border); }
+.cr-pager__btn[disabled] { opacity: var(--state-disabled-op); cursor: not-allowed; }
+.cr-pager__ellipsis { color: var(--muted); padding: 0 var(--space-1); }
 
 /* ── Tooltip (CSS reveal on hover/focus; role=tooltip + aria-describedby) ─ */
 .cr-tooltip { position: relative; display: inline-flex; }

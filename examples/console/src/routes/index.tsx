@@ -17,6 +17,9 @@ import {
   CrTable,
   CrTabs,
   CrMeter,
+  CrMenu,
+  CrPagination,
+  CrToastRegion,
 } from "../../../../dist/frameworks/qwik";
 
 type Sev = "crit" | "warn" | "work" | "ok" | "idle";
@@ -42,8 +45,20 @@ const SESSIONS: Session[] = [
 const THEMES = ["dark", "light", "extreme", "phosphor"] as const;
 
 export default component$(() => {
-  const ui = useStore({ theme: "dark", modal: false });
+  const ui = useStore({ theme: "dark", modal: false, page: 1 });
   const live = useStore<Record<string, boolean>>({ "nova-01": true, "ptl-757": false });
+  const toasts = useStore<{ list: { id: number; signal: string; message: string }[]; seq: number }>({
+    list: [],
+    seq: 0,
+  });
+
+  const pushToast = $((signal: string, message: string) => {
+    toasts.seq = toasts.seq + 1;
+    toasts.list = [...toasts.list, { id: toasts.seq, signal, message }];
+  });
+  const dismissToast = $((id: number | string) => {
+    toasts.list = toasts.list.filter((t) => t.id !== id);
+  });
 
   const setTheme = $((t: string) => {
     ui.theme = t;
@@ -76,6 +91,20 @@ export default component$(() => {
           <div style="display:flex;gap:var(--space-2);margin-top:var(--space-3);flex-wrap:wrap;align-items:center">
             <span class="cr-tag cr-tag--wait">2 waiting</span>
             <span class="cr-tag cr-tag--err">1 failing</span>
+            <CrMenu
+              label="actions ▾"
+              items={[
+                { label: "pause all" },
+                { label: "restart failed" },
+                { label: "kill all", danger: true },
+              ]}
+              onSelect={$((i: number) =>
+                pushToast(
+                  i === 2 ? "err" : "work",
+                  ["paused all workers", "restarting failed jobs", "killed all workers"][i],
+                ),
+              )}
+            />
             <span style="flex:1"></span>
             {THEMES.map((t) => (
               <CrButton
@@ -159,6 +188,13 @@ export default component$(() => {
             <CrMeter label="queue" value={40} tone="wait" />
             <CrMeter label="errors" value={12} tone="err" />
           </div>
+          <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
+            <CrPagination page={ui.page} total={9} onChange={$((p: number) => (ui.page = p))} />
+            <span style="flex:1"></span>
+            <CrButton size="sm" kind="controls" onClick={$(() => pushToast("done", "queue drained"))}>
+              notify
+            </CrButton>
+          </div>
         </section>
 
         <footer style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
@@ -168,6 +204,8 @@ export default component$(() => {
           <span class="cr-ruler" style="width:180px"></span>
         </footer>
       </div>
+
+      <CrToastRegion position="br" toasts={toasts.list} onDismiss={dismissToast} />
 
       <CrModal open={ui.modal} title="Incident · cr-1130" onClose={$(() => (ui.modal = false))}>
         <p style="font-family:var(--font-mono);font-size:var(--text-sm)">
