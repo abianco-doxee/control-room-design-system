@@ -384,6 +384,45 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
           </div>
         </div>
       </div>
+      <h3 style="margin-top:16px">Breadcrumb · Segmented control</h3>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:center">
+        <nav aria-label="Breadcrumb"><ol class="cr-breadcrumb">
+          <li class="cr-breadcrumb__item"><a class="cr-breadcrumb__link" href="#">control room</a></li>
+          <li class="cr-breadcrumb__item"><a class="cr-breadcrumb__link" href="#">sessions</a></li>
+          <li class="cr-breadcrumb__item" aria-current="page">cr-1130</li>
+        </ol></nav>
+        <div class="cr-segmented" role="radiogroup" aria-label="Scope">
+          <button type="button" role="radio" class="cr-segmented__opt" data-value="all" aria-checked="true" tabindex="0">all</button>
+          <button type="button" role="radio" class="cr-segmented__opt" data-value="mine" aria-checked="false" tabindex="-1">mine</button>
+          <button type="button" role="radio" class="cr-segmented__opt" data-value="failing" aria-checked="false" tabindex="-1">failing</button>
+        </div>
+      </div>
+      <h3 style="margin-top:16px">Combobox · Number field</h3>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+        <div class="cr-combobox" style="min-width:220px">
+          <input class="cr-combobox__input" type="text" role="combobox" aria-expanded="true" aria-controls="g-combo" aria-activedescendant="g-co-1" aria-autocomplete="list" aria-label="Jump to worker" value="nova" />
+          <ul class="cr-combobox__list" id="g-combo" role="listbox">
+            <li class="cr-combobox__opt" id="g-co-0" role="option" aria-selected="false">nova-01</li>
+            <li class="cr-combobox__opt cr-combobox__opt--active" id="g-co-1" role="option" aria-selected="true">nova-02</li>
+          </ul>
+        </div>
+        <div class="cr-numberfield">
+          <button type="button" class="cr-numberfield__btn" aria-label="Decrease">−</button>
+          <input type="number" class="cr-numberfield__input" value="6" aria-label="Max retries" />
+          <button type="button" class="cr-numberfield__btn" aria-label="Increase">+</button>
+        </div>
+      </div>
+      <h3 style="margin-top:16px">ASCII separators &amp; lists</h3>
+      <div style="max-width:340px">
+        <p class="cr-sep-label">recent events</p>
+        <ul class="cr-list cr-list--tick">
+          <li class="cr-list__item">12:03 stream opened</li>
+          <li class="cr-list__item">12:41 SSE closed · retry 3/5</li>
+        </ul>
+        <hr class="cr-sep" />
+        <div class="cr-leader"><span class="cr-leader__k">uptime</span><span class="cr-leader__fill"></span><span class="cr-leader__v">41h 12m</span></div>
+        <div class="cr-leader"><span class="cr-leader__k">region</span><span class="cr-leader__fill"></span><span class="cr-leader__v">eu-west-1</span></div>
+      </div>
     </div>
     <div style="grid-column:1/-1">
       <h3>Form controls</h3>

@@ -1804,6 +1804,86 @@
         { "cssVar": "--shadow-off-lg", "description": "sheet shadow" }
       ],
       "keywords": ["drawer", "sheet", "sidebar", "panel", "off-canvas", "inspector"]
+    },
+    {
+      "id": "breadcrumb",
+      "name": "Breadcrumb",
+      "category": "navigation",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Navigation trail — ascii \"/\" separators from CSS; the last crumb is the current page (aria-current).",
+      "spec": "references/components.md#breadcrumb",
+      "variants": { "prop": ["items"] },
+      "tokens": [
+        { "cssVar": "--muted", "description": "crumbs + separators" },
+        { "cssVar": "--ink", "description": "current page" }
+      ],
+      "keywords": ["breadcrumb", "trail", "nav", "path", "hierarchy", "ascii"]
+    },
+    {
+      "id": "segmented",
+      "name": "Segmented control",
+      "category": "navigation",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Single-select connected button bar (role=radiogroup, roving tabindex; ←/→/Home/End). Same semantics as a radio group, distinct connected visual.",
+      "spec": "references/components.md#segmented",
+      "variants": { "prop": ["value"] },
+      "tokens": [
+        { "cssVar": "--sig-work", "description": "selected segment" },
+        { "cssVar": "--panel", "description": "segment fill" },
+        { "cssVar": "--border", "description": "dividers" }
+      ],
+      "keywords": ["segmented", "toggle-group", "selectbutton", "switcher", "filter", "single-select"]
+    },
+    {
+      "id": "combobox",
+      "name": "Combobox",
+      "category": "forms",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Autocomplete — an input (role=combobox) filtering a listbox; ↑/↓ move the active option (aria-activedescendant), Enter selects, Esc closes. Active row shows an ascii ▸ marker.",
+      "spec": "references/components.md#combobox",
+      "variants": { "prop": ["value", "options"] },
+      "tokens": [
+        { "cssVar": "--board", "description": "input" },
+        { "cssVar": "--sig-work", "description": "active option + ▸ marker" },
+        { "cssVar": "--panel", "description": "list" }
+      ],
+      "keywords": ["combobox", "autocomplete", "typeahead", "select", "search", "dropdown", "form"]
+    },
+    {
+      "id": "number-field",
+      "name": "Number field",
+      "category": "forms",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Number input with −/+ steppers, clamped to min/max; the native input keeps its own keyboard.",
+      "spec": "references/components.md#number-field",
+      "variants": { "prop": ["value", "min", "max", "step"] },
+      "tokens": [
+        { "cssVar": "--board", "description": "field" },
+        { "cssVar": "--panel", "description": "stepper buttons" },
+        { "cssVar": "--state-disabled-op", "description": "disabled at bounds" }
+      ],
+      "keywords": ["number", "stepper", "spinner", "input", "quantity", "form"]
+    },
+    {
+      "id": "ascii-detail",
+      "name": "ASCII separators & lists",
+      "category": "media",
+      "kind": "utility",
+      "lifecycle": "stable",
+      "description": "Character-flavored detail utilities: .cr-sep / .cr-sep-label box-rule separators (dashed/dotted, labeled), .cr-list ascii-marker lists (▸ · » +), and .cr-leader dot-leader rows (label ····· value).",
+      "spec": "references/components.md#ascii-detail",
+      "variants": {
+        "class": ["cr-sep", "cr-sep--dot", "cr-sep--double", "cr-sep-label", "cr-list", "cr-list--dot", "cr-list--tick", "cr-list--plus", "cr-leader"]
+      },
+      "tokens": [
+        { "cssVar": "--muted", "description": "rule / marker ink" },
+        { "cssVar": "--sig-work", "description": "▸ / » markers" }
+      ],
+      "keywords": ["separator", "divider", "rule", "list", "leader", "ascii", "dot-leader", "marker", "bullet"]
     }
   ]
 }
