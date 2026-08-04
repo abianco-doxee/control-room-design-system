@@ -356,6 +356,67 @@ td b { color: var(--ink); } td .mono { font-family: var(--font-mono); font-size:
 
 - **MUST** set headers in the mono/label style; body cells in the data register.
 
+**Operator options** (the `CrTable` component). `sortable` makes each header a
+button (`aria-sort` + a `.cr-table__ind` arrow); `selectable` adds a leading
+checkbox column and toggles `tr[aria-selected]` (the row washes to `--sig-work`);
+`sticky` (`.cr-table--sticky`) pins the header — wrap the table in an
+`overflow:auto` box for it to bite. Rows hover-highlight via `--state-hover-mix`.
+
+```html
+<table class="cr-table cr-table--sticky">
+  <thead><tr>
+    <th class="cr-table__sel" aria-label="select"></th>
+    <th class="cr-table__sortable" aria-sort="ascending">Job<span class="cr-table__ind">▲</span></th>
+    …
+  </tr></thead>
+  <tbody>
+    <tr aria-selected="true"><td class="cr-table__sel"><input type="checkbox" class="cr-check" checked /></td>…</tr>
+  </tbody>
+</table>
+```
+
+- **MUST** keep sort/selection reflected in ARIA (`aria-sort`, `aria-selected`) —
+  the visual state is never the only channel.
+
+---
+
+## Tabs {#tabs}
+
+**Purpose.** Switch between sibling views. A `role=tablist` of buttons with a
+keyed underline on the active tab (scalar active-index state in `CrTabs`).
+
+```html
+<div class="cr-tabs" role="tablist">
+  <button role="tab" class="cr-tab cr-tab--on" aria-selected="true">queue</button>
+  <button role="tab" class="cr-tab" aria-selected="false">workers</button>
+</div>
+```
+```css
+.cr-tab--on { color: var(--ink); border-bottom-color: var(--sig-work); }
+```
+
+- **MUST** set `aria-selected` on each tab; the underline colour is the ramp
+  (`--sig-work`), not decoration.
+
+---
+
+## Meter {#meter}
+
+**Purpose.** Capacity / utilisation as a square, hard-edged bar keyed to a signal
+tone. `role=meter` with `aria-valuenow/min/max`.
+
+```html
+<div class="cr-meter cr-meter--work">
+  <span class="cr-meter__label">cpu</span>
+  <span class="cr-meter__track" role="meter" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" aria-label="cpu">
+    <span class="cr-meter__fill" style="width:72%"></span>
+  </span>
+</div>
+```
+
+- **MUST** carry the numeric value in ARIA — the fill width alone is not
+  accessible. Tone (`--work/--wait/--done/--err/--idle`) follows Law 2.
+
 ---
 
 ## Tag

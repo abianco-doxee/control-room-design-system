@@ -35,11 +35,16 @@
   --z-sticky: 50;
   --z-overlay: 100;
   --z-modal: 1000;
+  --brd-hair: 1.5px;
   --brd: 2px;
   --brd-heavy: 3px;
   --brd-brush: 5px;
+  --shadow-off-sm: 2px;
   --shadow-off: 4px;
   --shadow-off-lg: 6px;
+  --state-disabled-op: 0.45;
+  --state-hover-mix: 12%;
+  --row-h: 34px;
   --radius: 0px;
   --halftone-size: 7px;
   --breach-radius: 14px;
@@ -181,9 +186,11 @@
   --scanline: repeating-linear-gradient(0deg, rgba(0,240,255,0.12) 0 1px, transparent 1px 3px);
   --crosshatch: repeating-linear-gradient(45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 6px);
   --field: repeating-conic-gradient(rgba(255,255,255,0.05) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
+  --brd-hair: 2px;
   --brd: 3px;
   --brd-heavy: 4px;
   --brd-brush: 6px;
+  --shadow-off-sm: 3px;
   --shadow-off: 6px;
   --shadow-off-lg: 9px;
 }

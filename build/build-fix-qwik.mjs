@@ -1,18 +1,22 @@
 // Post-process the Mitosis Qwik output.
 //
-// The Qwik generator emits the ROOT element's computed `class` as an
+// The Qwik generator sometimes emits a computed attribute value as an
 // immediately-invoked arrow with a BLOCK body but no `return`:
 //
 //     class={(() => {
 //       "cr-btn" + (props.kind ? " cr-btn--" + props.kind : "");
 //     })()}
+//     aria-selected={(() => {
+//       state.active === i ? "true" : "false";
+//     })()}
 //
-// which evaluates the string and discards it — the element ships with no class
-// and loses all styling. (The same expression inside a `.map` callback is
-// emitted correctly.) React/Vue/Svelte/Angular/Solid are unaffected. This is a
-// generator quirk, not a source problem, so we fix the artifact rather than
-// contort the shared .lite.tsx sources. dist/frameworks/** is git-ignored and
-// regenerated on every `build:components`, so this runs each compile.
+// which evaluates the expression and discards it — the attribute ships as
+// `undefined`, so the element loses its class / aria state. (The bug is
+// inconsistent: the same shape sometimes DOES get a `return`.) React / Vue /
+// Svelte / Angular / Solid are unaffected. This is a generator quirk, not a
+// source problem, so we fix the artifact rather than contort the shared
+// .lite.tsx sources. dist/frameworks/** is git-ignored and regenerated on every
+// `build:components`, so this runs each compile.
 //
 //   node build/build-fix-qwik.mjs           patch dist/frameworks/qwik
 //   node build/build-fix-qwik.mjs --check   fail if any unpatched IIFE remains
@@ -24,8 +28,10 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const QWIK = join(ROOT, "dist", "frameworks", "qwik", "components");
 const CHECK = process.argv.includes("--check");
 
-// class={(() => { <body> })()}  — capture the block body, add `return` if absent.
-const IIFE = /class=\{\(\(\) => \{([\s\S]*?)\}\)\(\)\}/g;
+// any  ={(() => { <body> })()}  — capture the block body, add `return` if absent.
+// `})()}` (brace-paren-paren-brace) marks the true end and never appears inside a
+// normal single-expression body, so the non-greedy match is safe.
+const IIFE = /\{\(\(\) => \{([\s\S]*?)\}\)\(\)\}/g;
 
 if (!existsSync(QWIK)) {
   if (CHECK) { console.log("✓ qwik fixup: nothing compiled yet"); process.exit(0); }
@@ -43,7 +49,7 @@ for (const file of readdirSync(QWIK).filter((f) => f.endsWith(".tsx"))) {
     if (/\breturn\b/.test(body)) return match; // already correct
     // prefix the first non-whitespace of the body with `return `
     const fixed = body.replace(/^(\s*)(\S)/, (_m, ws, ch) => `${ws}return ${ch}`);
-    return `class={(() => {${fixed}})()}`;
+    return `{(() => {${fixed}})()}`;
   });
   if (out !== src) {
     if (CHECK) { unpatched++; console.error(`✗ ${file} has an unpatched Qwik class IIFE`); continue; }

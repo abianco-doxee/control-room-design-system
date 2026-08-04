@@ -43,11 +43,16 @@
   --z-sticky: 50;
   --z-overlay: 100;
   --z-modal: 1000;
+  --brd-hair: 1.5px;
   --brd: 2px;
   --brd-heavy: 3px;
   --brd-brush: 5px;
+  --shadow-off-sm: 2px;
   --shadow-off: 4px;
   --shadow-off-lg: 6px;
+  --state-disabled-op: 0.45;
+  --state-hover-mix: 12%;
+  --row-h: 34px;
   --radius: 0px;
   --halftone-size: 7px;
   --breach-radius: 14px;
@@ -189,9 +194,11 @@
   --scanline: repeating-linear-gradient(0deg, rgba(0,240,255,0.12) 0 1px, transparent 1px 3px);
   --crosshatch: repeating-linear-gradient(45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 6px);
   --field: repeating-conic-gradient(rgba(255,255,255,0.05) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
+  --brd-hair: 2px;
   --brd: 3px;
   --brd-heavy: 4px;
   --brd-brush: 6px;
+  --shadow-off-sm: 3px;
   --shadow-off: 6px;
   --shadow-off-lg: 9px;
 }
@@ -464,14 +471,53 @@ body {
 }
 .cr-table th, .cr-table td {
   text-align: left; padding: var(--space-2) var(--space-3);
-  border-bottom: 1.5px solid color-mix(in srgb, var(--border) 15%, transparent);
+  border-bottom: var(--brd-hair) solid color-mix(in srgb, var(--border) 15%, transparent);
 }
-.cr-table tr:last-child td { border-bottom: none; }
+.cr-table tbody tr:last-child td, .cr-table tr:last-child td { border-bottom: none; }
 .cr-table th {
   font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase;
   letter-spacing: 0.06em; color: var(--muted); font-weight: 800;
 }
 .cr-table td { color: var(--ink); }
+/* sticky header (opt-in) — wrap the table in a scroll box for it to bite */
+.cr-table--sticky thead th { position: sticky; top: 0; z-index: 1; background: var(--panel); }
+/* sortable header */
+.cr-table__sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+.cr-table__sortable:hover { color: var(--ink); }
+.cr-table__ind { color: var(--sig-work); font-weight: 900; margin-left: var(--space-1); }
+/* row hover + selection */
+.cr-table tbody tr:hover td { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-table tbody tr[aria-selected="true"] td { background: color-mix(in srgb, var(--sig-work) 18%, transparent); }
+.cr-table__sel { width: var(--space-8); text-align: center; }
+
+/* ── Tabs ──────────────────────────────────────────────────────────────── */
+.cr-tabs { display: flex; gap: 0; border-bottom: var(--brd) solid var(--border); }
+.cr-tab {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: var(--space-2) var(--space-4); background: transparent; color: var(--muted);
+  border: 0; border-bottom: var(--brd-heavy) solid transparent; margin-bottom: calc(var(--brd) * -1);
+  cursor: pointer;
+}
+.cr-tab:hover { color: var(--ink); }
+.cr-tab--on { color: var(--ink); border-bottom-color: var(--sig-work); }
+
+/* ── Meter (capacity / utilisation bar) ─────────────────────────────────── */
+.cr-meter { --cr-meter-c: var(--sig-work); display: flex; align-items: center; gap: var(--space-2); }
+.cr-meter__label {
+  font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); min-width: 6ch;
+}
+.cr-meter__track {
+  flex: 1; display: block; height: var(--space-2); background: var(--panel-2);
+  border: var(--brd-hair) solid var(--border);
+}
+.cr-meter__fill { display: block; height: 100%; background: var(--cr-meter-c); }
+.cr-meter--work { --cr-meter-c: var(--sig-work); }
+.cr-meter--wait { --cr-meter-c: var(--sig-wait); }
+.cr-meter--done { --cr-meter-c: var(--sig-done); }
+.cr-meter--err  { --cr-meter-c: var(--sig-err); }
+.cr-meter--idle { --cr-meter-c: var(--sig-idle); }
 
 /* ── Keyed contact sheet (Law 2) ───────────────────────────────────────── */
 .cr-tiles {
@@ -1161,14 +1207,31 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       </div>
     </div>
     <div style="grid-column:1/-1">
-      <h3>Table</h3>
-      <table class="cr-table">
-        <thead><tr><th>Session</th><th>Task</th><th>Status</th></tr></thead>
+      <h3>Table (sortable · selectable · sticky header)</h3>
+      <table class="cr-table cr-table--sticky">
+        <thead><tr>
+          <th class="cr-table__sel" aria-label="select"></th>
+          <th class="cr-table__sortable" aria-sort="ascending">Session<span class="cr-table__ind">▲</span></th>
+          <th class="cr-table__sortable" aria-sort="none">Task</th>
+          <th class="cr-table__sortable" aria-sort="none">Status</th>
+        </tr></thead>
         <tbody>
-          <tr><td>nova</td><td>PTL-757 chat-turn</td><td>streaming</td></tr>
-          <tr><td>rhea</td><td>rp verify</td><td>2 failing</td></tr>
+          <tr aria-selected="true"><td class="cr-table__sel"><input type="checkbox" class="cr-check" checked aria-label="select row" /></td><td>nova</td><td>PTL-757 chat-turn</td><td>streaming</td></tr>
+          <tr aria-selected="false"><td class="cr-table__sel"><input type="checkbox" class="cr-check" aria-label="select row" /></td><td>rhea</td><td>rp verify</td><td>2 failing</td></tr>
         </tbody>
       </table>
+      <h3 style="margin-top:16px">Tabs</h3>
+      <div class="cr-tabs" role="tablist">
+        <button type="button" role="tab" class="cr-tab cr-tab--on" aria-selected="true">queue</button>
+        <button type="button" role="tab" class="cr-tab" aria-selected="false">workers</button>
+        <button type="button" role="tab" class="cr-tab" aria-selected="false">history</button>
+      </div>
+      <h3 style="margin-top:16px">Meters (capacity)</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;max-width:340px">
+        <div class="cr-meter cr-meter--work"><span class="cr-meter__label">cpu</span><span class="cr-meter__track" role="meter" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" aria-label="cpu"><span class="cr-meter__fill" style="width:72%"></span></span></div>
+        <div class="cr-meter cr-meter--wait"><span class="cr-meter__label">queue</span><span class="cr-meter__track" role="meter" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" aria-label="queue"><span class="cr-meter__fill" style="width:40%"></span></span></div>
+        <div class="cr-meter cr-meter--err"><span class="cr-meter__label">errors</span><span class="cr-meter__track" role="meter" aria-valuenow="12" aria-valuemin="0" aria-valuemax="100" aria-label="errors"><span class="cr-meter__fill" style="width:12%"></span></span></div>
+      </div>
     </div>
     <div style="grid-column:1/-1">
       <h3>Form controls</h3>
