@@ -52,7 +52,7 @@ export default function CrPalette(props: CrPaletteProps) {
     run(id: string) {
       if (props.onRun) props.onRun(id);
     },
-    onKey(event: KeyboardEvent) {
+    onKey(event: any) {
       if (event.key === "ArrowDown") {
         event.preventDefault();
         state.move(1);

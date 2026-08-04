@@ -12,7 +12,7 @@ export interface CrTooltipProps {
 export default function CrTooltip(props: CrTooltipProps) {
   return (
     <span class="cr-tooltip">
-      <span class="cr-tooltip__trigger" tabindex={0} aria-describedby={props.id}>
+      <span class="cr-tooltip__trigger" tabIndex={0} aria-describedby={props.id}>
         {props.children}
       </span>
       <span class="cr-tooltip__bubble" role="tooltip" id={props.id}>

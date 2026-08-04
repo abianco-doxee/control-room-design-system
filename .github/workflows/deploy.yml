@@ -34,6 +34,8 @@ jobs:
           BASE_PATH: /control-room-design-system/
       - name: Compile framework components (Mitosis → react/vue/svelte/angular/solid)
         run: npm run build:components
+      - name: Type-check compiled React output (codegen guard)
+        run: npm run verify:types
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
       - name: Accessibility gate (axe, all four themes)
