@@ -4,7 +4,9 @@ export interface CrMeterProps {
   value: number;
   max?: number;
   label?: string;
-  /** Signal tone for the fill: work | wait | done | err | idle. */
+  /** Signal for the fill (canonical vocabulary). */
+  signal?: "work" | "wait" | "done" | "err" | "idle";
+  /** @deprecated use `signal` */
   tone?: string;
 }
 
@@ -24,7 +26,7 @@ export default function CrMeter(props: CrMeterProps) {
     },
   });
   return (
-    <div class={"cr-meter cr-meter--" + (props.tone || "work")}>
+    <div class={"cr-meter cr-meter--" + (props.signal || props.tone || "work")}>
       <Show when={props.label}>
         <span class="cr-meter__label">{props.label}</span>
       </Show>

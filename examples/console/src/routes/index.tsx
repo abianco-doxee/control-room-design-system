@@ -319,9 +319,9 @@ export default component$(() => {
             />
           </div>
           <div style="display:flex;flex-direction:column;gap:var(--space-2)">
-            <CrMeter label="cpu" value={72} tone="work" />
-            <CrMeter label="queue" value={40} tone="wait" />
-            <CrMeter label="errors" value={12} tone="err" />
+            <CrMeter label="cpu" value={72} signal="work" />
+            <CrMeter label="queue" value={40} signal="wait" />
+            <CrMeter label="errors" value={12} signal="err" />
           </div>
           <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
             <CrPagination page={ui.page} total={9} onChange={$((p: number) => (ui.page = p))} />
@@ -353,7 +353,7 @@ export default component$(() => {
               <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">indexing</p>
               <CrProgress value={64} label="Indexing 64%" />
               <div style="height:var(--space-2)"></div>
-              <CrProgress indeterminate tone="wait" label="Syncing" />
+              <CrProgress indeterminate signal="wait" label="Syncing" />
             </div>
             <div>
               <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">scope</p>
