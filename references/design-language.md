@@ -60,6 +60,9 @@ Miller and Mike Mignola: black as a compositional mass.
 - **MUST** treat line weight as hierarchy: `--brd-brush` (5px) outer chassis ·
   `--brd-heavy` (3px) major panel · `--brd` (2px) internal divider. This matches
   the documented neobrutalist 2–4px spec.
+- The mass may be a **chromatic near-black** — the grounds carry a slight OKLCH
+  hue bias (violet in dark/extreme) so the "black" reads as a deliberate,
+  vibrant-leaning ink rather than dead grey. It is still a mass, not a colour.
 - **NEVER** use a third mid-tone on a surface — that is exactly the graded
   shading being replaced.
 - **NEVER** apply a gradient, blur, soft shadow, or inner glow to a surface. The
@@ -83,17 +86,20 @@ channel.
 > stage lights for different characters* — worked out per cut with the studio's
 > color designer.
 
-**The signal ramp** (the keys, each bound to a state):
+**The signal ramp** (the keys, each bound to a state). Values are generated in
+**OKLCH** (`build/build-palette.mjs`) so every theme sits at a consistent perceived
+lightness/chroma — vibrant on purpose, and AA-checked against its on-colour:
 
 | Token | State | Dark value |
 | --- | --- | --- |
-| `--sig-work` | working | `#22d3ee` cyan |
-| `--sig-wait` | waiting / needs input | `#fde047` yellow |
-| `--sig-done` | done / merged | `#5eead4` aqua |
-| `--sig-err` | error / failing | `#ff3b6b` red |
-| `--sig-idle` | idle | `#6b6b8a` grey |
-| `--sig-accent` | attention / primary action | `#ff2e97` magenta |
-| `--stage` | calm / nominal (nothing needs attention) | `#00b34a` green |
+| `--sig-work` | working | `#00d3fb` cyan |
+| `--sig-wait` | waiting / needs input | `#f9ad00` amber |
+| `--sig-done` | done / merged | `#00deaa` aqua |
+| `--sig-err` | error / failing | `#f45058` red |
+| `--sig-idle` | idle | `#848496` grey |
+| `--sig-accent` | attention / primary action | `#ff1a9d` hot magenta |
+| `--sig-accent-2` | **secondary action** (not a state) | `#9ad335` acid |
+| `--stage` | calm / nominal (nothing needs attention) | `#49de78` green |
 
 **Rules**
 
@@ -103,6 +109,9 @@ channel.
   needs attention, it keys to `--stage` and stays calm.
 - **SHOULD** render many keyed cells as a uniform, gridded contact sheet — equal
   size and gridding make it read as one instrument, not competing stages.
+- **`--sig-accent-2`** is the one exception to "colour = state" — a *secondary
+  action / brand* key (a second CTA, a highlighted control). It is still an
+  action, never a mood; the state ramp above stays untouched.
 - **NEVER** key a region to a hue that does not correspond to real state.
 - **NEVER** put two full-bleed keys competing on one screen. One key per region.
 
@@ -347,11 +356,15 @@ isn't, whatever the palette. Use this as the identity checklist.
 8. **The drip and the arrow-rail.** Corruption drips *downward* in `--drip` on
    error/masthead surfaces only (Law 3); sequence is carried by the chevron-cut
    arrow-rail (Law 4). Both are house shapes with one fixed meaning each.
-9. **The seeded pixel-cat.** Identity-from-seed, pose-is-state — the system's one
-   sanctioned piece of warmth, and the reason the *copy* stays cold (Law 8).
+9. **Neo-print grain on hardware.** Halftone, ordered dither, and scanlines
+   (`.cr-tex--*`) live *only* inside a bezel/screen (Law 6) — the aged-glass wash
+   that says there is real hardware. Never on a flat field.
+10. **The seeded pair — pixel-cat and cyber-sigil.** Both are identity-from-seed
+   pixel art: the cat is warmth (pose-is-state), the sigil is a per-entity mark
+   (`references/seeded-sigil.md`). They are why the *copy* can stay cold (Law 8).
 
 If a screen has the palette but none of tells 1, 2, 5, and 6, it is cosplaying
-Control Room. If it has all nine, it could carry no logo and still be recognized.
+Control Room. If it has all ten, it could carry no logo and still be recognized.
 
 ---
 

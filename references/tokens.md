@@ -225,11 +225,50 @@ all themes — they resolve to nothing elsewhere.
 | `--stage-ink` | `#04140a` | `#04140a` | `#12061a` | `#d9ffe6` |
 | `--drip` | `#4affc8` | `#0a7f5c` | `#00f0ff` | `#43ff7a` |
 
+## OKLCH-generated palette {#oklch}
+
+The four themes' grounds and signals are authored in **OKLCH** (perceptually
+uniform) rather than eyeballed in sRGB, so every theme's signals sit at a
+consistent *perceived* lightness/chroma. `build/build-palette.mjs` takes a compact
+per-theme spec (ground L/C/H + signal hues + target L/C), gamut-maps to sRGB
+(`culori`), and — crucially — **auto-picks each fill's on-colour** (near-black vs
+near-white) by WCAG contrast, printing any pair under AA.
+
+```bash
+node build/build-palette.mjs           # → tokens/palette.generated.json + contrast report
+node build/build-palette.mjs --report  # report only
+```
+
+Its output is folded into `tokens/tokens.json` (the hand-editable source of
+truth); the generator is provenance + a tuning surface. Dark and extreme are fully
+generated (the vibrant, chromatic-near-black shift lives there); light and
+phosphor keep their hand-tuned character and only take the new second accent.
+
+**`--sig-accent-2`** is a **second action key** (acid lime in dark/extreme, a deep
+violet on light, an aqua-green in phosphor) with `--on-accent-2`. It is a
+*secondary action / brand* accent, **not** a machine state — Law 2 still governs
+the state ramp (`--sig-work/wait/done/err/idle`).
+
+## Texture tokens
+
+Three theme-keyed texture backgrounds for **hardware surfaces only** (Law 6):
+
+| Token | Texture |
+| --- | --- |
+| `--halftone` | neo-print dot pattern |
+| `--dither` | ordered 1-bit checker (50% dither) |
+| `--scanline` | CRT scanlines |
+
+Apply via the `.cr-tex--halftone` / `.cr-tex--dither` / `.cr-tex--scan` /
+`.cr-tex--glass` utilities (see `references/components.md`) — never on a flat
+content field.
+
 ## Adding a token
 
 1. Add it to `tokens.json` under the right group, with a `cssVar`, a `role`, and
    a value for **all four themes**.
 2. Run `npm run build:tokens` to regenerate dist/ and design-tokens/ (DTCG).
 3. If it is a new signal hue, verify `--on-sig` contrast against it in every
-   theme (`references/accessibility.md`).
+   theme (`references/accessibility.md`) — or add it to `build/build-palette.mjs`
+   and let the generator pick + check the on-colour for you.
 4. Reference it from components by variable — never inline the value.

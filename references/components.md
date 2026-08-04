@@ -668,3 +668,40 @@ works in a server-rendered page with no component at all.
   the hint into the trigger's accessible name.
 - **SHOULD** keep tooltips short; anything longer than a line belongs in a Panel or
   a Modal, not a hovering bubble.
+
+## Texture utilities (hardware only)
+
+Neo-print / CRT grain for **hardware** surfaces (a bezel, screen, or hero) —
+**never** a flat content field (Law 6). Theme-keyed via the texture tokens
+(`references/tokens.md`).
+
+| Class | Texture |
+| --- | --- |
+| `.cr-tex--halftone` | dot pattern |
+| `.cr-tex--dither` | ordered 1-bit checker |
+| `.cr-tex--scan` | CRT scanlines |
+| `.cr-tex--glass` | scanlines + halftone (the house "aged glass" wash) |
+
+```html
+<div class="cr-bezel cr-anim-scan">
+  <div class="cr-bezel__screen cr-tex--glass">&gt; streaming · 14 sessions</div>
+</div>
+```
+
+- **MUST** apply only to hardware; a textured flat panel violates Law 6.
+- Ambient loop classes (`.cr-anim-scan/-pulse/-drift/-flick`) are documented in
+  `references/motion.md` — low, slow, hardware-bound, reduced-motion-off.
+
+## Sigil (seeded pixel-glyph)
+
+A retro-futuristic **cyber-sigil** generated from a seed — a per-entity identity
+mark that pairs with the pixel-cat. Full contract in `references/seeded-sigil.md`.
+
+```tsx
+import { CrSigil } from "@control-room/design-system/react";
+<CrSigil seed="nova-01" state="working" />
+```
+
+- **MUST** key the hue to a signal (Law 2); the glyph is identity + state.
+- **NEVER** use it as the only affordance for an action — it is a mark, not a
+  button.

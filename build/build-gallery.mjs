@@ -25,7 +25,7 @@ const GROUPS = [
   ["Surface", ["--ground", "--board", "--panel", "--panel-2", "--rail"]],
   ["Text", ["--ink", "--muted", "--rail-ink", "--on-sig"]],
   ["Line & mass", ["--border", "--mass", "--shadow-col"]],
-  ["Signal (state)", ["--sig-work", "--sig-wait", "--sig-done", "--sig-err", "--sig-idle", "--sig-accent"]],
+  ["Signal (state)", ["--sig-work", "--sig-wait", "--sig-done", "--sig-err", "--sig-idle", "--sig-accent", "--sig-accent-2"]],
   ["Keyed & decay", ["--stage", "--stage-ink", "--drip"]],
 ];
 
@@ -124,9 +124,22 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       </div>
     </div>
     <div>
-      <h3>Bezel (texture lives here only)</h3>
-      <div class="cr-bezel"><div class="cr-bezel__rivets" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-        <div class="cr-bezel__screen">&gt; scan complete · 14 sessions · 2 flagged</div></div>
+      <h3>Bezel + texture (halftone / dither / scan — hardware only)</h3>
+      <div class="cr-bezel cr-anim-scan"><div class="cr-bezel__rivets" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <div class="cr-bezel__screen cr-tex--glass">&gt; scan complete · 14 sessions · 2 flagged</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
+        <div class="cr-panel cr-panel--inset cr-tex--halftone" style="min-height:44px;font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px">halftone</div>
+        <div class="cr-panel cr-panel--inset cr-tex--dither" style="min-height:44px;font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px">dither</div>
+        <div class="cr-panel cr-panel--inset cr-tex--scan" style="min-height:44px;font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px">scan</div>
+      </div>
+      <h3 style="margin-top:16px">Seeded pixel-sigils (cyber-sigilism)</h3>
+      <div id="sigrow" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+        <canvas class="crsig" width="52" height="52" data-seed="nova-01" data-state="working"></canvas>
+        <canvas class="crsig" width="52" height="52" data-seed="ptl-757" data-state="waiting"></canvas>
+        <canvas class="crsig" width="52" height="52" data-seed="cr-1130" data-state="error"></canvas>
+        <canvas class="crsig" width="52" height="52" data-seed="rp-verify" data-state="done"></canvas>
+        <canvas class="crsig" width="52" height="52" data-seed="ail-chat" data-state="idle"></canvas>
+      </div>
       <h3 style="margin-top:16px">Arrow-rail (sequence)</h3>
       <div class="cr-rail"><span class="cr-rail__step cr-rail__step--on">scan</span><span class="cr-rail__step">triage</span><span class="cr-rail__step">fix</span><span class="cr-rail__step">verify</span></div>
     </div>
@@ -259,6 +272,30 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         x.setAttribute("aria-pressed",String(x===b));
       });
     });
+  });
+
+  // Seeded pixel-sigils (cyber-sigilism) — same seed → same glyph.
+  function hashSeed(s){var h=2166136261>>>0;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+  function mb32(a){return function(){a|=0;a=(a+0x6d2b79f5)|0;var t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return ((t^(t>>>14))>>>0)/4294967296;};}
+  var SINK=["#00d3fb","#ff1a9d","#9ad335","#00deaa","#b061ff","#f9ad00"];
+  var SST={working:"#00d3fb",waiting:"#f9ad00",idle:"#848496",error:"#f45058",done:"#9ad335"};
+  document.querySelectorAll(".crsig").forEach(function(cv){
+    var seed=cv.dataset.seed,G=16,cell=cv.width/G,rng=mb32(hashSeed(seed));
+    var ink=cv.dataset.state?SST[cv.dataset.state]:SINK[Math.floor(rng()*SINK.length)];
+    var m=[];for(var y=0;y<G;y++){m.push(new Array(G).fill(0));}
+    var cx=G>>1;function set(x,y){if(x>=0&&x<G&&y>=0&&y<G){m[y][x]=1;m[y][G-1-x]=1;}}
+    for(var y2=2;y2<G-2;y2++){if(rng()>0.22)set(cx,y2);}
+    var arms=3+Math.floor(rng()*3);
+    for(var a=0;a<arms;a++){var x=cx,y=2+Math.floor(rng()*(G-6)),len=2+Math.floor(rng()*4);
+      for(var i=0;i<len;i++){x+=rng()>0.5?1:0;y+=rng()>0.4?1:0;set(x,y);}set(x,y);if(rng()>0.5){set(x+1,y);set(x,y+1);}}
+    for(var xc=0;xc<=cx;xc++){var low=-1;for(var yy=0;yy<G;yy++){if(m[yy][xc])low=yy;}
+      if(low>=0&&rng()>0.45){var d=1+Math.floor(rng()*3);for(var k=1;k<=d;k++)set(xc,low+k);}}
+    set(cx,2);if(rng()>0.4)set(cx-1,3);
+    var ctx=cv.getContext("2d");ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.globalAlpha=0.12;ctx.fillStyle=ink;
+    for(var gy=cell;gy<cv.height;gy+=cell*2){for(var gx=cell;gx<cv.width;gx+=cell*2){ctx.fillRect(gx,gy,1,1);}}
+    ctx.globalAlpha=1;
+    for(var ry=0;ry<G;ry++){for(var rx=0;rx<G;rx++){if(m[ry][rx]){ctx.fillStyle=ink;ctx.fillRect(rx*cell,ry*cell,cell,cell);}}}
   });
 </script>
 </body>

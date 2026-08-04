@@ -29,6 +29,7 @@ const PAGES = [
   ["references/motion.md", "reference", "motion", "Motion"],
   ["references/accessibility.md", "reference", "accessibility", "Accessibility"],
   ["references/seeded-cat.md", "reference", "seeded-cat", "Seeded Pixel-Cat"],
+  ["references/seeded-sigil.md", "reference", "seeded-sigil", "Seeded Pixel-Sigil"],
   ["references/frameworks.md", "reference", "frameworks", "Framework Components (Mitosis)"],
   ["references/figma-bridge.md", "reference", "figma-bridge", "Figma Bridge"],
   ["references/figma-kit-build.md", "reference", "figma-kit-build", "Building the Figma Kit"],

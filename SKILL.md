@@ -52,6 +52,7 @@ Detail lives in `references/`. Load only what the task needs.
 | `references/motion.md` | The four motion tiers, the glitch/CRT vocabulary, and the reduced-motion contract. |
 | `references/accessibility.md` | The accessibility contract — contrast, focus, ARIA, and how the aesthetic and a11y coexist. |
 | `references/seeded-cat.md` | The seeded pixel-cat: identity-from-seed, pose-is-state, the `paint()` contract. |
+| `references/seeded-sigil.md` | The seeded cyber-sigil: identity-from-seed pixel glyph (cyber-sigilism), state-keyed hue, the drip vocabulary. |
 | `references/figma-bridge.md` | Optional, free Figma → code round-trip: the `figma` map, the open-source Figma MCP, secret handling, and the node → component agent workflow. |
 | `references/figma-kit-build.md` | How to create the Figma kit from scratch: file setup, near-automatic token import (DTCG → Variables), the component recipe, and closing the loop back to the catalog. |
 | `tokens/tokens.json` | Machine-readable token source (parse this to generate CSS/Tailwind/JSON). |

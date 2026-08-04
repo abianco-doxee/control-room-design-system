@@ -147,3 +147,32 @@ animation and transition under `prefers-reduced-motion: reduce`. Beyond that:
   carried by color + shape + text, never by motion alone.
 - **MUST** check `matchMedia("(prefers-reduced-motion: reduce)")` before starting
   any JS-driven loop (ticker, rAF) and skip it when set.
+
+## Ambient loop utilities
+
+The system is *alive at rest* (Law 7) — a low ambient floor, not a static screen.
+These opt-in CSS classes provide that floor. They are **hardware-bound** (use them
+on a bezel/screen/hero, not on a flat content field) and every one is killed by
+the global reduced-motion rule.
+
+| Class | Loop | Use on |
+| --- | --- | --- |
+| `.cr-anim-scan` | a thin CRT sweep bar falls down the surface (`::after`) | a bezel/screen (host is `position:relative; overflow:hidden`) |
+| `.cr-anim-pulse` | a slow expanding ring — set `--_pulse` to re-key the hue | a signal dot that needs attention |
+| `.cr-anim-drift` | a halftone/dither surface drifts one cell | a `.cr-tex--*` hardware surface |
+| `.cr-anim-flick` | a two-step opacity flicker | a live ticker/cursor readout |
+
+```html
+<div class="cr-bezel cr-anim-scan">
+  <div class="cr-bezel__screen cr-tex--glass">> streaming · 14 sessions</div>
+</div>
+<span class="cr-dot cr-anim-pulse" style="--_pulse: var(--sig-err); background: var(--sig-err)"></span>
+```
+
+- **MUST** keep loops low and slow (2–6s) — this is the ambient floor, not an
+  event. A real event still gets the tier-2 eruption above, and there is only one
+  eruption at a time.
+- **SHOULD** confine loops to hardware (bezel/screen/hero). A looping flat panel
+  reads as noise and erases the contrast that makes a real event legible.
+- **NEVER** loop data, numerals, or labels; **NEVER** ambient-animate the whole
+  screen at once.
