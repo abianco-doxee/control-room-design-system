@@ -73,7 +73,7 @@
 .cr-tag--work   { background: var(--sig-work); color: var(--on-sig); }
 .cr-tag--wait   { background: var(--sig-wait); color: var(--on-sig); }
 .cr-tag--err    { background: var(--sig-err);  color: var(--on-err); }
-.cr-tag--idle   { background: var(--sig-idle); color: var(--on-sig); }
+.cr-tag--idle   { background: var(--sig-idle); color: var(--on-idle); }
 .cr-tag--accent { background: var(--sig-accent); color: var(--on-accent); }
 /* Legacy tell-time aliases (kept — nothing is lost): now→done, later→wait, no→err. */
 .cr-tag--now   { background: var(--sig-done); color: var(--on-sig); }
