@@ -6,7 +6,9 @@ export interface CrProgressProps {
   max?: number;
   /** Unknown-duration work — an animated hazard sweep, no numeric value. */
   indeterminate?: boolean;
-  /** Signal tone: work (default) · wait · done · err. */
+  /** Signal for the fill (canonical vocabulary): work · wait · done · err. */
+  signal?: "work" | "wait" | "done" | "err";
+  /** @deprecated use `signal` */
   tone?: string;
   label?: string;
 }
@@ -31,7 +33,7 @@ export default function CrProgress(props: CrProgressProps) {
       class={
         "cr-progress" +
         (props.indeterminate ? " cr-progress--indeterminate" : "") +
-        (props.tone ? " cr-progress--" + props.tone : "")
+        (props.signal || props.tone ? " cr-progress--" + (props.signal || props.tone) : "")
       }
       role="progressbar"
       aria-label={props.label || "progress"}

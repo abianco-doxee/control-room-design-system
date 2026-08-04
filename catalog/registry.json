@@ -202,7 +202,7 @@
       "description": "One row of a live list — the densest unit; calm at rest, one-shot glitch on a real state change.",
       "spec": "references/components.md#sessionrow",
       "variants": {
-        "state": [
+        "signal": [
           "work",
           "wait",
           "done",
@@ -245,7 +245,7 @@
       "description": "The smallest state readout — a square keyed to the signal ramp, with an aria-label naming the state.",
       "spec": "references/components.md#statusdot",
       "variants": {
-        "state": [
+        "signal": [
           "work",
           "wait",
           "done",
@@ -558,7 +558,7 @@
       "description": "Token-driven capacity / utilisation bar (role=meter), square and hard-edged, keyed to a signal tone.",
       "spec": "references/components.md#meter",
       "variants": {
-        "tone": [
+        "signal": [
           "work",
           "wait",
           "done",
@@ -598,11 +598,13 @@
       "description": "Inline status label inside dense content; variants map to the signal ramp.",
       "spec": "references/components.md#tag",
       "variants": {
-        "tone": [
-          "now",
+        "signal": [
           "work",
-          "later",
-          "no"
+          "wait",
+          "done",
+          "err",
+          "idle",
+          "accent"
         ]
       },
       "tokens": [
@@ -1675,13 +1677,36 @@
       "lifecycle": "stable",
       "description": "Inline callout keyed to a signal (info/wait/done/err) — a left brush-bar in the signal hue, optional dismiss. err announces assertively (role=alert).",
       "spec": "references/components.md#alert",
-      "variants": { "signal": ["info", "wait", "done", "err"] },
+      "variants": {
+        "signal": [
+          "info",
+          "wait",
+          "done",
+          "err"
+        ]
+      },
       "tokens": [
-        { "cssVar": "--sig-work", "description": "info key" },
-        { "cssVar": "--sig-err", "description": "error key" },
-        { "cssVar": "--panel", "description": "fill" }
+        {
+          "cssVar": "--sig-work",
+          "description": "info key"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error key"
+        },
+        {
+          "cssVar": "--panel",
+          "description": "fill"
+        }
       ],
-      "keywords": ["alert", "callout", "banner", "message", "notice", "inline"]
+      "keywords": [
+        "alert",
+        "callout",
+        "banner",
+        "message",
+        "notice",
+        "inline"
+      ]
     },
     {
       "id": "radio-group",
@@ -1691,13 +1716,34 @@
       "lifecycle": "stable",
       "description": "Single-choice group (role=radiogroup) with roving tabindex + arrow-key nav. Square radios (radius 0) — a filled inner square marks the choice.",
       "spec": "references/components.md#radio-group",
-      "variants": { "prop": ["value", "row"] },
+      "variants": {
+        "prop": [
+          "value",
+          "row"
+        ]
+      },
       "tokens": [
-        { "cssVar": "--sig-work", "description": "checked mark" },
-        { "cssVar": "--panel-2", "description": "box fill" },
-        { "cssVar": "--border", "description": "box border" }
+        {
+          "cssVar": "--sig-work",
+          "description": "checked mark"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "box fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "box border"
+        }
       ],
-      "keywords": ["radio", "radiogroup", "choice", "option", "single-select", "form"]
+      "keywords": [
+        "radio",
+        "radiogroup",
+        "choice",
+        "option",
+        "single-select",
+        "form"
+      ]
     },
     {
       "id": "slider",
@@ -1707,13 +1753,36 @@
       "lifecycle": "stable",
       "description": "Styled native range input — square track + thumb, keyboard for free (arrows, Home/End, PageUp/Down).",
       "spec": "references/components.md#slider",
-      "variants": { "prop": ["value", "min", "max", "step"] },
+      "variants": {
+        "prop": [
+          "value",
+          "min",
+          "max",
+          "step"
+        ]
+      },
       "tokens": [
-        { "cssVar": "--sig-work", "description": "thumb" },
-        { "cssVar": "--panel-2", "description": "track" },
-        { "cssVar": "--border", "description": "track/thumb border" }
+        {
+          "cssVar": "--sig-work",
+          "description": "thumb"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "track"
+        },
+        {
+          "cssVar": "--border",
+          "description": "track/thumb border"
+        }
       ],
-      "keywords": ["slider", "range", "threshold", "input", "numeric", "form"]
+      "keywords": [
+        "slider",
+        "range",
+        "threshold",
+        "input",
+        "numeric",
+        "form"
+      ]
     },
     {
       "id": "progress",
@@ -1723,12 +1792,32 @@
       "lifecycle": "stable",
       "description": "Task progress (role=progressbar) — determinate fills to value/max; indeterminate runs an animated hazard sweep. Distinct from Meter (a static capacity reading).",
       "spec": "references/components.md#progress",
-      "variants": { "tone": ["work", "wait", "done", "err"] },
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err"
+        ]
+      },
       "tokens": [
-        { "cssVar": "--sig-work", "description": "fill" },
-        { "cssVar": "--panel-2", "description": "track" }
+        {
+          "cssVar": "--sig-work",
+          "description": "fill"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "track"
+        }
       ],
-      "keywords": ["progress", "progressbar", "loading", "task", "indeterminate", "bar"]
+      "keywords": [
+        "progress",
+        "progressbar",
+        "loading",
+        "task",
+        "indeterminate",
+        "bar"
+      ]
     },
     {
       "id": "skeleton",
@@ -1738,9 +1827,27 @@
       "lifecycle": "stable",
       "description": "Loading placeholder — a blocky pulse (never rounded). Sizes: --line, --text, --block; give it a width inline.",
       "spec": "references/components.md#skeleton",
-      "variants": { "class": ["cr-skeleton--line", "cr-skeleton--text", "cr-skeleton--block"] },
-      "tokens": [{ "cssVar": "--panel-2", "description": "placeholder fill" }],
-      "keywords": ["skeleton", "loading", "placeholder", "shimmer", "pulse", "ghost"]
+      "variants": {
+        "class": [
+          "cr-skeleton--line",
+          "cr-skeleton--text",
+          "cr-skeleton--block"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "placeholder fill"
+        }
+      ],
+      "keywords": [
+        "skeleton",
+        "loading",
+        "placeholder",
+        "shimmer",
+        "pulse",
+        "ghost"
+      ]
     },
     {
       "id": "data-list",
@@ -1750,12 +1857,31 @@
       "lifecycle": "stable",
       "description": "Key → value readout (dl/dt/dd) on a two-column grid — mono/label keys, data-register values. For detail panels.",
       "spec": "references/components.md#data-list",
-      "variants": { "class": ["cr-dl", "cr-dl__k", "cr-dl__v"] },
+      "variants": {
+        "class": [
+          "cr-dl",
+          "cr-dl__k",
+          "cr-dl__v"
+        ]
+      },
       "tokens": [
-        { "cssVar": "--muted", "description": "keys" },
-        { "cssVar": "--ink", "description": "values" }
+        {
+          "cssVar": "--muted",
+          "description": "keys"
+        },
+        {
+          "cssVar": "--ink",
+          "description": "values"
+        }
       ],
-      "keywords": ["data", "list", "description", "definition", "key-value", "detail"]
+      "keywords": [
+        "data",
+        "list",
+        "description",
+        "definition",
+        "key-value",
+        "detail"
+      ]
     },
     {
       "id": "accordion",
@@ -1765,13 +1891,34 @@
       "lifecycle": "stable",
       "description": "Collapsible sections — header buttons (aria-expanded + aria-controls) reveal region panels. single = exclusive; ↑/↓/Home/End move between headers.",
       "spec": "references/components.md#accordion",
-      "variants": { "prop": ["single", "defaultOpen"] },
+      "variants": {
+        "prop": [
+          "single",
+          "defaultOpen"
+        ]
+      },
       "tokens": [
-        { "cssVar": "--border", "description": "dividers" },
-        { "cssVar": "--sig-work", "description": "open chevron" },
-        { "cssVar": "--state-hover-mix", "description": "header hover" }
+        {
+          "cssVar": "--border",
+          "description": "dividers"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "open chevron"
+        },
+        {
+          "cssVar": "--state-hover-mix",
+          "description": "header hover"
+        }
       ],
-      "keywords": ["accordion", "collapse", "collapsible", "disclosure", "expander", "sections"]
+      "keywords": [
+        "accordion",
+        "collapse",
+        "collapsible",
+        "disclosure",
+        "expander",
+        "sections"
+      ]
     },
     {
       "id": "popover",
@@ -1781,13 +1928,34 @@
       "lifecycle": "stable",
       "description": "Generic anchored overlay for arbitrary content — a trigger toggles a floating panel; scrim closes on outside click, Esc closes and returns focus. Use Menu for a list of actions.",
       "spec": "references/components.md#popover",
-      "variants": { "align": ["left", "right"] },
+      "variants": {
+        "align": [
+          "left",
+          "right"
+        ]
+      },
       "tokens": [
-        { "cssVar": "--panel", "description": "panel fill" },
-        { "cssVar": "--shadow-off", "description": "panel shadow" },
-        { "cssVar": "--z-overlay", "description": "stacking layer" }
+        {
+          "cssVar": "--panel",
+          "description": "panel fill"
+        },
+        {
+          "cssVar": "--shadow-off",
+          "description": "panel shadow"
+        },
+        {
+          "cssVar": "--z-overlay",
+          "description": "stacking layer"
+        }
       ],
-      "keywords": ["popover", "overlay", "anchored", "floating", "flyout", "hovercard"]
+      "keywords": [
+        "popover",
+        "overlay",
+        "anchored",
+        "floating",
+        "flyout",
+        "hovercard"
+      ]
     },
     {
       "id": "drawer",
@@ -1797,13 +1965,34 @@
       "lifecycle": "stable",
       "description": "An edge sheet on the native dialog (focus-trap + Esc + backdrop) — slides from the left or right, full height. For detail/inspector panels.",
       "spec": "references/components.md#drawer",
-      "variants": { "side": ["left", "right"] },
+      "variants": {
+        "side": [
+          "left",
+          "right"
+        ]
+      },
       "tokens": [
-        { "cssVar": "--panel", "description": "sheet fill" },
-        { "cssVar": "--brd-brush", "description": "edge border" },
-        { "cssVar": "--shadow-off-lg", "description": "sheet shadow" }
+        {
+          "cssVar": "--panel",
+          "description": "sheet fill"
+        },
+        {
+          "cssVar": "--brd-brush",
+          "description": "edge border"
+        },
+        {
+          "cssVar": "--shadow-off-lg",
+          "description": "sheet shadow"
+        }
       ],
-      "keywords": ["drawer", "sheet", "sidebar", "panel", "off-canvas", "inspector"]
+      "keywords": [
+        "drawer",
+        "sheet",
+        "sidebar",
+        "panel",
+        "off-canvas",
+        "inspector"
+      ]
     },
     {
       "id": "breadcrumb",
@@ -1813,12 +2002,29 @@
       "lifecycle": "stable",
       "description": "Navigation trail — ascii \"/\" separators from CSS; the last crumb is the current page (aria-current).",
       "spec": "references/components.md#breadcrumb",
-      "variants": { "prop": ["items"] },
+      "variants": {
+        "prop": [
+          "items"
+        ]
+      },
       "tokens": [
-        { "cssVar": "--muted", "description": "crumbs + separators" },
-        { "cssVar": "--ink", "description": "current page" }
+        {
+          "cssVar": "--muted",
+          "description": "crumbs + separators"
+        },
+        {
+          "cssVar": "--ink",
+          "description": "current page"
+        }
       ],
-      "keywords": ["breadcrumb", "trail", "nav", "path", "hierarchy", "ascii"]
+      "keywords": [
+        "breadcrumb",
+        "trail",
+        "nav",
+        "path",
+        "hierarchy",
+        "ascii"
+      ]
     },
     {
       "id": "segmented",
@@ -1828,13 +2034,33 @@
       "lifecycle": "stable",
       "description": "Single-select connected button bar (role=radiogroup, roving tabindex; ←/→/Home/End). Same semantics as a radio group, distinct connected visual.",
       "spec": "references/components.md#segmented",
-      "variants": { "prop": ["value"] },
+      "variants": {
+        "prop": [
+          "value"
+        ]
+      },
       "tokens": [
-        { "cssVar": "--sig-work", "description": "selected segment" },
-        { "cssVar": "--panel", "description": "segment fill" },
-        { "cssVar": "--border", "description": "dividers" }
+        {
+          "cssVar": "--sig-work",
+          "description": "selected segment"
+        },
+        {
+          "cssVar": "--panel",
+          "description": "segment fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "dividers"
+        }
       ],
-      "keywords": ["segmented", "toggle-group", "selectbutton", "switcher", "filter", "single-select"]
+      "keywords": [
+        "segmented",
+        "toggle-group",
+        "selectbutton",
+        "switcher",
+        "filter",
+        "single-select"
+      ]
     },
     {
       "id": "combobox",
@@ -1844,13 +2070,35 @@
       "lifecycle": "stable",
       "description": "Autocomplete — an input (role=combobox) filtering a listbox; ↑/↓ move the active option (aria-activedescendant), Enter selects, Esc closes. Active row shows an ascii ▸ marker.",
       "spec": "references/components.md#combobox",
-      "variants": { "prop": ["value", "options"] },
+      "variants": {
+        "prop": [
+          "value",
+          "options"
+        ]
+      },
       "tokens": [
-        { "cssVar": "--board", "description": "input" },
-        { "cssVar": "--sig-work", "description": "active option + ▸ marker" },
-        { "cssVar": "--panel", "description": "list" }
+        {
+          "cssVar": "--board",
+          "description": "input"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "active option + ▸ marker"
+        },
+        {
+          "cssVar": "--panel",
+          "description": "list"
+        }
       ],
-      "keywords": ["combobox", "autocomplete", "typeahead", "select", "search", "dropdown", "form"]
+      "keywords": [
+        "combobox",
+        "autocomplete",
+        "typeahead",
+        "select",
+        "search",
+        "dropdown",
+        "form"
+      ]
     },
     {
       "id": "number-field",
@@ -1860,13 +2108,36 @@
       "lifecycle": "stable",
       "description": "Number input with −/+ steppers, clamped to min/max; the native input keeps its own keyboard.",
       "spec": "references/components.md#number-field",
-      "variants": { "prop": ["value", "min", "max", "step"] },
+      "variants": {
+        "prop": [
+          "value",
+          "min",
+          "max",
+          "step"
+        ]
+      },
       "tokens": [
-        { "cssVar": "--board", "description": "field" },
-        { "cssVar": "--panel", "description": "stepper buttons" },
-        { "cssVar": "--state-disabled-op", "description": "disabled at bounds" }
+        {
+          "cssVar": "--board",
+          "description": "field"
+        },
+        {
+          "cssVar": "--panel",
+          "description": "stepper buttons"
+        },
+        {
+          "cssVar": "--state-disabled-op",
+          "description": "disabled at bounds"
+        }
       ],
-      "keywords": ["number", "stepper", "spinner", "input", "quantity", "form"]
+      "keywords": [
+        "number",
+        "stepper",
+        "spinner",
+        "input",
+        "quantity",
+        "form"
+      ]
     },
     {
       "id": "ascii-detail",
@@ -1877,13 +2148,39 @@
       "description": "Character-flavored detail utilities: .cr-sep / .cr-sep-label box-rule separators (dashed/dotted, labeled), .cr-list ascii-marker lists (▸ · » +), and .cr-leader dot-leader rows (label ····· value).",
       "spec": "references/components.md#ascii-detail",
       "variants": {
-        "class": ["cr-sep", "cr-sep--dot", "cr-sep--double", "cr-sep-label", "cr-list", "cr-list--dot", "cr-list--tick", "cr-list--plus", "cr-leader"]
+        "class": [
+          "cr-sep",
+          "cr-sep--dot",
+          "cr-sep--double",
+          "cr-sep-label",
+          "cr-list",
+          "cr-list--dot",
+          "cr-list--tick",
+          "cr-list--plus",
+          "cr-leader"
+        ]
       },
       "tokens": [
-        { "cssVar": "--muted", "description": "rule / marker ink" },
-        { "cssVar": "--sig-work", "description": "▸ / » markers" }
+        {
+          "cssVar": "--muted",
+          "description": "rule / marker ink"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "▸ / » markers"
+        }
       ],
-      "keywords": ["separator", "divider", "rule", "list", "leader", "ascii", "dot-leader", "marker", "bullet"]
+      "keywords": [
+        "separator",
+        "divider",
+        "rule",
+        "list",
+        "leader",
+        "ascii",
+        "dot-leader",
+        "marker",
+        "bullet"
+      ]
     },
     {
       "id": "hover-card",
@@ -1893,13 +2190,34 @@
       "lifecycle": "stable",
       "description": "A rich hover/focus card for structured content (Tooltip is for plain text, Menu for actions). CSS-driven reveal with an open delay; the trigger is focusable so keyboard users get it too.",
       "spec": "references/components.md#hover-card",
-      "variants": { "align": ["left", "right"] },
+      "variants": {
+        "align": [
+          "left",
+          "right"
+        ]
+      },
       "tokens": [
-        { "cssVar": "--panel", "description": "card fill" },
-        { "cssVar": "--shadow-off", "description": "card shadow" },
-        { "cssVar": "--z-overlay", "description": "stacking layer" }
+        {
+          "cssVar": "--panel",
+          "description": "card fill"
+        },
+        {
+          "cssVar": "--shadow-off",
+          "description": "card shadow"
+        },
+        {
+          "cssVar": "--z-overlay",
+          "description": "stacking layer"
+        }
       ],
-      "keywords": ["hover", "card", "hovercard", "preview", "richtooltip", "popover"]
+      "keywords": [
+        "hover",
+        "card",
+        "hovercard",
+        "preview",
+        "richtooltip",
+        "popover"
+      ]
     },
     {
       "id": "tree",
@@ -1909,13 +2227,35 @@
       "lifecycle": "stable",
       "description": "Hierarchical tree (role=tree) for nested data like a worker→session fleet. Rendered as a flat list of visible rows; full keyboard nav (arrows expand/collapse/step, Home/End) and aria-level/aria-expanded.",
       "spec": "references/components.md#tree",
-      "variants": { "prop": ["nodes", "defaultExpanded"] },
+      "variants": {
+        "prop": [
+          "nodes",
+          "defaultExpanded"
+        ]
+      },
       "tokens": [
-        { "cssVar": "--sig-work", "description": "open twist + selection" },
-        { "cssVar": "--muted", "description": "twist / leaf marker" },
-        { "cssVar": "--state-hover-mix", "description": "row hover" }
+        {
+          "cssVar": "--sig-work",
+          "description": "open twist + selection"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "twist / leaf marker"
+        },
+        {
+          "cssVar": "--state-hover-mix",
+          "description": "row hover"
+        }
       ],
-      "keywords": ["tree", "treeview", "hierarchy", "nested", "fleet", "expand", "collapse"]
+      "keywords": [
+        "tree",
+        "treeview",
+        "hierarchy",
+        "nested",
+        "fleet",
+        "expand",
+        "collapse"
+      ]
     },
     {
       "id": "datetime",
@@ -1925,12 +2265,32 @@
       "lifecycle": "stable",
       "description": "A styled native date/time input (datetime-local / date / time) — the browser owns the picker, keyboard, and locale.",
       "spec": "references/components.md#datetime",
-      "variants": { "kind": ["datetime-local", "date", "time"] },
+      "variants": {
+        "kind": [
+          "datetime-local",
+          "date",
+          "time"
+        ]
+      },
       "tokens": [
-        { "cssVar": "--board", "description": "field" },
-        { "cssVar": "--border", "description": "border" }
+        {
+          "cssVar": "--board",
+          "description": "field"
+        },
+        {
+          "cssVar": "--border",
+          "description": "border"
+        }
       ],
-      "keywords": ["date", "time", "datetime", "calendar", "picker", "schedule", "form"]
+      "keywords": [
+        "date",
+        "time",
+        "datetime",
+        "calendar",
+        "picker",
+        "schedule",
+        "form"
+      ]
     },
     {
       "id": "cron-field",
@@ -1940,13 +2300,37 @@
       "lifecycle": "stable",
       "description": "A cron-expression field with quick presets and a live human-readable readout. The translation is injected as `description` (compute with cronstrue in the host) so the design system stays dependency-free.",
       "spec": "references/components.md#cron-field",
-      "variants": { "prop": ["value", "presets", "description", "invalid"] },
+      "variants": {
+        "prop": [
+          "value",
+          "presets",
+          "description",
+          "invalid"
+        ]
+      },
       "tokens": [
-        { "cssVar": "--board", "description": "input" },
-        { "cssVar": "--sig-work", "description": "readout" },
-        { "cssVar": "--sig-err", "description": "invalid readout" }
+        {
+          "cssVar": "--board",
+          "description": "input"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "readout"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "invalid readout"
+        }
       ],
-      "keywords": ["cron", "schedule", "crontab", "cronstrue", "expression", "recurring", "form"]
+      "keywords": [
+        "cron",
+        "schedule",
+        "crontab",
+        "cronstrue",
+        "expression",
+        "recurring",
+        "form"
+      ]
     }
   ]
 }

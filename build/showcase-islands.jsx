@@ -264,10 +264,10 @@ const DEMOS = {
   tag: {
     tag: "CrTag",
     defs: [
-      T("enum", "tone", "done", { options: ["done", "work", "wait", "err", "idle", "accent"] }),
+      T("enum", "signal", "done", { options: ["work", "wait", "done", "err", "idle", "accent"] }),
       T("children", "children", "shipped", { label: "text" }),
     ],
-    render: (s) => h(CrTag, { tone: s.tone }, s.children),
+    render: (s) => h(CrTag, { signal: s.signal }, s.children),
   },
   chip: {
     tag: "CrChip",
@@ -276,8 +276,8 @@ const DEMOS = {
   },
   "status-dot": {
     tag: "CrStatusDot",
-    defs: [T("enum", "state", "work", { options: ["work", "wait", "done", "err", "idle"] }), T("text", "label", "working")],
-    render: (s) => h(CrStatusDot, { state: s.state, label: s.label }),
+    defs: [T("enum", "signal", "work", { options: ["work", "wait", "done", "err", "idle"] }), T("text", "label", "working")],
+    render: (s) => h(CrStatusDot, { signal: s.signal, label: s.label }),
   },
   kbd: {
     tag: "CrKbd",
@@ -314,10 +314,10 @@ const DEMOS = {
     defs: [
       T("number", "value", 68, { min: 0, max: 100 }),
       T("number", "max", 100),
-      T("enum", "tone", "work", { options: ["work", "wait", "done", "err", "idle"] }),
+      T("enum", "signal", "work", { options: ["work", "wait", "done", "err", "idle"] }),
       T("text", "label", "CPU"),
     ],
-    render: (s) => h(CrMeter, { value: s.value, max: s.max, tone: s.tone, label: s.label }),
+    render: (s) => h(CrMeter, { value: s.value, max: s.max, signal: s.signal, label: s.label }),
   },
   progress: {
     tag: "CrProgress",
@@ -325,10 +325,10 @@ const DEMOS = {
       T("number", "value", 40, { min: 0, max: 100 }),
       T("number", "max", 100),
       T("boolean", "indeterminate", false),
-      T("enum", "tone", "work", { options: ["work", "wait", "done", "err"] }),
+      T("enum", "signal", "work", { options: ["work", "wait", "done", "err"] }),
       T("text", "label", "Uploading"),
     ],
-    render: (s) => h(CrProgress, { value: s.value, max: s.max, indeterminate: s.indeterminate, tone: s.tone, label: s.label }),
+    render: (s) => h(CrProgress, { value: s.value, max: s.max, indeterminate: s.indeterminate, signal: s.signal, label: s.label }),
   },
   input: {
     tag: "CrInput",
@@ -361,10 +361,10 @@ const DEMOS = {
     defs: [
       T("text", "name", "session 4f2a"),
       T("text", "status", "scanning · 68%"),
-      T("enum", "state", "work", { options: ["work", "wait", "done", "err", "idle"] }),
+      T("enum", "signal", "work", { options: ["work", "wait", "done", "err", "idle"] }),
       T("boolean", "event", false),
     ],
-    render: (s) => h(CrSessionRow, { name: s.name, status: s.status, state: s.state, event: s.event }),
+    render: (s) => h(CrSessionRow, { name: s.name, status: s.status, signal: s.signal, event: s.event }),
   },
   "empty-error-state": {
     tag: "CrEmptyState",
