@@ -110,6 +110,17 @@ body {
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+/* Loudness dial — a product setting, not a user preference. The default look is the
+   loud "showcase" profile; set data-intensity="calm" on <html> for an 8-hour
+   operations profile: no non-essential animation, decorative texture toned down.
+   Wire new decorative layers to var(--decoration-intensity) so they follow it. */
+:root[data-intensity="calm"] { --motion-intensity: 0; --decoration-intensity: 0.4; }
+:root[data-intensity="calm"] *,
+:root[data-intensity="calm"] *::before,
+:root[data-intensity="calm"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+}
 `;
 
 async function buildCss() {
