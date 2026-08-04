@@ -1408,3 +1408,23 @@ import { CrBreach } from "@control-room/design-system/react";
   motion.
 - **NEVER** breach data, tables, dense lists, or routine chrome — the breach is
   for the exceptional only.
+
+## Icon {#icon}
+
+`CrIcon` is the house operational glyph set — the one place the system reaches for
+an icon instead of a text glyph, a canvas sigil, or ASCII.
+
+**Contract.** Every icon is 24×24, drawn with a single 2px stroke in `currentColor`
+(no fill), with **square caps and miter joins** so the geometry stays hard-edged and
+consistent with the neobrutalist line. Icons inherit text colour and size on the
+space grid via `size` (default 20).
+
+**Accessibility.** Decorative by default (`aria-hidden`); pass `label` to expose the
+icon as an image with an accessible name. Pair an icon-only control with a `label`
+or visually-hidden text.
+
+**API.** `name` (glyph id), `size` (px, default 20), `label` (optional accessible
+name). The set: `play · pause · stop · retry · deploy · scan · search · alert ·
+error · done · clock · cpu · logs · filter · sliders · close · chevron · plus ·
+minus · trash · external · copy · session · menu`. Add one by adding a single-`d`,
+square-geometry path to the map in `components/CrIcon.lite.tsx`.

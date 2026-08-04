@@ -769,6 +769,11 @@
 /* a stacked "aged glass" — halftone + scanlines together, the house hardware wash */
 .cr-tex--glass    { background-image: var(--scanline), var(--halftone); background-size: auto, var(--halftone-size) var(--halftone-size); }
 
+/* ── Icon (CrIcon) — house operational glyph set ───────────────────────────
+ * 24×24, currentColor, single 2px stroke, square caps. Inherits text colour and
+ * aligns to the text baseline; never shrinks in a flex row. */
+.cr-icon { display: inline-block; vertical-align: -0.15em; flex-shrink: 0; }
+
 /* ── Ambient loops (Law 7 — alive at rest; low-fps, hardware-bound) ─────────
  * Opt-in classes. All are OFF under prefers-reduced-motion (global rule in
  * control-room.css already kills animations; these add the keyframes). */

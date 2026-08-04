@@ -233,7 +233,7 @@ const ISLAND_IDS = new Set([
   // presentational / form components
   "button", "tag", "chip", "status-dot", "kbd", "checkbox", "alert", "toast", "meter",
   "progress", "input", "textarea", "form-field", "breadcrumb", "session-row",
-  "empty-error-state", "panel",
+  "empty-error-state", "panel", "icon",
 ]);
 
 function stageHtml(id) {

@@ -2183,6 +2183,62 @@
       ]
     },
     {
+      "id": "icon",
+      "name": "Icon",
+      "category": "media",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "The house operational glyph set — 24×24, currentColor, single 2px stroke, square caps to match the neobrutalist geometry. Decorative by default; pass a label to name it.",
+      "spec": "references/components.md#icon",
+      "variants": {
+        "name": [
+          "play",
+          "pause",
+          "stop",
+          "retry",
+          "deploy",
+          "scan",
+          "search",
+          "alert",
+          "error",
+          "done",
+          "clock",
+          "cpu",
+          "logs",
+          "filter",
+          "sliders",
+          "close",
+          "chevron",
+          "plus",
+          "minus",
+          "trash",
+          "external",
+          "copy",
+          "session",
+          "menu"
+        ],
+        "size": [
+          "16",
+          "20",
+          "24"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--ink",
+          "description": "inherited stroke colour (currentColor)"
+        }
+      ],
+      "keywords": [
+        "icon",
+        "glyph",
+        "svg",
+        "symbol",
+        "stroke",
+        "operational"
+      ]
+    },
+    {
       "id": "hover-card",
       "name": "Hover card",
       "category": "overlay",
