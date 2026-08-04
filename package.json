@@ -60,7 +60,7 @@
     "skills:check": "node scripts/skills-sync.mjs --check",
     "pretest:e2e": "npm run build:tokens && npm run build:gallery && npm run build:showcase",
     "test:e2e": "playwright test",
-    "test:a11y": "playwright test tests/a11y.spec.mjs",
+    "test:a11y": "playwright test tests/a11y.spec.mjs tests/a11y-showcase.spec.mjs",
     "test:visual": "playwright test tests/visual.spec.mjs",
     "test:visual:update": "playwright test tests/visual.spec.mjs --update-snapshots",
     "changeset": "changeset",
