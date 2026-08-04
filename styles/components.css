@@ -422,7 +422,7 @@
 .cr-seam   { height: 4px; border-top: 1px solid var(--rail-ink); border-bottom: 1px solid var(--mass); background: var(--panel-2); }
 .cr-plate  { display: inline-block; font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: 0.14em;
              text-transform: uppercase; color: var(--muted); border: 1px solid var(--rail-ink); padding: 1px var(--space-2); }
-.cr-tally  { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.24em; color: var(--sig-done); }
+.cr-tally  { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.24em; color: var(--ink); }
 
 /* ── Richer texture — crosshatch (× diagonals) + duotone (cross-colours) ────
  * Answers "not just dots": cross-hatching from ±45° diagonals (Law 4 energy),

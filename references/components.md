@@ -484,31 +484,104 @@ contract, and the per-state poses.
 
 ---
 
-## Composition example — the instrument
+## Composition — an operator's screen
 
-The reference layout: `Rail` + a `board` containing a keyed `Hero` and a `Panel`
-of `SessionRow`s, wrapped in the outer instrument chassis.
+The whole vocabulary in one screen, using only the shipped `cr-` classes. It
+exercises the nine laws together: the condensed masthead with registration ticks
+(`.cr-mark`), a keyed `Hero`, the **severity shapes** beside colour, a seeded
+**Sigil** per session, the **arrow-rail**, a **texture + scanline** bezel with the
+ambient scan loop, keyed **tiles**, and exactly **one Law-9 breach**. It survives a
+theme flip with zero per-theme code — see it live, and toggle dark / light /
+extreme / phosphor, in the **Live Gallery** (linked at the top of the sidebar).
 
 ```html
-<div class="cr">
-  <nav class="rail"><!-- brand + nav --></nav>
-  <div class="board">
-    <div class="hero" data-state="wait"><!-- … --></div>
-    <section class="panel">
-      <h4>Sessions</h4>
-      <!-- .srow × N -->
-      <div class="chips"><span class="chip">PTL-757</span></div>
-      <button class="btn" type="button">RUN SCAN</button>
-    </section>
+<div class="cr-instrument">
+  <nav class="cr-nav" aria-label="Primary">
+    <div class="cr-nav__brand">CONTROL<br>ROOM</div>
+    <ul class="cr-nav__list">
+      <li><a class="cr-nav__item cr-nav__item--active" href="#" aria-current="page">◈ Attention <span class="cr-nav__badge">2</span></a></li>
+      <li><a class="cr-nav__item" href="#">◧ Sessions</a></li>
+      <li><a class="cr-nav__item" href="#">▦ Sprint</a></li>
+    </ul>
+  </nav>
+
+  <div class="cr-instrument__board">
+    <!-- condensed masthead + the one registration mark -->
+    <header class="cr-masthead cr-mark">
+      <p class="cr-masthead__eyebrow">DP Control Room · Phase 0</p>
+      <h1 class="cr-masthead__title">14 sessions<br>2 need you</h1>
+    </header>
+
+    <!-- the single keyed focal region -->
+    <div class="cr-hero cr-hero--wait">
+      <div>
+        <div class="cr-hero__big">nova needs you</div>
+        <div class="cr-hero__sub">CR-1130 · paused for input · 6m</div>
+      </div>
+      <!-- <CrSigil seed="nova-01" state="waiting" /> -->
+    </div>
+
+    <div class="cr-cols">
+      <!-- sessions: severity SHAPE (non-colour) + seeded sigil + status -->
+      <section class="cr-panel cr-panel--major">
+        <h4 class="cr-panel__title">Sessions</h4>
+        <div class="cr-row"><span class="cr-sev cr-sev--work" role="img" aria-label="working"></span><span class="cr-row__name">PTL-757 chat-turn</span><span class="cr-row__status">streaming</span></div>
+        <div class="cr-row"><span class="cr-sev cr-sev--warn" role="img" aria-label="attend"></span><span class="cr-row__name">CR-1130 picker</span><span class="cr-row__status">needs input</span></div>
+        <div class="cr-row"><span class="cr-sev cr-sev--crit" role="img" aria-label="critical"></span><span class="cr-row__name">rp verify</span><span class="cr-row__status">2 failing</span></div>
+        <div class="cr-row"><span class="cr-sev cr-sev--ok" role="img" aria-label="nominal"></span><span class="cr-row__name">atlas deploy</span><span class="cr-row__status">merged</span></div>
+      </section>
+
+      <!-- pipeline: arrow-rail + hardware bezel (texture + scan loop) + chrome -->
+      <section class="cr-panel">
+        <h4 class="cr-panel__title">Pipeline</h4>
+        <div class="cr-rail">
+          <span class="cr-rail__step cr-rail__step--on">scan</span>
+          <span class="cr-rail__step">triage</span>
+          <span class="cr-rail__step">fix</span>
+          <span class="cr-rail__step">verify</span>
+        </div>
+        <div class="cr-bezel cr-anim-scan">
+          <div class="cr-bezel__rivets" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <div class="cr-bezel__screen cr-tex--glass">&gt; scan complete · 14 sessions · 2 flagged</div>
+        </div>
+        <div class="cr-hw-row"><span class="cr-plate">UNIT · CR-00 · REV.C</span><span class="cr-tally">▐▐▐ ▌ 14</span></div>
+      </section>
+    </div>
+
+    <!-- the ONE breach: the exceptional item, softened + glowing (Law 9) -->
+    <div class="cr-breach cr-breach--wash cr-breach--alive">
+      <p class="cr-masthead__eyebrow">Milestone</p>
+      <div class="cr-hero__big">Sprint 41 shipped</div>
+      <div class="cr-hero__sub">38 tasks · 0 regressions · 2 days early</div>
+    </div>
+
+    <!-- keyed contact sheet -->
+    <div class="cr-tiles">
+      <div class="cr-tile cr-tile--work">nova</div>
+      <div class="cr-tile cr-tile--wait">atlas</div>
+      <div class="cr-tile cr-tile--done">echo</div>
+      <div class="cr-tile cr-tile--err">rhea</div>
+      <div class="cr-tile cr-tile--idle">kite</div>
+      <div class="cr-tile cr-tile--stage">calm</div>
+    </div>
   </div>
 </div>
 ```
+
+The only page-level CSS is layout glue (the token layer + `styles/components.css`
+carry everything else):
+
 ```css
-.cr { display: flex; border: var(--brd-heavy) solid var(--border);
-  box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
-  background: var(--board); overflow: hidden; }
-.board { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.cr-cols   { display: grid; grid-template-columns: 1.25fr 1fr; gap: var(--space-3); }
+.cr-hw-row { display: flex; gap: var(--space-3); align-items: center; margin-top: var(--space-3); }
+.cr-breach { background-color: var(--panel); padding: var(--space-4); }  /* wash needs a base */
 ```
+
+- **MUST** keep to **one** keyed hero and **one** breach per screen (Laws 2 + 9).
+- **MUST** pair each row's colour with its severity **shape** so state survives the
+  monochrome phosphor theme (Law 4 / accessibility).
+- Everything above is theme-independent — the same markup renders in all four
+  themes with zero overrides.
 
 ---
 
