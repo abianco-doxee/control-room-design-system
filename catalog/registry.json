@@ -1562,6 +1562,66 @@
         "snackbar",
         "live"
       ]
+    },
+    {
+      "id": "kbd",
+      "name": "Key hint",
+      "category": "primitives",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "A keycap badge for a keyboard shortcut. Decorative (aria-hidden) — the real binding rides aria-keyshortcuts on the action. Main actions show it always; secondary use the hint variant, revealed on host hover/focus or a global peek.",
+      "spec": "references/components.md#key-hint",
+      "variants": {
+        "flag": [
+          "hint",
+          "on"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "keycap fill"
+        },
+        {
+          "cssVar": "--brd-hair",
+          "description": "keycap border"
+        },
+        {
+          "cssVar": "--shadow-off-sm",
+          "description": "keycap depth"
+        }
+      ],
+      "keywords": [
+        "kbd",
+        "keycap",
+        "shortcut",
+        "hotkey",
+        "hint",
+        "accelerator"
+      ]
+    },
+    {
+      "id": "key-hints",
+      "name": "Key hints (peek)",
+      "category": "behavior",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Headless behavior — while the reveal key (default Alt) is held, sets data-cr-keys on the root so every secondary key hint fades in at once (a peek-all-shortcuts gesture). Renders nothing visible.",
+      "spec": "references/components.md#key-hint",
+      "variants": {
+        "prop": [
+          "revealKey"
+        ]
+      },
+      "tokens": [],
+      "keywords": [
+        "keyboard",
+        "shortcuts",
+        "peek",
+        "reveal",
+        "headless",
+        "behavior"
+      ]
     }
   ]
 }
