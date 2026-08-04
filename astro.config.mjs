@@ -31,6 +31,14 @@ function remarkHeadingIds() {
 const site = process.env.SITE_URL || "https://abianco-doxee.github.io";
 const base = process.env.BASE_PATH || "/control-room-design-system/";
 
+// The gallery + component browser are self-contained static pages in public/,
+// served at the site root (not Starlight routes). Starlight's sidebar rewrites
+// internal links — it prepends `base` AND strips the `.html` extension — which
+// turns `/components.html` into a 404. A fully-qualified URL is treated as
+// external and passed through verbatim, so link to these with `${site}${base}…`.
+const galleryHref = `${site}${base}gallery.html`;
+const browserHref = `${site}${base}components.html`;
+
 // Astro output goes to site-dist/ so it never clobbers the token dist/.
 export default defineConfig({
   site,
@@ -58,8 +66,8 @@ export default defineConfig({
           label: "Overview",
           items: [
             { label: "What is Control Room", link: "/guide/skill/" },
-            { label: "Live Gallery ↗", link: `${base}gallery.html`, attrs: { target: "_self" } },
-            { label: "Component Browser ↗", link: `${base}components.html`, attrs: { target: "_self" } },
+            { label: "Live Gallery ↗", link: galleryHref, attrs: { target: "_self" } },
+            { label: "Component Browser ↗", link: browserHref, attrs: { target: "_self" } },
           ],
         },
         {
