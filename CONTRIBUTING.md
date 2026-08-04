@@ -50,6 +50,25 @@ npm run verify         # token drift + catalog drift + skill validity (the CI ga
    must pass in all four themes.
 6. Add a changeset (`npm run changeset`) — see Versioning below.
 
+### Design-review gate (new components)
+
+Before a component is accepted, a reviewer confirms:
+
+- **Naming** — props follow the house vocabulary. A signal selector is `signal`
+  with values `work·wait·done·err·idle·accent` (not `tone`/`state`/`kind` with a
+  bespoke value set). Sizes are `sm`/`md`. Reuse existing prop names before coining
+  new ones.
+- **States** — hover, active, disabled, focus-visible, and (where relevant) loading,
+  empty, and error are all handled. Focus uses the tokenized ring (`--focus-*`); don't
+  suppress the global `*:focus-visible`.
+- **Accessibility** — a control always has an accessible name (a `label` prop or a
+  documented `CrField` pairing — never a placeholder as the name); ARIA matches the
+  WAI pattern; colour is never the only signal.
+- **Tokens only** — no raw hex, no `border-radius`, hard shadow only; decorative
+  layers follow `--decoration-intensity` and motion respects reduced-motion.
+- **Compiles** — `npm run build:components && npm run verify:types` is clean (the
+  React output type-checks).
+
 ## Commit & PR conventions
 
 - Small, focused commits. Reference the law/component you touched.
@@ -113,3 +132,18 @@ Releases are automated with **Changesets** (`.changeset/`):
 3. Merge that PR to cut the release. The package is **private** — no npm publish.
 
 (You no longer hand-edit `CHANGELOG.md`; changesets own it going forward.)
+
+## Deprecation policy
+
+Nothing that ships is removed without a documented path:
+
+1. **Deprecate, don't delete.** Keep the old API working and mark it `@deprecated`
+   in the JSDoc with the replacement (e.g. Tag's `tone` → `signal`). Legacy values
+   keep resolving.
+2. **Announce it** in a changeset (minor bump) naming the old API, the new one, and
+   the removal target.
+3. **Remove only on a major**, after at least one minor where the deprecation was
+   shipped. Update the catalog, docs, and the reference app in the same change.
+
+Renames follow the same rule: add the new prop, alias the old one as a deprecated
+fallback, migrate consumers, then drop the alias on the next major.

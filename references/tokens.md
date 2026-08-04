@@ -183,6 +183,14 @@ from raw values.
 | `--mass` | black as a large fill area (Law 1) |
 | `--shadow-col` | hard offset shadow color |
 
+**On pure black (a decision on the record).** In dark/light/extreme, `--border`,
+`--mass`, and `--shadow-col` are pure `#000000` — deliberately. Neobrutalism earns the
+hard, untinted line; a tinted "rich black" would soften exactly the edge this system
+is built on. The phosphor theme is the exception: its line/mass carry a hair of the
+green ground (`#031a08` / `#010603`) so the black doesn't fight the CRT wash. If a
+future theme reads as harsh, tint *that* theme's line — don't globally soften the
+brutalist default.
+
 ### Signal ramp (state channel — Law 2)
 
 | Token | State / role |
