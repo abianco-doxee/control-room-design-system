@@ -20,7 +20,7 @@ canvas ones imperative
 `<canvas>`, painted in `onMount` — Mitosis resolves the ref correctly per target:
 `canvasRef.current` in React, `bind:this` in Svelte, etc.).
 
-Components apply the `cr-` classes and contain **no styling**, so all five
+Components apply the `cr-` classes and contain **no styling**, so all six
 targets are identical and the token/CSS layer stays the single source.
 
 **You can still skip the components entirely.** The static pieces are just `cr-`
@@ -47,7 +47,7 @@ export default function CrSwitch(props: CrSwitchProps) {
 ## Build
 
 ```bash
-npm run build:components     # → dist/frameworks/{react,vue,svelte,angular,solid}/
+npm run build:components     # → dist/frameworks/{react,vue,svelte,angular,solid,qwik}/
 ```
 
 Output is a build artifact (git-ignored); CI compiles it on every push so the
@@ -65,7 +65,7 @@ component for your framework:
 <link rel="stylesheet" href="@control-room/design-system/components" />  <!-- cr- classes -->
 ```
 Each framework has a **barrel entry** — import any component by name from one
-subpath (`/react`, `/vue`, `/svelte`, `/angular`, `/solid`):
+subpath (`/react`, `/vue`, `/svelte`, `/angular`, `/solid`, `/qwik`):
 
 ```tsx
 // React
@@ -77,6 +77,14 @@ import { CrSwitch, CrModal } from "@control-room/design-system/react";
 <script setup> import { CrSwitch } from "@control-room/design-system/vue"; </script>
 <CrSwitch :checked="on" label="Live" @change="on = $event" />
 ```
+```tsx
+// Qwik
+import { CrSwitch } from "@control-room/design-system/qwik";
+<CrSwitch checked={on.value} label="Live" onChange$={(v) => (on.value = v)} />
+```
+
+The **`examples/console/`** app is a real Qwik dashboard built on this barrel —
+see it for a full composition (nav rail, masthead, session panels, breach).
 
 Need just one component? The deep path still works (extension required):
 `import CrSwitch from "@control-room/design-system/frameworks/react/components/CrSwitch.tsx"`.

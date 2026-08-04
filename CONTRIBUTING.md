@@ -76,9 +76,10 @@ npm run test:e2e             # both (builds the gallery first)
 
 Static components ship as `cr-` CSS classes (framework-agnostic). Components with
 real state/logic/ARIA are authored once as Mitosis `.lite.tsx` in `components/`
-and compiled to React/Vue/Svelte/Angular/Solid (`npm run build:components`). They
-apply `cr-` classes and carry no styling. See `references/frameworks.md`. CI
-compiles all targets so sources can't silently break.
+and compiled to React/Vue/Svelte/Angular/Solid/Qwik (`npm run build:components`).
+They apply `cr-` classes and carry no styling. See `references/frameworks.md`. CI
+compiles all targets so sources can't silently break. A real Qwik app built on
+the compiled output lives in `examples/console/`.
 
 ## Skills
 

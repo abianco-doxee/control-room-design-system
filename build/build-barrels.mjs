@@ -17,6 +17,7 @@ const TARGETS = {
   svelte:  { ext: "svelte", index: "index.js" },
   angular: { ext: "js",     index: "index.ts" },
   solid:   { ext: "jsx",    index: "index.jsx" },
+  qwik:    { ext: "tsx",    index: "index.ts" },
 };
 
 const check = process.argv.includes("--check");

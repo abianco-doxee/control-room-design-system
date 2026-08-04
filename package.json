@@ -32,6 +32,7 @@
     "./svelte": "./dist/frameworks/svelte/index.js",
     "./angular": "./dist/frameworks/angular/index.ts",
     "./solid": "./dist/frameworks/solid/index.jsx",
+    "./qwik": "./dist/frameworks/qwik/index.ts",
     "./frameworks/*": "./dist/frameworks/*",
     "./cn": {
       "types": "./utils/cn.d.ts",
@@ -42,7 +43,7 @@
     "build:tokens": "node build/build-tokens.mjs",
     "build:palette": "node build/build-palette.mjs",
     "build:tw": "tailwindcss -i build/tailwind-input.css -o dist/utilities.css",
-    "build:components": "mitosis build && node build/build-barrels.mjs",
+    "build:components": "mitosis build && node build/build-fix-qwik.mjs && node build/build-barrels.mjs",
     "build:catalog": "node build/build-catalog.mjs",
     "build:gallery": "node build/build-gallery.mjs",
     "build:content": "node build/build-docs-content.mjs",
