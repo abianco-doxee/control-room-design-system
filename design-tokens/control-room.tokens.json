@@ -293,6 +293,20 @@
         "com.doxee.cssVar": "--focus-offset"
       }
     },
+    "motion-intensity": {
+      "$value": "1",
+      "$description": "loudness dial (0..1) for non-essential animation; the `calm` ops profile sets 0",
+      "$extensions": {
+        "com.doxee.cssVar": "--motion-intensity"
+      }
+    },
+    "decoration-intensity": {
+      "$value": "1",
+      "$description": "loudness dial (0..1) for decorative texture layers; the `calm` ops profile tones it down",
+      "$extensions": {
+        "com.doxee.cssVar": "--decoration-intensity"
+      }
+    },
     "radius": {
       "$type": "dimension",
       "$value": "0px",
