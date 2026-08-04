@@ -913,6 +913,100 @@ if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(
 
 ---
 
+## Alert {#alert}
+
+**Purpose.** An inline callout keyed to a signal (Law 2) — a left brush-bar in the
+signal hue. `err` announces assertively (`role=alert`); the rest are polite.
+
+```tsx
+<CrAlert signal="wait" title="Scheduled maintenance" message="Workers restart at 02:00 UTC." dismissible />
+```
+
+- **MUST** map `signal` to a real state; `err` uses `role="alert"` + assertive.
+- **SHOULD** carry a title only when it adds information — a one-line notice is fine
+  as `message` alone.
+
+---
+
+## Radio group {#radio-group}
+
+**Purpose.** Single choice from a small set. `role=radiogroup` with roving
+tabindex: only the checked radio (or the first) is tabbable, `↑`/`↓`/`←`/`→` move
+selection. Square radios (radius 0) — a filled inner square marks the choice.
+
+```tsx
+<CrRadioGroup value={density} row
+  options={[{ value: "cozy", label: "cozy" }, { value: "compact", label: "compact" }]}
+  onChange={setDensity} />
+```
+
+- **MUST** keep it controlled (`value` in, `onChange` out) and set `aria-checked`
+  on each radio.
+- **NEVER** round it — the mark is a square, not a dot (Law: radius 0).
+
+---
+
+## Slider {#slider}
+
+**Purpose.** A numeric operator control (threshold, interval). A **styled native
+`<input type=range>`**, so keyboard (arrows, `Home`/`End`, `PageUp`/`Down`) and
+screen-reader support come for free.
+
+```tsx
+<CrSlider value={refresh} min={5} max={120} step={5} label="Refresh interval" onChange={setRefresh} />
+```
+
+- **MUST** give it an `aria-label` (or visible label) — the value alone isn't a name.
+
+---
+
+## Progress {#progress}
+
+**Purpose.** Task progress. **Determinate** fills to `value/max`; **indeterminate**
+runs an animated hazard sweep and drops the numeric ARIA values. Distinct from
+**Meter** (a static capacity reading, not a running task).
+
+```tsx
+<CrProgress value={64} label="Indexing" />
+<CrProgress indeterminate tone="wait" label="Syncing" />
+```
+
+- **MUST** use `role="progressbar"`; set `aria-valuenow/min/max` only when
+  determinate. Both stop animating under `prefers-reduced-motion`.
+
+---
+
+## Skeleton {#skeleton}
+
+**Purpose.** A loading placeholder — a blocky pulse (never rounded). Sizes:
+`--line`, `--text`, `--block`; set the width inline.
+
+```html
+<span class="cr-skeleton cr-skeleton--text" style="width:70%"></span>
+```
+
+- **SHOULD** mirror the shape of the content it stands in for; **MUST** be
+  `aria-hidden` (it carries no information) and it freezes under reduced-motion.
+
+---
+
+## Data list {#data-list}
+
+**Purpose.** A key → value readout for detail panels — `dl`/`dt`/`dd` on a
+two-column grid, mono/label keys and data-register values.
+
+```html
+<dl class="cr-dl">
+  <dt class="cr-dl__k">worker</dt><dd class="cr-dl__v">nova-01</dd>
+  <dt class="cr-dl__k">uptime</dt><dd class="cr-dl__v">41h 12m</dd>
+</dl>
+```
+
+- **SHOULD** keep keys in the label register (mono, uppercase, `--muted`) and
+  values in the data register — the same split the rest of the system uses.
+
+---
+
 ## Keyboard navigation {#keyboard-nav}
 
 The interactive widgets follow the WAI-ARIA patterns, so they work without a mouse:
@@ -923,6 +1017,8 @@ The interactive widgets follow the WAI-ARIA patterns, so they work without a mou
 | **Menu** | trigger opens on click or `↓`; then `↑`/`↓` move, `Home`/`End` jump, `Esc` closes and returns focus to the trigger; `Enter`/`Space` select |
 | **Table** | sortable headers are real `<button>`s (operable with `Enter`/`Space`), selection checkboxes are in the tab order |
 | **Command palette** | `⌘K`/`Ctrl+K` opens; `↑`/`↓`/`Home`/`End` move the active option, `Enter` runs, `Esc` closes (focus stays in the search field) |
+| **Radio group** | roving tabindex — `↑`/`↓`/`←`/`→` move and select; only the checked radio is tabbable |
+| **Slider** | native range — `←`/`→` step, `Home`/`End` to ends, `PageUp`/`PageDown` jump |
 | **Modal / Switch / Pagination** | native focus-trap (dialog), `Space` toggle, `Tab` between page buttons |
 
 Focus is always visible (`*:focus-visible` → a `--sig-work` outline, system-wide).

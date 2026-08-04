@@ -325,6 +325,37 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
           </ul>
         </div>
       </div>
+      <h3 style="margin-top:16px">Alerts (signal-keyed callouts)</h3>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="cr-alert cr-alert--wait" role="status"><span class="cr-alert__icon" aria-hidden="true"></span><div class="cr-alert__body"><p class="cr-alert__title">Scheduled maintenance</p><p class="cr-alert__msg">Workers restart at 02:00 UTC.</p></div></div>
+        <div class="cr-alert cr-alert--err" role="alert"><span class="cr-alert__icon" aria-hidden="true"></span><div class="cr-alert__body"><p class="cr-alert__title">Endpoint unreachable</p><p class="cr-alert__msg">ai-global-chat · SSE closed.</p></div><button type="button" class="cr-alert__close" aria-label="Dismiss">✕</button></div>
+      </div>
+      <h3 style="margin-top:16px">Radio group · Slider</h3>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+        <div class="cr-radiogroup cr-radiogroup--row" role="radiogroup" aria-label="Density">
+          <button type="button" role="radio" class="cr-radio" data-value="cozy" aria-checked="false" tabindex="-1"><span class="cr-radio__box" aria-hidden="true"></span>cozy</button>
+          <button type="button" role="radio" class="cr-radio" data-value="compact" aria-checked="true" tabindex="0"><span class="cr-radio__box" aria-hidden="true"></span>compact</button>
+        </div>
+        <input type="range" class="cr-slider" min="0" max="100" value="64" aria-label="Threshold" style="max-width:220px" />
+      </div>
+      <h3 style="margin-top:16px">Progress (determinate · indeterminate)</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;max-width:340px">
+        <div class="cr-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="64" aria-label="Indexing"><span class="cr-progress__fill" style="width:64%"></span></div>
+        <div class="cr-progress cr-progress--indeterminate cr-progress--wait" role="progressbar" aria-label="Syncing"><span class="cr-progress__fill"></span></div>
+      </div>
+      <h3 style="margin-top:16px">Skeleton (loading) · Data list</h3>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:8px;min-width:180px">
+          <span class="cr-skeleton cr-skeleton--text" style="width:70%"></span>
+          <span class="cr-skeleton cr-skeleton--line" style="width:100%"></span>
+          <span class="cr-skeleton cr-skeleton--line" style="width:85%"></span>
+        </div>
+        <dl class="cr-dl">
+          <dt class="cr-dl__k">worker</dt><dd class="cr-dl__v">nova-01</dd>
+          <dt class="cr-dl__k">region</dt><dd class="cr-dl__v">eu-west-1</dd>
+          <dt class="cr-dl__k">uptime</dt><dd class="cr-dl__v">41h 12m</dd>
+        </dl>
+      </div>
     </div>
     <div style="grid-column:1/-1">
       <h3>Form controls</h3>
