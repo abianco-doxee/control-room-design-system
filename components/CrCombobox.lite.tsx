@@ -51,7 +51,7 @@ export default function CrCombobox(props: CrComboboxProps) {
       state.open = false;
       if (props.onChange) props.onChange(opt.value);
     },
-    onKey(event: KeyboardEvent) {
+    onKey(event: any) {
       if (event.key === "ArrowDown") {
         event.preventDefault();
         state.move(1);

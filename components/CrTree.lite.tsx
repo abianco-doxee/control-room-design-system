@@ -74,11 +74,11 @@ export default function CrTree(props: CrTreeProps) {
     indent(row: any): any {
       return { paddingLeft: "calc(" + row.depth + " * var(--space-4) + var(--space-2))" };
     },
-    onKey(event: KeyboardEvent) {
+    onKey(event: any) {
       const activeEl: any = document.activeElement;
       const tree = activeEl ? activeEl.closest('[role="tree"]') : null;
       if (!tree) return;
-      const items = Array.from(tree.querySelectorAll('[role="treeitem"]'));
+      const items: any[] = Array.from(tree.querySelectorAll('[role="treeitem"]'));
       const i = items.indexOf(activeEl);
       if (i < 0) return;
       const id = activeEl.getAttribute("data-id");

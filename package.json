@@ -55,6 +55,7 @@
     "preview": "astro preview",
     "verify:tokens": "node build/build-tokens.mjs --check",
     "verify:catalog": "node build/build-catalog.mjs --check",
+    "verify:types": "tsc -p build/tsconfig.frameworks.json",
     "verify:palette": "node build/build-palette.mjs --check",
     "skills:sync": "node scripts/skills-sync.mjs",
     "skills:check": "node scripts/skills-sync.mjs --check",
@@ -83,6 +84,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3",
     "undici": "^8.10.0"
   },
   "dependencies": {

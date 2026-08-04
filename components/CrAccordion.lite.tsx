@@ -23,7 +23,7 @@ export default function CrAccordion(props: CrAccordionProps) {
       if (props.single) state.open = state.open[i] ? {} : { [i]: true };
       else state.open = { ...state.open, [i]: !state.open[i] };
     },
-    onKey(event: KeyboardEvent) {
+    onKey(event: any) {
       const active: any = document.activeElement;
       const root = active ? active.closest(".cr-accordion") : null;
       if (!root) return;

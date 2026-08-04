@@ -17,7 +17,7 @@ export default function CrTabs(props: CrTabsProps) {
       state.active = i;
       if (props.onChange) props.onChange(i);
     },
-    onKey(e: KeyboardEvent) {
+    onKey(e: any) {
       /* resolve the tablist from the focused tab — event.currentTarget is null
          under Qwik's delegated events, so don't rely on it. */
       const active: any = document.activeElement;

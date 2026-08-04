@@ -26,7 +26,7 @@ export default function CrSegmented(props: CrSegmentedProps) {
       const chosen = idx < 0 ? 0 : idx;
       return chosen === i ? 0 : -1;
     },
-    onKey(event: KeyboardEvent) {
+    onKey(event: any) {
       const active: any = document.activeElement;
       const group = active ? active.closest('[role="radiogroup"]') : null;
       if (!group) return;

@@ -52,14 +52,14 @@ export default function CrMenu(props: CrMenuProps) {
       state.focusTrigger();
       if (props.onSelect) props.onSelect(i);
     },
-    onTriggerKey(e: KeyboardEvent) {
+    onTriggerKey(e: any) {
       if (e.key === "ArrowDown") {
         e.preventDefault();
         state.open = true;
         state.focusFirst(0);
       }
     },
-    onPanelKey(e: KeyboardEvent) {
+    onPanelKey(e: any) {
       const root: any = rootRef;
       if (!root) return;
       const items = Array.from(root.querySelectorAll('[role="menuitem"]'));
