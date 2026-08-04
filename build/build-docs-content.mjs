@@ -32,8 +32,6 @@ const PAGES = [
   ["references/seeded-sigil.md", "reference", "seeded-sigil", "Seeded Pixel-Sigil"],
   ["references/decoration.md", "reference", "decoration", "Decoration — ASCII / Pixel"],
   ["references/frameworks.md", "reference", "frameworks", "Framework Components (Mitosis)"],
-  ["references/figma-bridge.md", "reference", "figma-bridge", "Figma Bridge"],
-  ["references/figma-kit-build.md", "reference", "figma-kit-build", "Building the Figma Kit"],
   ["templates/component.md", "build", "component-template", "Component Template"],
   ["checklists/component-checklist.md", "build", "component-checklist", "Ship Checklist"],
 ];

@@ -419,15 +419,7 @@
         "cta",
         "press",
         "snap"
-      ],
-      "figma": {
-        "fileKey": null,
-        "componentKey": null,
-        "props": {
-          "Kind": "kind",
-          "State": "state"
-        }
-      }
+      ]
     },
     {
       "id": "bezel",
