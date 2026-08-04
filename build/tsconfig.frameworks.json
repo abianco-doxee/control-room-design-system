@@ -1,0 +1,22 @@
+{
+  "//": "Type-checks the COMPILED React framework output (dist/frameworks/react).",
+  "//2": "Cheap guard against codegen breakage — e.g. a store method colliding with a",
+  "//3": "useState setter, an undefined symbol, or a bad JSX element. Lenient on purpose",
+  "//4": "(the goal is catching hard breaks, not auditing the generated `any`s).",
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "types": ["react", "react-dom"],
+    "strict": false,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["../dist/frameworks/react/**/*.ts", "../dist/frameworks/react/**/*.tsx"]
+}

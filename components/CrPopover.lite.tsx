@@ -41,7 +41,7 @@ export default function CrPopover(props: CrPopoverProps) {
       }
       if ((tries || 0) < 6) setTimeout(() => state.focusPanel((tries || 0) + 1), 16);
     },
-    onKey(event: KeyboardEvent) {
+    onKey(event: any) {
       if (event.key === "Escape") {
         event.preventDefault();
         state.open = false;
