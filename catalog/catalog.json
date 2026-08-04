@@ -5,20 +5,20 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 30,
+    "count": 32,
     "categories": {
       "action": 1,
       "forms": 6,
       "identity": 2,
       "layout": 5,
-      "media": 3,
+      "media": 5,
       "navigation": 1,
       "overlay": 3,
       "primitives": 1,
       "state": 8
     },
     "lifecycles": {
-      "stable": 29,
+      "stable": 31,
       "experimental": 1
     }
   },
@@ -622,6 +622,43 @@
       ]
     },
     {
+      "id": "ascii",
+      "name": "Ascii",
+      "kind": "component",
+      "category": "media",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Seeded ASCII/Unicode density field (braille/block/ramp) for dead space — whisper contrast, aria-hidden, mask-faded off content.",
+      "spec": "references/decoration.md",
+      "variants": {
+        "variant": [
+          "braille",
+          "block",
+          "ramp"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--muted",
+          "description": "glyph ink"
+        },
+        {
+          "cssVar": "--field",
+          "description": "related background field"
+        }
+      ],
+      "keywords": [
+        "ascii",
+        "braille",
+        "block",
+        "density",
+        "decoration",
+        "background",
+        "seeded",
+        "dead-space"
+      ]
+    },
+    {
       "id": "chrome",
       "name": "Chrome",
       "kind": "component",
@@ -742,6 +779,36 @@
         "seeded",
         "identity",
         "glyph"
+      ]
+    },
+    {
+      "id": "telemetry",
+      "name": "Telemetry",
+      "kind": "component",
+      "category": "media",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Seeded NERV-style decorative telemetry string (hex id, byte, latency, mini bar) for a frame corner. Decoration, not data.",
+      "spec": "references/decoration.md",
+      "variants": {
+        "prop": [
+          "seed"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--muted",
+          "description": "text"
+        }
+      ],
+      "keywords": [
+        "telemetry",
+        "fui",
+        "hud",
+        "string",
+        "seeded",
+        "decoration",
+        "nerv"
       ]
     },
     {

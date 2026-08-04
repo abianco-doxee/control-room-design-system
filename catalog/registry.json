@@ -1238,6 +1238,71 @@
         "law-9",
         "milestone"
       ]
+    },
+    {
+      "id": "ascii",
+      "name": "Ascii",
+      "category": "media",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Seeded ASCII/Unicode density field (braille/block/ramp) for dead space — whisper contrast, aria-hidden, mask-faded off content.",
+      "spec": "references/decoration.md",
+      "variants": {
+        "variant": [
+          "braille",
+          "block",
+          "ramp"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--muted",
+          "description": "glyph ink"
+        },
+        {
+          "cssVar": "--field",
+          "description": "related background field"
+        }
+      ],
+      "keywords": [
+        "ascii",
+        "braille",
+        "block",
+        "density",
+        "decoration",
+        "background",
+        "seeded",
+        "dead-space"
+      ]
+    },
+    {
+      "id": "telemetry",
+      "name": "Telemetry",
+      "category": "media",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Seeded NERV-style decorative telemetry string (hex id, byte, latency, mini bar) for a frame corner. Decoration, not data.",
+      "spec": "references/decoration.md",
+      "variants": {
+        "prop": [
+          "seed"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--muted",
+          "description": "text"
+        }
+      ],
+      "keywords": [
+        "telemetry",
+        "fui",
+        "hud",
+        "string",
+        "seeded",
+        "decoration",
+        "nerv"
+      ]
     }
   ]
 }

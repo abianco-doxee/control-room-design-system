@@ -108,6 +108,7 @@
   --dither: repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
   --scanline: repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);
   --crosshatch: repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);
+  --field: repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
 }
 
 :root[data-theme="light"] {
@@ -142,6 +143,7 @@
   --dither: repeating-conic-gradient(rgba(0,0,0,0.11) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
   --scanline: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0 1px, transparent 1px 3px);
   --crosshatch: repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px);
+  --field: repeating-conic-gradient(rgba(0,0,0,0.045) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
 }
 
 :root[data-theme="extreme"] {
@@ -178,6 +180,7 @@
   --dither: repeating-conic-gradient(rgba(255,255,255,0.15) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
   --scanline: repeating-linear-gradient(0deg, rgba(0,240,255,0.12) 0 1px, transparent 1px 3px);
   --crosshatch: repeating-linear-gradient(45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 6px);
+  --field: repeating-conic-gradient(rgba(255,255,255,0.05) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
   --brd: 3px;
   --brd-heavy: 4px;
   --brd-brush: 6px;
@@ -217,6 +220,7 @@
   --dither: repeating-conic-gradient(rgba(67,255,122,0.14) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
   --scanline: repeating-linear-gradient(0deg, rgba(67,255,122,0.13) 0 1px, transparent 1px 3px);
   --crosshatch: repeating-linear-gradient(45deg, rgba(67,255,122,0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(67,255,122,0.16) 0 1px, transparent 1px 6px);
+  --field: repeating-conic-gradient(rgba(67,255,122,0.05) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
 }
 
 /* ── GLOBAL BASELINE ──────────────────────────────────────────────────── */
