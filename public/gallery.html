@@ -781,6 +781,80 @@ body {
 .cr-drawer__title { flex: 1; margin: 0; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
 .cr-drawer__close { font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1; cursor: pointer; background: var(--panel); color: var(--ink); border: var(--brd) solid var(--border); padding: var(--space-1) var(--space-2); }
 .cr-drawer__body { flex: 1; overflow: auto; padding: var(--space-4); }
+
+/* ── Breadcrumb (ascii "/" separators) ──────────────────────────────────── */
+.cr-breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--text-xs); margin: 0; padding: 0; list-style: none; }
+.cr-breadcrumb__item { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--muted); }
+.cr-breadcrumb__item + .cr-breadcrumb__item::before { content: "/"; color: color-mix(in srgb, var(--muted) 55%, transparent); }
+.cr-breadcrumb__link { color: var(--muted); text-decoration: none; }
+.cr-breadcrumb__link:hover { color: var(--ink); text-decoration: underline; }
+.cr-breadcrumb__item[aria-current="page"] { color: var(--ink); font-weight: 700; }
+
+/* ── Segmented control (single-select toggle group) ─────────────────────── */
+.cr-segmented { display: inline-flex; border: var(--brd) solid var(--border); }
+.cr-segmented__opt {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.04em; padding: var(--space-1) var(--space-3); background: var(--panel); color: var(--muted);
+  border: 0; border-left: var(--brd-hair) solid var(--border); cursor: pointer;
+}
+.cr-segmented__opt:first-child { border-left: 0; }
+.cr-segmented__opt:hover { color: var(--ink); }
+.cr-segmented__opt[aria-checked="true"] { background: var(--sig-work); color: var(--on-sig); }
+
+/* ── Combobox (autocomplete input + listbox) ────────────────────────────── */
+.cr-combobox { position: relative; display: inline-block; width: 100%; max-width: 20rem; }
+.cr-combobox__scrim { position: fixed; inset: 0; z-index: var(--z-overlay); background: transparent; border: 0; }
+.cr-combobox__input {
+  width: 100%; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink);
+  background: var(--board); border: var(--brd) solid var(--border); padding: var(--space-2) var(--space-3);
+}
+.cr-combobox__list {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: calc(var(--z-overlay) + 1);
+  list-style: none; margin: 0; padding: var(--space-1); max-height: 40vh; overflow: auto;
+  background: var(--panel); border: var(--brd) solid var(--border); border-top: 0;
+  box-shadow: var(--shadow-off-sm) var(--shadow-off-sm) 0 var(--shadow-col);
+}
+.cr-combobox__opt { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-2); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); cursor: pointer; }
+.cr-combobox__opt::before { content: "\25B8"; color: var(--sig-work); opacity: 0; }
+.cr-combobox__opt--active { background: var(--sig-work); color: var(--on-sig); }
+.cr-combobox__opt--active::before { color: currentColor; opacity: 1; }
+.cr-combobox__empty { padding: var(--space-2); font-family: var(--font-mono); color: var(--muted); }
+
+/* ── Number field (input + −/+ steppers) ────────────────────────────────── */
+.cr-numberfield { display: inline-flex; border: var(--brd) solid var(--border); background: var(--board); }
+.cr-numberfield__input {
+  width: 4rem; text-align: center; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink);
+  background: transparent; border: 0; outline: none; padding: var(--space-1); -moz-appearance: textfield;
+}
+.cr-numberfield__input::-webkit-outer-spin-button, .cr-numberfield__input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.cr-numberfield__btn {
+  width: var(--space-6); font-family: var(--font-mono); font-size: var(--text-md); font-weight: 800; line-height: 1;
+  background: var(--panel); color: var(--ink); border: 0; cursor: pointer;
+}
+.cr-numberfield__btn:first-child { border-right: var(--brd-hair) solid var(--border); }
+.cr-numberfield__btn:last-child { border-left: var(--brd-hair) solid var(--border); }
+.cr-numberfield__btn:hover:not([disabled]) { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-numberfield__btn[disabled] { opacity: var(--state-disabled-op); cursor: not-allowed; }
+
+/* ── ASCII separators & lists ───────────────────────────────────────────── */
+.cr-sep { border: 0; height: 0; border-top: var(--brd-hair) dashed color-mix(in srgb, var(--border) 60%, transparent); margin: var(--space-3) 0; }
+.cr-sep--dot { border-top-style: dotted; border-top-width: var(--brd); }
+.cr-sep--double { height: var(--space-0-5); border-top: var(--brd-hair) solid var(--border); border-bottom: var(--brd-hair) solid var(--border); }
+/* labeled rule — ── LABEL ── */
+.cr-sep-label { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-4) 0; font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+.cr-sep-label::before, .cr-sep-label::after { content: ""; flex: 1; border-top: var(--brd-hair) dashed color-mix(in srgb, var(--border) 60%, transparent); }
+/* ascii-marker list */
+.cr-list { list-style: none; margin: 0; padding: 0; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); }
+.cr-list__item { display: flex; gap: var(--space-2); padding: var(--space-0-5) 0; }
+.cr-list__item::before { content: "\25B8"; color: var(--sig-work); flex-shrink: 0; }   /* ▸ */
+.cr-list--dot .cr-list__item::before { content: "\00B7"; color: var(--muted); }          /* · */
+.cr-list--tick .cr-list__item::before { content: "\00BB"; color: var(--sig-work); }       /* » */
+.cr-list--plus .cr-list__item::before { content: "+"; color: var(--muted); }
+/* dot-leader row — label ······· value */
+.cr-leader { display: flex; align-items: baseline; font-family: var(--font-mono); font-size: var(--text-sm); gap: var(--space-2); }
+.cr-leader__k { color: var(--muted); }
+.cr-leader__fill { flex: 1; align-self: center; border-bottom: var(--brd) dotted color-mix(in srgb, var(--muted) 55%, transparent); }
+.cr-leader__v { color: var(--ink); font-variant-numeric: tabular-nums; }
 .cr-modal__head {
   display: flex; align-items: center; gap: var(--space-3);
   padding: var(--space-3) var(--space-4); border-bottom: var(--brd) solid var(--border);
@@ -1555,6 +1629,45 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
             <dl class="cr-dl"><dt class="cr-dl__k">state</dt><dd class="cr-dl__v">failing · SSE closed</dd><dt class="cr-dl__k">retries</dt><dd class="cr-dl__v">3 / 5</dd></dl>
           </div>
         </div>
+      </div>
+      <h3 style="margin-top:16px">Breadcrumb · Segmented control</h3>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:center">
+        <nav aria-label="Breadcrumb"><ol class="cr-breadcrumb">
+          <li class="cr-breadcrumb__item"><a class="cr-breadcrumb__link" href="#">control room</a></li>
+          <li class="cr-breadcrumb__item"><a class="cr-breadcrumb__link" href="#">sessions</a></li>
+          <li class="cr-breadcrumb__item" aria-current="page">cr-1130</li>
+        </ol></nav>
+        <div class="cr-segmented" role="radiogroup" aria-label="Scope">
+          <button type="button" role="radio" class="cr-segmented__opt" data-value="all" aria-checked="true" tabindex="0">all</button>
+          <button type="button" role="radio" class="cr-segmented__opt" data-value="mine" aria-checked="false" tabindex="-1">mine</button>
+          <button type="button" role="radio" class="cr-segmented__opt" data-value="failing" aria-checked="false" tabindex="-1">failing</button>
+        </div>
+      </div>
+      <h3 style="margin-top:16px">Combobox · Number field</h3>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+        <div class="cr-combobox" style="min-width:220px">
+          <input class="cr-combobox__input" type="text" role="combobox" aria-expanded="true" aria-controls="g-combo" aria-activedescendant="g-co-1" aria-autocomplete="list" aria-label="Jump to worker" value="nova" />
+          <ul class="cr-combobox__list" id="g-combo" role="listbox">
+            <li class="cr-combobox__opt" id="g-co-0" role="option" aria-selected="false">nova-01</li>
+            <li class="cr-combobox__opt cr-combobox__opt--active" id="g-co-1" role="option" aria-selected="true">nova-02</li>
+          </ul>
+        </div>
+        <div class="cr-numberfield">
+          <button type="button" class="cr-numberfield__btn" aria-label="Decrease">−</button>
+          <input type="number" class="cr-numberfield__input" value="6" aria-label="Max retries" />
+          <button type="button" class="cr-numberfield__btn" aria-label="Increase">+</button>
+        </div>
+      </div>
+      <h3 style="margin-top:16px">ASCII separators &amp; lists</h3>
+      <div style="max-width:340px">
+        <p class="cr-sep-label">recent events</p>
+        <ul class="cr-list cr-list--tick">
+          <li class="cr-list__item">12:03 stream opened</li>
+          <li class="cr-list__item">12:41 SSE closed · retry 3/5</li>
+        </ul>
+        <hr class="cr-sep" />
+        <div class="cr-leader"><span class="cr-leader__k">uptime</span><span class="cr-leader__fill"></span><span class="cr-leader__v">41h 12m</span></div>
+        <div class="cr-leader"><span class="cr-leader__k">region</span><span class="cr-leader__fill"></span><span class="cr-leader__v">eu-west-1</span></div>
       </div>
     </div>
     <div style="grid-column:1/-1">

@@ -30,6 +30,10 @@ import {
   CrAccordion,
   CrPopover,
   CrDrawer,
+  CrBreadcrumb,
+  CrSegmented,
+  CrCombobox,
+  CrNumberField,
 } from "../../../../dist/frameworks/qwik";
 
 type Sev = "crit" | "warn" | "work" | "ok" | "idle";
@@ -55,7 +59,7 @@ const SESSIONS: Session[] = [
 const THEMES = ["dark", "light", "extreme", "phosphor"] as const;
 
 export default component$(() => {
-  const ui = useStore({ theme: "dark", modal: false, page: 1, palette: false, density: "cozy", refresh: 30, drawer: false });
+  const ui = useStore({ theme: "dark", modal: false, page: 1, palette: false, density: "cozy", refresh: 30, drawer: false, scope: "all", worker: "", retries: 5 });
   const live = useStore<Record<string, boolean>>({ "nova-01": true, "ptl-757": false });
   const toasts = useStore<{ list: { id: number; signal: string; message: string }[]; seq: number }>({
     list: [],
@@ -148,6 +152,14 @@ export default component$(() => {
 
       {/* ── board ────────────────────────────────────────────────── */}
       <div style="padding:var(--space-5);display:flex;flex-direction:column;gap:var(--space-5)">
+        <CrBreadcrumb
+          items={[
+            { label: "control room", href: "#" },
+            { label: "sessions", href: "#" },
+            { label: "cr-1130" },
+          ]}
+        />
+
         <header class="cr-masthead cr-mark">
           <p class="cr-masthead__eyebrow">DP Control Room · Phase 0</p>
           <h1 class="cr-masthead__title">14 sessions<br />2 need you</h1>
@@ -309,6 +321,37 @@ export default component$(() => {
               <div style="height:var(--space-2)"></div>
               <CrProgress indeterminate tone="wait" label="Syncing" />
             </div>
+            <div>
+              <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">scope</p>
+              <CrSegmented
+                label="Queue scope"
+                value={ui.scope}
+                options={[
+                  { value: "all", label: "all" },
+                  { value: "mine", label: "mine" },
+                  { value: "failing", label: "failing" },
+                ]}
+                onChange={$((v: string) => (ui.scope = v))}
+              />
+            </div>
+            <div>
+              <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">jump to worker</p>
+              <CrCombobox
+                placeholder="worker…"
+                value={ui.worker}
+                options={[
+                  { value: "nova-01", label: "nova-01" },
+                  { value: "nova-02", label: "nova-02" },
+                  { value: "ail-chat", label: "ail-chat" },
+                  { value: "rp-verify", label: "rp-verify" },
+                ]}
+                onChange={$((v: string) => (ui.worker = v))}
+              />
+            </div>
+            <div>
+              <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">max retries</p>
+              <CrNumberField value={ui.retries} min={0} max={10} label="Max retries" onChange={$((v: number) => (ui.retries = v))} />
+            </div>
           </div>
         </section>
 
@@ -321,12 +364,22 @@ export default component$(() => {
       </div>
 
       <CrDrawer open={ui.drawer} side="right" title="cr-1130 · inspect" onClose={$(() => (ui.drawer = false))}>
-        <dl class="cr-dl" style="margin-bottom:var(--space-4)">
-          <dt class="cr-dl__k">worker</dt><dd class="cr-dl__v">nova-01</dd>
-          <dt class="cr-dl__k">region</dt><dd class="cr-dl__v">eu-west-1</dd>
-          <dt class="cr-dl__k">state</dt><dd class="cr-dl__v">failing · SSE closed</dd>
-          <dt class="cr-dl__k">retries</dt><dd class="cr-dl__v">3 / 5</dd>
-        </dl>
+        {/* dot-leader rows (ascii "·····" between key and value) */}
+        <div style="display:flex;flex-direction:column;gap:var(--space-1)">
+          <div class="cr-leader"><span class="cr-leader__k">worker</span><span class="cr-leader__fill"></span><span class="cr-leader__v">nova-01</span></div>
+          <div class="cr-leader"><span class="cr-leader__k">region</span><span class="cr-leader__fill"></span><span class="cr-leader__v">eu-west-1</span></div>
+          <div class="cr-leader"><span class="cr-leader__k">retries</span><span class="cr-leader__fill"></span><span class="cr-leader__v">3 / 5</span></div>
+        </div>
+
+        <p class="cr-sep-label">recent events</p>
+        {/* ascii-marker list */}
+        <ul class="cr-list cr-list--tick">
+          <li class="cr-list__item">12:03 stream opened</li>
+          <li class="cr-list__item">12:07 stall detected</li>
+          <li class="cr-list__item">12:41 SSE closed · retry 3/5</li>
+        </ul>
+
+        <p class="cr-sep-label">diagnostics</p>
         <CrAccordion
           single
           defaultOpen={[0]}

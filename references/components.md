@@ -1061,6 +1061,89 @@ height. Controlled via `open` (like Modal).
 
 ---
 
+## Breadcrumb {#breadcrumb}
+
+**Purpose.** A navigation trail. Separators are ascii `/` drawn from CSS; the last
+crumb is the current page (`aria-current="page"`).
+
+```tsx
+<CrBreadcrumb items={[{ label: "control room", href: "#" }, { label: "sessions", href: "#" }, { label: "cr-1130" }]} />
+```
+
+- **MUST** wrap it in `<nav aria-label>` and mark the last crumb `aria-current` (it
+  is not a link).
+
+---
+
+## Segmented control {#segmented}
+
+**Purpose.** A single choice shown as a connected button bar (filters, scopes).
+`role=radiogroup` + roving tabindex (`←`/`→`/`Home`/`End`) — the same semantics as
+a radio group, a distinct connected visual.
+
+```tsx
+<CrSegmented value={scope} options={[{ value: "all", label: "all" }, { value: "mine", label: "mine" }]} onChange={setScope} />
+```
+
+- **SHOULD** reach for this over a radio group when the options are few, short, and
+  mutually exclusive; keep it to one line.
+
+---
+
+## Combobox {#combobox}
+
+**Purpose.** An autocomplete form field: an input (`role=combobox`) filtering a
+listbox. Focus stays in the input; `↑`/`↓` move the active option
+(`aria-activedescendant`), `Enter` selects, `Esc` closes; a scrim closes on
+outside click. The active row shows an ascii `▸` marker.
+
+```tsx
+<CrCombobox value={worker} options={workers} placeholder="worker…" onChange={setWorker} />
+```
+
+- **MUST** keep `aria-expanded`/`aria-activedescendant` in sync and give each option
+  `role="option"`. It seeds its text from `value` on mount; selecting emits the
+  value.
+
+---
+
+## Number field {#number-field}
+
+**Purpose.** A number input with `−`/`+` steppers, clamped to `min`/`max`. The
+native input keeps its own keyboard; the buttons step by `step` and disable at the
+bounds.
+
+```tsx
+<CrNumberField value={retries} min={0} max={10} onChange={setRetries} />
+```
+
+- **MUST** clamp on both button and typed input; give it an `aria-label`.
+
+---
+
+## ASCII separators & lists {#ascii-detail}
+
+Character-flavored detail, drawn from the same FUI vocabulary as the decoration
+layer (`references/decoration.md`). Structure, never a signal.
+
+| Class | What |
+| --- | --- |
+| `.cr-sep` (`--dot`, `--double`) | a horizontal rule — dashed / dotted / double box-line |
+| `.cr-sep-label` | a labeled rule — `── LABEL ──` (dashed flanks, mono label) |
+| `.cr-list` (`--dot` `--tick` `--plus`) | an ascii-marker list — `▸` / `·` / `»` / `+` before each item |
+| `.cr-leader` | a dot-leader row — `label ········· value` (`__k` / `__fill` / `__v`) |
+
+```html
+<p class="cr-sep-label">recent events</p>
+<ul class="cr-list cr-list--tick"><li class="cr-list__item">SSE closed · retry 3/5</li></ul>
+<div class="cr-leader"><span class="cr-leader__k">uptime</span><span class="cr-leader__fill"></span><span class="cr-leader__v">41h 12m</span></div>
+```
+
+- **SHOULD** keep these to structure and dead space — the markers are ink/`--muted`,
+  never a signal hue used to imply state.
+
+---
+
 ## Keyboard navigation {#keyboard-nav}
 
 The interactive widgets follow the WAI-ARIA patterns, so they work without a mouse:
@@ -1073,6 +1156,8 @@ The interactive widgets follow the WAI-ARIA patterns, so they work without a mou
 | **Command palette** | `⌘K`/`Ctrl+K` opens; `↑`/`↓`/`Home`/`End` move the active option, `Enter` runs, `Esc` closes (focus stays in the search field) |
 | **Accordion** | `↑`/`↓`/`Home`/`End` move between headers; `Enter`/`Space` toggle a panel |
 | **Popover / Drawer** | `Esc` closes (drawer traps focus natively); popover returns focus to its trigger |
+| **Segmented control** | roving tabindex — `←`/`→`/`Home`/`End` move and select (radiogroup semantics) |
+| **Combobox** | `↑`/`↓` move the active option, `Enter` selects, `Esc` closes; focus stays in the input |
 | **Radio group** | roving tabindex — `↑`/`↓`/`←`/`→` move and select; only the checked radio is tabbable |
 | **Slider** | native range — `←`/`→` step, `Home`/`End` to ends, `PageUp`/`PageDown` jump |
 | **Modal / Switch / Pagination** | native focus-trap (dialog), `Space` toggle, `Tab` between page buttons |
