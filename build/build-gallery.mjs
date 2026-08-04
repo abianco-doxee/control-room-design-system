@@ -305,6 +305,15 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         <div class="cr-toast cr-toast--done" role="status" aria-live="polite"><span class="cr-toast__msg">queue drained</span><button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button></div>
         <div class="cr-toast cr-toast--err" role="alert" aria-live="assertive"><span class="cr-toast__msg">killed all workers</span><button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button></div>
       </div>
+      <h3 style="margin-top:16px">Key hints (main = always · secondary = on hover / hold Alt)</h3>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <button type="button" class="cr-btn cr-btn--err" aria-keyshortcuts="i">open incident <kbd class="cr-kbd cr-kbd--on" aria-hidden="true">I</kbd></button>
+        <div class="cr-keys-host" style="display:flex;gap:8px;align-items:center">
+          <span style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--muted)">hover me →</span>
+          <button type="button" class="cr-btn cr-btn--controls cr-btn--sm" aria-keyshortcuts="1">dark <kbd class="cr-kbd cr-kbd--hint" aria-hidden="true">1</kbd></button>
+          <button type="button" class="cr-btn cr-btn--controls cr-btn--sm" aria-keyshortcuts="2">light <kbd class="cr-kbd cr-kbd--hint" aria-hidden="true">2</kbd></button>
+        </div>
+      </div>
     </div>
     <div style="grid-column:1/-1">
       <h3>Form controls</h3>

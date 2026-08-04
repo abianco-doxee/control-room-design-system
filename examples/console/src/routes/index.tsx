@@ -1,4 +1,4 @@
-import { component$, useStore, $ } from "@builder.io/qwik";
+import { component$, useStore, useOnDocument, $ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 
 /* Consume the Mitosis-compiled Qwik components straight from the built barrel.
@@ -20,6 +20,8 @@ import {
   CrMenu,
   CrPagination,
   CrToastRegion,
+  CrKbd,
+  CrKeyHints,
 } from "../../../../dist/frameworks/qwik";
 
 type Sev = "crit" | "warn" | "work" | "ok" | "idle";
@@ -59,6 +61,27 @@ export default component$(() => {
   const dismissToast = $((id: number | string) => {
     toasts.list = toasts.list.filter((t) => t.id !== id);
   });
+
+  /* App-level keyboard shortcuts. Ignored while typing in a field. Hold Alt to
+   * peek every key-hint badge (CrKeyHints, mounted below). */
+  useOnDocument(
+    "keydown",
+    $((e: KeyboardEvent) => {
+      const el = e.target as HTMLElement;
+      if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === "i") {
+        ui.modal = true;
+      } else if (e.key === "n") {
+        toasts.seq = toasts.seq + 1;
+        toasts.list = [...toasts.list, { id: toasts.seq, signal: "done", message: "queue drained" }];
+      } else if (e.key >= "1" && e.key <= "4") {
+        const t = THEMES[Number(e.key) - 1];
+        ui.theme = t;
+        document.documentElement.setAttribute("data-theme", t);
+      }
+    }),
+  );
 
   const setTheme = $((t: string) => {
     ui.theme = t;
@@ -106,16 +129,19 @@ export default component$(() => {
               )}
             />
             <span style="flex:1"></span>
-            {THEMES.map((t) => (
-              <CrButton
-                key={t}
-                kind={ui.theme === t ? "accent" : "controls"}
-                size="sm"
-                onClick={$(() => setTheme(t))}
-              >
-                {t}
-              </CrButton>
-            ))}
+            <div class="cr-keys-host" style="display:flex;gap:var(--space-2);align-items:center">
+              {THEMES.map((t, i) => (
+                <CrButton
+                  key={t}
+                  kind={ui.theme === t ? "accent" : "controls"}
+                  size="sm"
+                  onClick={$(() => setTheme(t))}
+                >
+                  {t}
+                  <CrKbd keys={String(i + 1)} hint on={ui.theme === t} />
+                </CrButton>
+              ))}
+            </div>
           </div>
         </header>
 
@@ -131,8 +157,9 @@ export default component$(() => {
             <p style="font-family:var(--font-mono);font-size:var(--text-sm);margin:var(--space-2) 0 var(--space-3)">
               SSE closed · retry 3/5 · last green 41m ago
             </p>
-            <CrButton kind="err" onClick={$(() => (ui.modal = true))}>
+            <CrButton kind="err" keyshortcuts="i" onClick={$(() => (ui.modal = true))}>
               open incident
+              <CrKbd keys="I" on />
             </CrButton>
           </div>
         </div>
@@ -191,8 +218,9 @@ export default component$(() => {
           <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
             <CrPagination page={ui.page} total={9} onChange={$((p: number) => (ui.page = p))} />
             <span style="flex:1"></span>
-            <CrButton size="sm" kind="controls" onClick={$(() => pushToast("done", "queue drained"))}>
+            <CrButton size="sm" kind="controls" keyshortcuts="n" onClick={$(() => pushToast("done", "queue drained"))}>
               notify
+              <CrKbd keys="N" />
             </CrButton>
           </div>
         </section>
@@ -205,6 +233,8 @@ export default component$(() => {
         </footer>
       </div>
 
+      {/* hold Alt to peek every secondary key-hint badge */}
+      <CrKeyHints />
       <CrToastRegion position="br" toasts={toasts.list} onDismiss={dismissToast} />
 
       <CrModal open={ui.modal} title="Incident · cr-1130" onClose={$(() => (ui.modal = false))}>

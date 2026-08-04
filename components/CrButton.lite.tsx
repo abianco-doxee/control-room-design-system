@@ -3,6 +3,8 @@ export interface CrButtonProps {
   size?: "md" | "sm";
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
+  /** Announce a keyboard shortcut (maps to aria-keyshortcuts), e.g. "i" or "Alt+N". */
+  keyshortcuts?: string;
   onClick?: () => void;
   children?: any;
 }
@@ -13,6 +15,7 @@ export default function CrButton(props: CrButtonProps) {
     <button
       type={props.type || "button"}
       disabled={props.disabled}
+      aria-keyshortcuts={props.keyshortcuts}
       onClick={() => props.onClick && props.onClick()}
       class={
         "cr-btn" +

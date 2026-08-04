@@ -68,7 +68,6 @@ export default function CrTable(props: CrTableProps) {
             {(col: string, colIndex: number) => (
               <th
                 scope="col"
-                class={props.sortable ? "cr-table__sortable" : ""}
                 aria-sort={
                   state.sortCol === colIndex
                     ? state.sortDir === 1
@@ -76,11 +75,14 @@ export default function CrTable(props: CrTableProps) {
                       : "descending"
                     : "none"
                 }
-                onClick={() => state.toggleSort(colIndex)}
               >
-                {col}
-                <Show when={props.sortable && state.sortCol === colIndex}>
-                  <span class="cr-table__ind">{state.sortDir === 1 ? "▲" : "▼"}</span>
+                <Show when={props.sortable} else={<span>{col}</span>}>
+                  <button type="button" class="cr-table__sortable" onClick={() => state.toggleSort(colIndex)}>
+                    {col}
+                    <Show when={state.sortCol === colIndex}>
+                      <span class="cr-table__ind" aria-hidden="true">{state.sortDir === 1 ? "▲" : "▼"}</span>
+                    </Show>
+                  </button>
                 </Show>
               </th>
             )}

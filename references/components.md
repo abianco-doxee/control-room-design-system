@@ -849,6 +849,54 @@ windowed run of numbers with ellipses; the current page is keyed and
 - **SHOULD** keep the number window small (first · current±1 · last) so the control
   stays one line at any page count.
 
+---
+
+## Key hint {#key-hint}
+
+**Purpose.** A keycap badge announcing a keyboard shortcut. It is **decorative**
+(`aria-hidden`) — the real binding rides `aria-keyshortcuts` on the action. Two
+registers, matching how prominent the action is:
+
+- **Main actions** show the keycap **always** (`<CrKbd keys="I" />`).
+- **Secondary / bulk actions** use the **hint** variant — hidden until the user
+  hovers/focuses a `.cr-keys-host`, or **peeks all** by holding a key (default
+  `Alt`) via the headless `CrKeyHints` behavior.
+
+```tsx
+<CrButton keyshortcuts="i" onClick$={openIncident}>open incident <CrKbd keys="I" on /></CrButton>
+
+<div class="cr-keys-host">
+  <CrButton keyshortcuts="1">dark <CrKbd keys="1" hint /></CrButton>
+</div>
+
+<CrKeyHints />            {/* hold Alt to reveal every hint badge at once */}
+```
+```css
+.cr-kbd--hint { opacity: 0; }
+.cr-keys-host:hover .cr-kbd--hint,
+:root[data-cr-keys="on"] .cr-kbd--hint { opacity: 1; }   /* no layout shift */
+```
+
+- **MUST** pair the badge with `aria-keyshortcuts` on the actual control — the
+  keycap is a visual, not the accessible name.
+- **SHOULD** reserve always-on badges for the few primary actions; everything else
+  is a hint, so the chrome stays quiet until asked.
+
+---
+
+## Keyboard navigation {#keyboard-nav}
+
+The interactive widgets follow the WAI-ARIA patterns, so they work without a mouse:
+
+| Widget | Keys |
+| --- | --- |
+| **Tabs** | roving tabindex — `←`/`→` (and `↑`/`↓`) move, `Home`/`End` jump to ends; only the active tab is in the tab order |
+| **Menu** | trigger opens on click or `↓`; then `↑`/`↓` move, `Home`/`End` jump, `Esc` closes and returns focus to the trigger; `Enter`/`Space` select |
+| **Table** | sortable headers are real `<button>`s (operable with `Enter`/`Space`), selection checkboxes are in the tab order |
+| **Modal / Switch / Pagination** | native focus-trap (dialog), `Space` toggle, `Tab` between page buttons |
+
+Focus is always visible (`*:focus-visible` → a `--sig-work` outline, system-wide).
+
 ## Tooltip
 
 A hint bubble revealed on hover **and** keyboard focus, wired to its trigger with
