@@ -16,6 +16,7 @@ module.exports = {
               "on-sig": "var(--on-sig)",
               "on-err": "var(--on-err)",
               "on-accent": "var(--on-accent)",
+              "on-accent-2": "var(--on-accent-2)",
               "on-idle": "var(--on-idle)",
               "border": "var(--border)",
               "mass": "var(--mass)",
@@ -26,6 +27,7 @@ module.exports = {
               "sig-err": "var(--sig-err)",
               "sig-idle": "var(--sig-idle)",
               "sig-accent": "var(--sig-accent)",
+              "sig-accent-2": "var(--sig-accent-2)",
               "stage": "var(--stage)",
               "stage-ink": "var(--stage-ink)",
               "drip": "var(--drip)"

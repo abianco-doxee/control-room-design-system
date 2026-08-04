@@ -1055,6 +1055,51 @@
         "popover",
         "describedby"
       ]
+    },
+    {
+      "id": "sigil",
+      "name": "Sigil",
+      "category": "media",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Seeded cyber-sigil — a retro-futuristic pixel glyph generated from a seed; optional state keys the hue.",
+      "spec": "references/seeded-sigil.md",
+      "variants": {
+        "state": [
+          "working",
+          "waiting",
+          "idle",
+          "error",
+          "done"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "working hue"
+        },
+        {
+          "cssVar": "--sig-accent",
+          "description": "default glyph hue (seeded)"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error hue"
+        },
+        {
+          "cssVar": "--sig-accent-2",
+          "description": "done/acid hue"
+        }
+      ],
+      "keywords": [
+        "sigil",
+        "pixel",
+        "cyber-sigilism",
+        "pixel-art",
+        "seeded",
+        "identity",
+        "glyph"
+      ]
     }
   ]
 }
