@@ -220,6 +220,12 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       </div>
       <h3 style="margin-top:16px">Arrow-rail (sequence)</h3>
       <div class="cr-rail"><span class="cr-rail__step cr-rail__step--on">scan</span><span class="cr-rail__step">triage</span><span class="cr-rail__step">fix</span><span class="cr-rail__step">verify</span></div>
+      <h3 style="margin-top:16px">Diagonal primitives (shape = meaning)</h3>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <span class="cr-chev" style="font-family:var(--font-mono);font-size:var(--text-sm);color:var(--ink)">route</span>
+        <span class="cr-notch" style="font-family:var(--font-mono);font-size:var(--text-2xs);font-weight:800;text-transform:uppercase">held</span>
+        <span class="cr-wedge cr-panel" style="padding:8px 20px 8px 12px;font-family:var(--font-mono);font-size:var(--text-sm)">active panel</span>
+      </div>
     </div>
     <div>
       <h3>Error surface (drip)</h3>
