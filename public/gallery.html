@@ -112,10 +112,10 @@
   --stage: #49de78;
   --stage-ink: #04140a;
   --drip: #4affc8;
-  --halftone: radial-gradient(circle at center, rgba(255,255,255,.05) 1.1px, transparent 1.4px);
-  --dither: repeating-conic-gradient(rgba(255,255,255,.05) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
-  --scanline: repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0 1px, transparent 1px 3px);
-  --crosshatch: repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,.06) 0 1px, transparent 1px 6px);
+  --halftone: radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);
+  --dither: repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
+  --scanline: repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);
+  --crosshatch: repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);
 }
 
 :root[data-theme="light"] {
@@ -146,10 +146,10 @@
   --stage: #00a344;
   --stage-ink: #04140a;
   --drip: #0a7f5c;
-  --halftone: radial-gradient(circle at center, rgba(0,0,0,.075) 1.1px, transparent 1.4px);
-  --dither: repeating-conic-gradient(rgba(0,0,0,.06) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
-  --scanline: repeating-linear-gradient(0deg, rgba(0,0,0,.05) 0 1px, transparent 1px 3px);
-  --crosshatch: repeating-linear-gradient(45deg, rgba(0,0,0,.07) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,.07) 0 1px, transparent 1px 6px);
+  --halftone: radial-gradient(circle at center, rgba(0,0,0,0.13) 1.7px, transparent 2.2px);
+  --dither: repeating-conic-gradient(rgba(0,0,0,0.11) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
+  --scanline: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0 1px, transparent 1px 3px);
+  --crosshatch: repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px);
 }
 
 :root[data-theme="extreme"] {
@@ -182,10 +182,10 @@
   --stage: #0bf272;
   --stage-ink: #12061a;
   --drip: #00f0ff;
-  --halftone: radial-gradient(circle at center, rgba(255,255,255,.07) 1.2px, transparent 1.5px);
-  --dither: repeating-conic-gradient(rgba(255,255,255,.08) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
-  --scanline: repeating-linear-gradient(0deg, rgba(0,240,255,.06) 0 1px, transparent 1px 3px);
-  --crosshatch: repeating-linear-gradient(45deg, rgba(0,240,255,.08) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,240,255,.08) 0 1px, transparent 1px 6px);
+  --halftone: radial-gradient(circle at center, rgba(255,255,255,0.18) 1.7px, transparent 2.2px);
+  --dither: repeating-conic-gradient(rgba(255,255,255,0.15) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
+  --scanline: repeating-linear-gradient(0deg, rgba(0,240,255,0.12) 0 1px, transparent 1px 3px);
+  --crosshatch: repeating-linear-gradient(45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 6px);
   --brd: 3px;
   --brd-heavy: 4px;
   --brd-brush: 6px;
@@ -221,10 +221,10 @@
   --stage: #0d7a34;
   --stage-ink: #d9ffe6;
   --drip: #43ff7a;
-  --halftone: radial-gradient(circle at center, rgba(67,255,122,.09) 1.1px, transparent 1.4px);
-  --dither: repeating-conic-gradient(rgba(67,255,122,.09) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
-  --scanline: repeating-linear-gradient(0deg, rgba(67,255,122,.08) 0 1px, transparent 1px 3px);
-  --crosshatch: repeating-linear-gradient(45deg, rgba(67,255,122,.10) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(67,255,122,.10) 0 1px, transparent 1px 6px);
+  --halftone: radial-gradient(circle at center, rgba(67,255,122,0.16) 1.7px, transparent 2.2px);
+  --dither: repeating-conic-gradient(rgba(67,255,122,0.14) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
+  --scanline: repeating-linear-gradient(0deg, rgba(67,255,122,0.13) 0 1px, transparent 1px 3px);
+  --crosshatch: repeating-linear-gradient(45deg, rgba(67,255,122,0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(67,255,122,0.16) 0 1px, transparent 1px 6px);
 }
 
 /* ── GLOBAL BASELINE ──────────────────────────────────────────────────── */
@@ -608,11 +608,15 @@ body {
 /* ── Texture utilities (hardware only — Law 6) ─────────────────────────────
  * Apply to a bezel/screen/hardware surface, NEVER a flat content field. All
  * three read as the neo-print / CRT grain; theme-keyed via the texture tokens. */
-.cr-tex--halftone { background-image: var(--halftone); background-size: var(--halftone-size, 6px 6px); }
+/* All fill edge-to-edge (repeat, from the origin). Pair with a background-color. */
+.cr-tex--halftone, .cr-tex--dither, .cr-tex--scan, .cr-tex--cross, .cr-tex--glass {
+  background-repeat: repeat; background-position: 0 0; background-attachment: local;
+}
+.cr-tex--halftone { background-image: var(--halftone); background-size: var(--halftone-size) var(--halftone-size); }
 .cr-tex--dither   { background-image: var(--dither); }
 .cr-tex--scan     { background-image: var(--scanline); }
 /* a stacked "aged glass" — halftone + scanlines together, the house hardware wash */
-.cr-tex--glass    { background-image: var(--scanline), var(--halftone); background-size: auto, var(--halftone-size, 6px 6px); }
+.cr-tex--glass    { background-image: var(--scanline), var(--halftone); background-size: auto, var(--halftone-size) var(--halftone-size); }
 
 /* ── Ambient loops (Law 7 — alive at rest; low-fps, hardware-bound) ─────────
  * Opt-in classes. All are OFF under prefers-reduced-motion (global rule in
@@ -673,6 +677,19 @@ body {
 .cr-plate  { display: inline-block; font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: 0.14em;
              text-transform: uppercase; color: var(--muted); border: 1px solid var(--rail-ink); padding: 1px var(--space-2); }
 .cr-tally  { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.24em; color: var(--ink); }
+/* more fasteners + indicators (variance for hand-composed chrome) */
+.cr-screw  { width: var(--space-3); height: var(--space-3); border-radius: 50%; background: var(--rail-ink);
+             border: 1.5px solid var(--border); position: relative; }
+.cr-screw::after { content: ""; position: absolute; inset: 44% 18%; background: var(--border); }   /* single slot */
+.cr-screw--x::before { content: ""; position: absolute; inset: 18% 44%; background: var(--border); }/* + cross slot */
+.cr-bolt   { width: var(--space-3); height: var(--space-3); background: var(--rail-ink); border: 1.5px solid var(--border); }
+.cr-led    { width: var(--space-2); height: var(--space-2); border-radius: 50%; border: 1px solid var(--border);
+             background: var(--cr-led, var(--sig-work));
+             box-shadow: inset 0 0 0 1px color-mix(in srgb, #fff 35%, transparent); }  /* solid indicator, no glow */
+.cr-led--wait { --cr-led: var(--sig-wait); } .cr-led--done { --cr-led: var(--sig-done); }
+.cr-led--err { --cr-led: var(--sig-err); }   .cr-led--idle { --cr-led: var(--sig-idle); }
+.cr-grille { width: var(--space-6); height: var(--space-5); border: 1.5px solid var(--border);
+             background: repeating-linear-gradient(90deg, var(--rail-ink) 0 1.5px, var(--mass) 1.5px 3px); }  /* vertical grille */
 
 /* ── Richer texture — crosshatch (× diagonals) + duotone (cross-colours) ────
  * Answers "not just dots": cross-hatching from ±45° diagonals (Law 4 energy),
@@ -691,6 +708,9 @@ body {
  * a gradient — to mark the ONE most exceptional thing. It only reads because
  * everything around it is hard-edged. Rare by contract: one breach per screen.
  * Colour keys to a signal (default accent); set --cr-breach to re-key. */
+/* the rim angle is a registered property so the conic gradient can interpolate */
+@property --cr-breach-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
 .cr-breach {
   --cr-breach: var(--sig-accent);         /* primary neon hue  */
   --cr-breach-2: var(--sig-accent-2);     /* the paired hue (acid) — the neon pairing */
@@ -698,16 +718,25 @@ body {
   position: relative;
   border-radius: var(--breach-radius);                                  /* the soft corner   */
   border: 3px solid transparent;
-  /* rounded neon gradient RIM via padding-box/border-box; interior stays opaque
-   * and legible (no over-painting pseudo-elements). */
+  /* Layered backgrounds (top → bottom): opaque interior clipped to padding-box;
+   * bright SPOTS riding the border (counter-rotating); the rotating neon RIM.
+   * Both conic layers show only in the 3px border ring — the fill covers the
+   * interior, so text stays legible. */
   background:
     linear-gradient(var(--cr-breach-fill), var(--cr-breach-fill)) padding-box,
-    linear-gradient(135deg, var(--cr-breach), var(--cr-breach-2) 88%) border-box;
+    conic-gradient(from calc(var(--cr-breach-angle) * -1.7),
+      transparent 0 3%, #fff 3% 5%, transparent 5% 36%, #fff 36% 38%,
+      transparent 38% 69%, #fff 69% 71%, transparent 71%) border-box,
+    conic-gradient(from var(--cr-breach-angle),
+      var(--cr-breach), var(--cr-breach-2), var(--cr-breach)) border-box;
+  background-color: var(--cr-breach-fill);  /* explicit opaque interior for contrast tooling */
   /* dual-hue neon glow halo — magenta near, acid far (box-shadow stays outside) */
   box-shadow:
     0 0 calc(var(--breach-glow-size) * 0.9) color-mix(in srgb, var(--cr-breach) 70%, transparent),
     0 0 calc(var(--breach-glow-size) * 2.4) color-mix(in srgb, var(--cr-breach-2) 42%, transparent);
+  animation: cr-breach-spin var(--breach-spin, 9s) linear infinite;     /* the rim rotates   */
 }
+@keyframes cr-breach-spin { to { --cr-breach-angle: 360deg; } }
 /* re-key the primary hue to a signal (the pair stays acid unless overridden) */
 .cr-breach--work   { --cr-breach: var(--sig-work);  --cr-breach-2: var(--sig-accent); }
 .cr-breach--wait   { --cr-breach: var(--sig-wait);  --cr-breach-2: var(--sig-accent); }
@@ -718,8 +747,8 @@ body {
 .cr-breach--wash {
   --cr-breach-fill: color-mix(in srgb, var(--cr-breach) 16%, var(--panel));
 }
-/* a slow living dual-hue glow — opt-in, off under reduced motion */
-.cr-breach--alive { animation: cr-breath 3.6s ease-in-out infinite; }
+/* a living dual-hue glow on top of the rotating rim — opt-in */
+.cr-breach--alive { animation: cr-breach-spin var(--breach-spin, 9s) linear infinite, cr-breath 3.6s ease-in-out infinite; }
 @keyframes cr-breath {
   0%, 100% { box-shadow:
     0 0 calc(var(--breach-glow-size) * 0.7) color-mix(in srgb, var(--cr-breach) 55%, transparent),
@@ -728,6 +757,7 @@ body {
     0 0 calc(var(--breach-glow-size) * 1.3) color-mix(in srgb, var(--cr-breach) 85%, transparent),
     0 0 calc(var(--breach-glow-size) * 3) color-mix(in srgb, var(--cr-breach-2) 60%, transparent); }
 }
+@media (prefers-reduced-motion: reduce) { .cr-breach, .cr-breach--alive { animation: none; } }
 
 /* a standalone soft luminous accent — the antithesis of the hard pixel.
  * Purely decorative (aria-hidden); use to underline a single distinctive item. */
@@ -736,6 +766,23 @@ body {
   background: radial-gradient(closest-side, var(--cr-breach, var(--sig-accent)), transparent 70%);
   filter: blur(calc(var(--breach-blur) * 0.5)); pointer-events: none;
 }
+
+/* ── Scroll-bound progress rail (pure-CSS scroll-driven animation) ──────────
+ * Width is bound to scroll position via `animation-timeline: scroll()` — no JS,
+ * no scroll listener. Default binds to the document; add .cr-scrollbar--local on
+ * an element inside a scroll container to bind to the NEAREST scroller instead. */
+.cr-scrollbar {
+  position: fixed; inset: 0 0 auto 0; height: 3px; z-index: var(--z-overlay);
+  transform: scaleX(0); transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--sig-accent), var(--sig-accent-2));
+  animation: cr-scrollfill linear both;
+  animation-timeline: scroll(root block);
+}
+.cr-scrollbar--local { position: sticky; animation-timeline: scroll(nearest block); }
+@keyframes cr-scrollfill { to { transform: scaleX(1); } }
+/* the global reduced-motion rule sets `animation: none`, which would freeze the
+ * rail at empty — so hide it rather than leave a stuck bar. */
+@media (prefers-reduced-motion: reduce) { .cr-scrollbar { display: none; } }
 
 @media (prefers-reduced-motion: reduce) { .cr-breach--alive { animation: none; } }
 
@@ -772,6 +819,7 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
 </style>
 </head>
 <body>
+<div class="cr-scrollbar" aria-hidden="true"></div>
 <div class="wrap">
   <div class="bar">
     <h1>Control Room · Living Gallery</h1>
@@ -1070,16 +1118,28 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         <span style="display:flex;flex-direction:column;gap:6px;align-items:center"><span class="cr-sev cr-sev--idle" role="img" aria-label="idle"></span>idle · ●∞</span>
         <span style="color:var(--muted);max-width:34ch;line-height:1.5">Shape reads the severity even with no colour — survives the phosphor CRT and colour-blindness.</span>
       </div>
-      <h3 style="margin-top:18px">Hardware chrome vocabulary (bezel detail only)</h3>
+      <h3 style="margin-top:18px">Hardware chrome — kit + seeded strips (same seed → same strip)</h3>
       <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;background:var(--panel-2);border:2px solid var(--border);padding:12px">
         <i class="cr-rivet" aria-hidden="true"></i>
         <i class="cr-rivet cr-rivet--hex" aria-hidden="true"></i>
         <i class="cr-rivet cr-rivet--slot" aria-hidden="true"></i>
+        <i class="cr-screw" aria-hidden="true"></i>
+        <i class="cr-screw cr-screw--x" aria-hidden="true"></i>
+        <i class="cr-bolt" aria-hidden="true"></i>
+        <i class="cr-led" aria-hidden="true"></i>
+        <i class="cr-led cr-led--wait" aria-hidden="true"></i>
+        <i class="cr-led cr-led--err" aria-hidden="true"></i>
         <i class="cr-vent" aria-hidden="true"></i>
+        <i class="cr-grille" aria-hidden="true"></i>
         <i class="cr-port" aria-hidden="true"></i>
         <span class="cr-stripe" style="width:64px" aria-hidden="true"></span>
         <span class="cr-tally">▐▐▐ ▌</span>
         <span class="cr-plate">UNIT · CR-00 · REV.C</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+        <canvas class="crchrome" width="440" height="26" data-seed="cr-00"></canvas>
+        <canvas class="crchrome" width="440" height="26" data-seed="nova-rack"></canvas>
+        <canvas class="crchrome" width="440" height="26" data-seed="rp-verify-07"></canvas>
       </div>
       <h3 style="margin-top:18px">Texture — beyond dots: crosshatch (×) &amp; duotone (cross-colours)</h3>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;font-family:var(--font-mono);font-size:10px;color:var(--muted)">
@@ -1189,6 +1249,33 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
     for(var gy=cell;gy<cv.height;gy+=cell*2){for(var gx=cell;gx<cv.width;gx+=cell*2){ctx.fillRect(gx,gy,1,1);}}
     ctx.globalAlpha=1;
     for(var ry=0;ry<G;ry++){for(var rx=0;rx<G;rx++){if(m[ry][rx]){ctx.fillStyle=ink;ctx.fillRect(rx*cell,ry*cell,cell,cell);}}}
+  });
+
+  // Seeded hardware chrome strips (deterministic variance).
+  document.querySelectorAll(".crchrome").forEach(function(cv){
+    var W=cv.width,H=cv.height,rng=mb32(hashSeed(cv.dataset.seed));
+    var LED=["#00d3fb","#f9ad00","#9ad335","#f45058","#ff1a9d"];
+    var HI="#3a3550",MID="#2a2740",LO="#17141f",EDGE="#000",SCR="#4a4560";
+    var ctx=cv.getContext("2d");ctx.imageSmoothingEnabled=false;
+    ctx.fillStyle=MID;ctx.fillRect(0,0,W,H);
+    ctx.fillStyle=HI;ctx.fillRect(0,0,W,2);
+    ctx.fillStyle=LO;ctx.fillRect(0,H-Math.round(H*0.42),W,Math.round(H*0.42));
+    ctx.fillStyle=EDGE;ctx.fillRect(0,0,W,1);ctx.fillRect(0,H-1,W,1);
+    var sc=2+Math.floor(rng()*3);ctx.strokeStyle=SCR;ctx.lineWidth=1;
+    for(var i=0;i<sc;i++){var x=Math.floor(rng()*W),len=6+Math.floor(rng()*16);ctx.globalAlpha=0.4+rng()*0.3;ctx.beginPath();ctx.moveTo(x,4+rng()*(H-10));ctx.lineTo(x+len,4+rng()*(H-10));ctx.stroke();}
+    ctx.globalAlpha=1;
+    function fastener(cx,cy,kind){var r=4;
+      function disc(){ctx.fillStyle=EDGE;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.fill();ctx.fillStyle=HI;ctx.beginPath();ctx.arc(cx,cy,r-1,0,7);ctx.fill();ctx.fillStyle=MID;ctx.beginPath();ctx.arc(cx+0.6,cy+0.6,r-1.6,0,7);ctx.fill();}
+      if(kind===0){disc();}
+      else if(kind===1){ctx.fillStyle=EDGE;ctx.beginPath();for(var a=0;a<6;a++){var ang=Math.PI/3*a,px=cx+Math.cos(ang)*r,py=cy+Math.sin(ang)*r;a?ctx.lineTo(px,py):ctx.moveTo(px,py);}ctx.closePath();ctx.fill();ctx.fillStyle=HI;ctx.beginPath();for(var b=0;b<6;b++){var an=Math.PI/3*b,qx=cx+Math.cos(an)*(r-1.4),qy=cy+Math.sin(an)*(r-1.4);b?ctx.lineTo(qx,qy):ctx.moveTo(qx,qy);}ctx.closePath();ctx.fill();}
+      else if(kind===2){disc();ctx.fillStyle=EDGE;ctx.fillRect(cx-r+1,cy-0.5,(r-1)*2,1);}
+      else{disc();ctx.fillStyle=EDGE;ctx.fillRect(cx-r+1,cy-0.5,(r-1)*2,1);ctx.fillRect(cx-0.5,cy-r+1,1,(r-1)*2);}}
+    var n=Math.max(3,Math.round(W/(34+rng()*20))),pad=12;
+    for(var k=0;k<n;k++){var cx=Math.round(pad+k*(W-pad*2)/(n-1));fastener(cx,Math.round(H/2),Math.floor(rng()*4));}
+    var seams=Math.floor(rng()*3);
+    for(var s=0;s<seams;s++){var sx=Math.round(pad+rng()*(W-pad*2));ctx.fillStyle=EDGE;ctx.fillRect(sx,2,1,H-4);ctx.fillStyle=HI;ctx.fillRect(sx+1,2,1,H-4);}
+    var led=LED[Math.floor(rng()*LED.length)],lx=rng()>0.5?W-8:8;
+    ctx.fillStyle=EDGE;ctx.fillRect(lx-3,H/2-3,6,6);ctx.fillStyle=led;ctx.fillRect(lx-2,H/2-2,4,4);ctx.fillStyle="#fff";ctx.globalAlpha=0.6;ctx.fillRect(lx-2,H/2-2,1,1);ctx.globalAlpha=1;
   });
 </script>
 </body>

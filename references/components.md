@@ -813,7 +813,10 @@ rail, or masthead, **never** on a flat data field, and keep it `aria-hidden`
 | Class | Part |
 | --- | --- |
 | `.cr-rivet` · `--hex` · `--slot` | round rivet · hex bolt · slot screw |
-| `.cr-vent` | louvred vent |
+| `.cr-screw` · `--x` | slot screw · phillips (cross) screw |
+| `.cr-bolt` | square bolt head |
+| `.cr-led` · `--wait/-done/-err/-idle` | indicator LED, keyed to a signal (solid, no glow) |
+| `.cr-vent` · `.cr-grille` | louvred vent (horizontal) · grille (vertical) |
 | `.cr-port` | connector port |
 | `.cr-stripe` | hazard tape (`--sig-wait` diagonal) |
 | `.cr-seam` | panel seam (a hairline groove) |
@@ -822,6 +825,22 @@ rail, or masthead, **never** on a flat data field, and keep it `aria-hidden`
 
 - **MUST** confine chrome to hardware surfaces; a riveted flat panel is noise.
 - **SHOULD** use it sparingly — one plate, a few rivets. Chrome is seasoning.
+
+### Seeded chrome strip {#seeded-chrome}
+
+For a whole varied hardware bar, `CrChrome` paints a **seeded** pixel-art metal
+strip — a deterministic mix of fasteners (rivets / hex bolts / slot + phillips
+screws), panel seams, wear scratches, and one indicator LED. Same seed → same
+strip, so a rack/unit gets a stable, distinct face (like the seeded cat/sigil).
+
+```tsx
+import { CrChrome } from "@control-room/design-system/react";
+<CrChrome seed="nova-rack" width={440} />
+```
+
+- Decorative hardware (Law 6); it is `aria-hidden`/`role=img` with the seed as its
+  name and carries no information a label doesn't.
+- **NEVER** put it behind data; it is a bezel/rail/rack surface, not a content field.
 
 ## Richer textures
 
@@ -836,11 +855,13 @@ engine) — CSS covers the regular patterns; canvas covers the generative ones.
 
 The **one sanctioned rule-break per screen** (Law 9). `.cr-breach` licenses the
 forbidden vocabulary on a single element — a soft corner (`--breach-radius`), a
-**neon gradient rim** and a **dual-hue glow** in the house **magenta → acid** neon
-pairing (`--cr-breach` / `--cr-breach-2`), plus an optional interior `--wash` — to
-spotlight the most exceptional thing. The interior stays dark and legible; the
-*strike* is the rim + glow. It only reads because everything around it obeys, so
-**use it at most once per screen.**
+**rotating neon gradient rim** with bright spots riding the border, and a
+**dual-hue glow** in the house **magenta → acid** neon pairing (`--cr-breach` /
+`--cr-breach-2`), plus an optional interior `--wash` — to spotlight the most
+exceptional thing. The interior stays dark and legible; the *strike* is the rim +
+glow. Rotation speed is `--breach-spin` (default 9s), off under reduced motion. It
+only reads because everything around it obeys, so **use it at most once per
+screen.**
 
 ```html
 <div class="cr-breach cr-breach--wash cr-breach--alive" style="background:var(--panel)">

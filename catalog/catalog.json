@@ -5,20 +5,20 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 29,
+    "count": 30,
     "categories": {
       "action": 1,
       "forms": 6,
       "identity": 2,
       "layout": 5,
-      "media": 2,
+      "media": 3,
       "navigation": 1,
       "overlay": 3,
       "primitives": 1,
       "state": 8
     },
     "lifecycles": {
-      "stable": 28,
+      "stable": 29,
       "experimental": 1
     }
   },
@@ -619,6 +619,43 @@
         "data",
         "rows",
         "columns"
+      ]
+    },
+    {
+      "id": "chrome",
+      "name": "Chrome",
+      "kind": "component",
+      "category": "media",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Seeded hardware chrome strip — a pixel-art metal bar with deterministically varied fasteners, panel seams, wear scratches, and an indicator LED.",
+      "spec": "references/components.md#seeded-chrome",
+      "variants": {
+        "prop": [
+          "seed",
+          "width"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--rail-ink",
+          "description": "metal highlight (kit pieces)"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "LED default hue"
+        }
+      ],
+      "keywords": [
+        "chrome",
+        "hardware",
+        "seeded",
+        "rivet",
+        "bolt",
+        "screw",
+        "led",
+        "pixel",
+        "wear"
       ]
     },
     {

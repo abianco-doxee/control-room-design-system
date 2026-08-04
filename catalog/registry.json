@@ -1152,6 +1152,42 @@
       ]
     },
     {
+      "id": "chrome",
+      "name": "Chrome",
+      "category": "media",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Seeded hardware chrome strip — a pixel-art metal bar with deterministically varied fasteners, panel seams, wear scratches, and an indicator LED.",
+      "spec": "references/components.md#seeded-chrome",
+      "variants": {
+        "prop": [
+          "seed",
+          "width"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--rail-ink",
+          "description": "metal highlight (kit pieces)"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "LED default hue"
+        }
+      ],
+      "keywords": [
+        "chrome",
+        "hardware",
+        "seeded",
+        "rivet",
+        "bolt",
+        "screw",
+        "led",
+        "pixel",
+        "wear"
+      ]
+    },
+    {
       "id": "breach",
       "name": "Breach",
       "category": "layout",
