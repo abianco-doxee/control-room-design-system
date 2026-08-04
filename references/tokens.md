@@ -114,7 +114,8 @@ Two registers, nothing between (Law 5).
 
 | Token | Value | Notes |
 | --- | --- | --- |
-| `--font-sans` | `"CR Sans","Archivo",…` | display register |
+| `--font-display` | `"CR Display","Saira Condensed",…` | **display register** — condensed heavy grotesque |
+| `--font-sans` | `"CR Sans","Archivo",…` | UI / body fallback |
 | `--font-mono` | `"CR Mono","JetBrains Mono",…` | data register |
 | `--type-display-weight` | `900` | |
 | `--type-display-tracking` | `-0.038em` | |

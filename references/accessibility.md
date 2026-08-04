@@ -23,6 +23,10 @@ Color carries state (Law 2), so it must be backed up:
 
 - **MUST** pair every StatusDot / keyed region with a text or shape equivalent —
   an `aria-label`, a visible label, or one of the Law 4 diagonal primitives.
+- **SHOULD** reach for the **severity shape** (`.cr-sev--*`, Law 4) when a state
+  needs a non-colour reading: the polygon's side-count encodes danger independent
+  of hue, so it is the built-in backup for the `phosphor` (monochrome) theme and
+  for colour-blind operators.
 - **MUST** keep the system fully usable in the `phosphor` theme, which is
   effectively monochrome — if a screen only works because of hue, it is broken.
 
