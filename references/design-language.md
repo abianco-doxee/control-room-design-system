@@ -407,7 +407,7 @@ isn't, whatever the palette. Use this as the identity checklist.
    corner breaks the spell.
 3. **Color is state, never chrome.** A hue on screen is a machine state or a
    primary action — never a mood, a zebra-stripe, or a brand flourish (Law 2).
-4. **Two registers, no middle.** Archivo-900 display for the one big thing; mono
+4. **Two registers, no middle.** Condensed-900 display (Saira Condensed) for the one big thing; mono
    12–13px for everything operational. The absent 18–24px "body" register is a
    tell in the negative (Law 5).
 5. **Texture only on hardware.** Halftone / scanlines / CRT wash appear *only*

@@ -207,32 +207,16 @@ per theme (see `references/accessibility.md`).
 the `extreme` theme. **NEVER** reference them from a component that must work in
 all themes — they resolve to nothing elsewhere.
 
-## Full per-theme value matrix
+## Full per-theme values
 
-| Token | dark | light | extreme | phosphor |
-| --- | --- | --- | --- | --- |
-| `--ground` | `#0a0a12` | `#ecebe3` | `#0c0510` | `#020a04` |
-| `--board` | `#0e0e18` | `#e4e3d9` | `#12061a` | `#041207` |
-| `--panel` | `#14141f` | `#ffffff` | `#18091f` | `#06180a` |
-| `--panel-2` | `#191926` | `#f6f5ef` | `#210c2b` | `#0a2210` |
-| `--ink` | `#e6e6f2` | `#0b0b12` | `#fdf0ff` | `#43ff7a` |
-| `--muted` | `#8a8aa6` | `#55556b` | `#c79ad6` | `#2fac55` |
-| `--border` | `#000000` | `#000000` | `#000000` | `#031a08` |
-| `--rail` | `#050509` | `#0b0b12` | `#ff2e97` | `#020a04` |
-| `--rail-ink` | `#c8c8de` | `#ecebe3` | `#0c0510` | `#43ff7a` |
-| `--sig-work` | `#22d3ee` | `#0891b2` | `#00f0ff` | `#43ff7a` |
-| `--sig-accent` | `#ff2e97` | `#e60076` | `#ff2e97` | `#b6ff00` |
-| `--sig-done` | `#5eead4` | `#0d9488` | `#c6ff00` | `#00e05a` |
-| `--sig-wait` | `#fde047` | `#d97706` | `#ffd400` | `#a8ff3e` |
-| `--sig-err` | `#ff3b6b` | `#e11d48` | `#ff4d6d` | `#eaff40` |
-| `--sig-idle` | `#6b6b8a` | `#7e7e94` | `#9a7aab` | `#12602c` |
-| `--on-sig` | `#050509` | `#0b0b12` | `#0c0510` | `#020a04` |
-| `--on-err` | `#050509` | `#ffffff` | `#0c0510` | `#020a04` |
-| `--shadow-col` | `#000000` | `#000000` | `#000000` | `#031a08` |
-| `--mass` | `#000000` | `#0b0b12` | `#000000` | `#010603` |
-| `--stage` | `#00b34a` | `#00a344` | `#c6ff00` | `#0d7a34` |
-| `--stage-ink` | `#04140a` | `#04140a` | `#12061a` | `#d9ffe6` |
-| `--drip` | `#4affc8` | `#0a7f5c` | `#00f0ff` | `#43ff7a` |
+The resolved value of every token in every theme lives in the **generated,
+authoritative** file **[`dist/tokens.flat.json`](../../dist/tokens.flat.json)**
+(`{ themes: { dark|light|extreme|phosphor: { "--token": value } } }`) — emitted
+from `tokens/tokens.json` by `build:tokens`. It is not reproduced as a hand-typed
+table here on purpose: a copied hex matrix silently rots the moment a value
+changes (and the grounds/signals are themselves OKLCH-generated — see below). To
+read a theme's palette, open `tokens.flat.json`, the Live Gallery's colour-tokens
+section (which renders the real values), or `dist/control-room.css`.
 
 ## OKLCH-generated palette {#oklch}
 

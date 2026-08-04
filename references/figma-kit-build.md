@@ -59,7 +59,7 @@ The full list, categories, variants, and the tokens each consumes is the
 **catalog** — build straight from it:
 
 - Browse it in the docs: **Component Catalog** page, or read
-  `catalog/catalog.json` (16 components).
+  `catalog/catalog.json` (the components listed there).
 - Each entry gives you the Figma component name, its variant axes, and the exact
   token variables to bind.
 
