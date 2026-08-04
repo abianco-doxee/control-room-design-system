@@ -91,4 +91,23 @@ test.describe("component browser — live islands", () => {
     expect(ring.style, "outline style").not.toBe("none");
     expect(ring.width, "outline width > 0").toBeGreaterThan(0);
   });
+
+  test("calm intensity profile dials motion + decoration down", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    const def = await page.evaluate(() => {
+      const cs = getComputedStyle(document.documentElement);
+      return cs.getPropertyValue("--motion-intensity").trim();
+    });
+    expect(def, "default is the loud showcase profile").toBe("1");
+    const calm = await page.evaluate(() => {
+      document.documentElement.setAttribute("data-intensity", "calm");
+      const cs = getComputedStyle(document.documentElement);
+      return {
+        motion: cs.getPropertyValue("--motion-intensity").trim(),
+        decor: cs.getPropertyValue("--decoration-intensity").trim(),
+      };
+    });
+    expect(calm.motion, "calm kills non-essential motion").toBe("0");
+    expect(calm.decor, "calm tones decoration down").toBe("0.4");
+  });
 });

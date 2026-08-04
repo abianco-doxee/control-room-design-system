@@ -44,6 +44,8 @@
       "--row-h": "34px",
       "--focus-w": "3px",
       "--focus-offset": "2px",
+      "--motion-intensity": "1",
+      "--decoration-intensity": "1",
       "--radius": "0px",
       "--halftone-size": "7px",
       "--breach-radius": "14px",

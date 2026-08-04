@@ -759,6 +759,9 @@
 /* All fill edge-to-edge (repeat, from the origin). Pair with a background-color. */
 .cr-tex--halftone, .cr-tex--dither, .cr-tex--scan, .cr-tex--cross, .cr-tex--glass {
   background-repeat: repeat; background-position: 0 0; background-attachment: local;
+  /* Follows the loudness dial — 1 (default/showcase) is a no-op; the `calm` ops
+     profile tones the texture down. These are decorative texture layers by design. */
+  opacity: var(--decoration-intensity, 1);
 }
 .cr-tex--halftone { background-image: var(--halftone); background-size: var(--halftone-size) var(--halftone-size); }
 .cr-tex--dither   { background-image: var(--dither); }
