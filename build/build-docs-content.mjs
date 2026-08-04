@@ -16,6 +16,9 @@ import { dirname, join, basename } from "node:path";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const DOCS = join(ROOT, "src", "content", "docs");
 const REPO = "https://github.com/alebianco/control-room-design-system/blob/main";
+// Base path for the self-contained browser pages (gallery.html / components.html),
+// which live at the site root, not under a Starlight route. Matches astro.config.mjs.
+const BASE = process.env.BASE_PATH || "/control-room-design-system/";
 
 // source file → { section, slug, title }
 const PAGES = [
@@ -87,11 +90,11 @@ function catalogPage() {
   };
   let md = `---\ntitle: "Component Catalog"\n---\n\n`;
   md += `Generated from \`catalog/catalog.json\` — **${cat.meta.count}** components across ${Object.keys(byCat).length} categories. `;
-  md += `Prose specs live in the [Component Library](../reference/components/). This page is the queryable index (also emitted as machine-readable [\`catalog.json\`](${REPO}/catalog/catalog.json)).\n\n`;
+  md += `Prose specs live in the [Component Library](../reference/components/); see every component rendered and exercised in all its states in the [Component Browser](${BASE}components.html). This page is the queryable index (also emitted as machine-readable [\`catalog.json\`](${REPO}/catalog/catalog.json)).\n\n`;
   for (const category of Object.keys(byCat).sort()) {
-    md += `## ${category}\n\n| Component | Kind | Lifecycle | What it is |\n| --- | --- | --- | --- |\n`;
+    md += `## ${category}\n\n| Component | Kind | Lifecycle | What it is | Live |\n| --- | --- | --- | --- | --- |\n`;
     for (const e of byCat[category]) {
-      md += `| [${e.name}](${specLink(e)}) | ${e.kind} | ${e.lifecycle} | ${e.description} |\n`;
+      md += `| [${e.name}](${specLink(e)}) | ${e.kind} | ${e.lifecycle} | ${e.description} | [open ↗](${BASE}components.html#c-${e.id}) |\n`;
     }
     md += `\n`;
   }

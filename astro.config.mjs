@@ -2,6 +2,30 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 
+// Support `## Heading {#custom-id}` anchors (GitHub/kramdown syntax) so the
+// catalog + cross-doc links resolve to the right heading. Strips the literal
+// {#id} from the rendered text and sets the heading id before rehype-slug runs.
+function remarkHeadingIds() {
+  return (tree) => {
+    const walk = (node) => {
+      if (node.type === "heading" && node.children && node.children.length) {
+        const last = node.children[node.children.length - 1];
+        if (last && last.type === "text") {
+          const m = last.value.match(/\s*\{#([\w-]+)\}\s*$/);
+          if (m) {
+            last.value = last.value.slice(0, m.index).replace(/\s+$/, "");
+            node.data = node.data || {};
+            node.data.hProperties = { ...(node.data.hProperties || {}), id: m[1] };
+            node.data.id = m[1];
+          }
+        }
+      }
+      if (node.children) node.children.forEach(walk);
+    };
+    walk(tree);
+  };
+}
+
 // CI injects SITE_URL + BASE_PATH for the GitHub Pages subpath (base-path aware,
 // matching the Doxee Design-System-Hub convention).
 const site = process.env.SITE_URL || "https://alebianco.github.io";
@@ -12,6 +36,9 @@ export default defineConfig({
   site,
   base,
   outDir: "./site-dist",
+  markdown: {
+    remarkPlugins: [remarkHeadingIds],
+  },
   integrations: [
     starlight({
       title: "Control Room",
@@ -32,6 +59,7 @@ export default defineConfig({
           items: [
             { label: "What is Control Room", link: "/guide/skill/" },
             { label: "Live Gallery ↗", link: `${base}gallery.html`, attrs: { target: "_self" } },
+            { label: "Component Browser ↗", link: `${base}components.html`, attrs: { target: "_self" } },
           ],
         },
         {
