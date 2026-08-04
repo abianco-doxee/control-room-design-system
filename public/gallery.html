@@ -658,8 +658,54 @@ body {
 .cr-toast__msg { flex: 1; }
 .cr-toast__close {
   font-family: var(--font-mono); cursor: pointer; background: transparent; color: inherit;
-  border: 1.5px solid currentColor; padding: 0 var(--space-1); line-height: 1.4;
+  border: var(--brd-hair) solid currentColor; padding: 0 var(--space-1); line-height: 1.4;
 }
+
+/* ── Toast region (stacks toasts in a screen corner) ────────────────────── */
+.cr-toast-region {
+  position: fixed; z-index: var(--z-overlay); display: flex; flex-direction: column;
+  gap: var(--space-2); max-width: min(92vw, 30rem); pointer-events: none;
+}
+.cr-toast-region > * { pointer-events: auto; }
+.cr-toast-region--tr { top: var(--space-4); right: var(--space-4); }
+.cr-toast-region--br { bottom: var(--space-4); right: var(--space-4); }
+.cr-toast-region--tl { top: var(--space-4); left: var(--space-4); }
+.cr-toast-region--bl { bottom: var(--space-4); left: var(--space-4); }
+/* bottom-anchored regions stack newest nearest the corner */
+.cr-toast-region--br, .cr-toast-region--bl { flex-direction: column-reverse; }
+
+/* ── Menu (dropdown) ────────────────────────────────────────────────────── */
+.cr-menu { position: relative; display: inline-block; }
+.cr-menu__scrim { position: fixed; inset: 0; z-index: var(--z-overlay); background: transparent; border: 0; cursor: default; }
+.cr-menu__panel {
+  position: absolute; top: calc(100% + var(--space-1)); left: 0; z-index: calc(var(--z-overlay) + 1);
+  min-width: 12rem; background: var(--panel); border: var(--brd) solid var(--border);
+  box-shadow: var(--shadow-off-sm) var(--shadow-off-sm) 0 var(--shadow-col);
+  display: flex; flex-direction: column; padding: var(--space-1);
+}
+.cr-menu__panel--right { left: auto; right: 0; }
+.cr-menu__item {
+  font-family: var(--font-mono); font-size: var(--text-sm); text-align: left;
+  background: transparent; border: 0; color: var(--ink); cursor: pointer;
+  padding: var(--space-1) var(--space-2);
+}
+.cr-menu__item:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-menu__item--danger { color: var(--sig-err); }
+.cr-menu__sep { height: var(--brd-hair); background: color-mix(in srgb, var(--border) 30%, transparent); margin: var(--space-1) 0; }
+
+/* ── Pagination ─────────────────────────────────────────────────────────── */
+.cr-pager { display: flex; align-items: center; gap: var(--space-1); font-family: var(--font-mono); }
+.cr-pager__btn {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700;
+  min-width: var(--space-6); padding: var(--space-1) var(--space-2);
+  background: var(--panel); color: var(--ink); border: var(--brd-hair) solid var(--border); cursor: pointer;
+}
+.cr-pager__btn:hover:not([disabled]):not(.cr-pager__btn--on) {
+  background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent);
+}
+.cr-pager__btn--on { background: var(--sig-work); color: var(--on-sig); border-color: var(--border); }
+.cr-pager__btn[disabled] { opacity: var(--state-disabled-op); cursor: not-allowed; }
+.cr-pager__ellipsis { color: var(--muted); padding: 0 var(--space-1); }
 
 /* ── Tooltip (CSS reveal on hover/focus; role=tooltip + aria-describedby) ─ */
 .cr-tooltip { position: relative; display: inline-flex; }
@@ -1231,6 +1277,31 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         <div class="cr-meter cr-meter--work"><span class="cr-meter__label">cpu</span><span class="cr-meter__track" role="meter" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" aria-label="cpu"><span class="cr-meter__fill" style="width:72%"></span></span></div>
         <div class="cr-meter cr-meter--wait"><span class="cr-meter__label">queue</span><span class="cr-meter__track" role="meter" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" aria-label="queue"><span class="cr-meter__fill" style="width:40%"></span></span></div>
         <div class="cr-meter cr-meter--err"><span class="cr-meter__label">errors</span><span class="cr-meter__track" role="meter" aria-valuenow="12" aria-valuemin="0" aria-valuemax="100" aria-label="errors"><span class="cr-meter__fill" style="width:12%"></span></span></div>
+      </div>
+      <h3 style="margin-top:16px">Pagination</h3>
+      <nav class="cr-pager" aria-label="Pagination">
+        <button type="button" class="cr-pager__btn" aria-label="Previous page">‹</button>
+        <button type="button" class="cr-pager__btn" aria-label="Page 1">1</button>
+        <button type="button" class="cr-pager__btn cr-pager__btn--on" aria-label="Page 2" aria-current="page">2</button>
+        <button type="button" class="cr-pager__btn" aria-label="Page 3">3</button>
+        <span class="cr-pager__ellipsis" aria-hidden="true">…</span>
+        <button type="button" class="cr-pager__btn" aria-label="Page 9">9</button>
+        <button type="button" class="cr-pager__btn" aria-label="Next page">›</button>
+      </nav>
+      <h3 style="margin-top:16px">Menu (dropdown)</h3>
+      <div class="cr-menu" style="position:relative;min-height:150px">
+        <button type="button" class="cr-btn cr-btn--controls cr-btn--sm" aria-haspopup="menu" aria-expanded="true">actions ▾</button>
+        <div class="cr-menu__panel" role="menu">
+          <button type="button" role="menuitem" class="cr-menu__item">pause all</button>
+          <button type="button" role="menuitem" class="cr-menu__item">restart failed</button>
+          <div class="cr-menu__sep"></div>
+          <button type="button" role="menuitem" class="cr-menu__item cr-menu__item--danger">kill all</button>
+        </div>
+      </div>
+      <h3 style="margin-top:16px">Toast region (stacked)</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;max-width:340px">
+        <div class="cr-toast cr-toast--done" role="status" aria-live="polite"><span class="cr-toast__msg">queue drained</span><button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button></div>
+        <div class="cr-toast cr-toast--err" role="alert" aria-live="assertive"><span class="cr-toast__msg">killed all workers</span><button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button></div>
       </div>
     </div>
     <div style="grid-column:1/-1">
