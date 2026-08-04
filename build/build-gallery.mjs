@@ -423,6 +423,33 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         <div class="cr-leader"><span class="cr-leader__k">uptime</span><span class="cr-leader__fill"></span><span class="cr-leader__v">41h 12m</span></div>
         <div class="cr-leader"><span class="cr-leader__k">region</span><span class="cr-leader__fill"></span><span class="cr-leader__v">eu-west-1</span></div>
       </div>
+      <h3 style="margin-top:16px">Tree · Hover card</h3>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+        <ul class="cr-tree" role="tree" aria-label="Fleet" style="min-width:220px">
+          <li class="cr-tree__item" role="treeitem" data-id="nova" aria-level="1" aria-expanded="true" aria-selected="false" tabindex="0" style="padding-left:calc(0 * var(--space-4) + var(--space-2))"><span class="cr-tree__twist" aria-hidden="true"></span><span>nova (pool)</span></li>
+          <li class="cr-tree__item" role="treeitem" data-id="nova-01" aria-level="2" aria-selected="false" tabindex="-1" style="padding-left:calc(1 * var(--space-4) + var(--space-2))"><span class="cr-tree__lead" aria-hidden="true">·</span><span>nova-01 · streaming</span></li>
+          <li class="cr-tree__item" role="treeitem" data-id="nova-02" aria-level="2" aria-selected="true" tabindex="-1" style="padding-left:calc(1 * var(--space-4) + var(--space-2))"><span class="cr-tree__lead" aria-hidden="true">·</span><span>nova-02 · idle</span></li>
+          <li class="cr-tree__item" role="treeitem" data-id="ail" aria-level="1" aria-expanded="false" aria-selected="false" tabindex="-1" style="padding-left:calc(0 * var(--space-4) + var(--space-2))"><span class="cr-tree__twist" aria-hidden="true"></span><span>ail (pool)</span></li>
+        </ul>
+        <span class="cr-hovercard">
+          <span class="cr-hovercard__trigger" tabindex="0">health</span>
+          <span class="cr-hovercard__panel" role="group" aria-label="Fleet health" style="opacity:1;visibility:visible;position:static;box-shadow:var(--shadow-off) var(--shadow-off) 0 var(--shadow-col)">
+            <dl class="cr-dl"><dt class="cr-dl__k">workers</dt><dd class="cr-dl__v">4 online</dd><dt class="cr-dl__k">error rate</dt><dd class="cr-dl__v">1.2%</dd></dl>
+          </span>
+        </span>
+      </div>
+      <h3 style="margin-top:16px">Cron field (cronstrue) · Date-time</h3>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+        <div class="cr-cron" style="max-width:280px">
+          <input class="cr-cron__input" type="text" value="0 9 * * 1-5" aria-label="Cron expression" />
+          <div class="cr-cron__presets">
+            <button type="button" class="cr-cron__preset">hourly</button>
+            <button type="button" class="cr-cron__preset">nightly 2am</button>
+          </div>
+          <p class="cr-cron__out">At 09:00 AM, Monday through Friday</p>
+        </div>
+        <input type="datetime-local" class="cr-datetime" value="2026-08-04T02:00" aria-label="First run" />
+      </div>
     </div>
     <div style="grid-column:1/-1">
       <h3>Form controls</h3>
