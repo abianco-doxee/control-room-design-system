@@ -1,7 +1,7 @@
 {
   "name": "@control-room/design-system",
   "version": "1.0.0",
-  "description": "Control Room — a neon-noir, neobrutalist design system for dense operational dashboards. Design language (the eight laws), a four-theme token layer, a component library, motion tiers, and an accessibility contract.",
+  "description": "Control Room — a neon-noir, neobrutalist design system for dense operational dashboards. Design language (the nine laws), a four-theme token layer, a component library, motion tiers, and an accessibility contract.",
   "license": "UNLICENSED",
   "private": true,
   "type": "module",

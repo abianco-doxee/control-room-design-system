@@ -5,12 +5,12 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 28,
+    "count": 29,
     "categories": {
       "action": 1,
       "forms": 6,
       "identity": 2,
-      "layout": 4,
+      "layout": 5,
       "media": 2,
       "navigation": 1,
       "overlay": 3,
@@ -18,7 +18,7 @@
       "state": 8
     },
     "lifecycles": {
-      "stable": 27,
+      "stable": 28,
       "experimental": 1
     }
   },
@@ -445,6 +445,59 @@
         "texture",
         "halftone",
         "instrument"
+      ]
+    },
+    {
+      "id": "breach",
+      "name": "Breach",
+      "kind": "component",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The one sanctioned rule-break per screen (Law 9) — soft corner, colour glow, blurred blob, optional gradient wash — to spotlight the single most exceptional item.",
+      "spec": "references/components.md#breach",
+      "variants": {
+        "signal": [
+          "accent",
+          "work",
+          "wait",
+          "done",
+          "err",
+          "accent2"
+        ],
+        "flag": [
+          "wash",
+          "alive"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--breach-radius",
+          "description": "the soft corner"
+        },
+        {
+          "cssVar": "--breach-blur",
+          "description": "blurred-blob softness"
+        },
+        {
+          "cssVar": "--breach-glow-size",
+          "description": "glow radius"
+        },
+        {
+          "cssVar": "--sig-accent",
+          "description": "default glow hue"
+        }
+      ],
+      "keywords": [
+        "breach",
+        "glow",
+        "gradient",
+        "blob",
+        "soft",
+        "exception",
+        "spotlight",
+        "law-9",
+        "milestone"
       ]
     },
     {

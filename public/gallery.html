@@ -50,6 +50,9 @@
   --shadow-off-lg: 6px;
   --radius: 0px;
   --halftone-size: 7px;
+  --breach-radius: 14px;
+  --breach-blur: 26px;
+  --breach-glow-size: 40px;
   --font-sans: "CR Sans", "Archivo", "Arial Black", "Helvetica Neue", system-ui, sans-serif;
   --font-display: "CR Display", "Saira Condensed", "Archivo Narrow", "Oswald", var(--font-sans);
   --font-mono: "CR Mono", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -681,6 +684,54 @@ body {
   background-size: 5px 5px, 5px 5px; background-position: 0 0, 2.5px 2.5px;
 }
 
+/* ── The Breach (Law 9 — the one sanctioned rule-break per screen) ──────────
+ * Everything else obeys the laws; the breach is the single element licensed to
+ * use the forbidden vocabulary — a soft corner, a blurred blob, a colour glow,
+ * a gradient — to mark the ONE most exceptional thing. It only reads because
+ * everything around it is hard-edged. Rare by contract: one breach per screen.
+ * Colour keys to a signal (default accent); set --cr-breach to re-key. */
+.cr-breach {
+  position: relative; isolation: isolate;
+  border-radius: var(--breach-radius);                                  /* the soft corner   */
+  box-shadow: 0 0 var(--breach-glow-size)                               /* the soft glow     */
+    color-mix(in srgb, var(--cr-breach, var(--sig-accent)) 55%, transparent);
+}
+.cr-breach::before {                                                    /* the blurred blob  */
+  content: ""; position: absolute; inset: -18%; z-index: -1; pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(closest-side,
+    color-mix(in srgb, var(--cr-breach, var(--sig-accent)) 85%, transparent), transparent 72%);
+  filter: blur(var(--breach-blur)); opacity: 0.55;
+}
+/* re-key the glow to a signal (default is accent) */
+.cr-breach--work   { --cr-breach: var(--sig-work); }
+.cr-breach--wait   { --cr-breach: var(--sig-wait); }
+.cr-breach--done   { --cr-breach: var(--sig-done); }
+.cr-breach--err    { --cr-breach: var(--sig-err); }
+.cr-breach--accent2{ --cr-breach: var(--sig-accent-2); }
+/* subtle gradient wash over the surface — dark-keyed so --ink text stays legible */
+.cr-breach--wash {
+  background-image: linear-gradient(135deg,
+    color-mix(in srgb, var(--cr-breach, var(--sig-accent)) 26%, var(--panel)),
+    color-mix(in srgb, var(--sig-accent-2) 16%, var(--panel)));
+}
+/* a slow living glow — opt-in, off under reduced motion */
+.cr-breach--alive { animation: cr-breath 3.6s ease-in-out infinite; }
+@keyframes cr-breath {
+  0%, 100% { box-shadow: 0 0 calc(var(--breach-glow-size) * 0.7) color-mix(in srgb, var(--cr-breach, var(--sig-accent)) 45%, transparent); }
+  50%      { box-shadow: 0 0 calc(var(--breach-glow-size) * 1.4) color-mix(in srgb, var(--cr-breach, var(--sig-accent)) 70%, transparent); }
+}
+
+/* a standalone soft luminous accent — the antithesis of the hard pixel.
+ * Purely decorative (aria-hidden); use to underline a single distinctive item. */
+.cr-blob {
+  width: var(--space-10); height: var(--space-10); border-radius: 50%;
+  background: radial-gradient(closest-side, var(--cr-breach, var(--sig-accent)), transparent 70%);
+  filter: blur(calc(var(--breach-blur) * 0.5)); pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) { .cr-breach--alive { animation: none; } }
+
 
 /* gallery chrome only (not part of the system) */
 .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 100px;}
@@ -966,6 +1017,19 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         <div class="cr-panel cr-panel--inset cr-tex--cross" style="min-height:52px;padding:8px">crosshatch · ×</div>
         <div class="cr-panel cr-panel--inset cr-tex--duo" style="min-height:52px;padding:8px">duotone · cross-colours</div>
         <div class="cr-panel cr-panel--inset cr-tex--scan" style="min-height:52px;padding:8px">scanlines</div>
+      </div>
+    </div>
+    <div style="grid-column:1/-1">
+      <h3>The Breach (Law 9) — one sanctioned rule-break per screen</h3>
+      <div style="display:flex;gap:26px;flex-wrap:wrap;align-items:center;padding:16px 4px">
+        <div class="cr-breach cr-breach--wash cr-breach--alive" style="max-width:340px;padding:20px;background-color:var(--panel)">
+          <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--sig-accent)">Milestone</div>
+          <div style="font-family:var(--font-display);font-weight:900;font-size:30px;text-transform:uppercase;letter-spacing:-.03em;line-height:.88;margin-top:6px;color:var(--ink)">Sprint shipped</div>
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-top:8px">14 sessions · 0 failing · on time</div>
+        </div>
+        <span class="cr-blob" aria-hidden="true"></span>
+        <span class="cr-blob cr-breach--done" aria-hidden="true"></span>
+        <p style="font-family:var(--font-mono);font-size:11px;color:var(--muted);max-width:30ch;line-height:1.65">Soft corner · gradient wash · blurred blob · colour glow — every one forbidden elsewhere. It reads <em>because</em> everything around it is hard-edged. One per screen, never two.</p>
       </div>
     </div>
     <div style="grid-column:1/-1">

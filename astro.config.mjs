@@ -37,7 +37,7 @@ export default defineConfig({
         {
           label: "Foundations",
           items: [
-            { label: "Design Language — the 8 laws", link: "/reference/design-language/" },
+            { label: "Design Language — the 9 laws", link: "/reference/design-language/" },
             { label: "Tokens", link: "/reference/tokens/" },
           { label: "Tailwind-first", link: "/reference/tailwind/" },
             { label: "Motion", link: "/reference/motion/" },

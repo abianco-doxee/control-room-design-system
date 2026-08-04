@@ -7,13 +7,14 @@ A component is done when it passes every gate below in **all four themes**
 
 - [ ] Every color, border width, shadow, and font comes from a token — **no raw
       hex, px border, or hardcoded font** that a token already names.
-- [ ] All corners square (`--radius` / `0`). No `border-radius` anywhere.
+- [ ] All corners square (`--radius` / `0`). No `border-radius` anywhere —
+      *unless* this is the one Law 9 breach (`.cr-breach`).
 - [ ] Shadows are the hard offset idiom only — `offset offset 0 color`, never
-      blurred, never soft, never inset-glow.
-- [ ] No gradient on any content surface.
+      blurred, never soft, never inset-glow — *unless* it is the Law 9 breach glow.
+- [ ] No gradient on any content surface — *unless* it is the Law 9 breach wash.
 - [ ] Survives a theme flip with **zero per-theme overrides**.
 
-## Design language (the eight laws)
+## Design language (the nine laws)
 
 - [ ] **L1** — surfaces use two tones + hard boundary; correct border-weight
       hierarchy (`--brd` / `--brd-heavy` / `--brd-brush`); no mid-tone.
@@ -29,6 +30,9 @@ A component is done when it passes every gate below in **all four themes**
 - [ ] **L7** — calm at rest, event-driven eruption, always settles.
 - [ ] **L8** — every string is machine voice: present tense, datum first, one
       line, no apology/cheer/emoji, never first-person.
+- [ ] **L9** — at most **one** breach per screen (or none); it is keyed to a
+      signal, sits on the exceptional (never data/chrome), and everything else
+      stays hard-edged.
 
 ## Signatures (the tells)
 
