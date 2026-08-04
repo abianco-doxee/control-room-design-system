@@ -730,6 +730,57 @@ body {
 .cr-dl { display: grid; grid-template-columns: max-content 1fr; gap: var(--space-1) var(--space-4); margin: 0; }
 .cr-dl__k { font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
 .cr-dl__v { margin: 0; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); }
+
+/* ── Accordion (collapsible sections) ───────────────────────────────────── */
+.cr-accordion { border: var(--brd) solid var(--border); background: var(--panel); }
+.cr-accordion__item + .cr-accordion__item { border-top: var(--brd) solid var(--border); }
+.cr-accordion__header {
+  width: 100%; display: flex; align-items: center; gap: var(--space-2); justify-content: space-between;
+  background: transparent; border: 0; cursor: pointer; padding: var(--space-3) var(--space-4);
+  font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 700; color: var(--ink);
+  text-transform: uppercase; letter-spacing: 0.04em; text-align: left;
+}
+.cr-accordion__header:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-accordion__chevron {
+  display: inline-block; width: 0; height: 0; flex-shrink: 0;
+  border-left: 7px solid var(--muted); border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+  transition: transform var(--dur-press);
+}
+.cr-accordion__header[aria-expanded="true"] .cr-accordion__chevron { transform: rotate(90deg); border-left-color: var(--sig-work); }
+.cr-accordion__panel { padding: 0 var(--space-4) var(--space-4); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .cr-accordion__chevron { transition: none; } }
+
+/* ── Popover (generic anchored overlay) ─────────────────────────────────── */
+.cr-popover { position: relative; display: inline-block; }
+.cr-popover__scrim { position: fixed; inset: 0; z-index: var(--z-overlay); background: transparent; border: 0; cursor: default; }
+.cr-popover__panel {
+  position: absolute; top: calc(100% + var(--space-1)); left: 0; z-index: calc(var(--z-overlay) + 1);
+  min-width: 15rem; max-width: min(92vw, 22rem); background: var(--panel); color: var(--ink);
+  border: var(--brd) solid var(--border); box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  padding: var(--space-3) var(--space-4);
+}
+.cr-popover__panel--right { left: auto; right: 0; }
+.cr-popover__panel:focus-visible { outline: 3px solid var(--sig-work); outline-offset: 2px; }
+
+/* ── Drawer / sheet (edge panel on native dialog) ───────────────────────── */
+.cr-drawer {
+  position: fixed; inset: 0 0 0 auto; margin: 0; padding: 0; border-radius: var(--radius-none);
+  height: 100vh; max-height: 100vh; width: min(92vw, 26rem);
+  border: 0; border-left: var(--brd-brush) solid var(--border); background: var(--panel); color: var(--ink);
+  box-shadow: calc(var(--shadow-off-lg) * -1) 0 0 var(--shadow-col);
+}
+.cr-drawer--left { inset: 0 auto 0 0; border-left: 0; border-right: var(--brd-brush) solid var(--border); box-shadow: var(--shadow-off-lg) 0 0 var(--shadow-col); }
+.cr-drawer::backdrop { background: color-mix(in srgb, var(--mass) 72%, transparent); }
+.cr-drawer[open] { animation: cr-drawer-in var(--dur-press) ease-out; }
+.cr-drawer--left[open] { animation-name: cr-drawer-in-l; }
+@keyframes cr-drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes cr-drawer-in-l { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) { .cr-drawer[open] { animation: none; } }
+.cr-drawer__box { display: flex; flex-direction: column; height: 100%; }
+.cr-drawer__head { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: var(--brd) solid var(--border); }
+.cr-drawer__title { flex: 1; margin: 0; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
+.cr-drawer__close { font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1; cursor: pointer; background: var(--panel); color: var(--ink); border: var(--brd) solid var(--border); padding: var(--space-1) var(--space-2); }
+.cr-drawer__body { flex: 1; overflow: auto; padding: var(--space-4); }
 .cr-modal__head {
   display: flex; align-items: center; gap: var(--space-3);
   padding: var(--space-3) var(--space-4); border-bottom: var(--brd) solid var(--border);
@@ -1476,6 +1527,34 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
           <dt class="cr-dl__k">region</dt><dd class="cr-dl__v">eu-west-1</dd>
           <dt class="cr-dl__k">uptime</dt><dd class="cr-dl__v">41h 12m</dd>
         </dl>
+      </div>
+      <h3 style="margin-top:16px">Accordion · Popover</h3>
+      <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+        <div class="cr-accordion" style="min-width:280px">
+          <div class="cr-accordion__item">
+            <button type="button" class="cr-accordion__header" aria-expanded="true" aria-controls="g-acc-0" id="g-acc-h0"><span>Stack trace</span><span class="cr-accordion__chevron" aria-hidden="true"></span></button>
+            <div class="cr-accordion__panel" id="g-acc-0" role="region" aria-labelledby="g-acc-h0">SSEError: stream closed at turn 42</div>
+          </div>
+          <div class="cr-accordion__item">
+            <button type="button" class="cr-accordion__header" aria-expanded="false" aria-controls="g-acc-1" id="g-acc-h1"><span>Recent events</span><span class="cr-accordion__chevron" aria-hidden="true"></span></button>
+          </div>
+        </div>
+        <div class="cr-popover" style="position:relative;min-height:170px">
+          <button type="button" class="cr-btn cr-btn--controls cr-btn--sm" aria-haspopup="dialog" aria-expanded="true">filters ▾</button>
+          <div class="cr-popover__panel" role="dialog" aria-label="Queue filters" tabindex="-1">
+            <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 8px">show state</p>
+            <label style="font-family:var(--font-mono);font-size:var(--text-sm);display:flex;gap:8px;align-items:center"><input type="checkbox" class="cr-check" checked /> failing</label>
+          </div>
+        </div>
+      </div>
+      <h3 style="margin-top:16px">Drawer (edge sheet)</h3>
+      <div class="cr-drawer" style="position:static;inset:auto;margin:0;width:auto;max-width:320px;height:auto;border:var(--brd) solid var(--border);box-shadow:var(--shadow-off) var(--shadow-off) 0 var(--shadow-col)">
+        <div class="cr-drawer__box">
+          <div class="cr-drawer__head"><h2 class="cr-drawer__title">cr-1130 · inspect</h2><button type="button" class="cr-drawer__close" aria-label="Close">✕</button></div>
+          <div class="cr-drawer__body">
+            <dl class="cr-dl"><dt class="cr-dl__k">state</dt><dd class="cr-dl__v">failing · SSE closed</dd><dt class="cr-dl__k">retries</dt><dd class="cr-dl__v">3 / 5</dd></dl>
+          </div>
+        </div>
       </div>
     </div>
     <div style="grid-column:1/-1">

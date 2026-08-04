@@ -1007,6 +1007,60 @@ two-column grid, mono/label keys and data-register values.
 
 ---
 
+## Accordion {#accordion}
+
+**Purpose.** Fold dense sections (logs, config, details). Each header is a button
+(`aria-expanded` + `aria-controls`); the panel is a `role=region`. `single` makes
+it exclusive; `↑`/`↓`/`Home`/`End` move between headers (`Enter`/`Space` toggle).
+
+```tsx
+<CrAccordion single defaultOpen={[0]} items={[
+  { title: "Stack trace", body: "SSEError: stream closed at turn 42" },
+  { title: "Config", body: "model=opus · timeout=30s" },
+]} />
+```
+
+- **MUST** tie header → panel with `aria-controls`/`aria-labelledby` and keep
+  `aria-expanded` in sync; **NEVER** animate height in a way that breaks reduced-
+  motion (only the chevron rotates, and it freezes under the preference).
+
+---
+
+## Popover {#popover}
+
+**Purpose.** A generic anchored overlay for arbitrary content. A trigger toggles a
+floating panel; a transparent full-viewport scrim closes it on outside click, `Esc`
+closes and returns focus to the trigger. Use **Menu** for a list of actions.
+
+```tsx
+<CrPopover label="filters ▾" title="Queue filters">
+  <label><input type="checkbox" class="cr-check" /> failing</label>
+</CrPopover>
+```
+
+- **MUST** set `aria-expanded` on the trigger and give the panel an accessible name
+  (`title`); focus moves into the panel on open.
+
+---
+
+## Drawer {#drawer}
+
+**Purpose.** An edge sheet for detail/inspector panels. Built on the native
+`<dialog>` (focus-trap, `Esc`, backdrop); slides from the left or right, full
+height. Controlled via `open` (like Modal).
+
+```tsx
+<CrDrawer open={open} side="right" title="cr-1130 · inspect" onClose={close}>
+  <dl class="cr-dl">…</dl>
+  <CrAccordion single items={sections} />
+</CrDrawer>
+```
+
+- **MUST** drive it from `open` and handle `onClose` (the dialog fires it on `Esc`
+  and backdrop click); the slide-in animation is off under reduced-motion.
+
+---
+
 ## Keyboard navigation {#keyboard-nav}
 
 The interactive widgets follow the WAI-ARIA patterns, so they work without a mouse:
@@ -1017,6 +1071,8 @@ The interactive widgets follow the WAI-ARIA patterns, so they work without a mou
 | **Menu** | trigger opens on click or `↓`; then `↑`/`↓` move, `Home`/`End` jump, `Esc` closes and returns focus to the trigger; `Enter`/`Space` select |
 | **Table** | sortable headers are real `<button>`s (operable with `Enter`/`Space`), selection checkboxes are in the tab order |
 | **Command palette** | `⌘K`/`Ctrl+K` opens; `↑`/`↓`/`Home`/`End` move the active option, `Enter` runs, `Esc` closes (focus stays in the search field) |
+| **Accordion** | `↑`/`↓`/`Home`/`End` move between headers; `Enter`/`Space` toggle a panel |
+| **Popover / Drawer** | `Esc` closes (drawer traps focus natively); popover returns focus to its trigger |
 | **Radio group** | roving tabindex — `↑`/`↓`/`←`/`→` move and select; only the checked radio is tabbable |
 | **Slider** | native range — `←`/`→` step, `Home`/`End` to ends, `PageUp`/`PageDown` jump |
 | **Modal / Switch / Pagination** | native focus-trap (dialog), `Space` toggle, `Tab` between page buttons |
