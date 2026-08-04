@@ -467,9 +467,15 @@
       "category": "layout",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Dense tabular data on the same chassis as a panel; mono/label headers, data-register cells.",
+      "description": "Dense operator table on the same chassis as a panel; mono/label headers, data-register cells. Optional column sort, row selection (checkbox + aria-selected), and a sticky header.",
       "spec": "references/components.md#table",
-      "variants": {},
+      "variants": {
+        "prop": [
+          "sortable",
+          "selectable",
+          "sticky"
+        ]
+      },
       "tokens": [
         {
           "cssVar": "--panel",
@@ -482,6 +488,18 @@
         {
           "cssVar": "--muted",
           "description": "header text"
+        },
+        {
+          "cssVar": "--brd-hair",
+          "description": "row separators"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "sort indicator + selected-row wash"
+        },
+        {
+          "cssVar": "--state-hover-mix",
+          "description": "row hover"
         }
       ],
       "keywords": [
@@ -489,7 +507,86 @@
         "grid",
         "data",
         "rows",
-        "columns"
+        "columns",
+        "sort",
+        "select",
+        "sticky",
+        "operator"
+      ]
+    },
+    {
+      "id": "tabs",
+      "name": "Tabs",
+      "category": "navigation",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Tab strip (role=tablist) with a keyed underline on the active tab; scalar active-index state.",
+      "spec": "references/components.md#tabs",
+      "variants": {
+        "prop": [
+          "active"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--border",
+          "description": "baseline"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "active underline"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "inactive label"
+        }
+      ],
+      "keywords": [
+        "tabs",
+        "tablist",
+        "nav",
+        "switcher",
+        "segment"
+      ]
+    },
+    {
+      "id": "meter",
+      "name": "Meter",
+      "category": "state",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Token-driven capacity / utilisation bar (role=meter), square and hard-edged, keyed to a signal tone.",
+      "spec": "references/components.md#meter",
+      "variants": {
+        "tone": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "default fill"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "track"
+        },
+        {
+          "cssVar": "--brd-hair",
+          "description": "track outline"
+        }
+      ],
+      "keywords": [
+        "meter",
+        "bar",
+        "gauge",
+        "capacity",
+        "utilisation",
+        "progress"
       ]
     },
     {

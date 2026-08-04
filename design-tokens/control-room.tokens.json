@@ -199,6 +199,14 @@
     }
   },
   "chassis": {
+    "brd-hair": {
+      "$type": "dimension",
+      "$value": "1.5px",
+      "$description": "hairline — dot/tag outlines, row separators, dense chrome (thinner than --brd)",
+      "$extensions": {
+        "com.doxee.cssVar": "--brd-hair"
+      }
+    },
     "brd": {
       "$type": "dimension",
       "$value": "2px",
@@ -223,6 +231,14 @@
         "com.doxee.cssVar": "--brd-brush"
       }
     },
+    "shadow-off-sm": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "small floating pieces — menus, chips, popovers",
+      "$extensions": {
+        "com.doxee.cssVar": "--shadow-off-sm"
+      }
+    },
     "shadow-off": {
       "$type": "dimension",
       "$value": "4px",
@@ -237,6 +253,28 @@
       "$description": "mastheads, live instruments",
       "$extensions": {
         "com.doxee.cssVar": "--shadow-off-lg"
+      }
+    },
+    "state-disabled-op": {
+      "$value": "0.45",
+      "$description": "opacity for a disabled control",
+      "$extensions": {
+        "com.doxee.cssVar": "--state-disabled-op"
+      }
+    },
+    "state-hover-mix": {
+      "$value": "12%",
+      "$description": "amount of --ink mixed into a surface on hover (color-mix)",
+      "$extensions": {
+        "com.doxee.cssVar": "--state-hover-mix"
+      }
+    },
+    "row-h": {
+      "$type": "dimension",
+      "$value": "34px",
+      "$description": "default dense-table row height (density baseline)",
+      "$extensions": {
+        "com.doxee.cssVar": "--row-h"
       }
     },
     "radius": {
@@ -1245,6 +1283,14 @@
         }
       },
       "chassis": {
+        "brd-hair": {
+          "$type": "dimension",
+          "$value": "2px",
+          "$description": "chassis override",
+          "$extensions": {
+            "com.doxee.cssVar": "--brd-hair"
+          }
+        },
         "brd": {
           "$type": "dimension",
           "$value": "3px",
@@ -1267,6 +1313,14 @@
           "$description": "chassis override",
           "$extensions": {
             "com.doxee.cssVar": "--brd-brush"
+          }
+        },
+        "shadow-off-sm": {
+          "$type": "dimension",
+          "$value": "3px",
+          "$description": "chassis override",
+          "$extensions": {
+            "com.doxee.cssVar": "--shadow-off-sm"
           }
         },
         "shadow-off": {

@@ -5,20 +5,20 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 33,
+    "count": 35,
     "categories": {
       "action": 1,
       "forms": 6,
       "identity": 2,
       "layout": 5,
       "media": 6,
-      "navigation": 1,
+      "navigation": 2,
       "overlay": 3,
       "primitives": 1,
-      "state": 8
+      "state": 9
     },
     "lifecycles": {
-      "stable": 32,
+      "stable": 34,
       "experimental": 1
     }
   },
@@ -588,9 +588,15 @@
       "category": "layout",
       "lifecycle": "stable",
       "origin": "control-room",
-      "description": "Dense tabular data on the same chassis as a panel; mono/label headers, data-register cells.",
+      "description": "Dense operator table on the same chassis as a panel; mono/label headers, data-register cells. Optional column sort, row selection (checkbox + aria-selected), and a sticky header.",
       "spec": "references/components.md#table",
-      "variants": {},
+      "variants": {
+        "prop": [
+          "sortable",
+          "selectable",
+          "sticky"
+        ]
+      },
       "tokens": [
         {
           "cssVar": "--panel",
@@ -603,6 +609,18 @@
         {
           "cssVar": "--muted",
           "description": "header text"
+        },
+        {
+          "cssVar": "--brd-hair",
+          "description": "row separators"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "sort indicator + selected-row wash"
+        },
+        {
+          "cssVar": "--state-hover-mix",
+          "description": "row hover"
         }
       ],
       "keywords": [
@@ -610,7 +628,11 @@
         "grid",
         "data",
         "rows",
-        "columns"
+        "columns",
+        "sort",
+        "select",
+        "sticky",
+        "operator"
       ]
     },
     {
@@ -905,6 +927,42 @@
         "sidebar",
         "menu",
         "badge"
+      ]
+    },
+    {
+      "id": "tabs",
+      "name": "Tabs",
+      "kind": "component",
+      "category": "navigation",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Tab strip (role=tablist) with a keyed underline on the active tab; scalar active-index state.",
+      "spec": "references/components.md#tabs",
+      "variants": {
+        "prop": [
+          "active"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--border",
+          "description": "baseline"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "active underline"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "inactive label"
+        }
+      ],
+      "keywords": [
+        "tabs",
+        "tablist",
+        "nav",
+        "switcher",
+        "segment"
       ]
     },
     {
@@ -1223,6 +1281,47 @@
         "contact-sheet",
         "keyed",
         "roster"
+      ]
+    },
+    {
+      "id": "meter",
+      "name": "Meter",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Token-driven capacity / utilisation bar (role=meter), square and hard-edged, keyed to a signal tone.",
+      "spec": "references/components.md#meter",
+      "variants": {
+        "tone": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "default fill"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "track"
+        },
+        {
+          "cssVar": "--brd-hair",
+          "description": "track outline"
+        }
+      ],
+      "keywords": [
+        "meter",
+        "bar",
+        "gauge",
+        "capacity",
+        "utilisation",
+        "progress"
       ]
     },
     {

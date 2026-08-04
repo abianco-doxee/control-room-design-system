@@ -211,14 +211,53 @@
 }
 .cr-table th, .cr-table td {
   text-align: left; padding: var(--space-2) var(--space-3);
-  border-bottom: 1.5px solid color-mix(in srgb, var(--border) 15%, transparent);
+  border-bottom: var(--brd-hair) solid color-mix(in srgb, var(--border) 15%, transparent);
 }
-.cr-table tr:last-child td { border-bottom: none; }
+.cr-table tbody tr:last-child td, .cr-table tr:last-child td { border-bottom: none; }
 .cr-table th {
   font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase;
   letter-spacing: 0.06em; color: var(--muted); font-weight: 800;
 }
 .cr-table td { color: var(--ink); }
+/* sticky header (opt-in) — wrap the table in a scroll box for it to bite */
+.cr-table--sticky thead th { position: sticky; top: 0; z-index: 1; background: var(--panel); }
+/* sortable header */
+.cr-table__sortable { cursor: pointer; user-select: none; white-space: nowrap; }
+.cr-table__sortable:hover { color: var(--ink); }
+.cr-table__ind { color: var(--sig-work); font-weight: 900; margin-left: var(--space-1); }
+/* row hover + selection */
+.cr-table tbody tr:hover td { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-table tbody tr[aria-selected="true"] td { background: color-mix(in srgb, var(--sig-work) 18%, transparent); }
+.cr-table__sel { width: var(--space-8); text-align: center; }
+
+/* ── Tabs ──────────────────────────────────────────────────────────────── */
+.cr-tabs { display: flex; gap: 0; border-bottom: var(--brd) solid var(--border); }
+.cr-tab {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: var(--space-2) var(--space-4); background: transparent; color: var(--muted);
+  border: 0; border-bottom: var(--brd-heavy) solid transparent; margin-bottom: calc(var(--brd) * -1);
+  cursor: pointer;
+}
+.cr-tab:hover { color: var(--ink); }
+.cr-tab--on { color: var(--ink); border-bottom-color: var(--sig-work); }
+
+/* ── Meter (capacity / utilisation bar) ─────────────────────────────────── */
+.cr-meter { --cr-meter-c: var(--sig-work); display: flex; align-items: center; gap: var(--space-2); }
+.cr-meter__label {
+  font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); min-width: 6ch;
+}
+.cr-meter__track {
+  flex: 1; display: block; height: var(--space-2); background: var(--panel-2);
+  border: var(--brd-hair) solid var(--border);
+}
+.cr-meter__fill { display: block; height: 100%; background: var(--cr-meter-c); }
+.cr-meter--work { --cr-meter-c: var(--sig-work); }
+.cr-meter--wait { --cr-meter-c: var(--sig-wait); }
+.cr-meter--done { --cr-meter-c: var(--sig-done); }
+.cr-meter--err  { --cr-meter-c: var(--sig-err); }
+.cr-meter--idle { --cr-meter-c: var(--sig-idle); }
 
 /* ── Keyed contact sheet (Law 2) ───────────────────────────────────────── */
 .cr-tiles {
