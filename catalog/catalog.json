@@ -5,21 +5,21 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 55,
+    "count": 59,
     "categories": {
       "action": 1,
       "behavior": 1,
-      "forms": 10,
+      "forms": 12,
       "identity": 2,
       "layout": 7,
       "media": 7,
-      "navigation": 5,
-      "overlay": 8,
+      "navigation": 6,
+      "overlay": 9,
       "primitives": 2,
       "state": 12
     },
     "lifecycles": {
-      "stable": 54,
+      "stable": 58,
       "experimental": 1
     }
   },
@@ -182,6 +182,83 @@
         "select",
         "search",
         "dropdown",
+        "form"
+      ]
+    },
+    {
+      "id": "cron-field",
+      "name": "Cron field",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A cron-expression field with quick presets and a live human-readable readout. The translation is injected as `description` (compute with cronstrue in the host) so the design system stays dependency-free.",
+      "spec": "references/components.md#cron-field",
+      "variants": {
+        "prop": [
+          "value",
+          "presets",
+          "description",
+          "invalid"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "input"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "readout"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "invalid readout"
+        }
+      ],
+      "keywords": [
+        "cron",
+        "schedule",
+        "crontab",
+        "cronstrue",
+        "expression",
+        "recurring",
+        "form"
+      ]
+    },
+    {
+      "id": "datetime",
+      "name": "Date-time",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A styled native date/time input (datetime-local / date / time) — the browser owns the picker, keyboard, and locale.",
+      "spec": "references/components.md#datetime",
+      "variants": {
+        "kind": [
+          "datetime-local",
+          "date",
+          "time"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "field"
+        },
+        {
+          "cssVar": "--border",
+          "description": "border"
+        }
+      ],
+      "keywords": [
+        "date",
+        "time",
+        "datetime",
+        "calendar",
+        "picker",
+        "schedule",
         "form"
       ]
     },
@@ -1377,6 +1454,45 @@
       ]
     },
     {
+      "id": "tree",
+      "name": "Tree",
+      "kind": "component",
+      "category": "navigation",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Hierarchical tree (role=tree) for nested data like a worker→session fleet. Rendered as a flat list of visible rows; full keyboard nav (arrows expand/collapse/step, Home/End) and aria-level/aria-expanded.",
+      "spec": "references/components.md#tree",
+      "variants": {
+        "prop": [
+          "nodes",
+          "defaultExpanded"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "open twist + selection"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "twist / leaf marker"
+        },
+        {
+          "cssVar": "--state-hover-mix",
+          "description": "row hover"
+        }
+      ],
+      "keywords": [
+        "tree",
+        "treeview",
+        "hierarchy",
+        "nested",
+        "fleet",
+        "expand",
+        "collapse"
+      ]
+    },
+    {
       "id": "drawer",
       "name": "Drawer",
       "kind": "component",
@@ -1412,6 +1528,44 @@
         "panel",
         "off-canvas",
         "inspector"
+      ]
+    },
+    {
+      "id": "hover-card",
+      "name": "Hover card",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A rich hover/focus card for structured content (Tooltip is for plain text, Menu for actions). CSS-driven reveal with an open delay; the trigger is focusable so keyboard users get it too.",
+      "spec": "references/components.md#hover-card",
+      "variants": {
+        "align": [
+          "left",
+          "right"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "card fill"
+        },
+        {
+          "cssVar": "--shadow-off",
+          "description": "card shadow"
+        },
+        {
+          "cssVar": "--z-overlay",
+          "description": "stacking layer"
+        }
+      ],
+      "keywords": [
+        "hover",
+        "card",
+        "hovercard",
+        "preview",
+        "richtooltip",
+        "popover"
       ]
     },
     {

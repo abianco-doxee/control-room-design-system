@@ -1144,6 +1144,76 @@ layer (`references/decoration.md`). Structure, never a signal.
 
 ---
 
+## Hover card {#hover-card}
+
+**Purpose.** A rich card revealed on hover/focus — like Tooltip but for structured
+content (a stat block, a preview). CSS-driven with an open delay; the trigger is
+focusable so keyboard users get it too. For plain text use Tooltip; for actions use
+Menu.
+
+```tsx
+<CrHoverCard label="health" title="Fleet health">
+  <dl class="cr-dl"><dt class="cr-dl__k">workers</dt><dd class="cr-dl__v">4 online</dd></dl>
+</CrHoverCard>
+```
+
+- **SHOULD** keep the content glanceable; the card is supplementary, not a place for
+  primary actions (it dismisses on blur).
+
+---
+
+## Tree {#tree}
+
+**Purpose.** Hierarchical data — a worker→session fleet, a config tree. `role=tree`
+rendered as a flat list of the currently-visible rows (each with `aria-level` /
+`aria-expanded`). Full keyboard: `↑`/`↓`/`Home`/`End` move, `→` expands or steps in,
+`←` collapses or steps out, `Enter`/`Space` toggle+select.
+
+```tsx
+<CrTree label="Fleet" defaultExpanded={["nova"]} nodes={[
+  { id: "nova", label: "nova (pool)", children: [{ id: "nova-01", label: "nova-01" }] },
+]} />
+```
+
+- **MUST** keep `aria-level`/`aria-expanded` correct and a single tab stop (roving
+  tabindex). Selecting a node emits `onSelect`.
+
+---
+
+## Date-time {#datetime}
+
+**Purpose.** A styled native `datetime-local` / `date` / `time` input — the browser
+owns the picker, keyboard, and locale.
+
+```tsx
+<CrDateTime kind="datetime-local" value={startAt} onChange={setStartAt} />
+```
+
+- **MUST** give it an `aria-label` (or a visible label). Prefer native over a custom
+  calendar unless you truly need one.
+
+---
+
+## Cron field {#cron-field}
+
+**Purpose.** A cron-expression field for scheduling, with quick presets and a live
+**human-readable** readout. The translation is **injected** as `description` — the
+host computes it (e.g. with [cronstrue](https://github.com/bradymholt/cronstrue)) so
+the design system stays dependency-free.
+
+```tsx
+// host
+const d = (() => { try { return { text: cronstrue.toString(cron), bad: false }; }
+                   catch { return { text: "unrecognized", bad: true }; } })();
+<CrCronField value={cron} description={d.text} invalid={d.bad} onChange={setCron}
+  presets={[{ label: "nightly 2am", cron: "0 2 * * *" }]} />
+```
+
+- **SHOULD** compute `description` reactively (a `useComputed$` in Qwik, `useMemo` in
+  React) so it tracks the value; mark `invalid` on a parse failure.
+
+---
+
 ## Keyboard navigation {#keyboard-nav}
 
 The interactive widgets follow the WAI-ARIA patterns, so they work without a mouse:
@@ -1154,6 +1224,7 @@ The interactive widgets follow the WAI-ARIA patterns, so they work without a mou
 | **Menu** | trigger opens on click or `↓`; then `↑`/`↓` move, `Home`/`End` jump, `Esc` closes and returns focus to the trigger; `Enter`/`Space` select |
 | **Table** | sortable headers are real `<button>`s (operable with `Enter`/`Space`), selection checkboxes are in the tab order |
 | **Command palette** | `⌘K`/`Ctrl+K` opens; `↑`/`↓`/`Home`/`End` move the active option, `Enter` runs, `Esc` closes (focus stays in the search field) |
+| **Tree** | `↑`/`↓`/`Home`/`End` move; `→` expands or steps into children, `←` collapses or steps to parent; `Enter`/`Space` toggle+select |
 | **Accordion** | `↑`/`↓`/`Home`/`End` move between headers; `Enter`/`Space` toggle a panel |
 | **Popover / Drawer** | `Esc` closes (drawer traps focus natively); popover returns focus to its trigger |
 | **Segmented control** | roving tabindex — `←`/`→`/`Home`/`End` move and select (radiogroup semantics) |
