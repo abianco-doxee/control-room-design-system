@@ -4,10 +4,11 @@
  * Build: npm run build:components → dist/frameworks/<target>/ */
 module.exports = {
   files: "components/**",
-  targets: ["react", "vue", "svelte", "angular", "solid"],
+  targets: ["react", "vue", "svelte", "angular", "solid", "qwik"],
   dest: "dist/frameworks",
   options: {
     react: { typescript: true },
     vue: { typescript: true, api: "composition" },
+    qwik: { typescript: true },
   },
 };
