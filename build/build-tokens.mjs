@@ -268,7 +268,8 @@ function twTheme() {
     ink: "--ink", muted: "--muted", border: "--border", rail: "--rail", "rail-ink": "--rail-ink",
     "on-sig": "--on-sig", "on-err": "--on-err", stage: "--stage", drip: "--drip",
     work: "--sig-work", wait: "--sig-wait", done: "--sig-done", err: "--sig-err",
-    idle: "--sig-idle", accent: "--sig-accent",
+    idle: "--sig-idle", accent: "--sig-accent", accent2: "--sig-accent-2",
+    "on-accent": "--on-accent", "on-idle": "--on-idle",
   };
   const L = [];
   for (const [name, v] of Object.entries(colorMap)) L.push(`  --color-${name}: var(${v});`);

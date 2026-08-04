@@ -5,20 +5,20 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 26,
+    "count": 27,
     "categories": {
       "action": 1,
       "forms": 6,
       "identity": 2,
       "layout": 4,
-      "media": 1,
+      "media": 2,
       "navigation": 1,
       "overlay": 3,
       "primitives": 1,
       "state": 7
     },
     "lifecycles": {
-      "stable": 25,
+      "stable": 26,
       "experimental": 1
     }
   },
@@ -606,6 +606,52 @@
         "pixel",
         "canvas",
         "avatar"
+      ]
+    },
+    {
+      "id": "sigil",
+      "name": "Sigil",
+      "kind": "component",
+      "category": "media",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Seeded cyber-sigil — a retro-futuristic pixel glyph generated from a seed; optional state keys the hue.",
+      "spec": "references/seeded-sigil.md",
+      "variants": {
+        "state": [
+          "working",
+          "waiting",
+          "idle",
+          "error",
+          "done"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "working hue"
+        },
+        {
+          "cssVar": "--sig-accent",
+          "description": "default glyph hue (seeded)"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error hue"
+        },
+        {
+          "cssVar": "--sig-accent-2",
+          "description": "done/acid hue"
+        }
+      ],
+      "keywords": [
+        "sigil",
+        "pixel",
+        "cyber-sigilism",
+        "pixel-art",
+        "seeded",
+        "identity",
+        "glyph"
       ]
     },
     {

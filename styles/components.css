@@ -353,3 +353,34 @@
 .cr-tooltip:hover .cr-tooltip__bubble,
 .cr-tooltip:focus-within .cr-tooltip__bubble { opacity: 1; visibility: visible; }
 @media (prefers-reduced-motion: reduce) { .cr-tooltip__bubble { transition: none; } }
+
+/* ── Texture utilities (hardware only — Law 6) ─────────────────────────────
+ * Apply to a bezel/screen/hardware surface, NEVER a flat content field. All
+ * three read as the neo-print / CRT grain; theme-keyed via the texture tokens. */
+.cr-tex--halftone { background-image: var(--halftone); background-size: var(--halftone-size, 6px 6px); }
+.cr-tex--dither   { background-image: var(--dither); }
+.cr-tex--scan     { background-image: var(--scanline); }
+/* a stacked "aged glass" — halftone + scanlines together, the house hardware wash */
+.cr-tex--glass    { background-image: var(--scanline), var(--halftone); background-size: auto, var(--halftone-size, 6px 6px); }
+
+/* ── Ambient loops (Law 7 — alive at rest; low-fps, hardware-bound) ─────────
+ * Opt-in classes. All are OFF under prefers-reduced-motion (global rule in
+ * control-room.css already kills animations; these add the keyframes). */
+@keyframes cr-scan  { to { transform: translateY(100%); } }
+@keyframes cr-pulse { 0% { box-shadow: 0 0 0 0 var(--_pulse, var(--sig-work)); } 100% { box-shadow: 0 0 0 12px transparent; } }
+@keyframes cr-drift { to { background-position: var(--halftone-size, 6px 6px); } }
+@keyframes cr-flick { 50% { opacity: 0.45; } }
+
+/* a thin CRT sweep bar; host must be position:relative + overflow:hidden */
+.cr-anim-scan { position: relative; }
+.cr-anim-scan::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 14px;
+  background: linear-gradient(var(--sig-work), transparent); opacity: 0.4;
+  transform: translateY(-14px); animation: cr-scan 3.2s linear infinite; pointer-events: none;
+}
+/* a slow expanding ring on a signal dot; set --_pulse to a signal to re-key */
+.cr-anim-pulse { animation: cr-pulse 2.4s ease-out infinite; }
+/* halftone/dither surface that slowly drifts one cell */
+.cr-anim-drift { animation: cr-drift 6s linear infinite; }
+/* a ticker/cursor flicker for a live readout */
+.cr-anim-flick { animation: cr-flick 1.1s steps(2, jump-none) infinite; }

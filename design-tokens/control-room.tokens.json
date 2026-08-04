@@ -469,7 +469,7 @@
       "surface": {
         "ground": {
           "$type": "color",
-          "$value": "#0a0a12",
+          "$value": "#090413",
           "$description": "page background, furthest back",
           "$extensions": {
             "com.doxee.cssVar": "--ground"
@@ -477,7 +477,7 @@
         },
         "board": {
           "$type": "color",
-          "$value": "#0e0e18",
+          "$value": "#0f0819",
           "$description": "instrument / work surface",
           "$extensions": {
             "com.doxee.cssVar": "--board"
@@ -485,7 +485,7 @@
         },
         "panel": {
           "$type": "color",
-          "$value": "#14141f",
+          "$value": "#161021",
           "$description": "raised card / panel",
           "$extensions": {
             "com.doxee.cssVar": "--panel"
@@ -493,7 +493,7 @@
         },
         "panel-2": {
           "$type": "color",
-          "$value": "#191926",
+          "$value": "#1e182a",
           "$description": "recessed / inset region",
           "$extensions": {
             "com.doxee.cssVar": "--panel-2"
@@ -535,7 +535,7 @@
         },
         "on-sig": {
           "$type": "color",
-          "$value": "#050509",
+          "$value": "#06050c",
           "$description": "text/icon placed on a signal fill",
           "$extensions": {
             "com.doxee.cssVar": "--on-sig"
@@ -543,7 +543,7 @@
         },
         "on-err": {
           "$type": "color",
-          "$value": "#050509",
+          "$value": "#06050c",
           "$description": "text/icon on an error (--sig-err) fill; white in light, dark elsewhere",
           "$extensions": {
             "com.doxee.cssVar": "--on-err"
@@ -551,15 +551,23 @@
         },
         "on-accent": {
           "$type": "color",
-          "$value": "#050509",
+          "$value": "#06050c",
           "$description": "text/icon on an accent (--sig-accent) fill",
           "$extensions": {
             "com.doxee.cssVar": "--on-accent"
           }
         },
+        "on-accent-2": {
+          "$type": "color",
+          "$value": "#06050c",
+          "$description": "text on the second accent",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-accent-2"
+          }
+        },
         "on-idle": {
           "$type": "color",
-          "$value": "#ffffff",
+          "$value": "#06050c",
           "$description": "text/icon on an idle (--sig-idle) fill",
           "$extensions": {
             "com.doxee.cssVar": "--on-idle"
@@ -595,51 +603,58 @@
       "signal": {
         "sig-work": {
           "$type": "color",
-          "$value": "#22d3ee",
+          "$value": "#00d3fb",
           "$extensions": {
             "com.doxee.cssVar": "--sig-work"
           }
         },
         "sig-wait": {
           "$type": "color",
-          "$value": "#fde047",
+          "$value": "#f9ad00",
           "$extensions": {
             "com.doxee.cssVar": "--sig-wait"
           }
         },
         "sig-done": {
           "$type": "color",
-          "$value": "#5eead4",
+          "$value": "#00deaa",
           "$extensions": {
             "com.doxee.cssVar": "--sig-done"
           }
         },
         "sig-err": {
           "$type": "color",
-          "$value": "#ff3b6b",
+          "$value": "#f45058",
           "$extensions": {
             "com.doxee.cssVar": "--sig-err"
           }
         },
         "sig-idle": {
           "$type": "color",
-          "$value": "#6b6b8a",
+          "$value": "#848496",
           "$extensions": {
             "com.doxee.cssVar": "--sig-idle"
           }
         },
         "sig-accent": {
           "$type": "color",
-          "$value": "#ff2e97",
+          "$value": "#ff1a9d",
           "$extensions": {
             "com.doxee.cssVar": "--sig-accent"
+          }
+        },
+        "sig-accent-2": {
+          "$type": "color",
+          "$value": "#9ad335",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-accent-2"
           }
         }
       },
       "keyed": {
         "stage": {
           "$type": "color",
-          "$value": "#00b34a",
+          "$value": "#49de78",
           "$description": "calm/nominal keyed stage flood (Law 2)",
           "$extensions": {
             "com.doxee.cssVar": "--stage"
@@ -668,6 +683,20 @@
           "$description": "hardware texture; legal inside a bezel only (Law 6)",
           "$extensions": {
             "com.doxee.cssVar": "--halftone"
+          }
+        },
+        "dither": {
+          "$value": "repeating-conic-gradient(rgba(255,255,255,.05) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px",
+          "$description": "ordered 1-bit dither (hardware only, Law 6/3)",
+          "$extensions": {
+            "com.doxee.cssVar": "--dither"
+          }
+        },
+        "scanline": {
+          "$value": "repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0 1px, transparent 1px 3px)",
+          "$description": "CRT scanlines (hardware only)",
+          "$extensions": {
+            "com.doxee.cssVar": "--scanline"
           }
         }
       }
@@ -764,6 +793,14 @@
             "com.doxee.cssVar": "--on-accent"
           }
         },
+        "on-accent-2": {
+          "$type": "color",
+          "$value": "#f4f2ff",
+          "$description": "text on the second accent",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-accent-2"
+          }
+        },
         "on-idle": {
           "$type": "color",
           "$value": "#0b0b12",
@@ -841,6 +878,13 @@
           "$extensions": {
             "com.doxee.cssVar": "--sig-accent"
           }
+        },
+        "sig-accent-2": {
+          "$type": "color",
+          "$value": "#663e9e",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-accent-2"
+          }
         }
       },
       "keyed": {
@@ -876,6 +920,20 @@
           "$extensions": {
             "com.doxee.cssVar": "--halftone"
           }
+        },
+        "dither": {
+          "$value": "repeating-conic-gradient(rgba(0,0,0,.06) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px",
+          "$description": "ordered 1-bit dither (hardware only, Law 6/3)",
+          "$extensions": {
+            "com.doxee.cssVar": "--dither"
+          }
+        },
+        "scanline": {
+          "$value": "repeating-linear-gradient(0deg, rgba(0,0,0,.05) 0 1px, transparent 1px 3px)",
+          "$description": "CRT scanlines (hardware only)",
+          "$extensions": {
+            "com.doxee.cssVar": "--scanline"
+          }
         }
       }
     },
@@ -883,7 +941,7 @@
       "surface": {
         "ground": {
           "$type": "color",
-          "$value": "#0c0510",
+          "$value": "#0d0016",
           "$description": "page background, furthest back",
           "$extensions": {
             "com.doxee.cssVar": "--ground"
@@ -891,7 +949,7 @@
         },
         "board": {
           "$type": "color",
-          "$value": "#12061a",
+          "$value": "#13031d",
           "$description": "instrument / work surface",
           "$extensions": {
             "com.doxee.cssVar": "--board"
@@ -899,7 +957,7 @@
         },
         "panel": {
           "$type": "color",
-          "$value": "#18091f",
+          "$value": "#1d0a27",
           "$description": "raised card / panel",
           "$extensions": {
             "com.doxee.cssVar": "--panel"
@@ -907,7 +965,7 @@
         },
         "panel-2": {
           "$type": "color",
-          "$value": "#210c2b",
+          "$value": "#271432",
           "$description": "recessed / inset region",
           "$extensions": {
             "com.doxee.cssVar": "--panel-2"
@@ -949,7 +1007,7 @@
         },
         "on-sig": {
           "$type": "color",
-          "$value": "#0c0510",
+          "$value": "#06050c",
           "$description": "text/icon placed on a signal fill",
           "$extensions": {
             "com.doxee.cssVar": "--on-sig"
@@ -957,7 +1015,7 @@
         },
         "on-err": {
           "$type": "color",
-          "$value": "#0c0510",
+          "$value": "#06050c",
           "$description": "text/icon on an error (--sig-err) fill; white in light, dark elsewhere",
           "$extensions": {
             "com.doxee.cssVar": "--on-err"
@@ -965,15 +1023,23 @@
         },
         "on-accent": {
           "$type": "color",
-          "$value": "#0c0510",
+          "$value": "#06050c",
           "$description": "text/icon on an accent (--sig-accent) fill",
           "$extensions": {
             "com.doxee.cssVar": "--on-accent"
           }
         },
+        "on-accent-2": {
+          "$type": "color",
+          "$value": "#06050c",
+          "$description": "text on the second accent",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-accent-2"
+          }
+        },
         "on-idle": {
           "$type": "color",
-          "$value": "#0c0510",
+          "$value": "#06050c",
           "$description": "text/icon on an idle (--sig-idle) fill",
           "$extensions": {
             "com.doxee.cssVar": "--on-idle"
@@ -1009,51 +1075,58 @@
       "signal": {
         "sig-work": {
           "$type": "color",
-          "$value": "#00f0ff",
+          "$value": "#5cddff",
           "$extensions": {
             "com.doxee.cssVar": "--sig-work"
           }
         },
         "sig-wait": {
           "$type": "color",
-          "$value": "#ffd400",
+          "$value": "#ffbd4f",
           "$extensions": {
             "com.doxee.cssVar": "--sig-wait"
           }
         },
         "sig-done": {
           "$type": "color",
-          "$value": "#c6ff00",
+          "$value": "#00edb5",
           "$extensions": {
             "com.doxee.cssVar": "--sig-done"
           }
         },
         "sig-err": {
           "$type": "color",
-          "$value": "#ff4d6d",
+          "$value": "#fc4351",
           "$extensions": {
             "com.doxee.cssVar": "--sig-err"
           }
         },
         "sig-idle": {
           "$type": "color",
-          "$value": "#9a7aab",
+          "$value": "#8a80a0",
           "$extensions": {
             "com.doxee.cssVar": "--sig-idle"
           }
         },
         "sig-accent": {
           "$type": "color",
-          "$value": "#ff2e97",
+          "$value": "#ff2fa0",
           "$extensions": {
             "com.doxee.cssVar": "--sig-accent"
+          }
+        },
+        "sig-accent-2": {
+          "$type": "color",
+          "$value": "#a0e300",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-accent-2"
           }
         }
       },
       "keyed": {
         "stage": {
           "$type": "color",
-          "$value": "#c6ff00",
+          "$value": "#0bf272",
           "$description": "calm/nominal keyed stage flood (Law 2)",
           "$extensions": {
             "com.doxee.cssVar": "--stage"
@@ -1082,6 +1155,20 @@
           "$description": "hardware texture; legal inside a bezel only (Law 6)",
           "$extensions": {
             "com.doxee.cssVar": "--halftone"
+          }
+        },
+        "dither": {
+          "$value": "repeating-conic-gradient(rgba(255,255,255,.08) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px",
+          "$description": "ordered 1-bit dither (hardware only, Law 6/3)",
+          "$extensions": {
+            "com.doxee.cssVar": "--dither"
+          }
+        },
+        "scanline": {
+          "$value": "repeating-linear-gradient(0deg, rgba(0,240,255,.06) 0 1px, transparent 1px 3px)",
+          "$description": "CRT scanlines (hardware only)",
+          "$extensions": {
+            "com.doxee.cssVar": "--scanline"
           }
         }
       },
@@ -1238,6 +1325,14 @@
             "com.doxee.cssVar": "--on-accent"
           }
         },
+        "on-accent-2": {
+          "$type": "color",
+          "$value": "#06050c",
+          "$description": "text on the second accent",
+          "$extensions": {
+            "com.doxee.cssVar": "--on-accent-2"
+          }
+        },
         "on-idle": {
           "$type": "color",
           "$value": "#ffffff",
@@ -1315,6 +1410,13 @@
           "$extensions": {
             "com.doxee.cssVar": "--sig-accent"
           }
+        },
+        "sig-accent-2": {
+          "$type": "color",
+          "$value": "#00e6a8",
+          "$extensions": {
+            "com.doxee.cssVar": "--sig-accent-2"
+          }
         }
       },
       "keyed": {
@@ -1349,6 +1451,20 @@
           "$description": "hardware texture; legal inside a bezel only (Law 6)",
           "$extensions": {
             "com.doxee.cssVar": "--halftone"
+          }
+        },
+        "dither": {
+          "$value": "repeating-conic-gradient(rgba(67,255,122,.09) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px",
+          "$description": "ordered 1-bit dither (hardware only, Law 6/3)",
+          "$extensions": {
+            "com.doxee.cssVar": "--dither"
+          }
+        },
+        "scanline": {
+          "$value": "repeating-linear-gradient(0deg, rgba(67,255,122,.08) 0 1px, transparent 1px 3px)",
+          "$description": "CRT scanlines (hardware only)",
+          "$extensions": {
+            "com.doxee.cssVar": "--scanline"
           }
         }
       }

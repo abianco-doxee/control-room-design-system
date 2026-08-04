@@ -81,31 +81,35 @@
   --cr-hero-bg: var(--sig-accent);
   --cr-hero-fg: var(--on-accent);
   --cr-nav-w: 180px;
-  --ground: #0a0a12;
-  --board: #0e0e18;
-  --panel: #14141f;
-  --panel-2: #191926;
+  --ground: #090413;
+  --board: #0f0819;
+  --panel: #161021;
+  --panel-2: #1e182a;
   --ink: #e6e6f2;
   --muted: #8a8aa6;
   --border: #000000;
   --rail: #050509;
   --rail-ink: #c8c8de;
-  --sig-work: #22d3ee;
-  --sig-accent: #ff2e97;
-  --sig-done: #5eead4;
-  --sig-wait: #fde047;
-  --sig-err: #ff3b6b;
-  --sig-idle: #6b6b8a;
-  --on-sig: #050509;
-  --on-err: #050509;
-  --on-accent: #050509;
-  --on-idle: #ffffff;
+  --sig-work: #00d3fb;
+  --sig-accent: #ff1a9d;
+  --sig-accent-2: #9ad335;
+  --sig-done: #00deaa;
+  --sig-wait: #f9ad00;
+  --sig-err: #f45058;
+  --sig-idle: #848496;
+  --on-sig: #06050c;
+  --on-err: #06050c;
+  --on-accent: #06050c;
+  --on-accent-2: #06050c;
+  --on-idle: #06050c;
   --shadow-col: #000000;
   --mass: #000000;
-  --stage: #00b34a;
+  --stage: #49de78;
   --stage-ink: #04140a;
   --drip: #4affc8;
   --halftone: radial-gradient(circle at center, rgba(255,255,255,.05) 1.1px, transparent 1.4px);
+  --dither: repeating-conic-gradient(rgba(255,255,255,.05) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
+  --scanline: repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0 1px, transparent 1px 3px);
 }
 
 :root[data-theme="light"] {
@@ -121,6 +125,7 @@
   --rail-ink: #ecebe3;
   --sig-work: #0891b2;
   --sig-accent: #e60076;
+  --sig-accent-2: #663e9e;
   --sig-done: #0d9488;
   --sig-wait: #d97706;
   --sig-err: #e11d48;
@@ -128,6 +133,7 @@
   --on-sig: #0b0b12;
   --on-err: #ffffff;
   --on-accent: #ffffff;
+  --on-accent-2: #f4f2ff;
   --on-idle: #0b0b12;
   --shadow-col: #000000;
   --mass: #0b0b12;
@@ -135,37 +141,43 @@
   --stage-ink: #04140a;
   --drip: #0a7f5c;
   --halftone: radial-gradient(circle at center, rgba(0,0,0,.075) 1.1px, transparent 1.4px);
+  --dither: repeating-conic-gradient(rgba(0,0,0,.06) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
+  --scanline: repeating-linear-gradient(0deg, rgba(0,0,0,.05) 0 1px, transparent 1px 3px);
 }
 
 :root[data-theme="extreme"] {
   color-scheme: dark;
-  --ground: #0c0510;
-  --board: #12061a;
-  --panel: #18091f;
-  --panel-2: #210c2b;
+  --ground: #0d0016;
+  --board: #13031d;
+  --panel: #1d0a27;
+  --panel-2: #271432;
   --ink: #fdf0ff;
   --muted: #c79ad6;
   --border: #000000;
   --rail: #ff2e97;
   --rail-ink: #0c0510;
-  --sig-work: #00f0ff;
-  --sig-accent: #ff2e97;
-  --sig-done: #c6ff00;
-  --sig-wait: #ffd400;
-  --sig-err: #ff4d6d;
-  --sig-idle: #9a7aab;
-  --on-sig: #0c0510;
-  --on-err: #0c0510;
-  --on-accent: #0c0510;
-  --on-idle: #0c0510;
+  --sig-work: #5cddff;
+  --sig-accent: #ff2fa0;
+  --sig-accent-2: #a0e300;
+  --sig-done: #00edb5;
+  --sig-wait: #ffbd4f;
+  --sig-err: #fc4351;
+  --sig-idle: #8a80a0;
+  --on-sig: #06050c;
+  --on-err: #06050c;
+  --on-accent: #06050c;
+  --on-accent-2: #06050c;
+  --on-idle: #06050c;
   --extra-purple: #a855f7;
   --extra-orange: #ff6b35;
   --shadow-col: #000000;
   --mass: #000000;
-  --stage: #c6ff00;
+  --stage: #0bf272;
   --stage-ink: #12061a;
   --drip: #00f0ff;
   --halftone: radial-gradient(circle at center, rgba(255,255,255,.07) 1.2px, transparent 1.5px);
+  --dither: repeating-conic-gradient(rgba(255,255,255,.08) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
+  --scanline: repeating-linear-gradient(0deg, rgba(0,240,255,.06) 0 1px, transparent 1px 3px);
   --brd: 3px;
   --brd-heavy: 4px;
   --brd-brush: 6px;
@@ -186,6 +198,7 @@
   --rail-ink: #43ff7a;
   --sig-work: #43ff7a;
   --sig-accent: #b6ff00;
+  --sig-accent-2: #00e6a8;
   --sig-done: #00e05a;
   --sig-wait: #a8ff3e;
   --sig-err: #eaff40;
@@ -193,6 +206,7 @@
   --on-sig: #020a04;
   --on-err: #020a04;
   --on-accent: #020a04;
+  --on-accent-2: #06050c;
   --on-idle: #ffffff;
   --shadow-col: #031a08;
   --mass: #010603;
@@ -200,6 +214,8 @@
   --stage-ink: #d9ffe6;
   --drip: #43ff7a;
   --halftone: radial-gradient(circle at center, rgba(67,255,122,.09) 1.1px, transparent 1.4px);
+  --dither: repeating-conic-gradient(rgba(67,255,122,.09) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
+  --scanline: repeating-linear-gradient(0deg, rgba(67,255,122,.08) 0 1px, transparent 1px 3px);
 }
 
 /* ── GLOBAL BASELINE ──────────────────────────────────────────────────── */
@@ -578,6 +594,37 @@ body {
 .cr-tooltip:focus-within .cr-tooltip__bubble { opacity: 1; visibility: visible; }
 @media (prefers-reduced-motion: reduce) { .cr-tooltip__bubble { transition: none; } }
 
+/* ── Texture utilities (hardware only — Law 6) ─────────────────────────────
+ * Apply to a bezel/screen/hardware surface, NEVER a flat content field. All
+ * three read as the neo-print / CRT grain; theme-keyed via the texture tokens. */
+.cr-tex--halftone { background-image: var(--halftone); background-size: var(--halftone-size, 6px 6px); }
+.cr-tex--dither   { background-image: var(--dither); }
+.cr-tex--scan     { background-image: var(--scanline); }
+/* a stacked "aged glass" — halftone + scanlines together, the house hardware wash */
+.cr-tex--glass    { background-image: var(--scanline), var(--halftone); background-size: auto, var(--halftone-size, 6px 6px); }
+
+/* ── Ambient loops (Law 7 — alive at rest; low-fps, hardware-bound) ─────────
+ * Opt-in classes. All are OFF under prefers-reduced-motion (global rule in
+ * control-room.css already kills animations; these add the keyframes). */
+@keyframes cr-scan  { to { transform: translateY(100%); } }
+@keyframes cr-pulse { 0% { box-shadow: 0 0 0 0 var(--_pulse, var(--sig-work)); } 100% { box-shadow: 0 0 0 12px transparent; } }
+@keyframes cr-drift { to { background-position: var(--halftone-size, 6px 6px); } }
+@keyframes cr-flick { 50% { opacity: 0.45; } }
+
+/* a thin CRT sweep bar; host must be position:relative + overflow:hidden */
+.cr-anim-scan { position: relative; }
+.cr-anim-scan::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 14px;
+  background: linear-gradient(var(--sig-work), transparent); opacity: 0.4;
+  transform: translateY(-14px); animation: cr-scan 3.2s linear infinite; pointer-events: none;
+}
+/* a slow expanding ring on a signal dot; set --_pulse to a signal to re-key */
+.cr-anim-pulse { animation: cr-pulse 2.4s ease-out infinite; }
+/* halftone/dither surface that slowly drifts one cell */
+.cr-anim-drift { animation: cr-drift 6s linear infinite; }
+/* a ticker/cursor flicker for a live readout */
+.cr-anim-flick { animation: cr-flick 1.1s steps(2, jump-none) infinite; }
+
 
 /* gallery chrome only (not part of the system) */
 .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 100px;}
@@ -629,19 +676,19 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
   <div class="swgrid">
   <div class="sw">
     <div class="chipcolor" style="background:var(--ground)"></div>
-    <code>--ground</code><span class="hex">#0a0a12</span>
+    <code>--ground</code><span class="hex">#090413</span>
   </div>
   <div class="sw">
     <div class="chipcolor" style="background:var(--board)"></div>
-    <code>--board</code><span class="hex">#0e0e18</span>
+    <code>--board</code><span class="hex">#0f0819</span>
   </div>
   <div class="sw">
     <div class="chipcolor" style="background:var(--panel)"></div>
-    <code>--panel</code><span class="hex">#14141f</span>
+    <code>--panel</code><span class="hex">#161021</span>
   </div>
   <div class="sw">
     <div class="chipcolor" style="background:var(--panel-2)"></div>
-    <code>--panel-2</code><span class="hex">#191926</span>
+    <code>--panel-2</code><span class="hex">#1e182a</span>
   </div>
   <div class="sw">
     <div class="chipcolor" style="background:var(--rail)"></div>
@@ -663,7 +710,7 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
   </div>
   <div class="sw">
     <div class="chipcolor" style="background:var(--on-sig)"></div>
-    <code>--on-sig</code><span class="hex">#050509</span>
+    <code>--on-sig</code><span class="hex">#06050c</span>
   </div></div>
   <h3>Line & mass</h3>
   <div class="swgrid">
@@ -683,33 +730,37 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
   <div class="swgrid">
   <div class="sw">
     <div class="chipcolor" style="background:var(--sig-work)"></div>
-    <code>--sig-work</code><span class="hex">#22d3ee</span>
+    <code>--sig-work</code><span class="hex">#00d3fb</span>
   </div>
   <div class="sw">
     <div class="chipcolor" style="background:var(--sig-wait)"></div>
-    <code>--sig-wait</code><span class="hex">#fde047</span>
+    <code>--sig-wait</code><span class="hex">#f9ad00</span>
   </div>
   <div class="sw">
     <div class="chipcolor" style="background:var(--sig-done)"></div>
-    <code>--sig-done</code><span class="hex">#5eead4</span>
+    <code>--sig-done</code><span class="hex">#00deaa</span>
   </div>
   <div class="sw">
     <div class="chipcolor" style="background:var(--sig-err)"></div>
-    <code>--sig-err</code><span class="hex">#ff3b6b</span>
+    <code>--sig-err</code><span class="hex">#f45058</span>
   </div>
   <div class="sw">
     <div class="chipcolor" style="background:var(--sig-idle)"></div>
-    <code>--sig-idle</code><span class="hex">#6b6b8a</span>
+    <code>--sig-idle</code><span class="hex">#848496</span>
   </div>
   <div class="sw">
     <div class="chipcolor" style="background:var(--sig-accent)"></div>
-    <code>--sig-accent</code><span class="hex">#ff2e97</span>
+    <code>--sig-accent</code><span class="hex">#ff1a9d</span>
+  </div>
+  <div class="sw">
+    <div class="chipcolor" style="background:var(--sig-accent-2)"></div>
+    <code>--sig-accent-2</code><span class="hex">#9ad335</span>
   </div></div>
   <h3>Keyed & decay</h3>
   <div class="swgrid">
   <div class="sw">
     <div class="chipcolor" style="background:var(--stage)"></div>
-    <code>--stage</code><span class="hex">#00b34a</span>
+    <code>--stage</code><span class="hex">#49de78</span>
   </div>
   <div class="sw">
     <div class="chipcolor" style="background:var(--stage-ink)"></div>
@@ -747,9 +798,22 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       </div>
     </div>
     <div>
-      <h3>Bezel (texture lives here only)</h3>
-      <div class="cr-bezel"><div class="cr-bezel__rivets" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-        <div class="cr-bezel__screen">&gt; scan complete · 14 sessions · 2 flagged</div></div>
+      <h3>Bezel + texture (halftone / dither / scan — hardware only)</h3>
+      <div class="cr-bezel cr-anim-scan"><div class="cr-bezel__rivets" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <div class="cr-bezel__screen cr-tex--glass">&gt; scan complete · 14 sessions · 2 flagged</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
+        <div class="cr-panel cr-panel--inset cr-tex--halftone" style="min-height:44px;font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px">halftone</div>
+        <div class="cr-panel cr-panel--inset cr-tex--dither" style="min-height:44px;font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px">dither</div>
+        <div class="cr-panel cr-panel--inset cr-tex--scan" style="min-height:44px;font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:8px">scan</div>
+      </div>
+      <h3 style="margin-top:16px">Seeded pixel-sigils (cyber-sigilism)</h3>
+      <div id="sigrow" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+        <canvas class="crsig" width="52" height="52" data-seed="nova-01" data-state="working"></canvas>
+        <canvas class="crsig" width="52" height="52" data-seed="ptl-757" data-state="waiting"></canvas>
+        <canvas class="crsig" width="52" height="52" data-seed="cr-1130" data-state="error"></canvas>
+        <canvas class="crsig" width="52" height="52" data-seed="rp-verify" data-state="done"></canvas>
+        <canvas class="crsig" width="52" height="52" data-seed="ail-chat" data-state="idle"></canvas>
+      </div>
       <h3 style="margin-top:16px">Arrow-rail (sequence)</h3>
       <div class="cr-rail"><span class="cr-rail__step cr-rail__step--on">scan</span><span class="cr-rail__step">triage</span><span class="cr-rail__step">fix</span><span class="cr-rail__step">verify</span></div>
     </div>
@@ -882,6 +946,30 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         x.setAttribute("aria-pressed",String(x===b));
       });
     });
+  });
+
+  // Seeded pixel-sigils (cyber-sigilism) — same seed → same glyph.
+  function hashSeed(s){var h=2166136261>>>0;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+  function mb32(a){return function(){a|=0;a=(a+0x6d2b79f5)|0;var t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return ((t^(t>>>14))>>>0)/4294967296;};}
+  var SINK=["#00d3fb","#ff1a9d","#9ad335","#00deaa","#b061ff","#f9ad00"];
+  var SST={working:"#00d3fb",waiting:"#f9ad00",idle:"#848496",error:"#f45058",done:"#9ad335"};
+  document.querySelectorAll(".crsig").forEach(function(cv){
+    var seed=cv.dataset.seed,G=16,cell=cv.width/G,rng=mb32(hashSeed(seed));
+    var ink=cv.dataset.state?SST[cv.dataset.state]:SINK[Math.floor(rng()*SINK.length)];
+    var m=[];for(var y=0;y<G;y++){m.push(new Array(G).fill(0));}
+    var cx=G>>1;function set(x,y){if(x>=0&&x<G&&y>=0&&y<G){m[y][x]=1;m[y][G-1-x]=1;}}
+    for(var y2=2;y2<G-2;y2++){if(rng()>0.22)set(cx,y2);}
+    var arms=3+Math.floor(rng()*3);
+    for(var a=0;a<arms;a++){var x=cx,y=2+Math.floor(rng()*(G-6)),len=2+Math.floor(rng()*4);
+      for(var i=0;i<len;i++){x+=rng()>0.5?1:0;y+=rng()>0.4?1:0;set(x,y);}set(x,y);if(rng()>0.5){set(x+1,y);set(x,y+1);}}
+    for(var xc=0;xc<=cx;xc++){var low=-1;for(var yy=0;yy<G;yy++){if(m[yy][xc])low=yy;}
+      if(low>=0&&rng()>0.45){var d=1+Math.floor(rng()*3);for(var k=1;k<=d;k++)set(xc,low+k);}}
+    set(cx,2);if(rng()>0.4)set(cx-1,3);
+    var ctx=cv.getContext("2d");ctx.imageSmoothingEnabled=false;ctx.clearRect(0,0,cv.width,cv.height);
+    ctx.globalAlpha=0.12;ctx.fillStyle=ink;
+    for(var gy=cell;gy<cv.height;gy+=cell*2){for(var gx=cell;gx<cv.width;gx+=cell*2){ctx.fillRect(gx,gy,1,1);}}
+    ctx.globalAlpha=1;
+    for(var ry=0;ry<G;ry++){for(var rx=0;rx<G;rx++){if(m[ry][rx]){ctx.fillStyle=ink;ctx.fillRect(rx*cell,ry*cell,cell,cell);}}}
   });
 </script>
 </body>
