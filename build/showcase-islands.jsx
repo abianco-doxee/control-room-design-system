@@ -19,6 +19,9 @@ import {
   CrPopover, CrHoverCard, CrSegmented, CrRadioGroup, CrSlider, CrNumberField,
   CrPagination, CrDateTime, CrCronField, CrModal, CrSwitch, CrSelect,
   CrTooltip, CrTable, CrToastRegion,
+  CrButton, CrChoice, CrField, CrInput, CrTextarea, CrBreadcrumb, CrToast,
+  CrKbd, CrAlert, CrChip, CrEmptyState, CrMeter, CrProgress, CrStatusDot,
+  CrTag, CrSessionRow, CrPanel,
 } from "../dist/frameworks/react/index.ts";
 
 const h = React.createElement;
@@ -95,21 +98,23 @@ function Field({ def, value, set }) {
       h("select", { value, onChange: (e) => set(def.prop, e.target.value) },
         normOpts(def.options).map((o) => h("option", { key: o.value, value: o.value }, o.label))));
   }
-  return h("label", { className: "pg__ctl" }, // text
+  return h("label", { className: "pg__ctl" }, // text / children
     h("span", { className: "pg__ctl-name" }, label),
     h("input", { type: "text", value, onChange: (e) => set(def.prop, e.target.value) }));
 }
 
 function snippet(tag, defs, state) {
-  const parts = [];
+  const attrs = [];
+  let kids = null;
   for (const d of defs) {
+    if (d.type === "children") { kids = state[d.prop]; continue; }
     const v = state[d.prop];
-    if (d.type === "boolean") { if (v) parts.push(d.prop); }
-    else if (d.type === "number") parts.push(`${d.prop}={${v}}`);
-    else parts.push(`${d.prop}="${v}"`);
+    if (d.type === "boolean") { if (v) attrs.push(d.prop); }
+    else if (d.type === "number") attrs.push(`${d.prop}={${v}}`);
+    else attrs.push(`${d.prop}="${v}"`);
   }
-  const attrs = parts.length ? " " + parts.join(" ") : "";
-  return `<${tag}${attrs} />`;
+  const a = attrs.length ? " " + attrs.join(" ") : "";
+  return kids != null ? `<${tag}${a}>${kids}</${tag}>` : `<${tag}${a} />`;
 }
 
 function Playground({ tag, defs, render, extra }) {
@@ -244,6 +249,142 @@ const DEMOS = {
     render: (s, set) => h("div", null,
       h("button", { className: "cr-btn cr-btn--sm", onClick: () => set("toasts", [...s.toasts, { id: Date.now(), signal: "wait", message: "Queued a job" }]) }, "Push toast"),
       h(CrToastRegion, { toasts: s.toasts, position: s.position, onDismiss: (id) => set("toasts", s.toasts.filter((x) => x.id !== id)) })),
+  },
+
+  // ── presentational / form components ─────────────────────────────────────
+  button: {
+    tag: "CrButton",
+    defs: [
+      T("enum", "kind", "primary", { options: ["primary", "controls", "work", "accent", "err"] }),
+      T("enum", "size", "md", { options: ["md", "sm"] }),
+      T("boolean", "disabled", false),
+      T("children", "children", "run scan", { label: "text" }),
+    ],
+    render: (s) => h(CrButton, { kind: s.kind, size: s.size, disabled: s.disabled }, s.children),
+  },
+  tag: {
+    tag: "CrTag",
+    defs: [
+      T("enum", "tone", "done", { options: ["done", "work", "wait", "err", "idle", "accent"] }),
+      T("children", "children", "shipped", { label: "text" }),
+    ],
+    render: (s) => h(CrTag, { tone: s.tone }, s.children),
+  },
+  chip: {
+    tag: "CrChip",
+    defs: [T("enum", "tone", "done", { options: ["done", "alt"] }), T("children", "children", "PTL-757", { label: "text" })],
+    render: (s) => h(CrChip, { tone: s.tone }, s.children),
+  },
+  "status-dot": {
+    tag: "CrStatusDot",
+    defs: [T("enum", "state", "work", { options: ["work", "wait", "done", "err", "idle"] }), T("text", "label", "working")],
+    render: (s) => h(CrStatusDot, { state: s.state, label: s.label }),
+  },
+  kbd: {
+    tag: "CrKbd",
+    defs: [T("text", "keys", "⌘K"), T("boolean", "hint", false), T("boolean", "on", false)],
+    render: (s) => h(CrKbd, { keys: s.keys, hint: s.hint, on: s.on }),
+  },
+  checkbox: {
+    tag: "CrChoice",
+    defs: [
+      T("enum", "type", "checkbox", { options: ["checkbox", "radio"] }),
+      T("text", "label", "Auto-restart on crash"),
+      T("boolean", "checked", true),
+      T("boolean", "disabled", false),
+    ],
+    render: (s, set) => h(CrChoice, { type: s.type, label: s.label, checked: s.checked, disabled: s.disabled, onChange: (v) => set("checked", v) }),
+  },
+  alert: {
+    tag: "CrAlert",
+    defs: [
+      T("enum", "signal", "info", { options: ["info", "wait", "done", "err"] }),
+      T("text", "title", "Region degraded"),
+      T("text", "message", "eu-west-1 p95 latency above threshold for 4m."),
+      T("boolean", "dismissible", true),
+    ],
+    render: (s) => h(CrAlert, { signal: s.signal, title: s.title, message: s.message, dismissible: s.dismissible }),
+  },
+  toast: {
+    tag: "CrToast",
+    defs: [T("enum", "signal", "done", { options: ["work", "wait", "done", "err"] }), T("text", "message", "Deploy complete")],
+    render: (s) => h(CrToast, { signal: s.signal, message: s.message }),
+  },
+  meter: {
+    tag: "CrMeter",
+    defs: [
+      T("number", "value", 68, { min: 0, max: 100 }),
+      T("number", "max", 100),
+      T("enum", "tone", "work", { options: ["work", "wait", "done", "err", "idle"] }),
+      T("text", "label", "CPU"),
+    ],
+    render: (s) => h(CrMeter, { value: s.value, max: s.max, tone: s.tone, label: s.label }),
+  },
+  progress: {
+    tag: "CrProgress",
+    defs: [
+      T("number", "value", 40, { min: 0, max: 100 }),
+      T("number", "max", 100),
+      T("boolean", "indeterminate", false),
+      T("enum", "tone", "work", { options: ["work", "wait", "done", "err"] }),
+      T("text", "label", "Uploading"),
+    ],
+    render: (s) => h(CrProgress, { value: s.value, max: s.max, indeterminate: s.indeterminate, tone: s.tone, label: s.label }),
+  },
+  input: {
+    tag: "CrInput",
+    defs: [T("text", "placeholder", "search sessions…"), T("boolean", "disabled", false), T("boolean", "invalid", false)],
+    render: (s) => h("div", { style: { display: "flex", flexDirection: "column", gap: "4px" } },
+      h("label", { htmlFor: "isl-input", style: { fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--muted)" } }, "Filter"),
+      h(CrInput, { id: "isl-input", placeholder: s.placeholder, disabled: s.disabled, invalid: s.invalid })),
+  },
+  textarea: {
+    tag: "CrTextarea",
+    defs: [T("text", "placeholder", "notes…"), T("boolean", "disabled", false), T("boolean", "invalid", false)],
+    render: (s) => h("div", { style: { display: "flex", flexDirection: "column", gap: "4px" } },
+      h("label", { htmlFor: "isl-textarea", style: { fontFamily: "var(--font-mono)", fontSize: "11px", color: "var(--muted)" } }, "Notes"),
+      h(CrTextarea, { id: "isl-textarea", placeholder: s.placeholder, disabled: s.disabled, invalid: s.invalid })),
+  },
+  "form-field": {
+    tag: "CrField",
+    defs: [
+      T("text", "label", "Session name"),
+      T("text", "value", "prod-scan-eu"),
+      T("text", "placeholder", "name…"),
+      T("text", "hint", "Lowercase, dashes only."),
+      T("text", "error", ""),
+    ],
+    render: (s, set) => h(CrField, { id: "isl-field", label: s.label, value: s.value, placeholder: s.placeholder, hint: s.hint, error: s.error, onChange: (v) => set("value", v) }),
+  },
+  breadcrumb: {
+    tag: "CrBreadcrumb",
+    defs: [T("text", "label", "Breadcrumb")],
+    render: (s) => h(CrBreadcrumb, { label: s.label, items: [{ label: "Hub", href: "#" }, { label: "Fleet", href: "#" }, { label: "worker-01" }] }),
+  },
+  "session-row": {
+    tag: "CrSessionRow",
+    defs: [
+      T("text", "name", "session 4f2a"),
+      T("text", "status", "scanning · 68%"),
+      T("enum", "state", "work", { options: ["work", "wait", "done", "err", "idle"] }),
+      T("boolean", "event", false),
+    ],
+    render: (s) => h(CrSessionRow, { name: s.name, status: s.status, state: s.state, event: s.event }),
+  },
+  "empty-error-state": {
+    tag: "CrEmptyState",
+    defs: [T("text", "message", "No sessions in this region yet.")],
+    render: (s) => h(CrEmptyState, { message: s.message }),
+  },
+  panel: {
+    tag: "CrPanel",
+    defs: [
+      T("text", "title", "Fleet health"),
+      T("enum", "weight", "default", { options: ["default", "major"] }),
+      T("boolean", "inset", false),
+      T("children", "children", "Panel body content.", { label: "body" }),
+    ],
+    render: (s) => h(CrPanel, { title: s.title, weight: s.weight, inset: s.inset }, s.children),
   },
 };
 
