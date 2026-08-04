@@ -32,7 +32,7 @@ export default function CrCombobox(props: CrComboboxProps) {
       if (!q) return props.options;
       return props.options.filter((o: CrComboOption) => o.label.toLowerCase().includes(q));
     },
-    setQuery(v: string) {
+    onQuery(v: string) {
       state.query = v;
       state.open = true;
       state.active = 0;
@@ -87,7 +87,7 @@ export default function CrCombobox(props: CrComboboxProps) {
         aria-label={props.label || props.placeholder || "Search"}
         placeholder={props.placeholder || "Search…"}
         value={state.query}
-        onInput={(event) => state.setQuery((event.target as HTMLInputElement).value)}
+        onInput={(event) => state.onQuery((event.target as HTMLInputElement).value)}
         onFocus={() => (state.open = true)}
         onKeyDown={(event) => state.onKey(event)}
       />

@@ -13,6 +13,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import * as esbuild from "esbuild";
 import { browserScript } from "./gallery-scripts.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -221,16 +222,44 @@ function tokensHtml(e) {
   const rows = e.tokens.map((t) => `<div class="vrow"><code>${t.cssVar}</code><span>${t.description || ""}</span></div>`).join("");
   return `<div class="vbox"><h4>tokens</h4>${rows}</div>`;
 }
+// Catalog ids that get a LIVE island — the real compiled React component,
+// mounted client-side by build/showcase-islands.jsx. Must match the DEMOS keys
+// there (asserted by tests/showcase-islands.spec.mjs). Everything else falls back
+// to its static state snippets.
+const ISLAND_IDS = new Set([
+  "accordion", "tabs", "menu", "combobox", "palette", "tree", "drawer", "popover",
+  "hover-card", "segmented", "radio-group", "slider", "number-field", "pagination",
+  "datetime", "cron-field", "modal", "switch", "select", "tooltip", "table", "toast-region",
+]);
+
 function stageHtml(id) {
-  const ex = EXAMPLES[id];
-  if (!ex || !ex.length) {
+  const ex = EXAMPLES[id] || [];
+  // Live cell first: the actual shipped component, hydrated. <noscript> keeps a
+  // sensible message if JS is off; the static state cells below still render.
+  const island = ISLAND_IDS.has(id)
+    ? `<div class="cell cell--live"><div class="cell__demo" data-island="${id}"><span class="cell__pending">mounting…<noscript> (enable JavaScript)</noscript></span></div><div class="cell__label">live · interactive</div></div>`
+    : "";
+  if (!island && !ex.length) {
     return `<div class="stage stage--empty">Composed in the <a href="./gallery.html">Live Gallery</a> and the <code>examples/console</code> app.</div>`;
   }
   const cells = ex
     .map((s) => `<div class="cell"><div class="cell__demo">${s.html}</div><div class="cell__label">${s.state}</div></div>`)
     .join("");
-  return `<div class="stage">${cells}</div>`;
+  return `<div class="stage">${island}${cells}</div>`;
 }
+
+// Bundle the live islands: the REAL compiled React components + a tiny stateful
+// wrapper each, inlined so the page stays self-contained (GitHub Pages + file://).
+const islandsBundle = esbuild.buildSync({
+  entryPoints: [join(ROOT, "build", "showcase-islands.jsx")],
+  bundle: true,
+  format: "iife",
+  loader: { ".ts": "tsx" },
+  jsx: "automatic",
+  define: { "process.env.NODE_ENV": '"production"' },
+  minify: true,
+  write: false,
+}).outputFiles[0].text;
 
 const entries = catalog.entries;
 const byCat = {};
@@ -306,6 +335,14 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
 .cell { display: flex; flex-direction: column; gap: 6px; }
 .cell__demo { display: flex; align-items: center; gap: 8px; }
 .cell__label { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+/* live islands: give the real component room + a signal-tinted marker */
+.cell--live { flex: 1 1 320px; min-width: 280px; }
+.cell--live > .cell__demo { display: block; }
+/* "live" marker: keep the label ink (AA in every theme); the signal is a
+ * decorative CSS dot, so it never trips a text-contrast check. */
+.cell--live > .cell__label { color: var(--ink); font-weight: 800; display: flex; align-items: center; gap: 5px; }
+.cell--live > .cell__label::before { content: ""; width: 7px; height: 7px; background: var(--sig-done); border: var(--brd-hair) solid var(--border); }
+.cell__pending { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
 .card__meta { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 14px; }
 .vbox h4 { font-family: var(--font-mono); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 0 0 4px; }
 .vrow { display: flex; gap: 10px; font-family: var(--font-mono); font-size: 11px; padding: 1px 0; }
@@ -331,6 +368,7 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
   <main>${cardsHtml}</main>
 </div>
 <script>${browserScript}</script>
+<script>${islandsBundle}</script>
 </body>
 </html>
 `;

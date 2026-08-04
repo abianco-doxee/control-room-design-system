@@ -40,7 +40,7 @@ export default function CrPalette(props: CrPaletteProps) {
           c.label.toLowerCase().includes(q) || (c.group || "").toLowerCase().includes(q),
       );
     },
-    setQuery(v: string) {
+    onQuery(v: string) {
       state.query = v;
       state.active = 0;
     },
@@ -108,7 +108,7 @@ export default function CrPalette(props: CrPaletteProps) {
           aria-label="Search commands"
           placeholder={props.placeholder || "Type a command…"}
           value={state.query}
-          onInput={(event) => state.setQuery((event.target as HTMLInputElement).value)}
+          onInput={(event) => state.onQuery((event.target as HTMLInputElement).value)}
           onKeyDown={(event) => state.onKey(event)}
         />
         <ul class="cr-palette__list" id="cr-palette-list" role="listbox" aria-label="Commands">
