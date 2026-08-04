@@ -1179,7 +1179,12 @@ body {
   --cr-breach-2: var(--sig-accent-2);     /* the paired hue (acid) — the neon pairing */
   --cr-breach-fill: var(--panel);         /* interior; --wash swaps this for a tint */
   position: relative;
-  border-radius: var(--breach-radius);                                  /* the soft corner   */
+  border-radius: var(--breach-radius);
+  /* the corner is a SQUIRCLE (superellipse), not a plain arc — the one place the
+   * system softens (the Law-9 breach). corner-shape keeps the glow + rim following
+   * the shape automatically and falls back to the plain radius where unsupported.
+   * Radius-0 holds everywhere else in the system. */
+  corner-shape: superellipse(4);
   border: 3px solid transparent;
   /* Layered backgrounds (top → bottom): opaque interior clipped to padding-box;
    * bright SPOTS riding the border (counter-rotating); the rotating neon RIM.
