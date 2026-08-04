@@ -424,6 +424,17 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         <div class="cr-leader"><span class="cr-leader__k">uptime</span><span class="cr-leader__fill"></span><span class="cr-leader__v">41h 12m</span></div>
         <div class="cr-leader"><span class="cr-leader__k">region</span><span class="cr-leader__fill"></span><span class="cr-leader__v">eu-west-1</span></div>
       </div>
+      <h3 style="margin-top:16px">ASCII rules · meters · spinner · empty state</h3>
+      <div style="max-width:360px;display:flex;flex-direction:column;gap:12px">
+        <div class="cr-rule" aria-hidden="true"></div>
+        <div class="cr-rule cr-rule--hatch" aria-hidden="true"></div>
+        <div class="cr-rule cr-rule--dot" aria-hidden="true"></div>
+        <div class="cr-leader"><span class="cr-leader__k">index</span><span class="cr-leader__fill"></span><span class="cr-ascii-bar" style="--v:0.65"><span class="cr-ascii-bar__fill"></span></span></div>
+        <div style="font-family:var(--font-mono);font-size:13px;color:var(--muted)"><span class="cr-ascii-spin" aria-hidden="true"></span> syncing worker pool…</div>
+        <div class="cr-panel cr-panel--inset cr-empty" style="text-align:center;padding:24px">
+          <p style="font-family:var(--font-mono);font-size:13px;color:var(--muted);margin:0">No sessions in this region yet.</p>
+        </div>
+      </div>
       <h3 style="margin-top:16px">Tree · Hover card</h3>
       <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
         <ul class="cr-tree" role="tree" aria-label="Fleet" style="min-width:220px">
