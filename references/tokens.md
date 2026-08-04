@@ -93,9 +93,11 @@ everything).
 
 | Token | Default | Extreme | Purpose |
 | --- | --- | --- | --- |
+| `--brd-hair` | `1.5px` | `2px` | hairline — dot/tag outlines, row separators, dense chrome |
 | `--brd` | `2px` | `3px` | internal dividers, minor panels |
 | `--brd-heavy` | `3px` | `4px` | major panels, mastheads, primary buttons |
 | `--brd-brush` | `5px` | `6px` | outer chassis, bezels — the "brush stroke" |
+| `--shadow-off-sm` | `2px` | `3px` | small floating pieces — menus, chips, popovers |
 | `--shadow-off` | `4px` | `6px` | standard hard drop offset |
 | `--shadow-off-lg` | `6px` | `9px` | mastheads, live instruments |
 | `--radius` | `0px` | `0px` | **always 0** — exists so the 0 is explicit |
@@ -108,6 +110,14 @@ The three `--breach-*` tokens are the **only** place radius, blur, and a soft gl
 are licensed (Law 9 — The Breach). They exist as named tokens precisely so the
 exception is explicit and greppable, and so a raw `border-radius` anywhere else
 still reads as a defect.
+
+**Interaction constants** (theme-independent — how a state *reads*, not a colour):
+
+| Token | Value | Purpose |
+| --- | --- | --- |
+| `--state-disabled-op` | `0.45` | opacity for a disabled control |
+| `--state-hover-mix` | `12%` | `--ink` mixed into a surface on hover (`color-mix`) |
+| `--row-h` | `34px` | dense-table row-height baseline (density) |
 
 **The hard-shadow idiom** (memorize it; it is everywhere):
 

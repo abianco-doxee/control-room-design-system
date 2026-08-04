@@ -255,14 +255,31 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       </div>
     </div>
     <div style="grid-column:1/-1">
-      <h3>Table</h3>
-      <table class="cr-table">
-        <thead><tr><th>Session</th><th>Task</th><th>Status</th></tr></thead>
+      <h3>Table (sortable · selectable · sticky header)</h3>
+      <table class="cr-table cr-table--sticky">
+        <thead><tr>
+          <th class="cr-table__sel" aria-label="select"></th>
+          <th class="cr-table__sortable" aria-sort="ascending">Session<span class="cr-table__ind">▲</span></th>
+          <th class="cr-table__sortable" aria-sort="none">Task</th>
+          <th class="cr-table__sortable" aria-sort="none">Status</th>
+        </tr></thead>
         <tbody>
-          <tr><td>nova</td><td>PTL-757 chat-turn</td><td>streaming</td></tr>
-          <tr><td>rhea</td><td>rp verify</td><td>2 failing</td></tr>
+          <tr aria-selected="true"><td class="cr-table__sel"><input type="checkbox" class="cr-check" checked aria-label="select row" /></td><td>nova</td><td>PTL-757 chat-turn</td><td>streaming</td></tr>
+          <tr aria-selected="false"><td class="cr-table__sel"><input type="checkbox" class="cr-check" aria-label="select row" /></td><td>rhea</td><td>rp verify</td><td>2 failing</td></tr>
         </tbody>
       </table>
+      <h3 style="margin-top:16px">Tabs</h3>
+      <div class="cr-tabs" role="tablist">
+        <button type="button" role="tab" class="cr-tab cr-tab--on" aria-selected="true">queue</button>
+        <button type="button" role="tab" class="cr-tab" aria-selected="false">workers</button>
+        <button type="button" role="tab" class="cr-tab" aria-selected="false">history</button>
+      </div>
+      <h3 style="margin-top:16px">Meters (capacity)</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;max-width:340px">
+        <div class="cr-meter cr-meter--work"><span class="cr-meter__label">cpu</span><span class="cr-meter__track" role="meter" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" aria-label="cpu"><span class="cr-meter__fill" style="width:72%"></span></span></div>
+        <div class="cr-meter cr-meter--wait"><span class="cr-meter__label">queue</span><span class="cr-meter__track" role="meter" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" aria-label="queue"><span class="cr-meter__fill" style="width:40%"></span></span></div>
+        <div class="cr-meter cr-meter--err"><span class="cr-meter__label">errors</span><span class="cr-meter__track" role="meter" aria-valuenow="12" aria-valuemin="0" aria-valuemax="100" aria-label="errors"><span class="cr-meter__fill" style="width:12%"></span></span></div>
+      </div>
     </div>
     <div style="grid-column:1/-1">
       <h3>Form controls</h3>

@@ -14,6 +14,9 @@ import {
   CrShape,
   CrSigil,
   CrChip,
+  CrTable,
+  CrTabs,
+  CrMeter,
 } from "../../../../dist/frameworks/qwik";
 
 type Sev = "crit" | "warn" | "work" | "ok" | "idle";
@@ -131,6 +134,31 @@ export default component$(() => {
               />
             </div>
           ))}
+        </section>
+
+        {/* queue: tabs + a sortable / selectable table + capacity meters */}
+        <section class="cr-panel" style="padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-3)">
+          <CrTabs tabs={["queue", "workers", "history"]} />
+          <div style="max-height:220px;overflow:auto">
+            <CrTable
+              sortable
+              selectable
+              sticky
+              columns={["job", "worker", "age", "state"]}
+              rows={[
+                ["cr-1130", "nova-01", "41m", "failing"],
+                ["ptl-757", "ail-chat", "4m", "waiting"],
+                ["rp-verify", "nova-02", "12m", "done"],
+                ["dx-880", "nova-01", "2m", "working"],
+                ["qz-3", "ail-chat", "58m", "idle"],
+              ]}
+            />
+          </div>
+          <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+            <CrMeter label="cpu" value={72} tone="work" />
+            <CrMeter label="queue" value={40} tone="wait" />
+            <CrMeter label="errors" value={12} tone="err" />
+          </div>
         </section>
 
         <footer style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
