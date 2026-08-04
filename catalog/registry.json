@@ -1622,6 +1622,50 @@
         "headless",
         "behavior"
       ]
+    },
+    {
+      "id": "palette",
+      "name": "Command palette",
+      "category": "overlay",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "A ⌘K command palette on the native dialog (focus-trap + Esc + backdrop). The input is a combobox driving a listbox — focus stays in the field while ↑/↓ move the active option (aria-activedescendant), Enter runs it; live query filter with per-command keycap hints.",
+      "spec": "references/components.md#command-palette",
+      "variants": {
+        "prop": [
+          "open",
+          "commands",
+          "placeholder"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "palette fill"
+        },
+        {
+          "cssVar": "--board",
+          "description": "search field"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "active option"
+        },
+        {
+          "cssVar": "--shadow-off-lg",
+          "description": "palette shadow"
+        }
+      ],
+      "keywords": [
+        "command",
+        "palette",
+        "cmdk",
+        "quick-open",
+        "spotlight",
+        "combobox",
+        "search",
+        "shortcuts"
+      ]
     }
   ]
 }

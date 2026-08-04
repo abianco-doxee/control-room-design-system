@@ -5,7 +5,7 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 40,
+    "count": 41,
     "categories": {
       "action": 1,
       "behavior": 1,
@@ -14,12 +14,12 @@
       "layout": 5,
       "media": 6,
       "navigation": 3,
-      "overlay": 5,
+      "overlay": 6,
       "primitives": 2,
       "state": 9
     },
     "lifecycles": {
-      "stable": 39,
+      "stable": 40,
       "experimental": 1
     }
   },
@@ -1112,6 +1112,51 @@
         "dialog",
         "overlay",
         "popup"
+      ]
+    },
+    {
+      "id": "palette",
+      "name": "Command palette",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A ⌘K command palette on the native dialog (focus-trap + Esc + backdrop). The input is a combobox driving a listbox — focus stays in the field while ↑/↓ move the active option (aria-activedescendant), Enter runs it; live query filter with per-command keycap hints.",
+      "spec": "references/components.md#command-palette",
+      "variants": {
+        "prop": [
+          "open",
+          "commands",
+          "placeholder"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "palette fill"
+        },
+        {
+          "cssVar": "--board",
+          "description": "search field"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "active option"
+        },
+        {
+          "cssVar": "--shadow-off-lg",
+          "description": "palette shadow"
+        }
+      ],
+      "keywords": [
+        "command",
+        "palette",
+        "cmdk",
+        "quick-open",
+        "spotlight",
+        "combobox",
+        "search",
+        "shortcuts"
       ]
     },
     {
