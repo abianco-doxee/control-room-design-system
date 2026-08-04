@@ -5,20 +5,20 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 35,
+    "count": 38,
     "categories": {
       "action": 1,
       "forms": 6,
       "identity": 2,
       "layout": 5,
       "media": 6,
-      "navigation": 2,
-      "overlay": 3,
+      "navigation": 3,
+      "overlay": 5,
       "primitives": 1,
       "state": 9
     },
     "lifecycles": {
-      "stable": 34,
+      "stable": 37,
       "experimental": 1
     }
   },
@@ -880,6 +880,48 @@
       ]
     },
     {
+      "id": "pagination",
+      "name": "Pagination",
+      "kind": "component",
+      "category": "navigation",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Controlled pager — prev/next plus a windowed run of page numbers with ellipses; current page keyed and aria-current.",
+      "spec": "references/components.md#pagination",
+      "variants": {
+        "prop": [
+          "page",
+          "total"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "button fill"
+        },
+        {
+          "cssVar": "--brd-hair",
+          "description": "button border"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "current page"
+        },
+        {
+          "cssVar": "--state-disabled-op",
+          "description": "disabled prev/next"
+        }
+      ],
+      "keywords": [
+        "pagination",
+        "pager",
+        "pages",
+        "prev",
+        "next",
+        "paginate"
+      ]
+    },
+    {
       "id": "rail",
       "name": "Rail + Nav",
       "kind": "component",
@@ -963,6 +1005,48 @@
         "nav",
         "switcher",
         "segment"
+      ]
+    },
+    {
+      "id": "menu",
+      "name": "Menu",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Dropdown menu — a trigger toggles a role=menu panel; a transparent full-viewport scrim closes it on outside click (no global listeners). Optional danger items.",
+      "spec": "references/components.md#menu",
+      "variants": {
+        "align": [
+          "left",
+          "right"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "panel fill"
+        },
+        {
+          "cssVar": "--shadow-off-sm",
+          "description": "panel shadow"
+        },
+        {
+          "cssVar": "--state-hover-mix",
+          "description": "item hover"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "danger item"
+        }
+      ],
+      "keywords": [
+        "menu",
+        "dropdown",
+        "popover",
+        "actions",
+        "overflow",
+        "kebab"
       ]
     },
     {
@@ -1054,6 +1138,42 @@
         "status",
         "snackbar",
         "alert"
+      ]
+    },
+    {
+      "id": "toast-region",
+      "name": "Toast region",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A fixed screen corner that stacks live toasts (parent owns the list). Each toast is its own live region — err announces assertively — so nothing double-announces. Bottom corners stack newest nearest the edge.",
+      "spec": "references/components.md#toast-region",
+      "variants": {
+        "position": [
+          "tr",
+          "br",
+          "tl",
+          "bl"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--z-overlay",
+          "description": "stacking layer"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error toast fill"
+        }
+      ],
+      "keywords": [
+        "toast",
+        "region",
+        "stack",
+        "notifications",
+        "snackbar",
+        "live"
       ]
     },
     {

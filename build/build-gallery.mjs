@@ -280,6 +280,31 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         <div class="cr-meter cr-meter--wait"><span class="cr-meter__label">queue</span><span class="cr-meter__track" role="meter" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" aria-label="queue"><span class="cr-meter__fill" style="width:40%"></span></span></div>
         <div class="cr-meter cr-meter--err"><span class="cr-meter__label">errors</span><span class="cr-meter__track" role="meter" aria-valuenow="12" aria-valuemin="0" aria-valuemax="100" aria-label="errors"><span class="cr-meter__fill" style="width:12%"></span></span></div>
       </div>
+      <h3 style="margin-top:16px">Pagination</h3>
+      <nav class="cr-pager" aria-label="Pagination">
+        <button type="button" class="cr-pager__btn" aria-label="Previous page">‹</button>
+        <button type="button" class="cr-pager__btn" aria-label="Page 1">1</button>
+        <button type="button" class="cr-pager__btn cr-pager__btn--on" aria-label="Page 2" aria-current="page">2</button>
+        <button type="button" class="cr-pager__btn" aria-label="Page 3">3</button>
+        <span class="cr-pager__ellipsis" aria-hidden="true">…</span>
+        <button type="button" class="cr-pager__btn" aria-label="Page 9">9</button>
+        <button type="button" class="cr-pager__btn" aria-label="Next page">›</button>
+      </nav>
+      <h3 style="margin-top:16px">Menu (dropdown)</h3>
+      <div class="cr-menu" style="position:relative;min-height:150px">
+        <button type="button" class="cr-btn cr-btn--controls cr-btn--sm" aria-haspopup="menu" aria-expanded="true">actions ▾</button>
+        <div class="cr-menu__panel" role="menu">
+          <button type="button" role="menuitem" class="cr-menu__item">pause all</button>
+          <button type="button" role="menuitem" class="cr-menu__item">restart failed</button>
+          <div class="cr-menu__sep"></div>
+          <button type="button" role="menuitem" class="cr-menu__item cr-menu__item--danger">kill all</button>
+        </div>
+      </div>
+      <h3 style="margin-top:16px">Toast region (stacked)</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;max-width:340px">
+        <div class="cr-toast cr-toast--done" role="status" aria-live="polite"><span class="cr-toast__msg">queue drained</span><button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button></div>
+        <div class="cr-toast cr-toast--err" role="alert" aria-live="assertive"><span class="cr-toast__msg">killed all workers</span><button type="button" class="cr-toast__close" aria-label="Dismiss">✕</button></div>
+      </div>
     </div>
     <div style="grid-column:1/-1">
       <h3>Form controls</h3>
