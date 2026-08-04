@@ -27,6 +27,9 @@ import {
   CrRadioGroup,
   CrSlider,
   CrProgress,
+  CrAccordion,
+  CrPopover,
+  CrDrawer,
 } from "../../../../dist/frameworks/qwik";
 
 type Sev = "crit" | "warn" | "work" | "ok" | "idle";
@@ -52,7 +55,7 @@ const SESSIONS: Session[] = [
 const THEMES = ["dark", "light", "extreme", "phosphor"] as const;
 
 export default component$(() => {
-  const ui = useStore({ theme: "dark", modal: false, page: 1, palette: false, density: "cozy", refresh: 30 });
+  const ui = useStore({ theme: "dark", modal: false, page: 1, palette: false, density: "cozy", refresh: 30, drawer: false });
   const live = useStore<Record<string, boolean>>({ "nova-01": true, "ptl-757": false });
   const toasts = useStore<{ list: { id: number; signal: string; message: string }[]; seq: number }>({
     list: [],
@@ -155,6 +158,14 @@ export default component$(() => {
               commands
               <CrKbd keys="⌘K" />
             </CrButton>
+            <CrPopover label="filters ▾" title="Queue filters">
+              <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">show state</p>
+              <div style="display:flex;flex-direction:column;gap:var(--space-1)">
+                <label style="font-family:var(--font-mono);font-size:var(--text-sm);display:flex;gap:var(--space-2);align-items:center"><input type="checkbox" class="cr-check" checked /> failing</label>
+                <label style="font-family:var(--font-mono);font-size:var(--text-sm);display:flex;gap:var(--space-2);align-items:center"><input type="checkbox" class="cr-check" checked /> waiting</label>
+                <label style="font-family:var(--font-mono);font-size:var(--text-sm);display:flex;gap:var(--space-2);align-items:center"><input type="checkbox" class="cr-check" /> idle</label>
+              </div>
+            </CrPopover>
             <CrMenu
               label="actions ▾"
               items={[
@@ -205,10 +216,13 @@ export default component$(() => {
             <p style="font-family:var(--font-mono);font-size:var(--text-sm);margin:var(--space-2) 0 var(--space-3)">
               SSE closed · retry 3/5 · last green 41m ago
             </p>
-            <CrButton kind="err" keyshortcuts="i" onClick={$(() => (ui.modal = true))}>
-              open incident
-              <CrKbd keys="I" on />
-            </CrButton>
+            <div style="display:flex;gap:var(--space-2);flex-wrap:wrap">
+              <CrButton kind="err" keyshortcuts="i" onClick={$(() => (ui.modal = true))}>
+                open incident
+                <CrKbd keys="I" on />
+              </CrButton>
+              <CrButton kind="controls" onClick={$(() => (ui.drawer = true))}>inspect ▸</CrButton>
+            </div>
           </div>
         </div>
 
@@ -305,6 +319,24 @@ export default component$(() => {
           <span class="cr-ruler" style="width:180px"></span>
         </footer>
       </div>
+
+      <CrDrawer open={ui.drawer} side="right" title="cr-1130 · inspect" onClose={$(() => (ui.drawer = false))}>
+        <dl class="cr-dl" style="margin-bottom:var(--space-4)">
+          <dt class="cr-dl__k">worker</dt><dd class="cr-dl__v">nova-01</dd>
+          <dt class="cr-dl__k">region</dt><dd class="cr-dl__v">eu-west-1</dd>
+          <dt class="cr-dl__k">state</dt><dd class="cr-dl__v">failing · SSE closed</dd>
+          <dt class="cr-dl__k">retries</dt><dd class="cr-dl__v">3 / 5</dd>
+        </dl>
+        <CrAccordion
+          single
+          defaultOpen={[0]}
+          items={[
+            { title: "Stack trace", body: "SSEError: stream closed at turn 42 · reconnect backoff exhausted" },
+            { title: "Recent events", body: "12:03 open · 12:07 stall · 12:41 SSE closed · retry 3/5" },
+            { title: "Config", body: "model=opus · timeout=30s · maxRetries=5 · region=eu-west-1" },
+          ]}
+        />
+      </CrDrawer>
 
       {/* hold Alt to peek every secondary key-hint badge */}
       <CrKeyHints />
