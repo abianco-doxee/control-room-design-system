@@ -2135,7 +2135,7 @@
       "description": "Token-driven capacity / utilisation bar (role=meter), square and hard-edged, keyed to a signal tone.",
       "spec": "references/components.md#meter",
       "variants": {
-        "tone": [
+        "signal": [
           "work",
           "wait",
           "done",
@@ -2176,7 +2176,7 @@
       "description": "Task progress (role=progressbar) — determinate fills to value/max; indeterminate runs an animated hazard sweep. Distinct from Meter (a static capacity reading).",
       "spec": "references/components.md#progress",
       "variants": {
-        "tone": [
+        "signal": [
           "work",
           "wait",
           "done",
@@ -2212,7 +2212,7 @@
       "description": "One row of a live list — the densest unit; calm at rest, one-shot glitch on a real state change.",
       "spec": "references/components.md#sessionrow",
       "variants": {
-        "state": [
+        "signal": [
           "work",
           "wait",
           "done",
@@ -2338,7 +2338,7 @@
       "description": "The smallest state readout — a square keyed to the signal ramp, with an aria-label naming the state.",
       "spec": "references/components.md#statusdot",
       "variants": {
-        "state": [
+        "signal": [
           "work",
           "wait",
           "done",
@@ -2374,11 +2374,13 @@
       "description": "Inline status label inside dense content; variants map to the signal ramp.",
       "spec": "references/components.md#tag",
       "variants": {
-        "tone": [
-          "now",
+        "signal": [
           "work",
-          "later",
-          "no"
+          "wait",
+          "done",
+          "err",
+          "idle",
+          "accent"
         ]
       },
       "tokens": [
