@@ -45,6 +45,8 @@
   --state-disabled-op: 0.45;
   --state-hover-mix: 12%;
   --row-h: 34px;
+  --focus-w: 3px;
+  --focus-offset: 2px;
   --radius: 0px;
   --halftone-size: 7px;
   --breach-radius: 14px;
@@ -242,7 +244,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 /* Focus is a first-class signal, not an afterthought. */
-*:focus-visible { outline: 3px solid var(--sig-work); outline-offset: 2px; }
+*:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
 /* Motion is opt-out at the system level. */
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }

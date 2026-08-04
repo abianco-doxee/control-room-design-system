@@ -277,6 +277,22 @@
         "com.doxee.cssVar": "--row-h"
       }
     },
+    "focus-w": {
+      "$type": "dimension",
+      "$value": "3px",
+      "$description": "keyboard focus-ring thickness (colour is --sig-work, themed)",
+      "$extensions": {
+        "com.doxee.cssVar": "--focus-w"
+      }
+    },
+    "focus-offset": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "keyboard focus-ring offset from the control edge",
+      "$extensions": {
+        "com.doxee.cssVar": "--focus-offset"
+      }
+    },
     "radius": {
       "$type": "dimension",
       "$value": "0px",

@@ -442,7 +442,7 @@
 .cr-slider { -webkit-appearance: none; appearance: none; width: 100%; height: var(--space-2); background: var(--panel-2); border: var(--brd-hair) solid var(--border); cursor: pointer; }
 .cr-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: var(--space-3); height: var(--space-4); background: var(--sig-work); border: var(--brd) solid var(--border); box-shadow: var(--space-px) var(--brd-hair) 0 var(--shadow-col); }
 .cr-slider::-moz-range-thumb { width: var(--space-3); height: var(--space-4); border-radius: 0; background: var(--sig-work); border: var(--brd) solid var(--border); }
-.cr-slider:focus-visible { outline: 3px solid var(--sig-work); outline-offset: 2px; }
+.cr-slider:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
 
 /* ── Progress (task progress; determinate + indeterminate) ──────────────── */
 .cr-progress { --cr-prog-c: var(--sig-work); height: var(--space-2); background: var(--panel-2); border: var(--brd-hair) solid var(--border); overflow: hidden; }
@@ -500,7 +500,7 @@
   padding: var(--space-3) var(--space-4);
 }
 .cr-popover__panel--right { left: auto; right: 0; }
-.cr-popover__panel:focus-visible { outline: 3px solid var(--sig-work); outline-offset: 2px; }
+.cr-popover__panel:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
 
 /* ── Drawer / sheet (edge panel on native dialog) ───────────────────────── */
 .cr-drawer {
@@ -615,7 +615,7 @@
 .cr-tree__item { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-0-5) var(--space-2); cursor: pointer; color: var(--ink); }
 .cr-tree__item:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
 .cr-tree__item[aria-selected="true"] { background: color-mix(in srgb, var(--sig-work) 20%, transparent); }
-.cr-tree__item:focus-visible { outline: 3px solid var(--sig-work); outline-offset: -3px; }
+.cr-tree__item:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -3px; }
 .cr-tree__twist { width: 0; height: 0; flex-shrink: 0; border-left: 6px solid var(--muted); border-top: 5px solid transparent; border-bottom: 5px solid transparent; transition: transform var(--dur-press); }
 .cr-tree__item[aria-expanded="true"] .cr-tree__twist { transform: rotate(90deg); border-left-color: var(--sig-work); }
 .cr-tree__lead { width: 6px; flex-shrink: 0; color: color-mix(in srgb, var(--muted) 60%, transparent); text-align: center; }
@@ -626,7 +626,7 @@
   font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); background: var(--board);
   border: var(--brd) solid var(--border); padding: var(--space-2) var(--space-3);
 }
-.cr-datetime:focus-visible { outline: 3px solid var(--sig-work); outline-offset: 2px; }
+.cr-datetime:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
 .cr-datetime::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.7; }
 
 /* ── Cron field (expression input + human-readable readout) ─────────────── */

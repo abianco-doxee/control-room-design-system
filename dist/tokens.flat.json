@@ -42,6 +42,8 @@
       "--state-disabled-op": "0.45",
       "--state-hover-mix": "12%",
       "--row-h": "34px",
+      "--focus-w": "3px",
+      "--focus-offset": "2px",
       "--radius": "0px",
       "--halftone-size": "7px",
       "--breach-radius": "14px",
