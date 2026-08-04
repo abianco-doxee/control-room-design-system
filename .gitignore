@@ -40,3 +40,10 @@ src/content/docs/build/
 *.secret
 figma-token*
 *.token.txt
+
+# scratch screenshots (root only; tests/*-snapshots baselines stay tracked)
+/scratch-*.png
+/s-*.png
+/refresh-*.png
+/board-*.png
+/scratch-shot.mjs
