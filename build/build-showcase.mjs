@@ -237,7 +237,7 @@ function stageHtml(id) {
   // Live cell first: the actual shipped component, hydrated. <noscript> keeps a
   // sensible message if JS is off; the static state cells below still render.
   const island = ISLAND_IDS.has(id)
-    ? `<div class="cell cell--live"><div class="cell__demo" data-island="${id}"><span class="cell__pending">mounting…<noscript> (enable JavaScript)</noscript></span></div><div class="cell__label">live · interactive</div></div>`
+    ? `<div class="cell cell--live"><div class="cell__label">playground · editable props</div><div class="cell__demo" data-island="${id}"><span class="cell__pending">mounting…<noscript> (enable JavaScript)</noscript></span></div></div>`
     : "";
   if (!island && !ex.length) {
     return `<div class="stage stage--empty">Composed in the <a href="./gallery.html">Live Gallery</a> and the <code>examples/console</code> app.</div>`;
@@ -335,13 +335,29 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
 .cell { display: flex; flex-direction: column; gap: 6px; }
 .cell__demo { display: flex; align-items: center; gap: 8px; }
 .cell__label { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
-/* live islands: give the real component room + a signal-tinted marker */
-.cell--live { flex: 1 1 320px; min-width: 280px; }
+/* live playground gets a full row */
+.cell--live { flex: 1 1 100%; min-width: 0; order: -1; }
 .cell--live > .cell__demo { display: block; }
-/* "live" marker: keep the label ink (AA in every theme); the signal is a
+/* "playground" marker: label stays ink (AA in every theme); the signal is a
  * decorative CSS dot, so it never trips a text-contrast check. */
 .cell--live > .cell__label { color: var(--ink); font-weight: 800; display: flex; align-items: center; gap: 5px; }
 .cell--live > .cell__label::before { content: ""; width: 7px; height: 7px; background: var(--sig-done); border: var(--brd-hair) solid var(--border); }
+/* ── playground harness (browser chrome, not shipped) ──────────────────── */
+.pg { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+.pg__live { flex: 1 1 320px; min-width: 260px; }
+.pg__panel { flex: 0 1 280px; min-width: 220px; display: flex; flex-direction: column; gap: 10px; }
+.pg__controls { display: flex; flex-direction: column; gap: 8px; padding: 12px; background: var(--panel-2); border: var(--brd-hair) solid var(--border); }
+.pg__ctl { display: flex; flex-direction: column; gap: 3px; font-family: var(--font-mono); font-size: 11px; color: var(--ink); }
+.pg__ctl--bool { flex-direction: row; align-items: center; gap: 7px; }
+.pg__ctl-name { text-transform: uppercase; letter-spacing: .05em; font-size: 10px; font-weight: 700; color: var(--muted); }
+.pg__ctl input[type="text"], .pg__ctl input[type="number"], .pg__ctl select {
+  font-family: var(--font-mono); font-size: 12px; color: var(--ink); background: var(--panel);
+  border: var(--brd-hair) solid var(--border); padding: 4px 6px; width: 100%; }
+.pg__ctl--bool input { width: 15px; height: 15px; accent-color: var(--sig-work); }
+.pg__code { font-family: var(--font-mono); font-size: 11px; color: var(--ink); background: var(--board);
+  border: var(--brd-hair) solid var(--border); padding: 8px 10px; margin: 0; white-space: pre-wrap; word-break: break-word; }
+.pg__note { font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin: 8px 0 0; }
+@media (max-width: 720px) { .pg__panel { flex-basis: 100%; } }
 .cell__pending { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
 .card__meta { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 14px; }
 .vbox h4 { font-family: var(--font-mono); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 0 0 4px; }

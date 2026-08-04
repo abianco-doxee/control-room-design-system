@@ -57,4 +57,22 @@ test.describe("component browser — live islands", () => {
     await hdr.click();
     await expect(hdr).toHaveAttribute("aria-expanded", wasOpen ? "false" : "true");
   });
+
+  test("editing a control prop re-renders the live component", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const seg = page.locator('[data-island="segmented"]');
+
+    // change the `value` enum control in the panel → the live segmented updates
+    await seg.locator(".pg__controls select").selectOption("24h");
+    await expect(seg.locator('.pg__live [aria-checked="true"]')).toHaveText("24h");
+
+    // toggle the slider's `disabled` boolean control → the live input disables
+    const slider = page.locator('[data-island="slider"]');
+    await slider.locator('.pg__controls input[type="checkbox"]').check();
+    await expect(slider.locator('.pg__live input[type="range"]')).toBeDisabled();
+
+    // the code snippet reflects the current props
+    await expect(slider.locator(".pg__code")).toContainText("disabled");
+  });
 });
