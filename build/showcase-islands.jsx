@@ -247,7 +247,9 @@ const DEMOS = {
     tag: "CrToastRegion",
     defs: [T("enum", "position", "br", { options: ["tr", "br", "tl", "bl"] })],
     extra: { toasts: [{ id: 1, signal: "done", message: "Deploy complete" }, { id: 2, signal: "work", message: "Scanning 3 workers…" }] },
-    render: (s, set) => h("div", null,
+    // `transform` makes this a containing block so the region's position:fixed
+    // toasts anchor inside the demo instead of floating over the whole browser page.
+    render: (s, set) => h("div", { style: { position: "relative", transform: "translateZ(0)", minHeight: "140px", padding: "10px", border: "var(--brd-hair) dashed color-mix(in srgb, var(--border) 40%, transparent)" } },
       h("button", { className: "cr-btn cr-btn--sm", onClick: () => set("toasts", [...s.toasts, { id: Date.now(), signal: "wait", message: "Queued a job" }]) }, "Push toast"),
       h(CrToastRegion, { toasts: s.toasts, position: s.position, onDismiss: (id) => set("toasts", s.toasts.filter((x) => x.id !== id)) })),
   },
