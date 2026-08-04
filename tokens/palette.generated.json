@@ -1,10 +1,10 @@
 {
   "dark": {
     "grounds": {
-      "ground": "#090413",
-      "board": "#0f0819",
-      "panel": "#161021",
-      "panel-2": "#1e182a"
+      "ground": "#0f0327",
+      "board": "#15092f",
+      "panel": "#1d133a",
+      "panel-2": "#271d45"
     },
     "signals": {
       "work": "#00d3fb",
@@ -13,8 +13,8 @@
       "err": "#f45058",
       "idle": "#848496",
       "accent": "#ff1a9d",
-      "accent2": "#9ad335",
-      "stage": "#49de78"
+      "stage": "#49de78",
+      "accent2": "#9ad335"
     },
     "on": {
       "work": "#06050c",
@@ -23,16 +23,16 @@
       "err": "#06050c",
       "idle": "#06050c",
       "accent": "#06050c",
-      "accent2": "#06050c",
-      "stage": "#06050c"
+      "stage": "#06050c",
+      "accent2": "#06050c"
     }
   },
   "extreme": {
     "grounds": {
-      "ground": "#0d0016",
-      "board": "#13031d",
-      "panel": "#1d0a27",
-      "panel-2": "#271432"
+      "ground": "#150021",
+      "board": "#20012e",
+      "panel": "#2b0b3a",
+      "panel-2": "#361747"
     },
     "signals": {
       "work": "#5cddff",
@@ -41,8 +41,8 @@
       "err": "#fc4351",
       "idle": "#8a80a0",
       "accent": "#ff2fa0",
-      "accent2": "#a0e300",
-      "stage": "#0bf272"
+      "stage": "#0bf272",
+      "accent2": "#a0e300"
     },
     "on": {
       "work": "#06050c",
@@ -51,11 +51,17 @@
       "err": "#06050c",
       "idle": "#06050c",
       "accent": "#06050c",
-      "accent2": "#06050c",
-      "stage": "#06050c"
+      "stage": "#06050c",
+      "accent2": "#06050c"
     }
   },
   "light": {
+    "grounds": {
+      "ground": "#eaeaf2",
+      "board": "#e2e2e9",
+      "panel": "#fbfbff",
+      "panel-2": "#f2f3fa"
+    },
     "signals": {
       "accent2": "#663e9e"
     },

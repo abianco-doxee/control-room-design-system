@@ -574,7 +574,7 @@ carry everything else):
 ```css
 .cr-cols   { display: grid; grid-template-columns: 1.25fr 1fr; gap: var(--space-3); }
 .cr-hw-row { display: flex; gap: var(--space-3); align-items: center; margin-top: var(--space-3); }
-.cr-breach { background-color: var(--panel); padding: var(--space-4); }  /* wash needs a base */
+/* .cr-breach carries its own panel background + padding; add only your own spacing */
 ```
 
 - **MUST** keep to **one** keyed hero and **one** breach per screen (Laws 2 + 9).
@@ -836,9 +836,11 @@ engine) — CSS covers the regular patterns; canvas covers the generative ones.
 
 The **one sanctioned rule-break per screen** (Law 9). `.cr-breach` licenses the
 forbidden vocabulary on a single element — a soft corner (`--breach-radius`), a
-colour glow, a blurred **blob** (`::before`), and an optional gradient `--wash` —
-to spotlight the most exceptional thing. It only reads because everything around
-it obeys, so **use it at most once per screen.**
+**neon gradient rim** and a **dual-hue glow** in the house **magenta → acid** neon
+pairing (`--cr-breach` / `--cr-breach-2`), plus an optional interior `--wash` — to
+spotlight the most exceptional thing. The interior stays dark and legible; the
+*strike* is the rim + glow. It only reads because everything around it obeys, so
+**use it at most once per screen.**
 
 ```html
 <div class="cr-breach cr-breach--wash cr-breach--alive" style="background:var(--panel)">
@@ -855,10 +857,10 @@ import { CrBreach } from "@control-room/design-system/react";
 
 | Class | Effect |
 | --- | --- |
-| `.cr-breach` | soft corner + colour glow + blurred-blob `::before` |
-| `.cr-breach--wash` | adds the dark gradient wash (keeps `--ink` legible) |
-| `.cr-breach--alive` | slow breathing glow (off under reduced motion) |
-| `.cr-breach--work/-wait/-done/-err/-accent2` | re-key the glow to a signal (default accent) |
+| `.cr-breach` | soft corner + neon gradient rim + dual-hue glow (magenta → acid) |
+| `.cr-breach--wash` | tints the interior with the pair (kept dark; `--ink` stays legible) |
+| `.cr-breach--alive` | slow breathing dual glow (off under reduced motion) |
+| `.cr-breach--work/-wait/-done/-err/-accent2` | re-key the primary hue to a signal |
 | `.cr-blob` | a standalone soft luminous accent (decorative, `aria-hidden`) |
 
 - **MUST** use one breach per screen, keyed to a signal, with everything else
