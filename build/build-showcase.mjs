@@ -10,7 +10,7 @@
  * Per-component state snippets: EXAMPLES below (structure) — anything not listed
  * still gets a card with its variants/tokens and a link to the Live Gallery.
  */
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import * as esbuild from "esbuild";
@@ -209,6 +209,46 @@ const EXAMPLES = {
 };
 
 const kbdBadge = (t) => `<span class="badge">${t}</span>`;
+// ── prop tables, generated from the compiled React interfaces ─────────────
+const REACT_DIR = join(ROOT, "dist", "frameworks", "react", "components");
+const COMP_INDEX = {}; // lowercased export name → actual file base (for case/hyphen mismatches)
+try {
+  for (const f of readdirSync(REACT_DIR)) if (f.endsWith(".tsx")) COMP_INDEX[f.slice(0, -4).toLowerCase()] = f.slice(0, -4);
+} catch { /* dist not built yet */ }
+// catalog id → component export name where "Cr"+PascalCase(id) doesn't resolve.
+const COMP_OVERRIDES = { checkbox: "CrChoice", "form-field": "CrField", "seeded-cat": "CrCat", "empty-error-state": "CrEmptyState", rail: "CrNav" };
+function resolveComponent(e) {
+  if (COMP_OVERRIDES[e.id]) return COMP_OVERRIDES[e.id];
+  const cand = "Cr" + e.id.split("-").map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join("");
+  return COMP_INDEX[cand.toLowerCase()] || null;
+}
+const escT = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function readProps(comp) {
+  const path = join(REACT_DIR, comp + ".tsx");
+  if (!existsSync(path)) return null;
+  const src = readFileSync(path, "utf8");
+  const m = src.match(new RegExp("export interface " + comp + "Props \\{([\\s\\S]*?)\\n\\}"));
+  if (!m) return null;
+  const rows = []; let doc = "";
+  for (const raw of m[1].split("\n")) {
+    const line = raw.trim();
+    if (!line) continue;
+    const jd = line.match(/^\/\*\*\s*(.*?)\s*\*\/$/); if (jd) { doc = jd[1]; continue; }
+    if (line.startsWith("/*") || line.startsWith("*") || line.startsWith("//")) continue;
+    const p = line.match(/^(\w+)(\??):\s*(.+?);?\s*$/);
+    if (p) { rows.push({ prop: p[1], req: p[2] !== "?", type: p[3].replace(/\s+/g, " "), doc }); doc = ""; }
+  }
+  return rows.length ? rows : null;
+}
+function propsHtml(e) {
+  const comp = resolveComponent(e);
+  const rows = comp ? readProps(comp) : null;
+  if (!rows) return "";
+  const body = rows
+    .map((r) => `<div class="prow"><code class="prow__n">${r.prop}${r.req ? "" : "?"}</code><code class="prow__t">${escT(r.type)}</code><span class="prow__d">${r.doc ? escT(r.doc) : ""}</span></div>`)
+    .join("");
+  return `<div class="vbox vbox--props"><h4>props · <code>&lt;${comp} /&gt;</code></h4>${body}</div>`;
+}
 function variantsHtml(e) {
   const keys = Object.keys(e.variants || {});
   if (!keys.length) return "";
@@ -291,7 +331,7 @@ const cardsHtml = cats
     </header>
     <p class="card__desc">${e.description}</p>
     ${stageHtml(e.id)}
-    <div class="card__meta">${variantsHtml(e)}${tokensHtml(e)}</div>
+    <div class="card__meta">${propsHtml(e)}${variantsHtml(e)}${tokensHtml(e)}</div>
   </article>`,
       )
       .join(""),
@@ -367,6 +407,14 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
 .cell__pending { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
 .card__meta { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 14px; }
 .vbox h4 { font-family: var(--font-mono); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 0 0 4px; }
+.vbox h4 code { text-transform: none; color: var(--ink); font-weight: 700; }
+/* prop tables — generated from the TS interfaces */
+.vbox--props { flex: 1 1 100%; }
+.prow { display: grid; grid-template-columns: minmax(96px, auto) minmax(130px, 1fr) 2fr; gap: 12px; font-family: var(--font-mono); font-size: 11px; padding: 2px 0; align-items: baseline; border-top: var(--brd-hair) solid color-mix(in srgb, var(--border) 25%, transparent); }
+.prow__n { color: var(--sig-accent); font-weight: 700; }
+.prow__t { color: var(--ink); overflow-x: auto; }
+.prow__d { color: var(--muted); }
+@media (max-width: 640px) { .prow { grid-template-columns: 1fr; gap: 1px; } }
 .vrow { display: flex; gap: 10px; font-family: var(--font-mono); font-size: 11px; padding: 1px 0; }
 .vrow code { color: var(--sig-accent); }
 .vrow span { color: var(--muted); }
