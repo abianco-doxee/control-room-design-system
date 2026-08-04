@@ -5,21 +5,21 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 59,
+    "count": 60,
     "categories": {
       "action": 1,
       "behavior": 1,
       "forms": 12,
       "identity": 2,
       "layout": 7,
-      "media": 7,
+      "media": 8,
       "navigation": 6,
       "overlay": 9,
       "primitives": 2,
       "state": 12
     },
     "lifecycles": {
-      "stable": 58,
+      "stable": 59,
       "experimental": 1
     }
   },
@@ -1137,6 +1137,63 @@
         "fui",
         "decoration",
         "dead-space"
+      ]
+    },
+    {
+      "id": "icon",
+      "name": "Icon",
+      "kind": "component",
+      "category": "media",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The house operational glyph set — 24×24, currentColor, single 2px stroke, square caps to match the neobrutalist geometry. Decorative by default; pass a label to name it.",
+      "spec": "references/components.md#icon",
+      "variants": {
+        "name": [
+          "play",
+          "pause",
+          "stop",
+          "retry",
+          "deploy",
+          "scan",
+          "search",
+          "alert",
+          "error",
+          "done",
+          "clock",
+          "cpu",
+          "logs",
+          "filter",
+          "sliders",
+          "close",
+          "chevron",
+          "plus",
+          "minus",
+          "trash",
+          "external",
+          "copy",
+          "session",
+          "menu"
+        ],
+        "size": [
+          "16",
+          "20",
+          "24"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--ink",
+          "description": "inherited stroke colour (currentColor)"
+        }
+      ],
+      "keywords": [
+        "icon",
+        "glyph",
+        "svg",
+        "symbol",
+        "stroke",
+        "operational"
       ]
     },
     {

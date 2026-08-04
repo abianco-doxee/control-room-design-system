@@ -21,8 +21,10 @@ import {
   CrTooltip, CrTable, CrToastRegion,
   CrButton, CrChoice, CrField, CrInput, CrTextarea, CrBreadcrumb, CrToast,
   CrKbd, CrAlert, CrChip, CrEmptyState, CrMeter, CrProgress, CrStatusDot,
-  CrTag, CrSessionRow, CrPanel,
+  CrTag, CrSessionRow, CrPanel, CrIcon,
 } from "../dist/frameworks/react/index.ts";
+
+const ICON_NAMES = ["play", "pause", "stop", "retry", "deploy", "scan", "search", "alert", "error", "done", "clock", "cpu", "logs", "filter", "sliders", "close", "chevron", "plus", "minus", "trash", "external", "copy", "session", "menu"];
 
 const h = React.createElement;
 
@@ -380,6 +382,26 @@ const DEMOS = {
       T("children", "children", "Panel body content.", { label: "body" }),
     ],
     render: (s) => h(CrPanel, { title: s.title, weight: s.weight, inset: s.inset }, s.children),
+  },
+  icon: {
+    tag: "CrIcon",
+    defs: [
+      T("enum", "name", "deploy", { options: ICON_NAMES }),
+      T("number", "size", 24, { min: 12, max: 48 }),
+      T("text", "label", "deploy"),
+    ],
+    render: (s) => h("div", { style: { display: "flex", flexDirection: "column", gap: "14px" } },
+      h("div", { style: { display: "flex", alignItems: "center", gap: "10px" } },
+        h(CrIcon, { name: s.name, size: s.size, label: s.label }),
+        h("code", { style: { fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--muted)" } }, s.name)),
+      // the whole set, live, so the browser shows every glyph at a glance
+      h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(72px, 1fr))", gap: "6px" } },
+        ICON_NAMES.map((n) => h("div", {
+          key: n, title: n,
+          style: { display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", padding: "8px 4px", border: "var(--brd-hair) solid color-mix(in srgb, var(--border) 45%, transparent)", color: "var(--ink)" },
+        },
+          h(CrIcon, { name: n, size: 22 }),
+          h("span", { style: { fontFamily: "var(--font-mono)", fontSize: "9px", color: "var(--muted)" } }, n))))),
   },
 };
 
