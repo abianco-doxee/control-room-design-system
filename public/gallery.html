@@ -671,7 +671,7 @@ body {
 .cr-seam   { height: 4px; border-top: 1px solid var(--rail-ink); border-bottom: 1px solid var(--mass); background: var(--panel-2); }
 .cr-plate  { display: inline-block; font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: 0.14em;
              text-transform: uppercase; color: var(--muted); border: 1px solid var(--rail-ink); padding: 1px var(--space-2); }
-.cr-tally  { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.24em; color: var(--sig-done); }
+.cr-tally  { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.24em; color: var(--ink); }
 
 /* ── Richer texture — crosshatch (× diagonals) + duotone (cross-colours) ────
  * Answers "not just dots": cross-hatching from ±45° diagonals (Law 4 energy),
@@ -886,6 +886,64 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
 
   <h2>03 · Components</h2>
   <div class="demogrid">
+    <div style="grid-column:1/-1">
+      <h3>Composed — an operator's screen (the whole vocabulary in one)</h3>
+      <p style="font-family:var(--font-mono);font-size:11px;color:var(--muted);max-width:80ch;line-height:1.6;margin:0 0 12px">
+        One screen exercising the nine laws together: condensed masthead + registration ticks, a keyed hero,
+        severity shapes beside colour, seeded sigils per session, the arrow-rail, a texture + scanline bezel,
+        keyed tiles — and exactly one Law-9 breach. Flip the theme; it holds with zero per-theme code.
+      </p>
+      <div class="cr-instrument">
+        <nav class="cr-nav" aria-label="Primary">
+          <div class="cr-nav__brand">CONTROL<br>ROOM</div>
+          <ul class="cr-nav__list">
+            <li><a class="cr-nav__item cr-nav__item--active" href="#" aria-current="page">◈ Attention <span class="cr-nav__badge">2</span></a></li>
+            <li><a class="cr-nav__item" href="#">◧ Sessions</a></li>
+            <li><a class="cr-nav__item" href="#">▦ Sprint</a></li>
+            <li><a class="cr-nav__item" href="#">◹ Pipeline</a></li>
+          </ul>
+        </nav>
+        <div class="cr-instrument__board">
+          <header class="cr-masthead cr-mark">
+            <p class="cr-masthead__eyebrow">DP Control Room · Phase 0</p>
+            <h1 class="cr-masthead__title">14 sessions<br>2 need you</h1>
+          </header>
+          <div class="cr-hero cr-hero--wait">
+            <div><div class="cr-hero__big">nova needs you</div><div class="cr-hero__sub">CR-1130 · paused for input · 6m</div></div>
+            <canvas class="crsig" width="56" height="56" data-seed="nova-01" data-state="waiting" style="margin-left:auto"></canvas>
+          </div>
+          <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:12px">
+            <section class="cr-panel cr-panel--major">
+              <h4 class="cr-panel__title">Sessions</h4>
+              <div class="cr-row"><span class="cr-sev cr-sev--work" role="img" aria-label="working"></span><canvas class="crsig" width="20" height="20" data-seed="ptl-757" data-state="working"></canvas><span class="cr-row__name">PTL-757 chat-turn</span><span class="cr-row__status">streaming</span></div>
+              <div class="cr-row"><span class="cr-sev cr-sev--warn" role="img" aria-label="attend"></span><canvas class="crsig" width="20" height="20" data-seed="cr-1130" data-state="waiting"></canvas><span class="cr-row__name">CR-1130 picker</span><span class="cr-row__status">needs input</span></div>
+              <div class="cr-row"><span class="cr-sev cr-sev--crit" role="img" aria-label="critical"></span><canvas class="crsig" width="20" height="20" data-seed="rp-verify" data-state="error"></canvas><span class="cr-row__name">rp verify</span><span class="cr-row__status">2 failing</span></div>
+              <div class="cr-row"><span class="cr-sev cr-sev--ok" role="img" aria-label="nominal"></span><canvas class="crsig" width="20" height="20" data-seed="atlas" data-state="done"></canvas><span class="cr-row__name">atlas deploy</span><span class="cr-row__status">merged</span></div>
+            </section>
+            <section class="cr-panel">
+              <h4 class="cr-panel__title">Pipeline</h4>
+              <div class="cr-rail" style="margin-bottom:10px"><span class="cr-rail__step cr-rail__step--on">scan</span><span class="cr-rail__step">triage</span><span class="cr-rail__step">fix</span><span class="cr-rail__step">verify</span></div>
+              <div class="cr-bezel cr-anim-scan"><div class="cr-bezel__rivets" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+                <div class="cr-bezel__screen cr-tex--glass">&gt; scan complete · 14 sessions · 2 flagged<br>&gt; awaiting operator on CR-1130</div></div>
+              <div style="display:flex;gap:10px;margin-top:10px;align-items:center"><span class="cr-plate">UNIT · CR-00 · REV.C</span><span class="cr-tally">▐▐▐ ▌ 14</span></div>
+            </section>
+          </div>
+          <div class="cr-breach cr-breach--wash cr-breach--alive" style="background-color:var(--panel);padding:16px">
+            <div class="cr-masthead__eyebrow" style="color:var(--sig-accent)">Milestone</div>
+            <div class="cr-hero__big" style="color:var(--ink)">Sprint 41 shipped</div>
+            <div class="cr-hero__sub" style="color:var(--muted)">38 tasks · 0 regressions · 2 days early</div>
+          </div>
+          <div class="cr-tiles">
+            <div class="cr-tile cr-tile--work">nova</div>
+            <div class="cr-tile cr-tile--wait">atlas</div>
+            <div class="cr-tile cr-tile--done">echo</div>
+            <div class="cr-tile cr-tile--err">rhea</div>
+            <div class="cr-tile cr-tile--idle">kite</div>
+            <div class="cr-tile cr-tile--stage">calm</div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div>
       <h3>Panel · SessionRow · StatusDot</h3>
       <section class="cr-panel"><h4 class="cr-panel__title">Sessions</h4>
