@@ -33,7 +33,7 @@ re-import the DTCG, re-export. The tokens never diverge from code.
 
 ## Step 2 — the component recipe (memorize once)
 
-Every Control Room component is the same chassis (the eight laws made physical).
+Every Control Room component is the same chassis (the nine laws made physical).
 Build it from the Variables above, never raw values:
 
 - **Shape:** rectangle/auto-layout frame, **corner radius 0** (Law 1/token `--radius`).

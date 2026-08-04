@@ -6,7 +6,7 @@ hero:
   tagline: A neobrutalist design system for dense operational dashboards. Black is a mass; one hue keys the scene and it means something; decay is information.
   actions:
     - theme: brand
-      text: The eight laws
+      text: The nine laws
       link: /references/design-language
     - theme: alt
       text: Live gallery
@@ -16,7 +16,7 @@ hero:
       link: /references/components
 features:
   - title: Design language, not vibes
-    details: Eight research-grounded laws, each a decision procedure with explicit MUST / SHOULD / NEVER — so the next component doesn't need a taste debate.
+    details: Nine research-grounded laws, each a decision procedure with explicit MUST / SHOULD / NEVER — so the next component doesn't need a taste debate.
   - title: Token-first, four themes
     details: One machine-readable source (tokens.json) drives dark / light / extreme / phosphor. Any component built from tokens survives a theme flip with zero per-theme code.
   - title: A spec'd component library

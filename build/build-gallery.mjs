@@ -251,6 +251,19 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       </div>
     </div>
     <div style="grid-column:1/-1">
+      <h3>The Breach (Law 9) — one sanctioned rule-break per screen</h3>
+      <div style="display:flex;gap:26px;flex-wrap:wrap;align-items:center;padding:16px 4px">
+        <div class="cr-breach cr-breach--wash cr-breach--alive" style="max-width:340px;padding:20px;background-color:var(--panel)">
+          <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--sig-accent)">Milestone</div>
+          <div style="font-family:var(--font-display);font-weight:900;font-size:30px;text-transform:uppercase;letter-spacing:-.03em;line-height:.88;margin-top:6px;color:var(--ink)">Sprint shipped</div>
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-top:8px">14 sessions · 0 failing · on time</div>
+        </div>
+        <span class="cr-blob" aria-hidden="true"></span>
+        <span class="cr-blob cr-breach--done" aria-hidden="true"></span>
+        <p style="font-family:var(--font-mono);font-size:11px;color:var(--muted);max-width:30ch;line-height:1.65">Soft corner · gradient wash · blurred blob · colour glow — every one forbidden elsewhere. It reads <em>because</em> everything around it is hard-edged. One per screen, never two.</p>
+      </div>
+    </div>
+    <div style="grid-column:1/-1">
       <h3>Overlays — Modal · Toast · Tooltip</h3>
       <div style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));align-items:start">
         <div>

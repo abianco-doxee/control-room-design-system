@@ -1150,6 +1150,58 @@
         "identity",
         "glyph"
       ]
+    },
+    {
+      "id": "breach",
+      "name": "Breach",
+      "category": "layout",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "The one sanctioned rule-break per screen (Law 9) — soft corner, colour glow, blurred blob, optional gradient wash — to spotlight the single most exceptional item.",
+      "spec": "references/components.md#breach",
+      "variants": {
+        "signal": [
+          "accent",
+          "work",
+          "wait",
+          "done",
+          "err",
+          "accent2"
+        ],
+        "flag": [
+          "wash",
+          "alive"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--breach-radius",
+          "description": "the soft corner"
+        },
+        {
+          "cssVar": "--breach-blur",
+          "description": "blurred-blob softness"
+        },
+        {
+          "cssVar": "--breach-glow-size",
+          "description": "glow radius"
+        },
+        {
+          "cssVar": "--sig-accent",
+          "description": "default glow hue"
+        }
+      ],
+      "keywords": [
+        "breach",
+        "glow",
+        "gradient",
+        "blob",
+        "soft",
+        "exception",
+        "spotlight",
+        "law-9",
+        "milestone"
+      ]
     }
   ]
 }

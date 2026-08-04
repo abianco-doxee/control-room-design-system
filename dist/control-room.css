@@ -42,6 +42,9 @@
   --shadow-off-lg: 6px;
   --radius: 0px;
   --halftone-size: 7px;
+  --breach-radius: 14px;
+  --breach-blur: 26px;
+  --breach-glow-size: 40px;
   --font-sans: "CR Sans", "Archivo", "Arial Black", "Helvetica Neue", system-ui, sans-serif;
   --font-display: "CR Display", "Saira Condensed", "Archivo Narrow", "Oswald", var(--font-sans);
   --font-mono: "CR Mono", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;

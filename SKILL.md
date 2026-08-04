@@ -4,10 +4,10 @@ description: >-
   The Control Room design system — a neon-noir, neobrutalist instrument for
   dense operational dashboards (session monitors, sprint boards, agent control
   rooms). Use whenever building, restyling, or reviewing any UI that should
-  match Control Room: its design language (the eight laws), design tokens
+  match Control Room: its design language (the nine laws), design tokens
   (four themes on an intensity dial), component library, motion tiers, the
   seeded pixel-cat, and its accessibility contract. Triggers include "control
-  room", "sprint dashboard", "neon-noir dashboard", "the eight laws", building
+  room", "sprint dashboard", "neon-noir dashboard", "the nine laws", building
   a Panel/Chip/Button/StatusDot/SessionRow/Bezel in this style, adding a theme,
   or generating a component that must read as part of this system.
 metadata:
@@ -46,7 +46,7 @@ Detail lives in `references/`. Load only what the task needs.
 
 | File | Read it when you need… |
 | --- | --- |
-| `references/design-language.md` | The **eight laws** — the *why* and the do/don't for every visual decision. Read this first for any new component. |
+| `references/design-language.md` | The **nine laws** — the *why* and the do/don't for every visual decision. Read this first for any new component. |
 | `references/tokens.md` | The full token reference — every variable, every theme, and how to consume them. |
 | `references/components.md` | The **component library** — formal spec + API for each component (Panel, Button, Chip, StatusDot, SessionRow, Rail, Hero, Bezel, Table, Tag, diagonal primitives, keyed tiles, drip, form controls, instrument shell, and the overlays — Modal / Toast / Tooltip). |
 | `references/motion.md` | The four motion tiers, the glitch/CRT vocabulary, and the reduced-motion contract. |
@@ -81,7 +81,8 @@ The irreducible rules. Each expands in the references.
 - **MUST** build on the token layer (`dist/control-room.css`). Never hardcode a
   hex, a border width, or a shadow that a token already names.
 - **MUST** keep every corner square. `--radius` is `0` and stays `0`. **NEVER**
-  round a corner, blur a shadow, or add a gradient to a content surface.
+  round a corner, blur a shadow, or add a gradient to a content surface — with
+  exactly one exception: the Law 9 **breach** (see below).
 - **MUST** treat color as state, not decoration. A signal hue on screen asserts
   a real machine state (working / waiting / done / error / idle) or a real
   action (accent). **NEVER** flood a region with a hue that doesn't correspond
@@ -102,6 +103,10 @@ The irreducible rules. Each expands in the references.
 - **MUST** write in the machine voice (Law 8): present tense, datum first, one
   line, no apology, no cheer, no emoji (`2 failing`, not "Oops — something went
   wrong!"). **NEVER** address the operator in the first person.
+- **MAY** break one law, once, on purpose (Law 9 — the **breach**): the single
+  most exceptional item on a screen may use a glow / gradient / soft corner / blob
+  (`.cr-breach`) to stand apart. **NEVER** more than one per screen, and **NEVER**
+  on data or routine chrome — the breach only reads because everything else obeys.
 
 The **tells** — the marks that make a screen unmistakably Control Room: the one
 hard offset shadow (and press-into-shadow `:active`), absolute-square corners,

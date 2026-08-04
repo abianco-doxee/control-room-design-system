@@ -252,6 +252,30 @@
       "$extensions": {
         "com.doxee.cssVar": "--halftone-size"
       }
+    },
+    "breach-radius": {
+      "$type": "dimension",
+      "$value": "14px",
+      "$description": "the one soft corner",
+      "$extensions": {
+        "com.doxee.cssVar": "--breach-radius"
+      }
+    },
+    "breach-blur": {
+      "$type": "dimension",
+      "$value": "26px",
+      "$description": "blurred-blob softness",
+      "$extensions": {
+        "com.doxee.cssVar": "--breach-blur"
+      }
+    },
+    "breach-glow-size": {
+      "$type": "dimension",
+      "$value": "40px",
+      "$description": "soft glow radius",
+      "$extensions": {
+        "com.doxee.cssVar": "--breach-glow-size"
+      }
     }
   },
   "typography": {

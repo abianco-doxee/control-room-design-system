@@ -758,3 +758,39 @@ signals (`--cr-duo-a` / `--cr-duo-b`, default accent + accent-2) — "cross-colo
 Both are hardware-only like the rest of the `.cr-tex--*` family. For freeform
 **symbol / ASCII dithering**, paint it on a `<canvas>` (the seeded-cat / sigil
 engine) — CSS covers the regular patterns; canvas covers the generative ones.
+
+## The Breach {#breach}
+
+The **one sanctioned rule-break per screen** (Law 9). `.cr-breach` licenses the
+forbidden vocabulary on a single element — a soft corner (`--breach-radius`), a
+colour glow, a blurred **blob** (`::before`), and an optional gradient `--wash` —
+to spotlight the most exceptional thing. It only reads because everything around
+it obeys, so **use it at most once per screen.**
+
+```html
+<div class="cr-breach cr-breach--wash cr-breach--alive" style="background:var(--panel)">
+  <div class="cr-masthead__eyebrow">Milestone</div>
+  <h2 class="cr-masthead__title">Sprint shipped</h2>
+  <p>14 sessions · 0 failing · on time</p>
+</div>
+<span class="cr-blob" aria-hidden="true"></span>  <!-- standalone soft accent -->
+```
+```tsx
+import { CrBreach } from "@control-room/design-system/react";
+<CrBreach signal="done" wash alive>…the one exceptional thing…</CrBreach>
+```
+
+| Class | Effect |
+| --- | --- |
+| `.cr-breach` | soft corner + colour glow + blurred-blob `::before` |
+| `.cr-breach--wash` | adds the dark gradient wash (keeps `--ink` legible) |
+| `.cr-breach--alive` | slow breathing glow (off under reduced motion) |
+| `.cr-breach--work/-wait/-done/-err/-accent2` | re-key the glow to a signal (default accent) |
+| `.cr-blob` | a standalone soft luminous accent (decorative, `aria-hidden`) |
+
+- **MUST** use one breach per screen, keyed to a signal, with everything else
+  hard-edged.
+- **MUST** keep breach text within contrast; the `--alive` glow honors reduced
+  motion.
+- **NEVER** breach data, tables, dense lists, or routine chrome — the breach is
+  for the exceptional only.

@@ -100,6 +100,14 @@ everything).
 | `--shadow-off-lg` | `6px` | `9px` | mastheads, live instruments |
 | `--radius` | `0px` | `0px` | **always 0** — exists so the 0 is explicit |
 | `--halftone-size` | `7px` | `7px` | halftone cell size (bezels only) |
+| `--breach-radius` | `14px` | `14px` | Law 9 — the one soft corner (`.cr-breach` only) |
+| `--breach-blur` | `26px` | `26px` | Law 9 — blurred-blob softness |
+| `--breach-glow-size` | `40px` | `40px` | Law 9 — glow radius |
+
+The three `--breach-*` tokens are the **only** place radius, blur, and a soft glow
+are licensed (Law 9 — The Breach). They exist as named tokens precisely so the
+exception is explicit and greppable, and so a raw `border-radius` anywhere else
+still reads as a defect.
 
 **The hard-shadow idiom** (memorize it; it is everywhere):
 
