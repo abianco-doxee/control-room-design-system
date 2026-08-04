@@ -899,6 +899,40 @@ body {
 .cr-leader__fill { flex: 1; align-self: center; border-bottom: var(--brd) dotted color-mix(in srgb, var(--muted) 55%, transparent); }
 .cr-leader__v { color: var(--ink); font-variant-numeric: tabular-nums; }
 
+/* ── ASCII rules · meters · spinner (first-class ASCII vocabulary) ───────────
+ * Real characters, not borders — the house ASCII voice, monospace + tabular. */
+.cr-rule { font-family: var(--font-mono); color: color-mix(in srgb, var(--muted) 70%, transparent);
+  line-height: 1; overflow: hidden; white-space: nowrap; user-select: none; }
+.cr-rule::before { content: "\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500"; }         /* ──── */
+.cr-rule--hatch::before { content: "\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591"; }  /* ▓▒░ */
+.cr-rule--dot::before   { content: "\00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7"; letter-spacing: 2px; }
+
+/* ASCII progress/meter — a real block-glyph bar driven by --v (0..1). */
+.cr-ascii-bar { position: relative; display: inline-block; font-family: var(--font-mono); font-size: var(--text-sm);
+  color: color-mix(in srgb, var(--muted) 55%, transparent); letter-spacing: 1px; line-height: 1; user-select: none; }
+.cr-ascii-bar::before { content: "\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1"; }  /* ▱×20 track */
+.cr-ascii-bar__fill { position: absolute; top: 0; left: 0; overflow: hidden; white-space: nowrap;
+  width: calc(var(--v, 0) * 100%); color: var(--sig-work); }
+.cr-ascii-bar__fill::before { content: "\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0"; letter-spacing: 1px; }  /* ▰×20 fill */
+
+/* ASCII spinner — cycles braille frames (honors reduced motion + the motion dial). */
+.cr-ascii-spin { font-family: var(--font-mono); color: var(--sig-work); }
+.cr-ascii-spin::before { content: "\28CB"; animation: cr-braille 0.8s steps(1, jump-none) infinite; }
+@keyframes cr-braille {
+  0%   { content: "\280B"; } 12.5% { content: "\2819"; } 25%  { content: "\2839"; } 37.5% { content: "\2838"; }
+  50%  { content: "\283C"; } 62.5% { content: "\2834"; } 75%  { content: "\2826"; } 87.5% { content: "\2827"; }
+}
+@media (prefers-reduced-motion: reduce) { .cr-ascii-spin::before { animation: none; content: "\28FF"; } }
+
+/* ASCII/braille density backdrop — the default texture for empty & loading states.
+ * A masked braille tile so it themes to --muted and follows the loudness dial. */
+.cr-empty { position: relative; isolation: isolate; overflow: hidden;
+  --cr-braille: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2272%22%20height=%2254%22%20viewBox=%220%200%2072%2054%22%3E%3Ctext%20x=%226%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠁%3C/text%3E%3Ctext%20x=%2218%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠒%3C/text%3E%3Ctext%20x=%2230%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠹%3C/text%3E%3Ctext%20x=%2242%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠶%3C/text%3E%3Ctext%20x=%2254%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠇%3C/text%3E%3Ctext%20x=%2266%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠘%3C/text%3E%3Ctext%20x=%226%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠠%3C/text%3E%3Ctext%20x=%2218%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠉%3C/text%3E%3Ctext%20x=%2230%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠛%3C/text%3E%3Ctext%20x=%2242%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠿%3C/text%3E%3Ctext%20x=%2254%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠄%3C/text%3E%3Ctext%20x=%2266%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠧%3C/text%3E%3Ctext%20x=%226%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠁%3C/text%3E%3Ctext%20x=%2218%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠒%3C/text%3E%3Ctext%20x=%2230%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠹%3C/text%3E%3Ctext%20x=%2242%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠶%3C/text%3E%3Ctext%20x=%2254%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠇%3C/text%3E%3Ctext%20x=%2266%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠘%3C/text%3E%3C/svg%3E"); }
+.cr-empty::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: color-mix(in srgb, var(--muted) 45%, transparent);
+  -webkit-mask: var(--cr-braille) 0 0 / 72px 54px repeat; mask: var(--cr-braille) 0 0 / 72px 54px repeat;
+  opacity: calc(0.5 * var(--decoration-intensity, 1)); }
+
 /* ── Hover card (rich hover/focus reveal) ───────────────────────────────── */
 .cr-hovercard { position: relative; display: inline-flex; }
 .cr-hovercard__trigger { cursor: default; border-bottom: var(--brd-hair) dashed var(--muted); }
@@ -1771,6 +1805,17 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         <hr class="cr-sep" />
         <div class="cr-leader"><span class="cr-leader__k">uptime</span><span class="cr-leader__fill"></span><span class="cr-leader__v">41h 12m</span></div>
         <div class="cr-leader"><span class="cr-leader__k">region</span><span class="cr-leader__fill"></span><span class="cr-leader__v">eu-west-1</span></div>
+      </div>
+      <h3 style="margin-top:16px">ASCII rules · meters · spinner · empty state</h3>
+      <div style="max-width:360px;display:flex;flex-direction:column;gap:12px">
+        <div class="cr-rule" aria-hidden="true"></div>
+        <div class="cr-rule cr-rule--hatch" aria-hidden="true"></div>
+        <div class="cr-rule cr-rule--dot" aria-hidden="true"></div>
+        <div class="cr-leader"><span class="cr-leader__k">index</span><span class="cr-leader__fill"></span><span class="cr-ascii-bar" style="--v:0.65"><span class="cr-ascii-bar__fill"></span></span></div>
+        <div style="font-family:var(--font-mono);font-size:13px;color:var(--muted)"><span class="cr-ascii-spin" aria-hidden="true"></span> syncing worker pool…</div>
+        <div class="cr-panel cr-panel--inset cr-empty" style="text-align:center;padding:24px">
+          <p style="font-family:var(--font-mono);font-size:13px;color:var(--muted);margin:0">No sessions in this region yet.</p>
+        </div>
       </div>
       <h3 style="margin-top:16px">Tree · Hover card</h3>
       <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
