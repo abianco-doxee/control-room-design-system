@@ -67,5 +67,7 @@ re-themes automatically** when you change `html[data-theme]`.
 - **Utilities** (this file) — layout, spacing, one-off composition, app screens.
 - **`cr-` components** (`styles/components.css`) — recurring pieces (Button,
   Panel, Chip, …) you don't want to re-compose each time.
-- **v3 preset** — `dist/tailwind-preset.cjs` is still exported (`./tailwind-preset`)
-  for Tailwind v3 projects; v4 `@theme` is the preferred path.
+
+Tailwind v4 `@theme` (`dist/tw-theme.css`) is the single Tailwind integration —
+import it after `tailwindcss` and utilities resolve to the runtime CSS vars, so
+they follow `html[data-theme]` automatically.

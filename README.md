@@ -26,9 +26,7 @@ control-room-design-system/
 │   ├── seeded-sigil.md            # the seeded cyber-sigil pixel glyph
 │   ├── decoration.md             # ASCII/pixel decoration for dead space (the decorative-only contract)
 │   ├── frameworks.md             # Mitosis compile-to-many + the cn() helper
-│   ├── tailwind.md               # Tailwind-first authoring (v4 @theme)
-│   ├── figma-bridge.md           # optional Figma → code bridge
-│   └── figma-kit-build.md        # optional Figma kit build guide
+│   └── tailwind.md               # Tailwind-first authoring (v4 @theme)
 ├── components/                    # Mitosis .lite.tsx SOURCES (author interactive components here)
 ├── tokens/
 │   └── tokens.json                # machine-readable token SOURCE OF TRUTH (author here)

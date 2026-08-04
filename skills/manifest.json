@@ -1,5 +1,5 @@
 {
-  "$comment": "Skill install manifest — mirrors the Doxee Design-System-Hub convention (single source of truth fanned out to every agent provider, gated by a validity/drift check).",
+  "$comment": "Skill install manifest \u2014 single source of truth installed into the Claude provider.",
   "skills": [
     {
       "id": "control-room-design-system",
@@ -20,8 +20,6 @@
     }
   ],
   "providers": {
-    "claude": ".claude/skills",
-    "cursor": ".cursor/skills",
-    "opencode": ".opencode/skills"
+    "claude": ".claude/skills"
   }
 }
