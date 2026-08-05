@@ -5,10 +5,11 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 60,
+    "count": 64,
     "categories": {
       "action": 1,
       "behavior": 1,
+      "chart": 4,
       "forms": 12,
       "identity": 2,
       "layout": 7,
@@ -19,7 +20,7 @@
       "state": 12
     },
     "lifecycles": {
-      "stable": 59,
+      "stable": 63,
       "experimental": 1
     }
   },
@@ -110,6 +111,178 @@
         "reveal",
         "headless",
         "behavior"
+      ]
+    },
+    {
+      "id": "bar-chart",
+      "name": "Bar chart",
+      "kind": "component",
+      "category": "chart",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Categorical bar chart — baseline-anchored bars with rounded data-ends, a 2px surface gap, optional dashed target line, monospace value/category labels.",
+      "spec": "references/components.md#bar-chart",
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle",
+          "accent",
+          "accent2"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "plot surface"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "first categorical hue"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "target line"
+        }
+      ],
+      "keywords": [
+        "bar chart",
+        "chart",
+        "graph",
+        "column",
+        "categorical",
+        "magnitude",
+        "target",
+        "budget"
+      ]
+    },
+    {
+      "id": "line-chart",
+      "name": "Line chart",
+      "kind": "component",
+      "category": "chart",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Time-series line chart — recessive grid, non-scaling 2px lines, a data-end dot per series, tick labels and a legend for ≥2 series. One y-axis only.",
+      "spec": "references/components.md#line-chart",
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle",
+          "accent",
+          "accent2"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "plot surface"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "first categorical hue"
+        },
+        {
+          "cssVar": "--ink",
+          "description": "grid (mixed to ~16%)"
+        }
+      ],
+      "keywords": [
+        "line chart",
+        "chart",
+        "graph",
+        "time series",
+        "trend",
+        "series",
+        "plot",
+        "telemetry"
+      ]
+    },
+    {
+      "id": "sparkline",
+      "name": "Sparkline",
+      "kind": "component",
+      "category": "chart",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Inline micro line/area chart for a KPI or table cell — no axes, a crisp non-scaling 2px stroke, a data-end dot. Stretches to fill its box.",
+      "spec": "references/components.md#sparkline",
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle",
+          "accent",
+          "accent2"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "default line/area/dot"
+        },
+        {
+          "cssVar": "--panel",
+          "description": "dot halo"
+        }
+      ],
+      "keywords": [
+        "sparkline",
+        "trend",
+        "chart",
+        "line",
+        "area",
+        "micro",
+        "kpi",
+        "inline"
+      ]
+    },
+    {
+      "id": "stacked-bar",
+      "name": "Stacked bar",
+      "kind": "component",
+      "category": "chart",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A single composition bar (\"stacked progress\") — signal-toned segments sized by share, with a 2px surface gap and a legend (label · value · %). Compose several for a comparison.",
+      "spec": "references/components.md#stacked-bar",
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle",
+          "accent",
+          "accent2"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "a segment tone"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "track"
+        }
+      ],
+      "keywords": [
+        "stacked bar",
+        "stacked progress",
+        "composition",
+        "breakdown",
+        "share",
+        "chart",
+        "segments",
+        "mix"
       ]
     },
     {
