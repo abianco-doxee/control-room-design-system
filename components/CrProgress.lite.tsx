@@ -8,8 +8,6 @@ export interface CrProgressProps {
   indeterminate?: boolean;
   /** Signal for the fill (canonical vocabulary): work · wait · done · err. */
   signal?: "work" | "wait" | "done" | "err";
-  /** @deprecated use `signal` */
-  tone?: string;
   label?: string;
 }
 
@@ -33,7 +31,7 @@ export default function CrProgress(props: CrProgressProps) {
       class={
         "cr-progress" +
         (props.indeterminate ? " cr-progress--indeterminate" : "") +
-        (props.signal || props.tone ? " cr-progress--" + (props.signal || props.tone) : "")
+        (props.signal ? " cr-progress--" + props.signal : "")
       }
       role="progressbar"
       aria-label={props.label || "progress"}

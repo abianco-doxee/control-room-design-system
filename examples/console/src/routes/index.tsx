@@ -200,7 +200,7 @@ export default component$(() => {
                 <dt class="cr-dl__k">error rate</dt><dd class="cr-dl__v">1.2%</dd>
               </dl>
             </CrHoverCard>
-            <CrButton size="sm" kind="controls" keyshortcuts="Meta+K Control+K" onClick={$(() => (ui.palette = true))}>
+            <CrButton size="sm" emphasis="outline" keyshortcuts="Meta+K Control+K" onClick={$(() => (ui.palette = true))}>
               commands
               <CrKbd keys="⌘K" />
             </CrButton>
@@ -231,7 +231,8 @@ export default component$(() => {
               {THEMES.map((t, i) => (
                 <CrButton
                   key={t}
-                  kind={ui.theme === t ? "accent" : "controls"}
+                  emphasis={ui.theme === t ? "solid" : "outline"}
+                  signal={ui.theme === t ? "accent" : undefined}
                   size="sm"
                   onClick={$(() => setTheme(t))}
                 >
@@ -263,11 +264,11 @@ export default component$(() => {
               SSE closed · retry 3/5 · last green 41m ago
             </p>
             <div style="display:flex;gap:var(--space-2);flex-wrap:wrap">
-              <CrButton kind="err" keyshortcuts="i" onClick={$(() => (ui.modal = true))}>
+              <CrButton signal="err" keyshortcuts="i" onClick={$(() => (ui.modal = true))}>
                 open incident
                 <CrKbd keys="I" on />
               </CrButton>
-              <CrButton kind="controls" onClick={$(() => (ui.drawer = true))}>inspect ▸</CrButton>
+              <CrButton emphasis="outline" onClick={$(() => (ui.drawer = true))}>inspect ▸</CrButton>
             </div>
           </div>
         </div>
@@ -326,7 +327,7 @@ export default component$(() => {
           <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
             <CrPagination page={ui.page} total={9} onChange={$((p: number) => (ui.page = p))} />
             <span style="flex:1"></span>
-            <CrButton size="sm" kind="controls" keyshortcuts="n" onClick={$(() => pushToast("done", "queue drained"))}>
+            <CrButton size="sm" emphasis="outline" keyshortcuts="n" onClick={$(() => pushToast("done", "queue drained"))}>
               notify
               <CrKbd keys="N" />
             </CrButton>
@@ -468,8 +469,8 @@ export default component$(() => {
           3 of 5 retries have elapsed. Escalate or restart the worker.
         </p>
         <div style="display:flex;gap:var(--space-2);margin-top:var(--space-3)">
-          <CrButton kind="err" onClick={$(() => (ui.modal = false))}>restart worker</CrButton>
-          <CrButton kind="controls" onClick={$(() => (ui.modal = false))}>dismiss</CrButton>
+          <CrButton signal="err" onClick={$(() => (ui.modal = false))}>restart worker</CrButton>
+          <CrButton emphasis="outline" onClick={$(() => (ui.modal = false))}>dismiss</CrButton>
         </div>
       </CrModal>
     </div>

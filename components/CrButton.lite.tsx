@@ -16,24 +16,14 @@ export interface CrButtonProps {
   keyshortcuts?: string;
   onClick?: () => void;
   children?: any;
-  /** @deprecated use `emphasis` (gravity) + `signal` (colour) */
-  kind?: "primary" | "controls" | "work" | "accent" | "err";
 }
 
 export default function CrButton(props: CrButtonProps) {
   const state = useStore({
     get cls(): string {
-      let emph = props.emphasis;
-      let sig = props.signal;
-      // legacy `kind` → (emphasis, signal)
-      if (!emph && !sig && props.kind) {
-        if (props.kind === "controls") emph = "outline";
-        else if (props.kind === "primary") emph = "solid";
-        else { emph = "solid"; sig = props.kind as any; }
-      }
       let c = "cr-btn";
-      if (emph && emph !== "solid") c += " cr-btn--" + emph;
-      if (sig) c += " cr-btn--sig-" + sig;
+      if (props.emphasis && props.emphasis !== "solid") c += " cr-btn--" + props.emphasis;
+      if (props.signal) c += " cr-btn--sig-" + props.signal;
       if (props.size === "sm") c += " cr-btn--sm";
       return c;
     },

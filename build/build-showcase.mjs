@@ -37,10 +37,10 @@ const sig = (seed, st, n) => `<canvas class="crsig" width="${n || 40}" height="$
 const EXAMPLES = {
   button: [
     { state: "primary", html: `<button class="cr-btn">run scan</button>` },
-    { state: "work", html: `<button class="cr-btn cr-btn--work">deploy</button>` },
-    { state: "accent", html: `<button class="cr-btn cr-btn--accent">commit</button>` },
-    { state: "err", html: `<button class="cr-btn cr-btn--err">kill</button>` },
-    { state: "controls · sm", html: `<button class="cr-btn cr-btn--controls cr-btn--sm">controls</button>` },
+    { state: "work", html: `<button class="cr-btn cr-btn--sig-work">deploy</button>` },
+    { state: "accent", html: `<button class="cr-btn cr-btn--sig-accent">commit</button>` },
+    { state: "err", html: `<button class="cr-btn cr-btn--sig-err">kill</button>` },
+    { state: "outline · sm", html: `<button class="cr-btn cr-btn--outline cr-btn--sm">controls</button>` },
     { state: "disabled", html: `<button class="cr-btn" disabled>run scan</button>` },
   ],
   chip: [
@@ -117,8 +117,8 @@ const EXAMPLES = {
     { state: "sortable · selectable", html: `<table class="cr-table"><thead><tr><th class="cr-table__sel"></th><th><button class="cr-table__sortable" type="button">job<span class="cr-table__ind">▲</span></button></th><th>worker</th><th>state</th></tr></thead><tbody><tr aria-selected="true"><td class="cr-table__sel"><input type="checkbox" class="cr-check" checked aria-label="select"/></td><td>cr-1130</td><td>nova-01</td><td>failing</td></tr><tr aria-selected="false"><td class="cr-table__sel"><input type="checkbox" class="cr-check" aria-label="select"/></td><td>ptl-757</td><td>ail-chat</td><td>waiting</td></tr></tbody></table>` },
   ],
   kbd: [
-    { state: "keycap", html: `<button class="cr-btn cr-btn--controls cr-btn--sm">save <kbd class="cr-kbd">⌘S</kbd></button>` },
-    { state: "on fill", html: `<button class="cr-btn cr-btn--err">incident <kbd class="cr-kbd cr-kbd--on">I</kbd></button>` },
+    { state: "keycap", html: `<button class="cr-btn cr-btn--outline cr-btn--sm">save <kbd class="cr-kbd">⌘S</kbd></button>` },
+    { state: "on fill", html: `<button class="cr-btn cr-btn--sig-err">incident <kbd class="cr-kbd cr-kbd--on">I</kbd></button>` },
   ],
   breach: [
     { state: "err · alive", html: `<div class="cr-breach cr-breach--err cr-breach--alive" style="padding:16px;max-width:360px"><div style="position:relative;z-index:1"><strong style="font-family:var(--font-display);text-transform:uppercase">build failing</strong><p style="font-family:var(--font-mono);font-size:12px;margin:6px 0 0">SSE closed · retry 3/5</p></div></div>` },
@@ -175,7 +175,7 @@ const EXAMPLES = {
     { state: "stacked (br)", html: `<div style="display:flex;flex-direction:column;gap:8px;max-width:320px"><div class="cr-toast cr-toast--done" role="status"><span class="cr-toast__msg">queue drained</span><button class="cr-toast__close" aria-label="Dismiss">✕</button></div><div class="cr-toast cr-toast--err" role="alert"><span class="cr-toast__msg">killed all workers</span><button class="cr-toast__close" aria-label="Dismiss">✕</button></div></div>` },
   ],
   menu: [
-    { state: "open panel", html: `<div class="cr-menu" style="position:relative;min-height:130px"><button class="cr-btn cr-btn--controls cr-btn--sm" aria-haspopup="menu" aria-expanded="true">actions ▾</button><div class="cr-menu__panel" role="menu"><button role="menuitem" class="cr-menu__item">pause all</button><button role="menuitem" class="cr-menu__item">restart failed</button><div class="cr-menu__sep"></div><button role="menuitem" class="cr-menu__item cr-menu__item--danger">kill all</button></div></div>` },
+    { state: "open panel", html: `<div class="cr-menu" style="position:relative;min-height:130px"><button class="cr-btn cr-btn--outline cr-btn--sm" aria-haspopup="menu" aria-expanded="true">actions ▾</button><div class="cr-menu__panel" role="menu"><button role="menuitem" class="cr-menu__item">pause all</button><button role="menuitem" class="cr-menu__item">restart failed</button><div class="cr-menu__sep"></div><button role="menuitem" class="cr-menu__item cr-menu__item--danger">kill all</button></div></div>` },
   ],
   combobox: [
     { state: "filtering", html: `<div class="cr-combobox" style="min-width:220px;min-height:150px"><input class="cr-combobox__input" value="nova" role="combobox" aria-expanded="true" aria-controls="sx-cb" aria-label="worker" /><ul class="cr-combobox__list" id="sx-cb" role="listbox"><li class="cr-combobox__opt" role="option" aria-selected="false">nova-01</li><li class="cr-combobox__opt cr-combobox__opt--active" role="option" aria-selected="true">nova-02</li></ul></div>` },

@@ -76,13 +76,6 @@
 .cr-btn--sig-accent  { --cr-btn-bg: var(--sig-accent);   --cr-btn-fg: var(--on-accent);   --cr-btn-tint: var(--sig-accent); }
 .cr-btn--sig-accent2 { --cr-btn-bg: var(--sig-accent-2); --cr-btn-fg: var(--on-accent-2); --cr-btn-tint: var(--sig-accent-2); }
 
-/* legacy variants (kept for back-compat; prefer emphasis + signal) */
-.cr-btn--controls { --cr-btn-bg: var(--panel); --cr-btn-fg: var(--muted); border-width: var(--brd); box-shadow: 3px 3px 0 var(--border); }
-.cr-btn--work { --cr-btn-bg: var(--sig-work); }
-.cr-btn--accent { --cr-btn-bg: var(--sig-accent); --cr-btn-fg: var(--on-accent); }
-.cr-btn--accent2 { --cr-btn-bg: var(--sig-accent-2); --cr-btn-fg: var(--on-accent-2); }
-.cr-btn--err { --cr-btn-bg: var(--sig-err); --cr-btn-fg: var(--on-err); }
-
 /* ── Chip ──────────────────────────────────────────────────────────────── */
 .cr-chip {
   display: inline-block; font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700;
@@ -105,10 +98,6 @@
 .cr-tag--err    { background: var(--sig-err);  color: var(--on-err); }
 .cr-tag--idle   { background: var(--sig-idle); color: var(--on-idle); }
 .cr-tag--accent { background: var(--sig-accent); color: var(--on-accent); }
-/* Legacy tell-time aliases (kept — nothing is lost): now→done, later→wait, no→err. */
-.cr-tag--now   { background: var(--sig-done); color: var(--on-sig); }
-.cr-tag--later { background: var(--sig-wait); color: var(--on-sig); }
-.cr-tag--no    { background: var(--sig-err);  color: var(--on-err); }
 
 /* ── StatusDot (a square — radius 0) ───────────────────────────────────── */
 .cr-dot { display: inline-block; width: var(--space-2); height: var(--space-2); border: 1.5px solid var(--border); }
