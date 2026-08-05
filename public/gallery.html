@@ -1181,6 +1181,23 @@ body {
   55% { clip-path: inset(20% 0 55% 0); transform: translate(-2px,0); }
   80% { clip-path: inset(5% 0 80% 0);  transform: translate(1px,0); }
 }
+/* Chroma variant — a faint always-on RGB fringe so an element reads as "signal"
+ * even at rest; the slice animation still fires on hover / --on. The fringe is
+ * decoration-only (aria owns the real text) and fades with --decoration-intensity. */
+.cr-glitch--chroma::before, .cr-glitch--chroma::after {
+  clip-path: none; opacity: calc(0.32 * var(--decoration-intensity, 1)); mix-blend-mode: screen;
+}
+.cr-glitch--chroma::before { color: var(--sig-err); transform: translate(-0.6px, 0); }
+.cr-glitch--chroma::after  { color: var(--sig-work); transform: translate(0.6px, 0); }
+.cr-glitch--chroma:hover::before, .cr-glitch--chroma.cr-glitch--on::before { opacity: 0.9; }
+.cr-glitch--chroma:hover::after,  .cr-glitch--chroma.cr-glitch--on::after  { opacity: 0.9; }
+
+/* CURSED — zalgo decay (Law 3, T3). The clean text lives on the element as an
+ * aria-label; the JS painter replaces the visible glyphs with an aria-hidden,
+ * combining-mark-corrupted span (MAX 2 marks/glyph). We only style the corrupted
+ * layer here — tinted toward danger, with room for the marks to overshoot the box. */
+.cr-cursed { color: var(--sig-err); line-height: 1.9; overflow: visible; }
+.cr-cursed > [aria-hidden] { display: inline-block; }
 
 /* ATTENTION — a slow breathing glow that pulls the eye to a primary/active item.
  * Keys to the element's signal via --cr-attn (default accent). Deliberately calm. */
@@ -1890,11 +1907,15 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         </div>
       </div>
       <h3 style="margin-top:16px">Motion — glitch · attention · interaction · 3D break</h3>
-      <p class="note" style="margin-bottom:10px">Hover the glitch title and the 3D card. All motion honors reduced-motion and the <code>calm</code> intensity profile.</p>
+      <p class="note" style="margin-bottom:10px">Hover the glitch title and the 3D card. The <code>--auto</code> tags glitch on their own, one at a time, in brief random bursts. All motion honors reduced-motion and the <code>calm</code> intensity profile.</p>
       <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
         <div>
           <div class="cr-glitch" data-text="BREACH DETECTED" style="font-family:var(--font-display);font-weight:900;font-size:28px;text-transform:uppercase;letter-spacing:-.02em;color:var(--ink)">BREACH DETECTED</div>
           <p class="note" style="margin-top:6px">glitch · hover (or <code>--on</code> for alerts)</p>
+        </div>
+        <div>
+          <div class="cr-glitch cr-glitch--chroma cr-glitch-auto" data-text="SIGNAL LOST" style="font-family:var(--font-display);font-weight:900;font-size:22px;text-transform:uppercase;letter-spacing:-.02em;color:var(--ink)">SIGNAL LOST</div>
+          <p class="note" style="margin-top:6px">chroma fringe · random auto-burst</p>
         </div>
         <div>
           <button class="cr-btn cr-btn--sig-accent cr-attention" type="button" style="--cr-attn:var(--sig-accent)">nova needs you</button>
@@ -1911,6 +1932,13 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
           </div>
           <p class="note" style="margin-top:6px">sanctioned 3D break of the flat plane</p>
         </div>
+      </div>
+      <h3 style="margin-top:16px">Cursed text — T3 decay (Law 3)</h3>
+      <p class="note" style="margin-bottom:10px">Zalgo combining marks, capped at 2 per glyph. The clean string owns the <code>aria-label</code>; the corrupted glyphs are <code>aria-hidden</code>. Corruption density follows <code>--decoration-intensity</code> and is seeded — same seed, same decay.</p>
+      <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:center;font-family:var(--font-display);font-weight:900;text-transform:uppercase;letter-spacing:-.01em">
+        <span class="cr-cursed" data-seed="corrupt" style="font-size:26px">CORRUPTED</span>
+        <span class="cr-cursed" data-seed="decay" style="font-size:26px">CHECKSUM FAIL</span>
+        <span class="cr-cursed cr-glitch-auto cr-glitch" data-text="DAEMON" data-seed="daemon" style="font-size:26px">DAEMON</span>
       </div>
       <h3 style="margin-top:16px">Tree · Hover card</h3>
       <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
@@ -2209,8 +2237,46 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
     for(var r=0;r<rows;r++){for(var c=0;c<cols;c++){var d=dens(c/cols,r/rows)*(0.6+rng()*0.4);var gi=Math.min(ramp.length-1,Math.floor(d*ramp.length));var g=ramp[gi];if(g===" ")continue;ctx.globalAlpha=0.12+d*0.16;ctx.fillText(g,c*cw,r*ch);}}
     ctx.globalAlpha=1;
   });
+
+  // Cursed text (Law 3, T3 decay): zalgo combining marks, MAX 2 per glyph. The clean
+  // string owns aria-label; the corrupted glyphs are aria-hidden. Corruption density
+  // follows --decoration-intensity. Runs once per element (seeded, deterministic).
+  var CMARKS=[0x0300,0x0301,0x0302,0x0303,0x0304,0x0306,0x0308,0x030A,0x0323,0x0324,0x0330,0x0331];
+  document.querySelectorAll(".cr-cursed").forEach(function(el){
+    if(el.dataset.cursedDone)return; el.dataset.cursedDone="1";
+    var clean=(el.dataset.text||el.textContent||"").trim(); if(!clean)return;
+    // Announce the clean string as a single graphic; the zalgo layer is aria-hidden.
+    if(!el.getAttribute("role"))el.setAttribute("role","img");
+    el.setAttribute("aria-label",clean);
+    var rng=mb32(hashSeed(el.dataset.seed||clean));
+    var di=parseFloat(cvar('--decoration-intensity','1'))||1;
+    var out="";
+    for(var i=0;i<clean.length;i++){var chr=clean[i];out+=chr;
+      if(chr===" ")continue;
+      var n=Math.round(rng()*2*Math.min(1,di)); // 0..2 marks, capped per the law
+      for(var k=0;k<n&&k<2;k++)out+=String.fromCharCode(CMARKS[Math.floor(rng()*CMARKS.length)]);
+    }
+    el.textContent="";
+    var span=document.createElement("span"); span.setAttribute("aria-hidden","true"); span.textContent=out; el.appendChild(span);
+  });
   }
   paintAll();
+
+  // Random glitch driver — brief, occasional bursts on OPT-IN decorative elements
+  // only (.cr-glitch-auto), one at a time. Never ambient-glitches the whole screen
+  // (Law 3). Off under reduced-motion and the calm intensity profile.
+  (function(){
+    if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+    function tick(){
+      if(root.getAttribute("data-intensity")==="calm")return;
+      var els=document.querySelectorAll(".cr-glitch-auto");
+      if(!els.length)return;
+      var el=els[Math.floor(Math.random()*els.length)];
+      el.classList.add("cr-glitch--on");
+      setTimeout(function(){el.classList.remove("cr-glitch--on");}, 220+Math.random()*260);
+    }
+    setInterval(tick, 2400+Math.random()*2600);
+  })();
 </script>
 </body>
 </html>

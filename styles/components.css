@@ -901,6 +901,23 @@
   55% { clip-path: inset(20% 0 55% 0); transform: translate(-2px,0); }
   80% { clip-path: inset(5% 0 80% 0);  transform: translate(1px,0); }
 }
+/* Chroma variant — a faint always-on RGB fringe so an element reads as "signal"
+ * even at rest; the slice animation still fires on hover / --on. The fringe is
+ * decoration-only (aria owns the real text) and fades with --decoration-intensity. */
+.cr-glitch--chroma::before, .cr-glitch--chroma::after {
+  clip-path: none; opacity: calc(0.32 * var(--decoration-intensity, 1)); mix-blend-mode: screen;
+}
+.cr-glitch--chroma::before { color: var(--sig-err); transform: translate(-0.6px, 0); }
+.cr-glitch--chroma::after  { color: var(--sig-work); transform: translate(0.6px, 0); }
+.cr-glitch--chroma:hover::before, .cr-glitch--chroma.cr-glitch--on::before { opacity: 0.9; }
+.cr-glitch--chroma:hover::after,  .cr-glitch--chroma.cr-glitch--on::after  { opacity: 0.9; }
+
+/* CURSED — zalgo decay (Law 3, T3). The clean text lives on the element as an
+ * aria-label; the JS painter replaces the visible glyphs with an aria-hidden,
+ * combining-mark-corrupted span (MAX 2 marks/glyph). We only style the corrupted
+ * layer here — tinted toward danger, with room for the marks to overshoot the box. */
+.cr-cursed { color: var(--sig-err); line-height: 1.9; overflow: visible; }
+.cr-cursed > [aria-hidden] { display: inline-block; }
 
 /* ATTENTION — a slow breathing glow that pulls the eye to a primary/active item.
  * Keys to the element's signal via --cr-attn (default accent). Deliberately calm. */
