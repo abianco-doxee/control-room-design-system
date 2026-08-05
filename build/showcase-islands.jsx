@@ -113,7 +113,7 @@ function snippet(tag, defs, state) {
     const v = state[d.prop];
     if (d.type === "boolean") { if (v) attrs.push(d.prop); }
     else if (d.type === "number") attrs.push(`${d.prop}={${v}}`);
-    else attrs.push(`${d.prop}="${v}"`);
+    else if (v !== "" && v != null) attrs.push(`${d.prop}="${v}"`); // "" = omitted prop
   }
   const a = attrs.length ? " " + attrs.join(" ") : "";
   return kids != null ? `<${tag}${a}>${kids}</${tag}>` : `<${tag}${a} />`;
@@ -258,12 +258,21 @@ const DEMOS = {
   button: {
     tag: "CrButton",
     defs: [
-      T("enum", "kind", "primary", { options: ["primary", "controls", "work", "accent", "err"] }),
+      T("enum", "emphasis", "solid", { options: ["solid", "outline", "ghost", "link"] }),
+      T("enum", "signal", "", { options: [{ value: "", label: "none" }, "work", "wait", "done", "err", "accent", "accent2"] }),
       T("enum", "size", "md", { options: ["md", "sm"] }),
       T("boolean", "disabled", false),
       T("children", "children", "run scan", { label: "text" }),
     ],
-    render: (s) => h(CrButton, { kind: s.kind, size: s.size, disabled: s.disabled }, s.children),
+    render: (s) => h("div", { style: { display: "flex", flexDirection: "column", gap: "14px", alignItems: "flex-start" } },
+      h(CrButton, { emphasis: s.emphasis, signal: s.signal || undefined, size: s.size, disabled: s.disabled }, s.children),
+      // gravity ladder — hierarchy reads by FORM, not just colour
+      h("div", { style: { display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" } },
+        h(CrButton, {}, "primary"),
+        h(CrButton, { emphasis: "outline" }, "secondary"),
+        h(CrButton, { emphasis: "ghost" }, "inline"),
+        h(CrButton, { emphasis: "link" }, "link"),
+        h(CrButton, { emphasis: "outline", signal: "err" }, "delete"))),
   },
   tag: {
     tag: "CrTag",

@@ -311,13 +311,14 @@ body {
 
 /* ── Button (snap-press) ───────────────────────────────────────────────── */
 .cr-btn {
+  --cr-btn-tint: var(--ink);   /* colour for outline/ghost/link (a signal overrides it) */
   display: inline-flex; align-items: center; gap: var(--cr-btn-gap);
   font-family: var(--font-mono); font-size: var(--cr-btn-size); font-weight: 800; letter-spacing: 0.03em;
   padding: var(--cr-btn-pad-y) var(--cr-btn-pad-x); cursor: pointer;
   background: var(--cr-btn-bg); color: var(--cr-btn-fg);
   border: var(--brd-heavy) solid var(--border);
   box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
-  transition: transform 0.05s, box-shadow 0.05s;
+  transition: transform 0.05s, box-shadow 0.05s, background 0.1s;
 }
 .cr-btn:active { transform: translate(var(--shadow-off), var(--shadow-off)); box-shadow: 0 0 0 var(--shadow-col); }
 /* disabled: flatten off the surface (drop the hard shadow), dim, block the press */
@@ -326,8 +327,32 @@ body {
   box-shadow: none; transform: none; filter: saturate(0.5);
 }
 .cr-btn--sm { --cr-btn-pad-x: var(--space-3); --cr-btn-pad-y: var(--space-1); --cr-btn-size: var(--text-xs); }
+
+/* ── EMPHASIS (gravity) — form, not colour ─────────────────────────────────
+ * solid (default, primary) is the filled+shadowed base above. */
+/* text is the tint shifted toward the theme ink so a signal colour stays AA on any
+ * surface; the pure signal still reads on the BORDER (outline) and hover wash. */
+.cr-btn { --cr-btn-ink: color-mix(in srgb, var(--cr-btn-tint) 66%, var(--ink)); }
+.cr-btn--outline { background: transparent; color: var(--cr-btn-ink); border: var(--brd) solid var(--cr-btn-tint); box-shadow: none; }
+.cr-btn--outline:hover:not(:disabled) { background: color-mix(in srgb, var(--cr-btn-tint) 14%, transparent); }
+.cr-btn--ghost { background: transparent; color: var(--cr-btn-ink); border-color: transparent; box-shadow: none; }
+.cr-btn--ghost:hover:not(:disabled) { background: color-mix(in srgb, var(--cr-btn-tint) 12%, transparent); }
+.cr-btn--link { background: transparent; color: var(--cr-btn-ink); border: 0; box-shadow: none;
+  padding-left: 0; padding-right: 0; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 2px; }
+.cr-btn--link:hover:not(:disabled) { filter: brightness(1.18); }
+/* outline/ghost/link don't snap-press off a shadow they don't have */
+.cr-btn--outline:active, .cr-btn--ghost:active, .cr-btn--link:active { transform: none; box-shadow: none; }
+
+/* ── SIGNAL (colour key) — sets the solid fill AND the outline/ghost/link tint ─ */
+.cr-btn--sig-work    { --cr-btn-bg: var(--sig-work);     --cr-btn-fg: var(--on-sig);      --cr-btn-tint: var(--sig-work); }
+.cr-btn--sig-wait    { --cr-btn-bg: var(--sig-wait);     --cr-btn-fg: var(--on-sig);      --cr-btn-tint: var(--sig-wait); }
+.cr-btn--sig-done    { --cr-btn-bg: var(--sig-done);     --cr-btn-fg: var(--on-sig);      --cr-btn-tint: var(--sig-done); }
+.cr-btn--sig-err     { --cr-btn-bg: var(--sig-err);      --cr-btn-fg: var(--on-err);      --cr-btn-tint: var(--sig-err); }
+.cr-btn--sig-accent  { --cr-btn-bg: var(--sig-accent);   --cr-btn-fg: var(--on-accent);   --cr-btn-tint: var(--sig-accent); }
+.cr-btn--sig-accent2 { --cr-btn-bg: var(--sig-accent-2); --cr-btn-fg: var(--on-accent-2); --cr-btn-tint: var(--sig-accent-2); }
+
+/* legacy variants (kept for back-compat; prefer emphasis + signal) */
 .cr-btn--controls { --cr-btn-bg: var(--panel); --cr-btn-fg: var(--muted); border-width: var(--brd); box-shadow: 3px 3px 0 var(--border); }
-/* signal variants — override just the bg/fg tokens */
 .cr-btn--work { --cr-btn-bg: var(--sig-work); }
 .cr-btn--accent { --cr-btn-bg: var(--sig-accent); --cr-btn-fg: var(--on-accent); }
 .cr-btn--accent2 { --cr-btn-bg: var(--sig-accent-2); --cr-btn-fg: var(--on-accent-2); }
@@ -2047,47 +2072,60 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
     for(var ry=0;ry<G;ry++){for(var rx=0;rx<G;rx++){if(m[ry][rx]){ctx.fillStyle=ink;ctx.fillRect(rx*cell,ry*cell,cell,cell);}}}
   });
 
-  // Seeded hardware chrome strips (deterministic variance). Brushed-metal body,
-  // beveled edges, high-contrast fasteners, an occasional vent, and a glowing LED.
+  // Seeded chrome strips — a DIGITAL / terminal / NERV-style HUD readout (not
+  // physical hardware): grid, ruler ticks, corner brackets, a hazard block, an
+  // equalizer, a hex readout, a reticle, and glowing indicator LEDs.
   document.querySelectorAll(".crchrome").forEach(function(cv){
     var W=cv.width,H=cv.height,rng=mb32(hashSeed(cv.dataset.seed));
-    var LED=[cvar('--sig-work','#00d3fb'),cvar('--sig-wait','#f9ad00'),cvar('--sig-accent-2','#9ad335'),cvar('--sig-err','#f45058'),cvar('--sig-accent','#ff1a9d')];
-    var HI=cvar('--rail-ink','#c8c8de'),MID=cvar('--panel-2','#271d45'),LO=cvar('--rail','#050509'),EDGE=cvar('--border','#000');
+    var SIG=[cvar('--sig-work','#00d3fb'),cvar('--sig-wait','#f9ad00'),cvar('--sig-done','#00deaa'),cvar('--sig-err','#f45058'),cvar('--sig-accent','#ff1a9d')];
+    var ACC=cvar('--sig-work','#00d3fb'),AMB=cvar('--sig-wait','#f9ad00'),INK=cvar('--rail-ink','#c8c8de'),LO=cvar('--rail','#050509'),EDGE=cvar('--border','#000');
     var ctx=cv.getContext("2d");ctx.imageSmoothingEnabled=false;
-    // brushed-metal body: a vertical sheen (light top → mid → dark base)
-    var g=ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0,HI);g.addColorStop(0.12,MID);g.addColorStop(0.6,MID);g.addColorStop(1,LO);
-    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-    // fine vertical brushing
-    for(var v=0;v<W;v+=2){ctx.globalAlpha=rng()*0.06;ctx.fillStyle=rng()>0.5?"#fff":"#000";ctx.fillRect(v,3,1,H-6);}
+    var mid=Math.round(H/2);
+    // base + faint terminal grid
+    ctx.fillStyle=LO;ctx.fillRect(0,0,W,H);
+    ctx.globalAlpha=0.08;ctx.fillStyle=ACC;
+    for(var gx=0;gx<W;gx+=14)ctx.fillRect(gx,0,1,H);
+    ctx.fillRect(0,mid,W,1);
     ctx.globalAlpha=1;
-    // top bevel highlight + hard top/bottom edges
-    ctx.globalAlpha=0.22;ctx.fillStyle="#fff";ctx.fillRect(0,1,W,1);ctx.globalAlpha=1;
+    // frame: hard edges + a dim accent scan line
     ctx.fillStyle=EDGE;ctx.fillRect(0,0,W,1);ctx.fillRect(0,H-1,W,1);
-    // scratches (light + dark, angled)
-    var sc=3+Math.floor(rng()*3);ctx.lineWidth=1;
-    for(var i=0;i<sc;i++){var x=Math.floor(rng()*W),len=8+Math.floor(rng()*20),yy=4+rng()*(H-10);ctx.globalAlpha=0.14+rng()*0.24;ctx.strokeStyle=rng()>0.5?"#fff":"#000";ctx.beginPath();ctx.moveTo(x,yy);ctx.lineTo(x+len,yy-1);ctx.stroke();}
+    ctx.globalAlpha=0.45;ctx.fillStyle=ACC;ctx.fillRect(0,2,W,1);ctx.globalAlpha=1;
+    // top ruler ticks (tall every 40px)
+    ctx.fillStyle=ACC;
+    for(var t=6;t<W-6;t+=8){var tall=(t%40<8);ctx.globalAlpha=tall?0.8:0.32;ctx.fillRect(t,3,1,tall?6:3);}
     ctx.globalAlpha=1;
-    function fastener(cx,cy,kind){var r=5;
-      function disc(){ctx.fillStyle=EDGE;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.fill();
-        var rg=ctx.createRadialGradient(cx-1.6,cy-1.6,0.4,cx,cy,r-0.4);rg.addColorStop(0,"#fff");rg.addColorStop(0.3,HI);rg.addColorStop(1,MID);
-        ctx.fillStyle=rg;ctx.beginPath();ctx.arc(cx,cy,r-1.4,0,7);ctx.fill();}
-      if(kind===0){disc();}
-      else if(kind===1){ctx.fillStyle=EDGE;ctx.beginPath();for(var a=0;a<6;a++){var ang=Math.PI/3*a+0.5,px=cx+Math.cos(ang)*r,py=cy+Math.sin(ang)*r;a?ctx.lineTo(px,py):ctx.moveTo(px,py);}ctx.closePath();ctx.fill();ctx.fillStyle=HI;ctx.beginPath();for(var b=0;b<6;b++){var an=Math.PI/3*b+0.5,qx=cx+Math.cos(an)*(r-1.6),qy=cy+Math.sin(an)*(r-1.6);b?ctx.lineTo(qx,qy):ctx.moveTo(qx,qy);}ctx.closePath();ctx.fill();}
-      else if(kind===2){disc();ctx.fillStyle=EDGE;ctx.fillRect(cx-r+1.5,cy-0.75,(r-1.5)*2,1.5);}
-      else{disc();ctx.fillStyle=EDGE;ctx.fillRect(cx-r+1.5,cy-0.75,(r-1.5)*2,1.5);ctx.fillRect(cx-0.75,cy-r+1.5,1.5,(r-1.5)*2);}}
-    var n=Math.max(3,Math.round(W/(40+rng()*22))),pad=13;
-    for(var k=0;k<n;k++){var cx=Math.round(pad+k*(W-pad*2)/(n-1));fastener(cx,Math.round(H/2),Math.floor(rng()*4));}
-    // occasional vent/grille — a stack of recessed slots
-    if(rng()>0.45){var gx=Math.round(pad+rng()*(W-pad*2-30)),slots=3+Math.floor(rng()*3),gy0=Math.round(H/2-slots*1.5);
-      for(var gs=0;gs<slots;gs++){var gy=gy0+gs*3;ctx.fillStyle=EDGE;ctx.fillRect(gx,gy,22,1.5);ctx.globalAlpha=0.12;ctx.fillStyle="#fff";ctx.fillRect(gx,gy+1.5,22,1);ctx.globalAlpha=1;}}
-    // panel seams — hard edge + highlight
-    var seams=1+Math.floor(rng()*2);
-    for(var s=0;s<seams;s++){var sx=Math.round(pad+rng()*(W-pad*2));ctx.fillStyle=EDGE;ctx.fillRect(sx,2,1.5,H-4);ctx.globalAlpha=0.16;ctx.fillStyle="#fff";ctx.fillRect(sx+1.5,2,1,H-4);ctx.globalAlpha=1;}
-    // status LED with a soft glow halo
-    var led=LED[Math.floor(rng()*LED.length)],lx=rng()>0.5?W-9:9,ly=Math.round(H/2);
-    var lg=ctx.createRadialGradient(lx,ly,0,lx,ly,8);lg.addColorStop(0,led);lg.addColorStop(1,"rgba(0,0,0,0)");ctx.globalAlpha=0.75;ctx.fillStyle=lg;ctx.beginPath();ctx.arc(lx,ly,8,0,7);ctx.fill();ctx.globalAlpha=1;
-    ctx.fillStyle=EDGE;ctx.fillRect(lx-3,ly-3,6,6);ctx.fillStyle=led;ctx.fillRect(lx-2,ly-2,4,4);ctx.fillStyle="#fff";ctx.globalAlpha=0.75;ctx.fillRect(lx-2,ly-2,1,1);ctx.globalAlpha=1;
+    // corner brackets
+    var bk=7;ctx.fillStyle=ACC;
+    ctx.fillRect(3,3,bk,2);ctx.fillRect(3,3,2,bk);
+    ctx.fillRect(W-3-bk,3,bk,2);ctx.fillRect(W-5,3,2,bk);
+    ctx.fillRect(3,H-5,bk,2);ctx.fillRect(3,H-3-bk,2,bk);
+    ctx.fillRect(W-3-bk,H-5,bk,2);ctx.fillRect(W-5,H-3-bk,2,bk);
+    var cx=12;
+    // hazard block (warning zone) — diagonal amber/black stripes
+    if(rng()>0.35){var hw=40,hy=8,hh=H-16;
+      ctx.save();ctx.beginPath();ctx.rect(cx,hy,hw,hh);ctx.clip();
+      ctx.fillStyle=AMB;ctx.fillRect(cx,hy,hw,hh);ctx.fillStyle=EDGE;
+      for(var d=-hh;d<hw;d+=9){ctx.beginPath();ctx.moveTo(cx+d,hy+hh);ctx.lineTo(cx+d+hh,hy);ctx.lineTo(cx+d+hh+4,hy);ctx.lineTo(cx+d+4,hy+hh);ctx.closePath();ctx.fill();}
+      ctx.restore();ctx.strokeStyle=EDGE;ctx.lineWidth=1;ctx.strokeRect(cx+0.5,hy+0.5,hw,hh);cx+=hw+10;}
+    // equalizer bars
+    var bars=5+Math.floor(rng()*3);
+    for(var bi=0;bi<bars;bi++){var bh=4+Math.floor(rng()*(H-16));ctx.globalAlpha=0.5+rng()*0.5;ctx.fillStyle=ACC;ctx.fillRect(cx+bi*5,H-8-bh,3,bh);}
+    ctx.globalAlpha=1;cx+=bars*5+10;
+    // hex readout (monospace)
+    ctx.font="bold 9px monospace";ctx.textBaseline="middle";
+    var hex=("0000"+Math.floor(rng()*65536).toString(16).toUpperCase()).slice(-4);
+    ctx.globalAlpha=0.85;ctx.fillStyle=INK;ctx.fillText("0x"+hex,cx,mid-0.5);
+    ctx.fillStyle=ACC;ctx.fillText("//SYS",cx,mid+8.5);ctx.globalAlpha=1;
+    // reticle
+    if(W>170){var rx=W-40,rr=6,rc=SIG[Math.floor(rng()*SIG.length)];ctx.strokeStyle=rc;ctx.lineWidth=1;
+      ctx.beginPath();ctx.arc(rx,mid,rr,0,7);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(rx-rr-3,mid);ctx.lineTo(rx-rr+2,mid);ctx.moveTo(rx+rr-2,mid);ctx.lineTo(rx+rr+3,mid);ctx.moveTo(rx,mid-rr-3);ctx.lineTo(rx,mid-rr+2);ctx.moveTo(rx,mid+rr-2);ctx.lineTo(rx,mid+rr+3);ctx.stroke();
+      ctx.fillStyle=rc;ctx.fillRect(rx-1,mid-1,2,2);}
+    // indicator LEDs — a vertical stack at the far right, one lit + glowing
+    var on=Math.floor(rng()*3);
+    for(var li=0;li<3;li++){var lx=W-11,ly=Math.round(mid-8+li*8),col=SIG[(li*2+Math.floor(rng()*5))%SIG.length],lit=li===on;
+      if(lit){var lg=ctx.createRadialGradient(lx+2,ly+2,0,lx+2,ly+2,7);lg.addColorStop(0,col);lg.addColorStop(1,'rgba(0,0,0,0)');ctx.globalAlpha=0.85;ctx.fillStyle=lg;ctx.fillRect(lx-5,ly-5,14,14);ctx.globalAlpha=1;}
+      ctx.fillStyle=EDGE;ctx.fillRect(lx,ly,4,4);ctx.fillStyle=lit?col:'rgba(200,200,220,0.18)';ctx.fillRect(lx+0.5,ly+0.5,3,3);}
   });
 
   // Seeded ASCII/Unicode density field (dead-space decoration).
