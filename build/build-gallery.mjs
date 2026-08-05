@@ -436,11 +436,15 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         </div>
       </div>
       <h3 style="margin-top:16px">Motion — glitch · attention · interaction · 3D break</h3>
-      <p class="note" style="margin-bottom:10px">Hover the glitch title and the 3D card. All motion honors reduced-motion and the <code>calm</code> intensity profile.</p>
+      <p class="note" style="margin-bottom:10px">Hover the glitch title and the 3D card. The <code>--auto</code> tags glitch on their own, one at a time, in brief random bursts. All motion honors reduced-motion and the <code>calm</code> intensity profile.</p>
       <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
         <div>
           <div class="cr-glitch" data-text="BREACH DETECTED" style="font-family:var(--font-display);font-weight:900;font-size:28px;text-transform:uppercase;letter-spacing:-.02em;color:var(--ink)">BREACH DETECTED</div>
           <p class="note" style="margin-top:6px">glitch · hover (or <code>--on</code> for alerts)</p>
+        </div>
+        <div>
+          <div class="cr-glitch cr-glitch--chroma cr-glitch-auto" data-text="SIGNAL LOST" style="font-family:var(--font-display);font-weight:900;font-size:22px;text-transform:uppercase;letter-spacing:-.02em;color:var(--ink)">SIGNAL LOST</div>
+          <p class="note" style="margin-top:6px">chroma fringe · random auto-burst</p>
         </div>
         <div>
           <button class="cr-btn cr-btn--sig-accent cr-attention" type="button" style="--cr-attn:var(--sig-accent)">nova needs you</button>
@@ -457,6 +461,13 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
           </div>
           <p class="note" style="margin-top:6px">sanctioned 3D break of the flat plane</p>
         </div>
+      </div>
+      <h3 style="margin-top:16px">Cursed text — T3 decay (Law 3)</h3>
+      <p class="note" style="margin-bottom:10px">Zalgo combining marks, capped at 2 per glyph. The clean string owns the <code>aria-label</code>; the corrupted glyphs are <code>aria-hidden</code>. Corruption density follows <code>--decoration-intensity</code> and is seeded — same seed, same decay.</p>
+      <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:center;font-family:var(--font-display);font-weight:900;text-transform:uppercase;letter-spacing:-.01em">
+        <span class="cr-cursed" data-seed="corrupt" style="font-size:26px">CORRUPTED</span>
+        <span class="cr-cursed" data-seed="decay" style="font-size:26px">CHECKSUM FAIL</span>
+        <span class="cr-cursed cr-glitch-auto cr-glitch" data-text="DAEMON" data-seed="daemon" style="font-size:26px">DAEMON</span>
       </div>
       <h3 style="margin-top:16px">Tree · Hover card</h3>
       <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
