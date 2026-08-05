@@ -212,3 +212,23 @@ bound to the document scroller:
   worse than none.
 - **SHOULD** reserve scroll-binding for progress/orientation cues, not for moving
   content around as the operator scrolls.
+
+## Governed effects — glitch · attention · interaction · 3D
+
+Motion beyond the press vocabulary, all under one governance: **transform / opacity /
+shadow only** (60fps), tokenized timing (`--dur-fast|med|ambient`, `--ease-snap|step`),
+**opt-in** by class, and **silenced twice over** — by the global `prefers-reduced-motion`
+rule and by the `calm` intensity profile (idle/ambient loops stop; interaction feedback
+stays). Never animate layout properties; never loop motion on body text.
+
+| Class | Effect | Use |
+| --- | --- | --- |
+| `.cr-glitch` (+ `data-text`) | RGB-split datamosh slices on hover; `--on` runs it continuously | a breach/alert headline — sparingly |
+| `.cr-attention` | slow breathing glow (keys to `--cr-attn`) | draw the eye to the ONE primary / "needs you" action on a screen |
+| `.cr-keyed` | keyed edge-sweep underline on hover/focus | interactive rows, nav items, cards |
+| `.cr-tilt` / `--live` | perspective hover tilt; `--live` adds a slow idle float | a **sanctioned break of the flat plane** — one accent element, like the Law-9 breach |
+
+**Restraint is the rule.** Glitch and 3D are rule-breaks: at most one of each per screen,
+on the exceptional element. Attention marks exactly one primary target — more than one and
+none of them reads as primary. Everything decays: nothing loops forever competing with the
+operator's own signal.
