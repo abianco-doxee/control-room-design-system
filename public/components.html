@@ -2025,53 +2025,57 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
     for(var ry=0;ry<G;ry++){for(var rx=0;rx<G;rx++){if(m[ry][rx]){ctx.fillStyle=ink;ctx.fillRect(rx*cell,ry*cell,cell,cell);}}}
   });
 
-  // Seeded chrome strips — BLOCKY neo-brutalist cyberpunk (not delicate HUD
-  // instrumentation): hard neon frame, chunky corner brackets, a stamped ID slab,
-  // a hazard block, chunky bars, segmented register cells, an RGB-split glitch
-  // block, and big blocky indicator LEDs.
+  // Seeded chrome strips — BLOCKY neo-brutalist cyberpunk, laid out on a strict
+  // shared content band (cy0..cy1) with hard module dividers so everything aligns.
   document.querySelectorAll(".crchrome").forEach(function(cv){
     var W=cv.width,H=cv.height,rng=mb32(hashSeed(cv.dataset.seed));
     var SIG=[cvar('--sig-work','#00d3fb'),cvar('--sig-wait','#f9ad00'),cvar('--sig-done','#00deaa'),cvar('--sig-err','#f45058'),cvar('--sig-accent','#ff1a9d')];
-    var ACC=cvar('--sig-work','#00d3fb'),AMB=cvar('--sig-wait','#f9ad00'),MAG=cvar('--sig-accent','#ff1a9d'),LO=cvar('--rail','#050509'),EDGE=cvar('--border','#000');
-    var ctx=cv.getContext("2d");ctx.imageSmoothingEnabled=false;var mid=Math.round(H/2);
+    var ACC=cvar('--sig-work','#00d3fb'),AMB=cvar('--sig-wait','#f9ad00'),MAG=cvar('--sig-accent','#ff1a9d'),LO=cvar('--rail','#050509'),EDGE=cvar('--border','#000'),DIM='rgba(200,200,220,0.16)';
+    var ctx=cv.getContext("2d");ctx.imageSmoothingEnabled=false;
+    var cy0=8,cy1=H-6,ch=cy1-cy0,mid=Math.round((cy0+cy1)/2);
     ctx.fillStyle=LO;ctx.fillRect(0,0,W,H);
-    // hard frame + a bold neon top edge
+    // hard frame + bold neon top edge + a dim baseline rail
     ctx.fillStyle=EDGE;ctx.fillRect(0,0,W,2);ctx.fillRect(0,H-2,W,2);
     ctx.fillStyle=ACC;ctx.fillRect(0,2,W,2);
-    // chunky corner brackets
-    var bk=10;ctx.fillStyle=ACC;
+    ctx.fillStyle=DIM;ctx.fillRect(6,cy1+1,W-12,1);
+    // chunky corner brackets (all four)
+    var bk=8;ctx.fillStyle=ACC;
     ctx.fillRect(4,4,bk,3);ctx.fillRect(4,4,3,bk);
     ctx.fillRect(W-4-bk,4,bk,3);ctx.fillRect(W-7,4,3,bk);
     ctx.fillRect(4,H-7,bk,3);ctx.fillRect(4,H-4-bk,3,bk);
     ctx.fillRect(W-4-bk,H-7,bk,3);ctx.fillRect(W-7,H-4-bk,3,bk);
-    var cx=14,by=9,bh=H-18;
-    // stamped ID slab — filled accent block, inverted mono label
+    var x=12, RIGHT=W-30;   // reserve the far-right LED column
+    function divider(){ if(x+8>RIGHT)return false; ctx.fillStyle=EDGE;ctx.fillRect(x,cy0,2,ch);x+=7;return true; }
+    function room(w){ return x+w<=RIGHT; }
+    // 1) stamped ID slab — filled accent block, inverted mono label
     ctx.font="bold 10px monospace";ctx.textBaseline="middle";
-    var hex=("00"+Math.floor(rng()*256).toString(16).toUpperCase()).slice(-2);
-    var idw=Math.round(ctx.measureText("CR-"+hex).width)+10;
-    ctx.fillStyle=ACC;ctx.fillRect(cx,by,idw,bh);
-    ctx.fillStyle=LO;ctx.fillText("CR-"+hex,cx+5,mid+0.5);cx+=idw+8;
-    // hazard block
-    if(rng()>0.4&&cx<W-90){var hw=34;ctx.save();ctx.beginPath();ctx.rect(cx,by,hw,bh);ctx.clip();
-      ctx.fillStyle=AMB;ctx.fillRect(cx,by,hw,bh);ctx.fillStyle=EDGE;
-      for(var d=-bh;d<hw;d+=10){ctx.beginPath();ctx.moveTo(cx+d,by+bh);ctx.lineTo(cx+d+bh,by);ctx.lineTo(cx+d+bh+5,by);ctx.lineTo(cx+d+5,by+bh);ctx.closePath();ctx.fill();}
-      ctx.restore();cx+=hw+8;}
-    // chunky equalizer — wide bars
-    var bars=4+Math.floor(rng()*3);
-    for(var bi=0;bi<bars&&cx+bi*7<W-70;bi++){var eh=6+Math.floor(rng()*(bh-2));ctx.fillStyle=ACC;ctx.fillRect(cx+bi*7,by+bh-eh,5,eh);}
-    cx+=bars*7+8;
-    // segmented register cells
-    if(cx<W-90){var cells=6,filled=1+Math.floor(rng()*cells);
-      for(var ci=0;ci<cells;ci++){ctx.fillStyle=EDGE;ctx.fillRect(cx+ci*8,mid-4,7,8);ctx.fillStyle=ci<filled?(ci>=cells-1?AMB:ACC):'rgba(200,200,220,0.12)';ctx.fillRect(cx+ci*8+1,mid-3,5,6);}
-      cx+=cells*8+10;}
-    // RGB-split glitch block (chromatic aberration)
-    if(cx<W-40){ctx.globalAlpha=0.8;ctx.fillStyle=ACC;ctx.fillRect(cx,mid-5,16,10);ctx.fillStyle=MAG;ctx.fillRect(cx+2,mid-4,16,10);ctx.globalAlpha=1;
-      ctx.fillStyle=EDGE;for(var gg=0;gg<3;gg++)ctx.fillRect(cx,mid-4+gg*3,18,1);}
-    // big blocky LEDs — far right, one lit + a glow
-    var on=Math.floor(rng()*3);
-    for(var li=0;li<3;li++){var lx=W-12,ly=mid-9+li*7,col=SIG[(li+Math.floor(rng()*5))%SIG.length],lit=li===on;
+    var hex=("00"+Math.floor(rng()*256).toString(16).toUpperCase()).slice(-2),lbl="CR-"+hex;
+    var idw=Math.round(ctx.measureText(lbl).width)+10;
+    if(room(idw)){ctx.fillStyle=ACC;ctx.fillRect(x,cy0,idw,ch);ctx.fillStyle=LO;ctx.fillText(lbl,x+5,mid+1);x+=idw+6;divider();}
+    // 2) blocky ruler — chunky ticks on the band (tall every 3rd)
+    var rw=Math.min(54,RIGHT-x-40);
+    if(rw>18){for(var t=0;t<rw;t+=6){var tall=(t/6)%3===0;ctx.fillStyle=tall?ACC:DIM;ctx.fillRect(x+t,cy0,2,tall?ch:Math.round(ch*0.55));}x+=rw+6;divider();}
+    // 3) hazard block (full band)
+    if(rng()>0.4&&room(30)){var hw=28;ctx.save();ctx.beginPath();ctx.rect(x,cy0,hw,ch);ctx.clip();
+      ctx.fillStyle=AMB;ctx.fillRect(x,cy0,hw,ch);ctx.fillStyle=EDGE;
+      for(var d=-ch;d<hw;d+=8){ctx.beginPath();ctx.moveTo(x+d,cy1);ctx.lineTo(x+d+ch,cy0);ctx.lineTo(x+d+ch+4,cy0);ctx.lineTo(x+d+4,cy1);ctx.closePath();ctx.fill();}
+      ctx.restore();x+=hw+6;divider();}
+    // 4) equalizer — wide bars, all baselined to cy1
+    if(room(30)){var bars=Math.min(6,Math.floor((RIGHT-x-40)/7));
+      for(var bi=0;bi<bars;bi++){var eh=4+Math.floor(rng()*ch);ctx.fillStyle=ACC;ctx.fillRect(x+bi*7,cy1-eh,5,eh);}
+      x+=bars*7+6;divider();}
+    // 5) segmented register — thin cells filling the full band
+    if(room(30)){var cells=Math.min(7,Math.floor((RIGHT-x-30)/8)),filled=1+Math.floor(rng()*cells);
+      for(var ci=0;ci<cells;ci++){ctx.fillStyle=EDGE;ctx.fillRect(x+ci*8,cy0,7,ch);ctx.fillStyle=ci<filled?(ci===filled-1?AMB:ACC):DIM;ctx.fillRect(x+ci*8+1,cy0+1,5,ch-2);}
+      x+=cells*8+6;divider();}
+    // 6) RGB-split glitch block (chromatic aberration)
+    if(room(20)){ctx.globalAlpha=0.8;ctx.fillStyle=ACC;ctx.fillRect(x,cy0+1,16,ch-2);ctx.fillStyle=MAG;ctx.fillRect(x+2,cy0,16,ch-2);ctx.globalAlpha=1;
+      ctx.fillStyle=EDGE;for(var gg=cy0+1;gg<cy1;gg+=3)ctx.fillRect(x,gg,18,1);x+=22;}
+    // 7) LED column — far right, a 3-stack, one lit + glow
+    var on=Math.floor(rng()*3),step=Math.max(6,Math.floor(ch/3));
+    for(var li=0;li<3;li++){var lx=W-13,ly=cy0+li*step,col=SIG[(li+Math.floor(rng()*5))%SIG.length],lit=li===on;
       if(lit){var lg=ctx.createRadialGradient(lx+3,ly+3,0,lx+3,ly+3,8);lg.addColorStop(0,col);lg.addColorStop(1,'rgba(0,0,0,0)');ctx.globalAlpha=0.8;ctx.fillStyle=lg;ctx.fillRect(lx-5,ly-5,16,16);ctx.globalAlpha=1;}
-      ctx.fillStyle=EDGE;ctx.fillRect(lx,ly,6,6);ctx.fillStyle=lit?col:'rgba(200,200,220,0.15)';ctx.fillRect(lx+1,ly+1,4,4);}
+      ctx.fillStyle=EDGE;ctx.fillRect(lx,ly,6,5);ctx.fillStyle=lit?col:DIM;ctx.fillRect(lx+1,ly+1,4,3);}
   });
 
   // Seeded ASCII/Unicode density field (dead-space decoration).
