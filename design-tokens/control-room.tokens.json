@@ -431,6 +431,44 @@
         "com.doxee.cssVar": "--dur-press"
       }
     },
+    "dur-fast": {
+      "$type": "duration",
+      "$value": "160ms",
+      "$description": "hover / interaction transitions",
+      "$extensions": {
+        "com.doxee.cssVar": "--dur-fast"
+      }
+    },
+    "dur-med": {
+      "$type": "duration",
+      "$value": "260ms",
+      "$description": "reveals, keyed moves",
+      "$extensions": {
+        "com.doxee.cssVar": "--dur-med"
+      }
+    },
+    "dur-ambient": {
+      "$type": "duration",
+      "$value": "3200ms",
+      "$description": "idle attention / filler loops",
+      "$extensions": {
+        "com.doxee.cssVar": "--dur-ambient"
+      }
+    },
+    "ease-snap": {
+      "$value": "cubic-bezier(0.2, 0, 0, 1)",
+      "$description": "hard, decisive — the house feel (no soft overshoot/bounce)",
+      "$extensions": {
+        "com.doxee.cssVar": "--ease-snap"
+      }
+    },
+    "ease-step": {
+      "$value": "steps(3, jump-none)",
+      "$description": "stepped / digital motion (glitch, tickers)",
+      "$extensions": {
+        "com.doxee.cssVar": "--ease-step"
+      }
+    },
     "tick-ambient": {
       "$type": "duration",
       "$value": "180ms",

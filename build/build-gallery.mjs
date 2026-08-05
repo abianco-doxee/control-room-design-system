@@ -435,6 +435,29 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
           <p style="font-family:var(--font-mono);font-size:13px;color:var(--muted);margin:0">No sessions in this region yet.</p>
         </div>
       </div>
+      <h3 style="margin-top:16px">Motion — glitch · attention · interaction · 3D break</h3>
+      <p class="note" style="margin-bottom:10px">Hover the glitch title and the 3D card. All motion honors reduced-motion and the <code>calm</code> intensity profile.</p>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+        <div>
+          <div class="cr-glitch" data-text="BREACH DETECTED" style="font-family:var(--font-display);font-weight:900;font-size:28px;text-transform:uppercase;letter-spacing:-.02em;color:var(--ink)">BREACH DETECTED</div>
+          <p class="note" style="margin-top:6px">glitch · hover (or <code>--on</code> for alerts)</p>
+        </div>
+        <div>
+          <button class="cr-btn cr-btn--sig-accent cr-attention" type="button" style="--cr-attn:var(--sig-accent)">nova needs you</button>
+          <p class="note" style="margin-top:6px">idle attention pulse on a primary action</p>
+        </div>
+        <div style="min-width:180px">
+          <a href="#" class="cr-keyed cr-nav__item" style="display:block;padding:8px 10px;font-family:var(--font-mono);font-size:13px;color:var(--ink);text-decoration:none;border:var(--brd) solid var(--border)">hover: keyed edge</a>
+          <p class="note" style="margin-top:6px">interaction · keyed sweep</p>
+        </div>
+        <div>
+          <div class="cr-panel cr-tilt" style="padding:16px;min-width:150px">
+            <div style="font-family:var(--font-display);font-weight:900;font-size:20px;text-transform:uppercase">CR-01</div>
+            <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">3D tilt · hover</div>
+          </div>
+          <p class="note" style="margin-top:6px">sanctioned 3D break of the flat plane</p>
+        </div>
+      </div>
       <h3 style="margin-top:16px">Tree · Hover card</h3>
       <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
         <ul class="cr-tree" role="tree" aria-label="Fleet" style="min-width:220px">
