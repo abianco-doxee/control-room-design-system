@@ -224,9 +224,19 @@ stays). Never animate layout properties; never loop motion on body text.
 | Class | Effect | Use |
 | --- | --- | --- |
 | `.cr-glitch` (+ `data-text`) | RGB-split datamosh slices on hover; `--on` runs it continuously | a breach/alert headline — sparingly |
+| `.cr-glitch--chroma` | a faint always-on RGB fringe so an element reads as "signal" at rest; the slice still fires on hover / `--on` | a live/degraded readout that should feel unstable without moving |
+| `.cr-glitch-auto` | opt **into** the random driver: brief bursts fire on their own, **one element at a time**, every ~2.4–5s | ambient "the feed is alive" texture — tag a small handful, not everything |
 | `.cr-attention` | slow breathing glow (keys to `--cr-attn`) | draw the eye to the ONE primary / "needs you" action on a screen |
 | `.cr-keyed` | keyed edge-sweep underline on hover/focus | interactive rows, nav items, cards |
 | `.cr-tilt` / `--live` | perspective hover tilt; `--live` adds a slow idle float | a **sanctioned break of the flat plane** — one accent element, like the Law-9 breach |
+| `.cr-cursed` (+ optional `data-text` / `data-seed`) | **T3 decay (Law 3):** zalgo combining marks, capped at 2/glyph. The painter moves the clean string to `aria-label`, marks the element `role="img"`, and hides the corrupted glyphs (`aria-hidden`). Seeded → deterministic. Density follows `--decoration-intensity` | a corrupted/failed label — checksum fail, dead daemon — where the decay *is* the meaning |
+
+**The random glitch driver.** `.cr-glitch-auto` is the only thing the ambient driver
+touches. It picks one tagged element at a time, glitches it for ~0.2–0.5s, then rests
+2.4–5s before the next — so the screen is never glitching everywhere at once. It is off
+under `prefers-reduced-motion` and under the `calm` profile, and it never touches an element
+you didn't opt in. Cursed text is **not** motion — it renders once and holds — but it obeys
+the same restraint: it is a decay tier, not decoration to sprinkle.
 
 **Restraint is the rule.** Glitch and 3D are rule-breaks: at most one of each per screen,
 on the exceptional element. Attention marks exactly one primary target — more than one and

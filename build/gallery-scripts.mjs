@@ -106,6 +106,44 @@ export const browserScript = `
     for(var r=0;r<rows;r++){for(var c=0;c<cols;c++){var d=dens(c/cols,r/rows)*(0.6+rng()*0.4);var gi=Math.min(ramp.length-1,Math.floor(d*ramp.length));var g=ramp[gi];if(g===" ")continue;ctx.globalAlpha=0.12+d*0.16;ctx.fillText(g,c*cw,r*ch);}}
     ctx.globalAlpha=1;
   });
+
+  // Cursed text (Law 3, T3 decay): zalgo combining marks, MAX 2 per glyph. The clean
+  // string owns aria-label; the corrupted glyphs are aria-hidden. Corruption density
+  // follows --decoration-intensity. Runs once per element (seeded, deterministic).
+  var CMARKS=[0x0300,0x0301,0x0302,0x0303,0x0304,0x0306,0x0308,0x030A,0x0323,0x0324,0x0330,0x0331];
+  document.querySelectorAll(".cr-cursed").forEach(function(el){
+    if(el.dataset.cursedDone)return; el.dataset.cursedDone="1";
+    var clean=(el.dataset.text||el.textContent||"").trim(); if(!clean)return;
+    // Announce the clean string as a single graphic; the zalgo layer is aria-hidden.
+    if(!el.getAttribute("role"))el.setAttribute("role","img");
+    el.setAttribute("aria-label",clean);
+    var rng=mb32(hashSeed(el.dataset.seed||clean));
+    var di=parseFloat(cvar('--decoration-intensity','1'))||1;
+    var out="";
+    for(var i=0;i<clean.length;i++){var chr=clean[i];out+=chr;
+      if(chr===" ")continue;
+      var n=Math.round(rng()*2*Math.min(1,di)); // 0..2 marks, capped per the law
+      for(var k=0;k<n&&k<2;k++)out+=String.fromCharCode(CMARKS[Math.floor(rng()*CMARKS.length)]);
+    }
+    el.textContent="";
+    var span=document.createElement("span"); span.setAttribute("aria-hidden","true"); span.textContent=out; el.appendChild(span);
+  });
   }
   paintAll();
+
+  // Random glitch driver — brief, occasional bursts on OPT-IN decorative elements
+  // only (.cr-glitch-auto), one at a time. Never ambient-glitches the whole screen
+  // (Law 3). Off under reduced-motion and the calm intensity profile.
+  (function(){
+    if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+    function tick(){
+      if(root.getAttribute("data-intensity")==="calm")return;
+      var els=document.querySelectorAll(".cr-glitch-auto");
+      if(!els.length)return;
+      var el=els[Math.floor(Math.random()*els.length)];
+      el.classList.add("cr-glitch--on");
+      setTimeout(function(){el.classList.remove("cr-glitch--on");}, 220+Math.random()*260);
+    }
+    setInterval(tick, 2400+Math.random()*2600);
+  })();
 `;
