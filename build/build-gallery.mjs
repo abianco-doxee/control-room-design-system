@@ -154,7 +154,7 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
               <div class="cr-row"><span class="cr-sev cr-sev--warn" role="img" aria-label="attend"></span><canvas class="crsig" width="20" height="20" data-seed="cr-1130" data-state="waiting"></canvas><span class="cr-row__name">CR-1130 picker</span><span class="cr-row__status">needs input</span></div>
               <div class="cr-row"><span class="cr-sev cr-sev--crit" role="img" aria-label="critical"></span><canvas class="crsig" width="20" height="20" data-seed="rp-verify" data-state="error"></canvas><span class="cr-row__name">rp verify</span><span class="cr-row__status">2 failing</span></div>
               <div class="cr-row"><span class="cr-sev cr-sev--ok" role="img" aria-label="nominal"></span><canvas class="crsig" width="20" height="20" data-seed="atlas" data-state="done"></canvas><span class="cr-row__name">atlas deploy</span><span class="cr-row__status">merged</span></div>
-              <div style="display:flex;gap:8px;margin-top:12px"><button class="cr-btn cr-btn--sm cr-btn--accent" type="button">Escalate</button><button class="cr-btn cr-btn--sm cr-btn--accent2" type="button">Approve all</button></div>
+              <div style="display:flex;gap:8px;margin-top:12px"><button class="cr-btn cr-btn--sm cr-btn--sig-accent" type="button">Escalate</button><button class="cr-btn cr-btn--sm cr-btn--sig-accent2" type="button">Approve all</button></div>
             </section>
             <section class="cr-panel">
               <h4 class="cr-panel__title">Pipeline</h4>
@@ -194,12 +194,12 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       <h3 style="margin-top:16px">Button · Chip · Tag</h3>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <button class="cr-btn" type="button">RUN SCAN</button>
-        <button class="cr-btn cr-btn--accent" type="button">Escalate</button>
-        <button class="cr-btn cr-btn--accent2" type="button">Approve</button>
+        <button class="cr-btn cr-btn--sig-accent" type="button">Escalate</button>
+        <button class="cr-btn cr-btn--sig-accent2" type="button">Approve</button>
       </div>
       <div style="margin-top:10px;display:flex;gap:7px;flex-wrap:wrap;align-items:center">
         <span class="cr-chip">PTL-757</span><span class="cr-chip cr-chip--alt">ui-kit</span>
-        <span class="cr-tag cr-tag--now">shipped</span><span class="cr-tag cr-tag--no">ruled out</span>
+        <span class="cr-tag cr-tag--done">shipped</span><span class="cr-tag cr-tag--err">ruled out</span>
       </div>
     </div>
     <div>
@@ -293,7 +293,7 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       </nav>
       <h3 style="margin-top:16px">Menu (dropdown)</h3>
       <div class="cr-menu" style="position:relative;min-height:150px">
-        <button type="button" class="cr-btn cr-btn--controls cr-btn--sm" aria-haspopup="menu" aria-expanded="true">actions ▾</button>
+        <button type="button" class="cr-btn cr-btn--outline cr-btn--sm" aria-haspopup="menu" aria-expanded="true">actions ▾</button>
         <div class="cr-menu__panel" role="menu">
           <button type="button" role="menuitem" class="cr-menu__item">pause all</button>
           <button type="button" role="menuitem" class="cr-menu__item">restart failed</button>
@@ -308,11 +308,11 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       </div>
       <h3 style="margin-top:16px">Key hints (main = always · secondary = on hover / hold Alt)</h3>
       <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-        <button type="button" class="cr-btn cr-btn--err" aria-keyshortcuts="i">open incident <kbd class="cr-kbd cr-kbd--on" aria-hidden="true">I</kbd></button>
+        <button type="button" class="cr-btn cr-btn--sig-err" aria-keyshortcuts="i">open incident <kbd class="cr-kbd cr-kbd--on" aria-hidden="true">I</kbd></button>
         <div class="cr-keys-host" style="display:flex;gap:8px;align-items:center">
           <span style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--muted)">hover me →</span>
-          <button type="button" class="cr-btn cr-btn--controls cr-btn--sm" aria-keyshortcuts="1">dark <kbd class="cr-kbd cr-kbd--hint" aria-hidden="true">1</kbd></button>
-          <button type="button" class="cr-btn cr-btn--controls cr-btn--sm" aria-keyshortcuts="2">light <kbd class="cr-kbd cr-kbd--hint" aria-hidden="true">2</kbd></button>
+          <button type="button" class="cr-btn cr-btn--outline cr-btn--sm" aria-keyshortcuts="1">dark <kbd class="cr-kbd cr-kbd--hint" aria-hidden="true">1</kbd></button>
+          <button type="button" class="cr-btn cr-btn--outline cr-btn--sm" aria-keyshortcuts="2">light <kbd class="cr-kbd cr-kbd--hint" aria-hidden="true">2</kbd></button>
         </div>
       </div>
       <h3 style="margin-top:16px">Command palette (⌘K)</h3>
@@ -369,7 +369,7 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
           </div>
         </div>
         <div class="cr-popover" style="position:relative;min-height:170px">
-          <button type="button" class="cr-btn cr-btn--controls cr-btn--sm" aria-haspopup="dialog" aria-expanded="true">filters ▾</button>
+          <button type="button" class="cr-btn cr-btn--outline cr-btn--sm" aria-haspopup="dialog" aria-expanded="true">filters ▾</button>
           <div class="cr-popover__panel" role="dialog" aria-label="Queue filters" tabindex="-1">
             <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 8px">show state</p>
             <label style="font-family:var(--font-mono);font-size:var(--text-sm);display:flex;gap:8px;align-items:center"><input type="checkbox" class="cr-check" checked /> failing</label>

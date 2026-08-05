@@ -34,12 +34,19 @@
       "description": "Primary action with the signature mechanical snap-press; secondary 'controls' variant for utilities.",
       "spec": "references/components.md#button",
       "variants": {
-        "kind": [
-          "primary",
-          "controls",
+        "emphasis": [
+          "solid",
+          "outline",
+          "ghost",
+          "link"
+        ],
+        "signal": [
           "work",
+          "wait",
+          "done",
+          "err",
           "accent",
-          "err"
+          "accent2"
         ],
         "size": [
           "md",

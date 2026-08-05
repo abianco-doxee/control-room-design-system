@@ -6,8 +6,6 @@ export interface CrMeterProps {
   label?: string;
   /** Signal for the fill (canonical vocabulary). */
   signal?: "work" | "wait" | "done" | "err" | "idle";
-  /** @deprecated use `signal` */
-  tone?: string;
 }
 
 /* A token-driven bar meter (capacity / utilisation). Square, hard-edged, keyed
@@ -26,7 +24,7 @@ export default function CrMeter(props: CrMeterProps) {
     },
   });
   return (
-    <div class={"cr-meter cr-meter--" + (props.signal || props.tone || "work")}>
+    <div class={"cr-meter cr-meter--" + (props.signal || "work")}>
       <Show when={props.label}>
         <span class="cr-meter__label">{props.label}</span>
       </Show>
