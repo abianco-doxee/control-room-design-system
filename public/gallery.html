@@ -780,6 +780,67 @@ body {
 @keyframes cr-prog-slide { from { transform: translateX(-110%); } to { transform: translateX(320%); } }
 @media (prefers-reduced-motion: reduce) { .cr-progress--indeterminate .cr-progress__fill { animation: none; width: 100%; } }
 
+/* ── Charts — sparkline · line · bar · stacked (SVG plots + token hues) ─────
+ * House rules from the dataviz method, tuned to the signal palette: thin marks,
+ * a crisp non-scaling 2px stroke, baseline-anchored bars with rounded data-ends,
+ * a recessive grid, a 2px surface gap between fills, legends/labels in text ink
+ * (never the series colour), and one y-axis only. Series colour is set inline
+ * from a signal token; text/grid/axis colours live here. */
+
+/* Sparkline — inline micro line/area (no axes) */
+.cr-spark { --cr-spark-c: var(--sig-work); display: inline-block; width: 120px; height: 32px; vertical-align: middle; color: var(--cr-spark-c); }
+.cr-spark__svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.cr-spark__line { fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: miter; stroke-linecap: square; }
+.cr-spark__area { fill: currentColor; opacity: 0.14; }
+.cr-spark__dot { fill: currentColor; stroke: var(--panel); stroke-width: 1; }
+.cr-spark--work { --cr-spark-c: var(--sig-work); }
+.cr-spark--wait { --cr-spark-c: var(--sig-wait); }
+.cr-spark--done { --cr-spark-c: var(--sig-done); }
+.cr-spark--err  { --cr-spark-c: var(--sig-err); }
+.cr-spark--idle { --cr-spark-c: var(--sig-idle); }
+.cr-spark--accent  { --cr-spark-c: var(--sig-accent); }
+.cr-spark--accent2 { --cr-spark-c: var(--sig-accent-2); }
+
+/* Shared plot furniture — grid, axis ticks, value + target */
+.cr-chart__grid { stroke: color-mix(in srgb, var(--ink) 16%, transparent); stroke-width: 1; }
+.cr-chart__target { stroke: var(--sig-err); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.cr-chart__tick { fill: var(--muted); font-family: var(--font-mono); font-size: 9px; letter-spacing: -0.02em; }
+.cr-chart__val { fill: var(--ink); font-family: var(--font-mono); font-size: 9px; font-weight: 700; }
+.cr-chart__legend { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-3); margin: var(--space-1) 0 0; padding: 0; }
+.cr-chart__key { display: inline-flex; align-items: center; gap: var(--space-1); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--ink); }
+.cr-chart__sw { width: 10px; height: 10px; border: var(--brd-hair) solid var(--border); flex: none; }
+
+/* Line chart */
+.cr-linechart { margin: 0; }
+.cr-linechart__plot { display: block; width: 100%; height: auto; background: var(--panel-2); border: var(--brd-hair) solid var(--border); }
+.cr-linechart__line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.cr-linechart__area { opacity: 0.12; stroke: none; }
+.cr-linechart__end { stroke: var(--panel-2); stroke-width: 1; }
+
+/* Bar chart */
+.cr-barchart { margin: 0; }
+.cr-barchart__plot { display: block; width: 100%; height: auto; background: var(--panel-2); border: var(--brd-hair) solid var(--border); }
+.cr-barchart__bar { stroke: var(--panel-2); stroke-width: 1; }
+
+/* Stacked bar — "stacked progress" */
+.cr-stack { display: flex; flex-direction: column; gap: var(--space-1); }
+.cr-stack__label { font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.cr-stack__bar { display: flex; gap: 2px; height: var(--space-3); background: var(--panel-2); border: var(--brd-hair) solid var(--border); overflow: hidden; }
+.cr-stack__seg { display: block; min-width: 3px; background: var(--sig-idle); }
+.cr-stack__seg--work { background: var(--sig-work); }
+.cr-stack__seg--wait { background: var(--sig-wait); }
+.cr-stack__seg--done { background: var(--sig-done); }
+.cr-stack__seg--err  { background: var(--sig-err); }
+.cr-stack__seg--idle { background: var(--sig-idle); }
+.cr-stack__seg--accent  { background: var(--sig-accent); }
+.cr-stack__seg--accent2 { background: var(--sig-accent-2); }
+.cr-stack__legend { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); }
+.cr-stack__key { display: inline-flex; align-items: center; gap: var(--space-1); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--ink); }
+.cr-stack__sw { width: 10px; height: 10px; border: var(--brd-hair) solid var(--border); flex: none; }
+.cr-stack__kl { color: var(--ink); }
+.cr-stack__kv { color: var(--ink); font-weight: 700; }
+.cr-stack__kp { color: var(--muted); }
+
 /* ── Skeleton (loading placeholder — blocky pulse, never rounded) ────────── */
 .cr-skeleton { background: var(--panel-2); border: var(--brd-hair) solid color-mix(in srgb, var(--border) 30%, transparent); animation: cr-skel-pulse 1.4s ease-in-out infinite; }
 .cr-skeleton--line { height: var(--space-2); }
@@ -1751,6 +1812,30 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         <div class="cr-meter cr-meter--work"><span class="cr-meter__label">cpu</span><span class="cr-meter__track" role="meter" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" aria-label="cpu"><span class="cr-meter__fill" style="width:72%"></span></span></div>
         <div class="cr-meter cr-meter--wait"><span class="cr-meter__label">queue</span><span class="cr-meter__track" role="meter" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" aria-label="queue"><span class="cr-meter__fill" style="width:40%"></span></span></div>
         <div class="cr-meter cr-meter--err"><span class="cr-meter__label">errors</span><span class="cr-meter__track" role="meter" aria-valuenow="12" aria-valuemin="0" aria-valuemax="100" aria-label="errors"><span class="cr-meter__fill" style="width:12%"></span></span></div>
+      </div>
+      
+      <h3 style="margin-top:16px">Telemetry &amp; charts — sparkline · line · bar · stacked</h3>
+      <p class="note" style="margin-bottom:10px">SVG plots on the signal palette: crisp non-scaling 2px marks, a recessive grid, baseline-anchored bars, one y-axis. Series identity carries a legend (never colour alone); every figure has a spoken summary.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+        <span style="font-family:var(--font-mono);font-size:12px;color:var(--muted)">p95 latency</span>
+        <span class="cr-spark cr-spark--work" role="img" aria-label="p95 latency: 12 points, latest 15"><svg class="cr-spark__svg" viewBox="0 0 120 32" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="cr-spark__area" d="M 0.00,32.00 L 0.00,29.00 L 10.91,24.67 L 21.82,26.83 L 32.73,20.33 L 43.64,22.50 L 54.55,16.00 L 65.45,18.17 L 76.36,9.50 L 87.27,13.83 L 98.18,5.17 L 109.09,11.67 L 120.00,3.00 L 120.00,32.00 Z"/><polyline class="cr-spark__line" points="0.00,29.00 10.91,24.67 21.82,26.83 32.73,20.33 43.64,22.50 54.55,16.00 65.45,18.17 76.36,9.50 87.27,13.83 98.18,5.17 109.09,11.67 120.00,3.00" vector-effect="non-scaling-stroke"/><circle class="cr-spark__dot" cx="120.00" cy="3.00" r="2.4" vector-effect="non-scaling-stroke"/></svg></span>
+        <span style="font-family:var(--font-mono);font-size:13px;color:var(--ink)">15ms</span>
+        <span class="cr-spark cr-spark--done" role="img" aria-label="error rate: 10 points, latest 2"><svg class="cr-spark__svg" viewBox="0 0 120 32" preserveAspectRatio="none" aria-hidden="true" focusable="false"><polyline class="cr-spark__line" points="0.00,3.00 13.33,10.43 26.67,6.71 40.00,17.86 53.33,14.14 66.67,21.57 80.00,17.86 93.33,25.29 106.67,21.57 120.00,29.00" vector-effect="non-scaling-stroke"/><circle class="cr-spark__dot" cx="120.00" cy="29.00" r="2.4" vector-effect="non-scaling-stroke"/></svg></span>
+        <span style="font-family:var(--font-mono);font-size:13px;color:var(--ink)">2%</span>
+      </div>
+      <div style="display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));align-items:start">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:6px">throughput vs errors · 09→16</div>
+          <figure class="cr-linechart" role="img" aria-label="Throughput vs errors — throughput latest 31, errors latest 4"><svg class="cr-linechart__plot" viewBox="0 0 320 140" aria-hidden="true" focusable="false"><line class="cr-chart__grid" x1="8" y1="10.00" x2="312" y2="10.00" vector-effect="non-scaling-stroke"/><line class="cr-chart__grid" x1="8" y1="66.00" x2="312" y2="66.00" vector-effect="non-scaling-stroke"/><line class="cr-chart__grid" x1="8" y1="122.00" x2="312" y2="122.00" vector-effect="non-scaling-stroke"/><path class="cr-linechart__area" d="M 8.00,122.00 L 8.00,83.38 L 51.43,60.21 L 94.86,71.79 L 138.29,44.76 L 181.71,56.34 L 225.14,29.31 L 268.57,37.03 L 312.00,10.00 L 312.00,122.00 Z" style="fill:var(--sig-work)"/><polyline class="cr-linechart__line" points="8.00,83.38 51.43,60.21 94.86,71.79 138.29,44.76 181.71,56.34 225.14,29.31 268.57,37.03 312.00,10.00" style="stroke:var(--sig-work)" vector-effect="non-scaling-stroke"/><circle class="cr-linechart__end" cx="312.00" cy="10.00" r="2.6" style="fill:var(--sig-work)" vector-effect="non-scaling-stroke"/><path class="cr-linechart__area" d="M 8.00,122.00 L 8.00,122.00 L 51.43,118.14 L 94.86,122.00 L 138.29,110.41 L 181.71,114.28 L 225.14,118.14 L 268.57,106.55 L 312.00,114.28 L 312.00,122.00 Z" style="fill:var(--sig-err)"/><polyline class="cr-linechart__line" points="8.00,122.00 51.43,118.14 94.86,122.00 138.29,110.41 181.71,114.28 225.14,118.14 268.57,106.55 312.00,114.28" style="stroke:var(--sig-err)" vector-effect="non-scaling-stroke"/><circle class="cr-linechart__end" cx="312.00" cy="114.28" r="2.6" style="fill:var(--sig-err)" vector-effect="non-scaling-stroke"/><text class="cr-chart__tick" x="8.00" y="135" text-anchor="middle">09</text><text class="cr-chart__tick" x="51.43" y="135" text-anchor="middle">10</text><text class="cr-chart__tick" x="94.86" y="135" text-anchor="middle">11</text><text class="cr-chart__tick" x="138.29" y="135" text-anchor="middle">12</text><text class="cr-chart__tick" x="181.71" y="135" text-anchor="middle">13</text><text class="cr-chart__tick" x="225.14" y="135" text-anchor="middle">14</text><text class="cr-chart__tick" x="268.57" y="135" text-anchor="middle">15</text><text class="cr-chart__tick" x="312.00" y="135" text-anchor="middle">16</text></svg><figcaption class="cr-chart__legend"><span class="cr-chart__key"><span class="cr-chart__sw" style="background:var(--sig-work)" aria-hidden="true"></span>throughput</span><span class="cr-chart__key"><span class="cr-chart__sw" style="background:var(--sig-err)" aria-hidden="true"></span>errors</span></figcaption></figure>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:6px">sessions by region · target 35</div>
+          <figure class="cr-barchart" role="img" aria-label="Sessions by region — eu 42, us 31, ap 18, sa 9"><svg class="cr-barchart__plot" viewBox="0 0 320 140" aria-hidden="true" focusable="false"><line class="cr-chart__grid" x1="6" y1="122" x2="314" y2="122" vector-effect="non-scaling-stroke"/><rect class="cr-barchart__bar" x="6.00" y="14.00" width="75.50" height="108.00" rx="1.5" style="fill:var(--sig-work)"/><text class="cr-chart__val" x="43.75" y="11.00" text-anchor="middle">42</text><text class="cr-chart__tick" x="43.75" y="135" text-anchor="middle">eu</text><rect class="cr-barchart__bar" x="83.50" y="42.29" width="75.50" height="79.71" rx="1.5" style="fill:var(--sig-accent-2)"/><text class="cr-chart__val" x="121.25" y="39.29" text-anchor="middle">31</text><text class="cr-chart__tick" x="121.25" y="135" text-anchor="middle">us</text><rect class="cr-barchart__bar" x="161.00" y="75.71" width="75.50" height="46.29" rx="1.5" style="fill:var(--sig-accent)"/><text class="cr-chart__val" x="198.75" y="72.71" text-anchor="middle">18</text><text class="cr-chart__tick" x="198.75" y="135" text-anchor="middle">ap</text><rect class="cr-barchart__bar" x="238.50" y="98.86" width="75.50" height="23.14" rx="1.5" style="fill:var(--sig-wait)"/><text class="cr-chart__val" x="276.25" y="95.86" text-anchor="middle">9</text><text class="cr-chart__tick" x="276.25" y="135" text-anchor="middle">sa</text><line class="cr-chart__target" x1="6" y1="32.00" x2="314" y2="32.00" vector-effect="non-scaling-stroke"/></svg></figure>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;max-width:420px;margin-top:16px">
+        <div class="cr-stack" role="img" aria-label="Fleet state — working 6 (32%), waiting 3 (16%), done 9 (47%), failed 1 (5%)"><span class="cr-stack__label">Fleet state</span><div class="cr-stack__bar" aria-hidden="true"><span class="cr-stack__seg cr-stack__seg--work" style="flex-grow:31.57894736842105" title="working · 6"></span><span class="cr-stack__seg cr-stack__seg--wait" style="flex-grow:15.789473684210526" title="waiting · 3"></span><span class="cr-stack__seg cr-stack__seg--done" style="flex-grow:47.368421052631575" title="done · 9"></span><span class="cr-stack__seg cr-stack__seg--err" style="flex-grow:5.263157894736842" title="failed · 1"></span></div><div class="cr-stack__legend" aria-hidden="true"><span class="cr-stack__key"><span class="cr-stack__sw cr-stack__seg--work"></span><span class="cr-stack__kl">working</span><span class="cr-stack__kv">6</span><span class="cr-stack__kp">32%</span></span><span class="cr-stack__key"><span class="cr-stack__sw cr-stack__seg--wait"></span><span class="cr-stack__kl">waiting</span><span class="cr-stack__kv">3</span><span class="cr-stack__kp">16%</span></span><span class="cr-stack__key"><span class="cr-stack__sw cr-stack__seg--done"></span><span class="cr-stack__kl">done</span><span class="cr-stack__kv">9</span><span class="cr-stack__kp">47%</span></span><span class="cr-stack__key"><span class="cr-stack__sw cr-stack__seg--err"></span><span class="cr-stack__kl">failed</span><span class="cr-stack__kv">1</span><span class="cr-stack__kp">5%</span></span></div></div>
+        <div class="cr-stack" role="img" aria-label="Worker eu-01 budget — cpu 41 (41%), io 22 (22%), idle 37 (37%)"><span class="cr-stack__label">Worker eu-01 budget</span><div class="cr-stack__bar" aria-hidden="true"><span class="cr-stack__seg cr-stack__seg--work" style="flex-grow:41" title="cpu · 41"></span><span class="cr-stack__seg cr-stack__seg--accent" style="flex-grow:22" title="io · 22"></span><span class="cr-stack__seg cr-stack__seg--idle" style="flex-grow:37" title="idle · 37"></span></div><div class="cr-stack__legend" aria-hidden="true"><span class="cr-stack__key"><span class="cr-stack__sw cr-stack__seg--work"></span><span class="cr-stack__kl">cpu</span><span class="cr-stack__kv">41</span><span class="cr-stack__kp">41%</span></span><span class="cr-stack__key"><span class="cr-stack__sw cr-stack__seg--accent"></span><span class="cr-stack__kl">io</span><span class="cr-stack__kv">22</span><span class="cr-stack__kp">22%</span></span><span class="cr-stack__key"><span class="cr-stack__sw cr-stack__seg--idle"></span><span class="cr-stack__kl">idle</span><span class="cr-stack__kv">37</span><span class="cr-stack__kp">37%</span></span></div></div>
       </div>
       <h3 style="margin-top:16px">Pagination</h3>
       <nav class="cr-pager" aria-label="Pagination">

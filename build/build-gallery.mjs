@@ -53,6 +53,127 @@ const swatchGroups = GROUPS.map(
   <div class="swgrid">${vars.map(swatch).join("")}</div>`,
 ).join("");
 
+// ── Chart demo generators — mirror the CrSparkline/CrLineChart/CrBarChart/
+// CrStackedBar geometry so the static gallery markup matches the shipped
+// components (the component browser mounts the real ones; these are the same
+// math, hand-rendered for the standalone page). ─────────────────────────────
+const hue = (sig, i) => {
+  const order = ["work", "accent-2", "accent", "wait", "done"];
+  const key = sig ? (sig === "accent2" ? "accent-2" : sig) : order[i % order.length];
+  return "var(--sig-" + key + ")";
+};
+function sparkSvg(data, { signal = "work", area = true, height = 32, label = "trend" } = {}) {
+  const W = 120, pad = 3, H = height, n = data.length;
+  const min = Math.min(...data), max = Math.max(...data), range = (max - min) || 1, innerH = H - pad * 2;
+  const pts = data.map((v, i) => ({ x: n === 1 ? W / 2 : (i / (n - 1)) * W, y: pad + (1 - (v - min) / range) * innerH }));
+  const line = pts.map((p) => p.x.toFixed(2) + "," + p.y.toFixed(2)).join(" ");
+  let ap = "M " + pts[0].x.toFixed(2) + "," + H.toFixed(2);
+  for (const p of pts) ap += " L " + p.x.toFixed(2) + "," + p.y.toFixed(2);
+  ap += " L " + pts[n - 1].x.toFixed(2) + "," + H.toFixed(2) + " Z";
+  const last = pts[n - 1];
+  return `<span class="cr-spark cr-spark--${signal}" role="img" aria-label="${label}: ${n} points, latest ${data[n - 1]}">`
+    + `<svg class="cr-spark__svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true" focusable="false">`
+    + (area ? `<path class="cr-spark__area" d="${ap}"/>` : "")
+    + `<polyline class="cr-spark__line" points="${line}" vector-effect="non-scaling-stroke"/>`
+    + `<circle class="cr-spark__dot" cx="${last.x.toFixed(2)}" cy="${last.y.toFixed(2)}" r="2.4" vector-effect="non-scaling-stroke"/></svg></span>`;
+}
+function lineChartSvg(series, labels, { area = true, height = 140, label = "line chart" } = {}) {
+  const W = 320, H = height, L = 8, R = 8, T = 10, B = 18, plotW = W - L - R, plotH = H - T - B;
+  let lo = Infinity, hi = -Infinity;
+  for (const s of series) for (const v of s.data) { if (v < lo) lo = v; if (v > hi) hi = v; }
+  const range = (hi - lo) || 1;
+  const xAt = (i, n) => L + (n <= 1 ? plotW / 2 : (i / (n - 1)) * plotW);
+  const yAt = (v) => T + (1 - (v - lo) / range) * plotH;
+  const grid = [0, 0.5, 1].map((f) => (T + f * plotH).toFixed(2));
+  const gridSvg = grid.map((gy) => `<line class="cr-chart__grid" x1="${L}" y1="${gy}" x2="${W - R}" y2="${gy}" vector-effect="non-scaling-stroke"/>`).join("");
+  const seriesSvg = series.map((s, si) => {
+    const color = hue(s.signal, si), n = s.data.length;
+    const pts = s.data.map((v, i) => ({ x: xAt(i, n), y: yAt(v) }));
+    const line = pts.map((p) => p.x.toFixed(2) + "," + p.y.toFixed(2)).join(" ");
+    let ap = "M " + pts[0].x.toFixed(2) + "," + (T + plotH).toFixed(2);
+    for (const p of pts) ap += " L " + p.x.toFixed(2) + "," + p.y.toFixed(2);
+    ap += " L " + pts[n - 1].x.toFixed(2) + "," + (T + plotH).toFixed(2) + " Z";
+    const e = pts[n - 1];
+    return (area ? `<path class="cr-linechart__area" d="${ap}" style="fill:${color}"/>` : "")
+      + `<polyline class="cr-linechart__line" points="${line}" style="stroke:${color}" vector-effect="non-scaling-stroke"/>`
+      + `<circle class="cr-linechart__end" cx="${e.x.toFixed(2)}" cy="${e.y.toFixed(2)}" r="2.6" style="fill:${color}" vector-effect="non-scaling-stroke"/>`;
+  }).join("");
+  const ticks = labels.map((t, i) => `<text class="cr-chart__tick" x="${xAt(i, labels.length).toFixed(2)}" y="${H - 5}" text-anchor="middle">${t}</text>`).join("");
+  const legend = series.length > 1
+    ? `<figcaption class="cr-chart__legend">${series.map((s, si) => `<span class="cr-chart__key"><span class="cr-chart__sw" style="background:${hue(s.signal, si)}" aria-hidden="true"></span>${s.name}</span>`).join("")}</figcaption>`
+    : "";
+  const summary = label + " — " + series.map((s) => s.name + " latest " + s.data[s.data.length - 1]).join(", ");
+  return `<figure class="cr-linechart" role="img" aria-label="${summary}"><svg class="cr-linechart__plot" viewBox="0 0 ${W} ${H}" aria-hidden="true" focusable="false">${gridSvg}${seriesSvg}${ticks}</svg>${legend}</figure>`;
+}
+function barChartSvg(data, { target, showValues = true, height = 140, label = "bar chart" } = {}) {
+  const W = 320, H = height, L = 6, R = 6, T = 14, B = 18, plotW = W - L - R, plotH = H - T - B, base = T + plotH;
+  let max = target || 0;
+  for (const d of data) if (d.value > max) max = d.value;
+  max = max || 1;
+  const n = data.length, gap = 2, bw = (plotW - gap * (n - 1)) / n;
+  const bars = data.map((d, i) => {
+    const h = Math.max(0, Math.min(1, d.value / max)) * plotH, x = L + i * (bw + gap), cx = x + bw / 2, color = hue(d.signal, i);
+    return `<rect class="cr-barchart__bar" x="${x.toFixed(2)}" y="${(base - h).toFixed(2)}" width="${bw.toFixed(2)}" height="${h.toFixed(2)}" rx="1.5" style="fill:${color}"/>`
+      + (showValues ? `<text class="cr-chart__val" x="${cx.toFixed(2)}" y="${(base - h - 3).toFixed(2)}" text-anchor="middle">${d.value}</text>` : "")
+      + `<text class="cr-chart__tick" x="${cx.toFixed(2)}" y="${H - 5}" text-anchor="middle">${d.label}</text>`;
+  }).join("");
+  const tline = target !== undefined ? `<line class="cr-chart__target" x1="${L}" y1="${(base - Math.max(0, Math.min(1, target / max)) * plotH).toFixed(2)}" x2="${W - R}" y2="${(base - Math.max(0, Math.min(1, target / max)) * plotH).toFixed(2)}" vector-effect="non-scaling-stroke"/>` : "";
+  const summary = label + " — " + data.map((d) => d.label + " " + d.value).join(", ");
+  return `<figure class="cr-barchart" role="img" aria-label="${summary}"><svg class="cr-barchart__plot" viewBox="0 0 ${W} ${H}" aria-hidden="true" focusable="false"><line class="cr-chart__grid" x1="${L}" y1="${base}" x2="${W - R}" y2="${base}" vector-effect="non-scaling-stroke"/>${bars}${tline}</svg></figure>`;
+}
+function stackedBar(segments, { label, showLegend = true } = {}) {
+  const total = segments.reduce((a, s) => a + s.value, 0) || 1;
+  const rows = segments.map((s) => ({ ...s, pct: (s.value / total) * 100 }));
+  const bar = rows.map((r) => `<span class="cr-stack__seg cr-stack__seg--${r.signal}" style="flex-grow:${r.pct}" title="${r.label} · ${r.value}"></span>`).join("");
+  const legend = showLegend
+    ? `<div class="cr-stack__legend" aria-hidden="true">${rows.map((r) => `<span class="cr-stack__key"><span class="cr-stack__sw cr-stack__seg--${r.signal}"></span><span class="cr-stack__kl">${r.label}</span><span class="cr-stack__kv">${r.value}</span><span class="cr-stack__kp">${Math.round(r.pct)}%</span></span>`).join("")}</div>`
+    : "";
+  const summary = (label || "breakdown") + " — " + rows.map((r) => r.label + " " + r.value + " (" + Math.round(r.pct) + "%)").join(", ");
+  return `<div class="cr-stack" role="img" aria-label="${summary}">${label ? `<span class="cr-stack__label">${label}</span>` : ""}<div class="cr-stack__bar" aria-hidden="true">${bar}</div>${legend}</div>`;
+}
+
+const chartsSection = `
+      <h3 style="margin-top:16px">Telemetry &amp; charts — sparkline · line · bar · stacked</h3>
+      <p class="note" style="margin-bottom:10px">SVG plots on the signal palette: crisp non-scaling 2px marks, a recessive grid, baseline-anchored bars, one y-axis. Series identity carries a legend (never colour alone); every figure has a spoken summary.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+        <span style="font-family:var(--font-mono);font-size:12px;color:var(--muted)">p95 latency</span>
+        ${sparkSvg([3, 5, 4, 7, 6, 9, 8, 12, 10, 14, 11, 15], { signal: "work", label: "p95 latency" })}
+        <span style="font-family:var(--font-mono);font-size:13px;color:var(--ink)">15ms</span>
+        ${sparkSvg([9, 7, 8, 5, 6, 4, 5, 3, 4, 2], { signal: "done", area: false, label: "error rate" })}
+        <span style="font-family:var(--font-mono);font-size:13px;color:var(--ink)">2%</span>
+      </div>
+      <div style="display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));align-items:start">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:6px">throughput vs errors · 09→16</div>
+          ${lineChartSvg([
+            { name: "throughput", data: [12, 18, 15, 22, 19, 26, 24, 31], signal: "work" },
+            { name: "errors", data: [2, 3, 2, 5, 4, 3, 6, 4], signal: "err" },
+          ], ["09", "10", "11", "12", "13", "14", "15", "16"], { label: "Throughput vs errors" })}
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:6px">sessions by region · target 35</div>
+          ${barChartSvg([
+            { label: "eu", value: 42 },
+            { label: "us", value: 31 },
+            { label: "ap", value: 18 },
+            { label: "sa", value: 9 },
+          ], { target: 35, label: "Sessions by region" })}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;max-width:420px;margin-top:16px">
+        ${stackedBar([
+          { label: "working", value: 6, signal: "work" },
+          { label: "waiting", value: 3, signal: "wait" },
+          { label: "done", value: 9, signal: "done" },
+          { label: "failed", value: 1, signal: "err" },
+        ], { label: "Fleet state" })}
+        ${stackedBar([
+          { label: "cpu", value: 41, signal: "work" },
+          { label: "io", value: 22, signal: "accent" },
+          { label: "idle", value: 37, signal: "idle" },
+        ], { label: "Worker eu-01 budget" })}
+      </div>`;
+
 const html = `<!doctype html>
 <html lang="en" data-theme="dark">
 <head>
@@ -281,6 +402,7 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         <div class="cr-meter cr-meter--wait"><span class="cr-meter__label">queue</span><span class="cr-meter__track" role="meter" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" aria-label="queue"><span class="cr-meter__fill" style="width:40%"></span></span></div>
         <div class="cr-meter cr-meter--err"><span class="cr-meter__label">errors</span><span class="cr-meter__track" role="meter" aria-valuenow="12" aria-valuemin="0" aria-valuemax="100" aria-label="errors"><span class="cr-meter__fill" style="width:12%"></span></span></div>
       </div>
+      ${chartsSection}
       <h3 style="margin-top:16px">Pagination</h3>
       <nav class="cr-pager" aria-label="Pagination">
         <button type="button" class="cr-pager__btn" aria-label="Previous page">‹</button>
