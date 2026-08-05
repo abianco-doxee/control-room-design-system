@@ -500,6 +500,67 @@
 @keyframes cr-prog-slide { from { transform: translateX(-110%); } to { transform: translateX(320%); } }
 @media (prefers-reduced-motion: reduce) { .cr-progress--indeterminate .cr-progress__fill { animation: none; width: 100%; } }
 
+/* ── Charts — sparkline · line · bar · stacked (SVG plots + token hues) ─────
+ * House rules from the dataviz method, tuned to the signal palette: thin marks,
+ * a crisp non-scaling 2px stroke, baseline-anchored bars with rounded data-ends,
+ * a recessive grid, a 2px surface gap between fills, legends/labels in text ink
+ * (never the series colour), and one y-axis only. Series colour is set inline
+ * from a signal token; text/grid/axis colours live here. */
+
+/* Sparkline — inline micro line/area (no axes) */
+.cr-spark { --cr-spark-c: var(--sig-work); display: inline-block; width: 120px; height: 32px; vertical-align: middle; color: var(--cr-spark-c); }
+.cr-spark__svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.cr-spark__line { fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: miter; stroke-linecap: square; }
+.cr-spark__area { fill: currentColor; opacity: 0.14; }
+.cr-spark__dot { fill: currentColor; stroke: var(--panel); stroke-width: 1; }
+.cr-spark--work { --cr-spark-c: var(--sig-work); }
+.cr-spark--wait { --cr-spark-c: var(--sig-wait); }
+.cr-spark--done { --cr-spark-c: var(--sig-done); }
+.cr-spark--err  { --cr-spark-c: var(--sig-err); }
+.cr-spark--idle { --cr-spark-c: var(--sig-idle); }
+.cr-spark--accent  { --cr-spark-c: var(--sig-accent); }
+.cr-spark--accent2 { --cr-spark-c: var(--sig-accent-2); }
+
+/* Shared plot furniture — grid, axis ticks, value + target */
+.cr-chart__grid { stroke: color-mix(in srgb, var(--ink) 16%, transparent); stroke-width: 1; }
+.cr-chart__target { stroke: var(--sig-err); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.cr-chart__tick { fill: var(--muted); font-family: var(--font-mono); font-size: 9px; letter-spacing: -0.02em; }
+.cr-chart__val { fill: var(--ink); font-family: var(--font-mono); font-size: 9px; font-weight: 700; }
+.cr-chart__legend { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-3); margin: var(--space-1) 0 0; padding: 0; }
+.cr-chart__key { display: inline-flex; align-items: center; gap: var(--space-1); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--ink); }
+.cr-chart__sw { width: 10px; height: 10px; border: var(--brd-hair) solid var(--border); flex: none; }
+
+/* Line chart */
+.cr-linechart { margin: 0; }
+.cr-linechart__plot { display: block; width: 100%; height: auto; background: var(--panel-2); border: var(--brd-hair) solid var(--border); }
+.cr-linechart__line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.cr-linechart__area { opacity: 0.12; stroke: none; }
+.cr-linechart__end { stroke: var(--panel-2); stroke-width: 1; }
+
+/* Bar chart */
+.cr-barchart { margin: 0; }
+.cr-barchart__plot { display: block; width: 100%; height: auto; background: var(--panel-2); border: var(--brd-hair) solid var(--border); }
+.cr-barchart__bar { stroke: var(--panel-2); stroke-width: 1; }
+
+/* Stacked bar — "stacked progress" */
+.cr-stack { display: flex; flex-direction: column; gap: var(--space-1); }
+.cr-stack__label { font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.cr-stack__bar { display: flex; gap: 2px; height: var(--space-3); background: var(--panel-2); border: var(--brd-hair) solid var(--border); overflow: hidden; }
+.cr-stack__seg { display: block; min-width: 3px; background: var(--sig-idle); }
+.cr-stack__seg--work { background: var(--sig-work); }
+.cr-stack__seg--wait { background: var(--sig-wait); }
+.cr-stack__seg--done { background: var(--sig-done); }
+.cr-stack__seg--err  { background: var(--sig-err); }
+.cr-stack__seg--idle { background: var(--sig-idle); }
+.cr-stack__seg--accent  { background: var(--sig-accent); }
+.cr-stack__seg--accent2 { background: var(--sig-accent-2); }
+.cr-stack__legend { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); }
+.cr-stack__key { display: inline-flex; align-items: center; gap: var(--space-1); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--ink); }
+.cr-stack__sw { width: 10px; height: 10px; border: var(--brd-hair) solid var(--border); flex: none; }
+.cr-stack__kl { color: var(--ink); }
+.cr-stack__kv { color: var(--ink); font-weight: 700; }
+.cr-stack__kp { color: var(--muted); }
+
 /* ── Skeleton (loading placeholder — blocky pulse, never rounded) ────────── */
 .cr-skeleton { background: var(--panel-2); border: var(--brd-hair) solid color-mix(in srgb, var(--border) 30%, transparent); animation: cr-skel-pulse 1.4s ease-in-out infinite; }
 .cr-skeleton--line { height: var(--space-2); }

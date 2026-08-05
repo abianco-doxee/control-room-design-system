@@ -22,6 +22,7 @@ import {
   CrButton, CrChoice, CrField, CrInput, CrTextarea, CrBreadcrumb, CrToast,
   CrKbd, CrAlert, CrChip, CrEmptyState, CrMeter, CrProgress, CrStatusDot,
   CrTag, CrSessionRow, CrPanel, CrIcon,
+  CrSparkline, CrLineChart, CrBarChart, CrStackedBar,
 } from "../dist/frameworks/react/index.ts";
 
 const ICON_NAMES = ["play", "pause", "stop", "retry", "deploy", "scan", "search", "alert", "error", "done", "clock", "cpu", "logs", "filter", "sliders", "close", "chevron", "plus", "minus", "trash", "external", "copy", "session", "menu"];
@@ -131,6 +132,26 @@ function Playground({ tag, defs, render, extra }) {
       h("div", { className: "pg__controls" }, defs.map((d) => h(Field, { key: d.prop, def: d, value: state[d.prop], set }))),
       h("pre", { className: "pg__code" }, snippet(tag, defs, state))));
 }
+
+// chart demo data (fixed; the playground edits the scalar props, not the data)
+const SPARK_DATA = [3, 5, 4, 7, 6, 9, 8, 12, 10, 14, 11, 15];
+const LINE_SERIES = [
+  { name: "throughput", data: [12, 18, 15, 22, 19, 26, 24, 31], signal: "work" },
+  { name: "errors", data: [2, 3, 2, 5, 4, 3, 6, 4], signal: "err" },
+];
+const LINE_LABELS = ["09", "10", "11", "12", "13", "14", "15", "16"];
+const BAR_DATA = [
+  { label: "eu", value: 42 },
+  { label: "us", value: 31 },
+  { label: "ap", value: 18 },
+  { label: "sa", value: 9 },
+];
+const STACK_SEGS = [
+  { label: "working", value: 6, signal: "work" },
+  { label: "waiting", value: 3, signal: "wait" },
+  { label: "done", value: 9, signal: "done" },
+  { label: "failed", value: 1, signal: "err" },
+];
 
 // ── per-component playgrounds (keyed by catalog id) ─────────────────────────
 const T = (type, prop, def, more) => ({ type, prop, default: def, ...(more || {}) });
@@ -342,6 +363,45 @@ const DEMOS = {
       T("text", "label", "Uploading"),
     ],
     render: (s) => h(CrProgress, { value: s.value, max: s.max, indeterminate: s.indeterminate, signal: s.signal, label: s.label }),
+  },
+  sparkline: {
+    tag: "CrSparkline",
+    defs: [
+      T("enum", "signal", "work", { options: ["work", "wait", "done", "err", "idle", "accent", "accent2"] }),
+      T("boolean", "area", true),
+      T("number", "height", 32, { min: 20, max: 80 }),
+      T("text", "label", "p95 latency"),
+    ],
+    render: (s) => h("div", { style: { display: "flex", alignItems: "center", gap: "10px" } },
+      h(CrSparkline, { data: SPARK_DATA, signal: s.signal, area: s.area, height: s.height, label: s.label }),
+      h("span", { style: { fontFamily: "var(--font-mono)", fontSize: "13px", color: "var(--ink)" } }, "15")),
+  },
+  "line-chart": {
+    tag: "CrLineChart",
+    defs: [
+      T("boolean", "area", true),
+      T("number", "height", 140, { min: 90, max: 220 }),
+      T("text", "label", "Throughput vs errors"),
+    ],
+    render: (s) => h(CrLineChart, { series: LINE_SERIES, labels: LINE_LABELS, area: s.area, height: s.height, label: s.label }),
+  },
+  "bar-chart": {
+    tag: "CrBarChart",
+    defs: [
+      T("boolean", "showValues", true),
+      T("number", "target", 35, { min: 0, max: 50 }),
+      T("number", "height", 140, { min: 90, max: 220 }),
+      T("text", "label", "Sessions by region"),
+    ],
+    render: (s) => h(CrBarChart, { data: BAR_DATA, showValues: s.showValues, target: s.target, height: s.height, label: s.label }),
+  },
+  "stacked-bar": {
+    tag: "CrStackedBar",
+    defs: [
+      T("boolean", "showLegend", true),
+      T("text", "label", "Fleet state"),
+    ],
+    render: (s) => h(CrStackedBar, { segments: STACK_SEGS, showLegend: s.showLegend, label: s.label }),
   },
   input: {
     tag: "CrInput",

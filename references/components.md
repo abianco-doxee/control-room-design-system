@@ -976,6 +976,91 @@ runs an animated hazard sweep and drops the numeric ARIA values. Distinct from
 
 ---
 
+## Charts — Sparkline · Line · Bar · Stacked
+
+The chart family renders the same house rules across four forms (from the
+data-viz method, tuned to the signal palette): **thin marks**, a crisp
+**non-scaling 2px stroke** (`vector-effect="non-scaling-stroke"` so lines stay
+sharp at any width), a **recessive grid** (`--ink` mixed to ~16%),
+**baseline-anchored** bars with rounded data-ends, a **2px surface gap** between
+fills, labels/legends in **text ink — never the series colour**, and **one
+y-axis, ever** (no dual-scale charts — split into two figures instead).
+
+Series colour follows the **entity**: pass a `signal` tone, or omit it to take
+the next hue in a **fixed categorical order** (`work · accent-2 · accent · wait ·
+done`) — never cycled, so a filtered-out series never repaints the survivors. That
+order is chosen so adjacent hues stay separable under colour-vision deficiency
+(validated with the data-viz palette checker against each theme surface). Every
+figure is `role="img"` with a spoken `aria-label` summary; the SVG itself is
+`aria-hidden`. A legend is present whenever there are **≥ 2 series** and each bar
+carries a direct category label — identity is never colour-alone, which is also
+the required relief for the palette's few CVD/contrast *warnings*. Status tones on
+a stacked bar are always paired with a text label.
+
+> **Palette note.** The signal hues are max-neon by design (Law 2), so they sit
+> brighter than a generic mid-lightness categorical band — an accepted house
+> deviation, the same palette the whole system ships and gates via
+> `verify:palette`. Separation and contrast are what we hold the line on; the
+> always-present legend + labels + spoken summary carry identity regardless.
+
+### Sparkline {#sparkline}
+
+**Purpose.** An inline micro line/area for a KPI or table cell — no axes, just the
+shape of a trend, with a data-end dot. Stretches to fill its box.
+
+```tsx
+<CrSparkline data={[3,5,4,7,6,9,8,12,10,14]} signal="work" area label="p95 latency" />
+```
+
+### Line chart {#line-chart}
+
+**Purpose.** A time series. Recessive grid, a 2px line + data-end dot per series,
+tick labels, and a legend for ≥ 2 series.
+
+```tsx
+<CrLineChart
+  series={[
+    { name: "throughput", data: [12,18,15,22,19,26,24,31], signal: "work" },
+    { name: "errors", data: [2,3,2,5,4,3,6,4], signal: "err" },
+  ]}
+  labels={["09","10","11","12","13","14","15","16"]}
+  area label="Throughput vs errors" />
+```
+
+- One shared y-scale. If two measures differ wildly in magnitude (e.g. throughput
+  vs a 0–100 %), **don't** add a second axis — show two charts or index to a base.
+
+### Bar chart {#bar-chart}
+
+**Purpose.** Magnitude across categories. Baseline-anchored bars, rounded
+data-ends, a 2px gap, optional dashed **target** line (a budget / SLO), and
+monospace value + category labels.
+
+```tsx
+<CrBarChart
+  data={[{label:"eu",value:42},{label:"us",value:31},{label:"ap",value:18},{label:"sa",value:9}]}
+  target={35} showValues label="Sessions by region" />
+```
+
+### Stacked bar {#stacked-bar}
+
+**Purpose.** Composition — a "stacked progress". One track split into signal-toned
+segments sized by share, with a legend (label · value · %). Compose several in a
+column for a per-row comparison (fleet state, error budget, queue mix).
+
+```tsx
+<CrStackedBar
+  label="Fleet state"
+  segments={[
+    { label: "working", value: 6, signal: "work" },
+    { label: "waiting", value: 3, signal: "wait" },
+    { label: "done", value: 9, signal: "done" },
+    { label: "failed", value: 1, signal: "err" },
+  ]} />
+```
+
+---
+
 ## Skeleton {#skeleton}
 
 **Purpose.** A loading placeholder — a blocky pulse (never rounded). Sizes:
