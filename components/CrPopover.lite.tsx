@@ -54,7 +54,7 @@ export default function CrPopover(props: CrPopoverProps) {
     <div class="cr-popover" ref={rootRef}>
       <button
         type="button"
-        class="cr-btn cr-btn--controls cr-btn--sm"
+        class="cr-btn cr-btn--outline cr-btn--sm"
         aria-haspopup="dialog"
         aria-expanded={state.open ? "true" : "false"}
         onClick={() => state.toggle()}
