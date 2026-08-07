@@ -276,6 +276,44 @@ body {
   animation-iteration-count: 1 !important;
 }
 
+/* Control Room brand: slate — Slate · neutral corporate re-skin (GENERATED
+ * from brands/slate.json). Appearance layer only — pair with dist/structure.css.
+ * Regenerate: npm run build:theme. */
+:root[data-theme="slate"] {
+  color-scheme: dark;
+  --ground: #0e1116;
+  --board: #141922;
+  --panel: #1b222d;
+  --panel-2: #232c39;
+  --ink: #e8edf4;
+  --muted: #8a97a8;
+  --border: #000000;
+  --rail: #0a0d12;
+  --rail-ink: #cdd6e2;
+  --sig-work: #3b9eff;
+  --sig-accent: #6d7cff;
+  --sig-accent-2: #4db6c9;
+  --sig-done: #35c98d;
+  --sig-wait: #e0a54a;
+  --sig-err: #e5484d;
+  --sig-idle: #6b7688;
+  --on-sig: #0b0e13;
+  --on-err: #ffffff;
+  --on-accent: #ffffff;
+  --on-accent-2: #0b0e13;
+  --on-idle: #ffffff;
+  --shadow-col: #000000;
+  --mass: #000000;
+  --stage: #2f7d4f;
+  --stage-ink: #eafff2;
+  --drip: #4db6c9;
+  --halftone: radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);
+  --dither: repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
+  --scanline: repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);
+  --crosshatch: repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);
+  --field: repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
+}
+
 /* ============================================================================
  * CONTROL ROOM — Component layer
  *
@@ -1625,6 +1663,7 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
     <button data-set="light" aria-pressed="false">light</button>
     <button data-set="extreme" aria-pressed="false">extreme</button>
     <button data-set="phosphor" aria-pressed="false">phosphor</button>
+    <button data-set="slate" aria-pressed="false" title="external brand — brands/slate.json">slate ▸</button>
   </div>
 </div>
 <div class="wrap">

@@ -19,6 +19,13 @@ import { browserScript } from "./gallery-scripts.mjs";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const tokensCss = readFileSync(join(ROOT, "dist", "control-room.css"), "utf8");
 const componentsCss = readFileSync(join(ROOT, "styles", "components.css"), "utf8");
+/* The `slate` BRAND is not in the built-in bundle — it's an external brand file
+ * (brands/slate.json → dist/themes/slate.css). Appending it proves the whole
+ * browser reskins to a brand via one appearance file + data-theme, no component
+ * change. See references/theming.md. */
+const slateThemeCss = existsSync(join(ROOT, "dist", "themes", "slate.css"))
+  ? readFileSync(join(ROOT, "dist", "themes", "slate.css"), "utf8")
+  : "";
 const catalog = JSON.parse(readFileSync(join(ROOT, "catalog", "catalog.json"), "utf8"));
 
 let displayFace = "";
@@ -351,6 +358,7 @@ const html = `<!doctype html>
 <style>
 ${displayFace}
 ${tokensCss}
+${slateThemeCss}
 ${componentsCss}
 /* browser chrome (not part of the shipped system) */
 * { box-sizing: border-box; }
@@ -435,6 +443,7 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
     <button data-set="light" aria-pressed="false">light</button>
     <button data-set="extreme" aria-pressed="false">extreme</button>
     <button data-set="phosphor" aria-pressed="false">phosphor</button>
+    <button data-set="slate" aria-pressed="false" title="external brand — brands/slate.json">slate ▸</button>
   </div>
 </div>
 <div class="wrap">
