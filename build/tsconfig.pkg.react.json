@@ -1,0 +1,27 @@
+{
+  "//": "Compiles the React framework output (dist/frameworks/react) into a real,",
+  "//2": "consumable package at dist/pkg/react: ESM JS + .d.ts declarations, with",
+  "//3": "relative import extensions rewritten .tsx -> .js so the emit resolves in",
+  "//4": "both Node ESM and bundlers. react/react-dom stay external (peer deps).",
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "types": ["react", "react-dom"],
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "../dist/pkg/react",
+    "rootDir": "../dist/frameworks/react",
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["../dist/frameworks/react/**/*.ts", "../dist/frameworks/react/**/*.tsx"]
+}

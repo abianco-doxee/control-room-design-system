@@ -36,6 +36,8 @@ jobs:
         run: npm run build:components
       - name: Type-check compiled React output (codegen guard)
         run: npm run verify:types
+      - name: Package consumability gate (build + import + render the named exports)
+        run: npm run test:pkg
       - name: Forms core gate (ArkType ⇄ JSON Schema + validation)
         run: npm run test:forms
       - name: Theme core gate (contract + brand validation + contrast)

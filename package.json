@@ -34,7 +34,11 @@
     "./dtcg": "./design-tokens/control-room.tokens.json",
     "./catalog": "./catalog/catalog.json",
     "./forms": "./lib/forms/index.js",
-    "./react": "./dist/frameworks/react/index.ts",
+    "./react": {
+      "types": "./dist/pkg/react/index.d.ts",
+      "import": "./dist/pkg/react/index.js",
+      "default": "./dist/pkg/react/index.js"
+    },
     "./vue": "./dist/frameworks/vue/index.ts",
     "./svelte": "./dist/frameworks/svelte/index.js",
     "./angular": "./dist/frameworks/angular/index.ts",
@@ -52,17 +56,20 @@
     "build:palette": "node build/build-palette.mjs",
     "build:tw": "tailwindcss -i build/tailwind-input.css -o dist/utilities.css",
     "build:components": "mitosis build && node build/build-fix-qwik.mjs && node build/build-fix-react.mjs && node build/build-barrels.mjs",
+    "build:pkg": "node build/build-pkg.mjs",
     "build:catalog": "node build/build-catalog.mjs",
     "build:gallery": "node build/build-gallery.mjs",
     "build:showcase": "node build/build-showcase.mjs",
     "build:content": "node build/build-docs-content.mjs",
     "prebuild:site": "npm run build:content",
     "build:site": "astro build",
-    "build": "npm run build:tokens && npm run build:theme && npm run build:tw && npm run build:catalog && npm run build:gallery && npm run build:components && npm run build:showcase && npm run build:content && astro build",
+    "build": "npm run build:tokens && npm run build:theme && npm run build:tw && npm run build:catalog && npm run build:gallery && npm run build:components && npm run build:pkg && npm run build:showcase && npm run build:content && astro build",
+    "prepack": "npm run build:components && npm run build:pkg",
     "dev": "npm run build:content && astro dev",
     "preview": "astro preview",
     "verify:tokens": "node build/build-tokens.mjs --check",
     "verify:theme": "node build/build-theme.mjs --check",
+    "verify:pkg": "node build/build-pkg.mjs --check",
     "verify:catalog": "node build/build-catalog.mjs --check",
     "verify:types": "tsc -p build/tsconfig.frameworks.json",
     "verify:palette": "node build/build-palette.mjs --check",
@@ -78,6 +85,8 @@
     "test:forms": "node --test tests/forms.test.mjs",
     "test:theme": "node --test tests/theme.test.mjs",
     "test:separation": "node --test tests/appearance-separation.test.mjs",
+    "pretest:pkg": "npm run build:pkg",
+    "test:pkg": "node --test tests/pkg-react.test.mjs",
     "changeset": "changeset",
     "version": "changeset version",
     "verify": "npm run verify:tokens && npm run verify:theme && npm run verify:palette && npm run verify:catalog && npm run skills:check"
@@ -99,6 +108,13 @@
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
     "undici": "^8.10.0"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react-dom": { "optional": true }
   },
   "dependencies": {
     "@astrojs/starlight": "^0.41.6",
