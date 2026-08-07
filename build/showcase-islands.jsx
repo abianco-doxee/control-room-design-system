@@ -22,8 +22,9 @@ import {
   CrButton, CrChoice, CrField, CrInput, CrTextarea, CrBreadcrumb, CrToast,
   CrKbd, CrAlert, CrChip, CrEmptyState, CrMeter, CrProgress, CrStatusDot,
   CrTag, CrSessionRow, CrPanel, CrIcon,
-  CrSparkline, CrLineChart, CrBarChart, CrStackedBar,
+  CrSparkline, CrLineChart, CrBarChart, CrStackedBar, CrForm,
 } from "../dist/frameworks/react/index.ts";
+import { defineForm, type as ark } from "../lib/forms/index.js";
 
 const ICON_NAMES = ["play", "pause", "stop", "retry", "deploy", "scan", "search", "alert", "error", "done", "clock", "cpu", "logs", "filter", "sliders", "close", "chevron", "plus", "minus", "trash", "external", "copy", "session", "menu"];
 
@@ -152,6 +153,31 @@ const STACK_SEGS = [
   { label: "done", value: 9, signal: "done" },
   { label: "failed", value: 1, signal: "err" },
 ];
+
+// Schema-driven form demo — one ArkType schema is the source of truth; the same
+// form is also derived from its exported JSON Schema to prove the bridge runs
+// both ways (identical model + validation, either source).
+const SessionSchema = ark({
+  name: "string >= 2",
+  endpoint: "string.url",
+  replicas: "1 <= number.integer <= 32",
+  region: "'eu-west' | 'us-east' | 'ap-south'",
+  "notes?": "string <= 140",
+  autoscale: "boolean",
+});
+const FORM_OVERRIDES = {
+  order: ["name", "endpoint", "replicas", "region", "notes", "autoscale"],
+  overrides: {
+    name: { label: "Session name", hint: "lowercase, no spaces", placeholder: "nova-01" },
+    endpoint: { label: "Endpoint URL", placeholder: "https://…" },
+    replicas: { hint: "1–32 workers" },
+    region: { label: "Region" },
+    notes: { kind: "textarea", hint: "optional · ≤140 chars" },
+    autoscale: { label: "Auto-scale on demand" },
+  },
+};
+const FORM_ARK = defineForm(SessionSchema, FORM_OVERRIDES);
+const FORM_JSON = defineForm(FORM_ARK.jsonSchema, FORM_OVERRIDES);
 
 // ── per-component playgrounds (keyed by catalog id) ─────────────────────────
 const T = (type, prop, def, more) => ({ type, prop, default: def, ...(more || {}) });
@@ -402,6 +428,36 @@ const DEMOS = {
       T("text", "label", "Fleet state"),
     ],
     render: (s) => h(CrStackedBar, { segments: STACK_SEGS, showLegend: s.showLegend, label: s.label }),
+  },
+  form: {
+    tag: "CrForm",
+    defs: [
+      T("enum", "source", "arktype", { options: [{ value: "arktype", label: "ArkType" }, { value: "jsonschema", label: "JSON Schema" }] }),
+      T("text", "title", "New session"),
+      T("text", "submitLabel", "Create session"),
+    ],
+    extra: { result: null },
+    render: (s, set) => {
+      const F = s.source === "jsonschema" ? FORM_JSON : FORM_ARK;
+      return h("div", { style: { display: "grid", gap: "14px" } },
+        h(CrForm, {
+          fields: F.model.fields,
+          title: s.title,
+          submitLabel: s.submitLabel,
+          validate: (vals) => F.validate(vals).errors,
+          onSubmit: (vals) => set("result", F.validate(vals).data),
+        }),
+        h("p", { className: "pg__note", style: { margin: 0 } },
+          s.source === "jsonschema"
+            ? "validated by ArkType — the type was converted from the JSON Schema below"
+            : "validated by ArkType — exportable to the JSON Schema below (feed it back for the same form)"),
+        s.result
+          ? h("pre", { className: "pg__code" }, "submitted ✓ (coerced + validated)\n" + JSON.stringify(s.result, null, 2))
+          : null,
+        h("details", null,
+          h("summary", { style: { fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--muted)", cursor: "pointer" } }, "exported JSON Schema"),
+          h("pre", { className: "pg__code" }, JSON.stringify(FORM_ARK.jsonSchema, null, 2))));
+    },
   },
   input: {
     tag: "CrInput",

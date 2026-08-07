@@ -647,6 +647,29 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
         <label class="cr-check"><input type="radio" name="g-r" /> Magenta</label>
         <button type="button" role="switch" aria-checked="true" class="cr-switch"><span class="cr-switch__track" aria-hidden="true"></span> Live</button>
       </div>
+      <h3 style="margin-top:18px">Schema-driven form — validation from ArkType / JSON Schema</h3>
+      <p class="note" style="margin-bottom:10px">One schema (an ArkType type <em>or</em> a JSON Schema) drives the fields, coercion, and validation — errors are derived, never hand-set. Required fields mark with <span style="color:var(--sig-err)">*</span>; an error sets aria-invalid + links the message. The interactive, editable playground lives in the <a href="./components.html#c-form">component browser</a>.</p>
+      <form class="cr-form" style="max-width:440px" novalidate onsubmit="return false">
+        <h3 class="cr-form__title">New session</h3>
+        <div class="cr-field">
+          <label class="cr-field__label" for="f-name">Session name<span class="cr-field__req" aria-hidden="true"> *</span></label>
+          <input id="f-name" name="name" class="cr-input" value="nova-01" aria-required="true" />
+          <span class="cr-field__hint" id="f-name-hint">lowercase, no spaces</span>
+        </div>
+        <div class="cr-field cr-field--error">
+          <label class="cr-field__label" for="f-ep">Endpoint URL<span class="cr-field__req" aria-hidden="true"> *</span></label>
+          <input id="f-ep" name="endpoint" class="cr-input" value="nope" aria-required="true" aria-invalid="true" aria-describedby="f-ep-err" />
+          <span class="cr-field__error" id="f-ep-err" role="alert">Endpoint must be a URL (was "nope")</span>
+        </div>
+        <div class="cr-field">
+          <label class="cr-field__label" for="f-reg">Region<span class="cr-field__req" aria-hidden="true"> *</span></label>
+          <select id="f-reg" name="region" class="cr-select" aria-required="true"><option value="">Select…</option><option value="eu-west" selected>Eu west</option><option value="us-east">Us east</option><option value="ap-south">Ap south</option></select>
+        </div>
+        <div class="cr-field">
+          <label class="cr-check"><input type="checkbox" name="autoscale" checked /> Auto-scale on demand</label>
+        </div>
+        <div class="cr-form__actions"><button type="submit" class="cr-btn">Create session</button></div>
+      </form>
     </div>
     <div style="grid-column:1/-1">
       <h3>Severity shapes — sides ∝ 1/danger (a channel beside colour)</h3>

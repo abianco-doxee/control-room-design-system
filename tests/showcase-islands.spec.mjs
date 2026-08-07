@@ -58,6 +58,36 @@ test.describe("component browser — live islands", () => {
     await expect(hdr).toHaveAttribute("aria-expanded", wasOpen ? "false" : "true");
   });
 
+  test("schema-driven form validates and coerces via the ArkType core", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const form = page.locator('[data-island="form"]');
+
+    // submit empty → the required fields report errors (notes is optional)
+    await form.locator('button[type="submit"]').click();
+    expect(await form.locator(".cr-field__error").count()).toBeGreaterThanOrEqual(4);
+
+    // fix every field → errors clear and the submitted, COERCED data appears
+    await form.locator("#cr-form-name").fill("nova-01");
+    await form.locator("#cr-form-endpoint").fill("https://eu.example.com");
+    await form.locator("#cr-form-replicas").fill("4");
+    await form.locator("#cr-form-region").selectOption("eu-west");
+    await form.locator('button[type="submit"]').click();
+    await expect(form.locator(".cr-field__error")).toHaveCount(0);
+    await expect(form.locator("pre").filter({ hasText: "submitted" })).toContainText('"replicas": 4'); // number, not "4"
+
+    // an invalid value re-fails on change once the field has been touched
+    await form.locator("#cr-form-endpoint").fill("nope");
+    await expect(form.locator("#cr-form-endpoint-err")).toBeVisible();
+
+    // switch the schema source (ArkType → JSON Schema) — the values persist, so
+    // the JSON-Schema-sourced validator still flags the bad endpoint ("nope").
+    await form.locator(".pg__controls select").first().selectOption("jsonschema");
+    await expect(form.locator(".cr-field").first()).toBeVisible();
+    await form.locator('button[type="submit"]').click();
+    await expect(form.locator("#cr-form-endpoint-err")).toBeVisible();
+  });
+
   test("editing a control prop re-renders the live component", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));

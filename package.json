@@ -16,7 +16,8 @@
     "checklists",
     "SKILL.md",
     "README.md",
-    "utils"
+    "utils",
+    "lib"
   ],
   "exports": {
     "./tokens.json": "./tokens/tokens.json",
@@ -27,6 +28,7 @@
     "./flat": "./dist/tokens.flat.json",
     "./dtcg": "./design-tokens/control-room.tokens.json",
     "./catalog": "./catalog/catalog.json",
+    "./forms": "./lib/forms/index.js",
     "./react": "./dist/frameworks/react/index.ts",
     "./vue": "./dist/frameworks/vue/index.ts",
     "./svelte": "./dist/frameworks/svelte/index.js",
@@ -66,6 +68,7 @@
     "test:responsive": "playwright test tests/responsive.spec.mjs",
     "test:visual": "playwright test tests/visual.spec.mjs",
     "test:visual:update": "playwright test tests/visual.spec.mjs --update-snapshots",
+    "test:forms": "node --test tests/forms.test.mjs",
     "changeset": "changeset",
     "version": "changeset version",
     "verify": "npm run verify:tokens && npm run verify:palette && npm run verify:catalog && npm run skills:check"
@@ -92,6 +95,7 @@
     "@astrojs/starlight": "^0.41.6",
     "@fontsource/archivo": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
+    "arktype": "^2.2.3",
     "astro": "^7.1.6",
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.6.0"
