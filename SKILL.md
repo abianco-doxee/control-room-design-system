@@ -48,6 +48,7 @@ Detail lives in `references/`. Load only what the task needs.
 | --- | --- |
 | `references/design-language.md` | The **nine laws** — the *why* and the do/don't for every visual decision. Read this first for any new component. |
 | `references/tokens.md` | The full token reference — every variable, every theme, and how to consume them. |
+| `references/theming.md` | **Theming & branding** — the feature ⇄ appearance split, the theme contract, authoring a brand (`brands/*.json` + `@control-room/design-system/theme`), contrast, and the appearance-separation guard. |
 | `references/components.md` | The **component library** — formal spec + API for each component (Panel, Button, Chip, StatusDot, SessionRow, Rail, Hero, Bezel, Table, Tag, diagonal primitives, keyed tiles, drip, form controls, instrument shell, and the overlays — Modal / Toast / Tooltip). |
 | `references/motion.md` | The four motion tiers, the glitch/CRT vocabulary, and the reduced-motion contract. |
 | `references/accessibility.md` | The accessibility contract — contrast, focus, ARIA, and how the aesthetic and a11y coexist. |

@@ -77,6 +77,7 @@
     "test:visual:update": "playwright test tests/visual.spec.mjs --update-snapshots",
     "test:forms": "node --test tests/forms.test.mjs",
     "test:theme": "node --test tests/theme.test.mjs",
+    "test:separation": "node --test tests/appearance-separation.test.mjs",
     "changeset": "changeset",
     "version": "changeset version",
     "verify": "npm run verify:tokens && npm run verify:theme && npm run verify:palette && npm run verify:catalog && npm run skills:check"

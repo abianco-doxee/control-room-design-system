@@ -40,6 +40,8 @@ jobs:
         run: npm run test:forms
       - name: Theme core gate (contract + brand validation + contrast)
         run: npm run test:theme
+      - name: Appearance-separation guard (no brand colour in the feature layer)
+        run: npm run test:separation
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
       - name: Accessibility gate (axe, all four themes)

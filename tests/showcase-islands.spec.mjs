@@ -163,6 +163,29 @@ test.describe("component browser — live islands", () => {
     await expect(slider.locator(".pg__code")).toContainText("disabled");
   });
 
+  test("an external brand (slate) reskins the whole browser from one theme file", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const groundOf = () => page.evaluate(() =>
+      getComputedStyle(document.documentElement).getPropertyValue("--ground").trim());
+    const accentOf = () => page.evaluate(() =>
+      getComputedStyle(document.documentElement).getPropertyValue("--sig-accent").trim());
+
+    // default (dark) brand values
+    expect(await groundOf()).toBe("#0f0327");
+    expect(await accentOf()).toBe("#ff1a9d");
+
+    // switch to the slate BRAND — an appearance file that lives outside the
+    // built-in bundle (brands/slate.json). The roles flip; no component reloads.
+    await page.locator('.switch button[data-set="slate"]').click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "slate");
+    expect(await groundOf()).toBe("#0e1116"); // slate's surface
+    expect(await accentOf()).toBe("#6d7cff"); // slate's accent — proves the reskin
+
+    // components are still the same live React islands, just re-themed
+    await expect(page.locator("[data-island]:not([data-island-ready])")).toHaveCount(0);
+  });
+
   test("keyboard focus shows a visible ring", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
