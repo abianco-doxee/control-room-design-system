@@ -15,6 +15,9 @@ export interface CrFormField {
   /** For `array`: the descriptor of a single item (a scalar field or a group). */
   item?: CrFormField;
   itemLabel?: string;
+  /** For `autocomplete`: options come from a static array, the field's enum
+   *  `options`, or an async `(query) => Promise<{value,label}[]>`. */
+  source?: { value: string; label: string }[] | ((query: string) => any);
   min?: number;
   max?: number;
   step?: number | string;
@@ -56,8 +59,15 @@ export default function CrForm(props: CrFormProps) {
     errs: {},
     touched: {},
     submitted: false,
+    /* autocomplete transient UI state, keyed by dotted field path */
+    acQuery: {},
+    acLabel: {},
+    acOpen: {},
+    acResults: {},
+    acLoading: {},
+    acActive: {},
 
-    // ── path helpers (path is an array of string keys / numeric indices) ──
+    /* ── path helpers (path is an array of string keys / numeric indices) ── */
     key(path: any[]): string {
       return path.join(".");
     },
@@ -94,7 +104,7 @@ export default function CrForm(props: CrFormProps) {
       return undefined;
     },
 
-    // ── kind helpers ──
+    /* ── kind helpers ── */
     isText(kind: string): boolean {
       return kind === "text" || kind === "email" || kind === "url";
     },
@@ -110,7 +120,113 @@ export default function CrForm(props: CrFormProps) {
       return "";
     },
 
-    // ── the flat render-list (recursion in JS, flat DOM) ──
+    /* ── autocomplete (a select whose options come from a `source`) ──
+     * source is a static array, or the field's enum `options`, or an async
+     * (query) => Promise<{value,label}[]>. A real async source should debounce /
+     * order its own responses; the component just renders whatever resolves. */
+    acItems(path: any[]): any[] {
+      return state.acResults[state.key(path)] || [];
+    },
+    acIsOpen(path: any[]): boolean {
+      return !!state.acOpen[state.key(path)];
+    },
+    acIsLoading(path: any[]): boolean {
+      return !!state.acLoading[state.key(path)];
+    },
+    acActiveIdx(path: any[]): number {
+      return state.acActive[state.key(path)] || 0;
+    },
+    acDisplay(field: CrFormField, path: any[]): string {
+      const k = state.key(path);
+      if (state.acQuery[k] != null) return state.acQuery[k];
+      if (state.acLabel[k] != null) return state.acLabel[k];
+      const v = state.getDeep(state.vals, path);
+      if (v == null || v === "") return "";
+      const arr = Array.isArray(field.source) ? field.source : field.options || [];
+      const o = arr.find((x: any) => String(x.value) === String(v));
+      return o ? o.label : String(v);
+    },
+    acLoad(field: CrFormField, path: any[], query: string) {
+      const k = state.key(path);
+      const src = field.source;
+      if (typeof src === "function") {
+        state.acLoading = { ...state.acLoading, [k]: true };
+        Promise.resolve(src(query)).then(
+          (res: any) => {
+            state.acResults = { ...state.acResults, [k]: res || [] };
+            state.acLoading = { ...state.acLoading, [k]: false };
+            state.acActive = { ...state.acActive, [k]: 0 };
+          },
+          () => {
+            state.acResults = { ...state.acResults, [k]: [] };
+            state.acLoading = { ...state.acLoading, [k]: false };
+          },
+        );
+      } else {
+        const arr = Array.isArray(src) ? src : field.options || [];
+        const q = (query || "").trim().toLowerCase();
+        const filtered = q ? arr.filter((o: any) => (o.label || "").toLowerCase().includes(q)) : arr;
+        state.acResults = { ...state.acResults, [k]: filtered };
+        state.acActive = { ...state.acActive, [k]: 0 };
+      }
+    },
+    acOpenList(field: CrFormField, path: any[]) {
+      const k = state.key(path);
+      state.acOpen = { ...state.acOpen, [k]: true };
+      state.acLoad(field, path, state.acQuery[k] != null ? state.acQuery[k] : "");
+    },
+    acInput(field: CrFormField, path: any[], text: string) {
+      const k = state.key(path);
+      state.acQuery = { ...state.acQuery, [k]: text };
+      state.acOpen = { ...state.acOpen, [k]: true };
+      state.acLoad(field, path, text);
+    },
+    acPick(field: CrFormField, path: any[], opt: any) {
+      const k = state.key(path);
+      state.acLabel = { ...state.acLabel, [k]: opt.label };
+      const q = { ...state.acQuery };
+      delete q[k];
+      state.acQuery = q; /* stop typing mode; display falls back to the label */
+      state.acOpen = { ...state.acOpen, [k]: false };
+      state.setField(path, opt.value);
+    },
+    acClose(path: any[]) {
+      const k = state.key(path);
+      state.acOpen = { ...state.acOpen, [k]: false };
+      const q = { ...state.acQuery };
+      delete q[k];
+      state.acQuery = q; /* discard an un-picked query; revert to the selected label */
+      state.blur(path);
+    },
+    acMove(path: any[], delta: number) {
+      const k = state.key(path);
+      const res = state.acResults[k] || [];
+      if (!res.length) return;
+      const cur = state.acActive[k] || 0;
+      state.acActive = { ...state.acActive, [k]: (cur + delta + res.length) % res.length };
+    },
+    acKeydown(field: CrFormField, path: any[], event: any) {
+      const k = state.key(path);
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        if (state.acOpen[k]) state.acMove(path, 1);
+        else state.acOpenList(field, path);
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        state.acMove(path, -1);
+      } else if (event.key === "Enter") {
+        const res = state.acResults[k] || [];
+        const a = state.acActive[k] || 0;
+        if (state.acOpen[k] && res[a]) {
+          event.preventDefault();
+          state.acPick(field, path, res[a]);
+        }
+      } else if (event.key === "Escape") {
+        state.acOpen = { ...state.acOpen, [k]: false };
+      }
+    },
+
+    /* ── the flat render-list (recursion in JS, flat DOM) ── */
     build(fields: CrFormField[], prefix: any[], depth: number, out: any[]) {
       for (const f of fields) {
         const path = prefix.concat([f.name]);
@@ -124,11 +240,11 @@ export default function CrForm(props: CrFormProps) {
             const itemPath = path.concat([i]);
             const isGroup = f.item && f.item.kind === "group";
             if (isGroup) {
-              // object item: a header row (with remove) + the item's fields
+              /* object item: header row (with remove) + the item fields */
               out.push({ t: "item", path: itemPath, field: f, index: i, depth: depth + 1 });
               state.build(f.item.fields || [], itemPath, depth + 2, out);
             } else {
-              // scalar item: a single field row carrying an inline remove
+              /* scalar item: a single field row carrying an inline remove */
               out.push({ t: "field", path: itemPath, field: f.item, depth: depth + 1, scalarItem: true });
             }
           }
@@ -146,7 +262,7 @@ export default function CrForm(props: CrFormProps) {
       return depth * 14 + "px";
     },
 
-    // ── mutation + validation ──
+    /* ── mutation + validation ── */
     revalidate(nextVals: any) {
       if (props.validate) state.errs = props.validate(nextVals) || {};
     },
@@ -321,6 +437,54 @@ export default function CrForm(props: CrFormProps) {
                       onInput={(event) => state.setField(row.path, (event.target as HTMLTextAreaElement).value)}
                       onBlur={() => state.blur(row.path)}
                     ></textarea>
+                  </Show>
+
+                  <Show when={row.field.kind === "autocomplete"}>
+                    <div class="cr-combobox">
+                      <input
+                        id={state.cid(row.path)}
+                        class="cr-combobox__input"
+                        type="text"
+                        role="combobox"
+                        autocomplete="off"
+                        value={state.acDisplay(row.field, row.path)}
+                        placeholder={row.field.placeholder}
+                        disabled={props.disabled}
+                        required={row.field.required}
+                        aria-required={row.field.required ? "true" : undefined}
+                        aria-expanded={state.acIsOpen(row.path) ? "true" : "false"}
+                        aria-autocomplete="list"
+                        aria-controls={state.cid(row.path) + "-list"}
+                        aria-invalid={state.showErr(row.path) ? "true" : "false"}
+                        aria-describedby={state.descId(row.path)}
+                        onInput={(event) => state.acInput(row.field, row.path, (event.target as HTMLInputElement).value)}
+                        onFocus={() => state.acOpenList(row.field, row.path)}
+                        onKeyDown={(event) => state.acKeydown(row.field, row.path, event)}
+                        onBlur={() => state.acClose(row.path)}
+                      />
+                      <Show when={state.acIsOpen(row.path)}>
+                        <ul class="cr-combobox__list" role="listbox" id={state.cid(row.path) + "-list"}>
+                          <Show when={state.acIsLoading(row.path)}>
+                            <li class="cr-combobox__empty">searching…</li>
+                          </Show>
+                          <For each={state.acItems(row.path)}>
+                            {(o: { value: string; label: string }, i: number) => (
+                              <li
+                                class={"cr-combobox__opt" + (state.acActiveIdx(row.path) === i ? " cr-combobox__opt--active" : "")}
+                                role="option"
+                                aria-selected={state.acActiveIdx(row.path) === i ? "true" : "false"}
+                                onMouseDown={() => state.acPick(row.field, row.path, o)}
+                              >
+                                {o.label}
+                              </li>
+                            )}
+                          </For>
+                          <Show when={!state.acIsLoading(row.path) && state.acItems(row.path).length === 0}>
+                            <li class="cr-combobox__empty">no matches</li>
+                          </Show>
+                        </ul>
+                      </Show>
+                    </div>
                   </Show>
 
                   {/* scalar array item: an inline remove */}

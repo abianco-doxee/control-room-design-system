@@ -96,8 +96,9 @@ change once it has been touched** (so an error clears as you fix it):
 ### Field kinds
 
 Inferred from the schema (overridable): `text` · `email` · `url` · `number` ·
-`select` (from an `enum`) · `textarea` (long strings, or forced) · `checkbox`
-(boolean) · `group` (nested object) · `array` (repeatable).
+`select` (from an `enum`) · `autocomplete` (searchable / async — see below) ·
+`textarea` (long strings, or forced) · `checkbox` (boolean) · `group` (nested
+object) · `array` (repeatable).
 
 ### Nesting — groups & arrays
 
@@ -121,6 +122,32 @@ const Session = type({
 Nested overrides use the dotted path (no array index): `overrides["limits.cpu"] =
 { label: "vCPU" }`, `overrides["hooks.url"] = { placeholder: "https://…" }`. An
 array override may set `itemLabel` for the per-item header.
+
+### Autocomplete — searchable / async select
+
+A select can draw its options from a **source** instead of a fixed list — give a
+field `kind: "autocomplete"` and it renders a searchable combobox. The source is:
+
+- a **static array** `{ value, label }[]`,
+- the field's own **enum** (`kind: "autocomplete"` on an enum property makes it a
+  searchable version of that select — no `source` needed), or
+- an **async function** `(query) => Promise<{ value, label }[]>` for a remote lookup.
+
+```ts
+defineForm(schema, {
+  overrides: {
+    region: { kind: "autocomplete" },                 // searchable enum
+    owner: { kind: "autocomplete", source: searchPeople }, // async: (q) => Promise<opts>
+  },
+});
+```
+
+Setting a `source` on a field implies `kind: "autocomplete"`. Type to filter (or
+call the async source), `↑`/`↓` move the active option, `Enter` selects, `Esc`
+closes; the picked option's **value** is stored (validated by the schema) while
+its **label** is shown. The control is `role="combobox"` with `aria-expanded` /
+`aria-controls` and a `role="listbox"` of `role="option"`s. A real async source
+should debounce and order its own responses — the field renders whatever resolves.
 
 ### Coercion
 
