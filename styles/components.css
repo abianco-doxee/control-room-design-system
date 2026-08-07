@@ -372,6 +372,20 @@
   text-transform: uppercase; letter-spacing: -0.01em; color: var(--ink);
 }
 .cr-form__actions { display: flex; gap: var(--space-2); margin-top: var(--space-1); }
+/* nesting: rows carry a depth pad; groups/array-items get a left rule so nested
+ * structure reads at a glance without real DOM nesting */
+.cr-form__row { display: flex; flex-direction: column; gap: var(--space-1); }
+.cr-form__row--group, .cr-form__row--array { margin-top: var(--space-1); }
+.cr-form__row--item { border-left: var(--brd) solid var(--border); }
+.cr-form__grouphead {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
+  border-bottom: var(--brd-hair) solid var(--border); padding-bottom: 2px;
+}
+.cr-form__arrayhead, .cr-form__itemhead { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.cr-form__itemidx { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.cr-form__control { display: flex; align-items: center; gap: var(--space-2); }
+.cr-form__control .cr-input, .cr-form__control .cr-select, .cr-form__control .cr-textarea { flex: 1; }
 
 /* ── Text input / textarea / select ────────────────────────────────────── */
 .cr-input, .cr-textarea, .cr-select {

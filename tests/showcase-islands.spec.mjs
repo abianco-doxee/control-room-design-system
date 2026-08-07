@@ -67,14 +67,18 @@ test.describe("component browser — live islands", () => {
     await form.locator('button[type="submit"]').click();
     expect(await form.locator(".cr-field__error").count()).toBeGreaterThanOrEqual(4);
 
-    // fix every field → errors clear and the submitted, COERCED data appears
+    // fix every field — including the nested `limits` group — then submit
     await form.locator("#cr-form-name").fill("nova-01");
     await form.locator("#cr-form-endpoint").fill("https://eu.example.com");
     await form.locator("#cr-form-replicas").fill("4");
     await form.locator("#cr-form-region").selectOption("eu-west");
+    await form.locator("#cr-form-limits-cpu").fill("2");
+    await form.locator("#cr-form-limits-memGB").fill("8");
     await form.locator('button[type="submit"]').click();
     await expect(form.locator(".cr-field__error")).toHaveCount(0);
-    await expect(form.locator("pre").filter({ hasText: "submitted" })).toContainText('"replicas": 4'); // number, not "4"
+    const result = form.locator("pre").filter({ hasText: "submitted" });
+    await expect(result).toContainText('"replicas": 4'); // number, not "4"
+    await expect(result).toContainText('"cpu": 2'); // nested group, coerced to number
 
     // an invalid value re-fails on change once the field has been touched
     await form.locator("#cr-form-endpoint").fill("nope");
@@ -83,7 +87,7 @@ test.describe("component browser — live islands", () => {
     // switch the schema source (ArkType → JSON Schema) — the values persist, so
     // the JSON-Schema-sourced validator still flags the bad endpoint ("nope").
     await form.locator(".pg__controls select").first().selectOption("jsonschema");
-    await expect(form.locator(".cr-field").first()).toBeVisible();
+    await expect(form.locator(".cr-form__row").first()).toBeVisible();
     await form.locator('button[type="submit"]').click();
     await expect(form.locator("#cr-form-endpoint-err")).toBeVisible();
   });
