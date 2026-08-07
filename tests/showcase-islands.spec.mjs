@@ -63,9 +63,11 @@ test.describe("component browser — live islands", () => {
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
     const form = page.locator('[data-island="form"]');
 
-    // submit empty → the required fields report errors (notes is optional)
+    // submit empty → required fields error AND the form-level summary appears
     await form.locator('button[type="submit"]').click();
     expect(await form.locator(".cr-field__error").count()).toBeGreaterThanOrEqual(4);
+    await expect(form.locator(".cr-form__summary")).toBeVisible();
+    expect(await form.locator(".cr-form__summary-link").count()).toBeGreaterThanOrEqual(4);
 
     // fix every field, incl. the nested `limits` group and the two autocompletes
     await form.locator("#cr-form-name").fill("nova-01");
@@ -83,6 +85,7 @@ test.describe("component browser — live islands", () => {
     await form.locator("#cr-form-limits-memGB").fill("8");
     await form.locator('button[type="submit"]').click();
     await expect(form.locator(".cr-field__error")).toHaveCount(0);
+    await expect(form.locator(".cr-form__summary")).toHaveCount(0); // summary clears when valid
     const result = form.locator("pre").filter({ hasText: "submitted" });
     await expect(result).toContainText('"replicas": 4'); // number, not "4"
     await expect(result).toContainText('"cpu": 2'); // nested group, coerced to number
