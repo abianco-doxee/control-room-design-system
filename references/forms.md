@@ -97,14 +97,37 @@ change once it has been touched** (so an error clears as you fix it):
 
 Inferred from the schema (overridable): `text` · `email` · `url` · `number` ·
 `select` (from an `enum`) · `textarea` (long strings, or forced) · `checkbox`
-(boolean) · `json` (nested object/array — shown as a textarea).
+(boolean) · `group` (nested object) · `array` (repeatable).
+
+### Nesting — groups & arrays
+
+Object and array properties nest automatically. An object property becomes a
+**`group`** (a labelled section with its sub-fields); an array property becomes an
+**`array`** (a repeatable item with add / remove) whose `item` is either a scalar
+field or a group. Values nest to match, and validation error paths are dotted with
+array indices — `limits.cpu`, `members.1.email` — so each nested control shows its
+own error. Depth is unbounded (the recursion lives in the core / render-list, not
+in component self-recursion).
+
+```ts
+const Session = type({
+  name: "string >= 2",
+  limits: { cpu: "1 <= number <= 64", memGB: "number > 0" },   // → group
+  "tags?": "string[]",                                          // → array of scalars
+  "hooks?": type({ event: "'deploy'|'error'", url: "string.url" }).array(), // → array of groups
+});
+```
+
+Nested overrides use the dotted path (no array index): `overrides["limits.cpu"] =
+{ label: "vCPU" }`, `overrides["hooks.url"] = { placeholder: "https://…" }`. An
+array override may set `itemLabel` for the per-item header.
 
 ### Coercion
 
 Inputs are strings; the core coerces per field before validating — `number` →
-`Number`, `checkbox` → `boolean`. An **unchecked required checkbox is a valid
-`false`**, never "missing". Empty optional fields drop out so `required` speaks for
-itself.
+`Number`, `checkbox` → `boolean` — **recursively through groups and array items**.
+An **unchecked required checkbox is a valid `false`**, never "missing". Empty
+optional fields drop out so `required` speaks for itself.
 
 ## Accessibility
 
@@ -115,9 +138,6 @@ announced (`role="alert"`); hint text is linked the same way. The submit path us
 
 ## Limitations (honest notes)
 
-- **Flat records of scalars.** This targets the operational case — a config panel,
-  a "new session" dialog. A nested object / array surfaces as a `json` textarea
-  rather than a nested sub-form.
 - **ArkType alphabetises enum export.** `Type.toJsonSchema()` sorts enum members,
   so an ArkType-sourced `select` lists options alphabetically. Pass
   `overrides[name].options` (or author via JSON Schema, which preserves order) to

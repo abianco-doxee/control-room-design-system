@@ -162,16 +162,26 @@ const SessionSchema = ark({
   endpoint: "string.url",
   replicas: "1 <= number.integer <= 32",
   region: "'eu-west' | 'us-east' | 'ap-south'",
+  limits: { cpu: "1 <= number <= 64", memGB: "number > 0" }, // nested group
+  "tags?": "string[]", // scalar array
+  "hooks?": ark({ event: "'deploy' | 'scale' | 'error'", url: "string.url" }).array(), // object array
   "notes?": "string <= 140",
   autoscale: "boolean",
 });
 const FORM_OVERRIDES = {
-  order: ["name", "endpoint", "replicas", "region", "notes", "autoscale"],
+  order: ["name", "endpoint", "replicas", "region", "limits", "tags", "hooks", "notes", "autoscale"],
   overrides: {
     name: { label: "Session name", hint: "lowercase, no spaces", placeholder: "nova-01" },
     endpoint: { label: "Endpoint URL", placeholder: "https://…" },
     replicas: { hint: "1–32 workers" },
     region: { label: "Region" },
+    limits: { label: "Resource limits" },
+    "limits.cpu": { label: "vCPU", hint: "1–64" },
+    "limits.memGB": { label: "Memory (GB)" },
+    tags: { label: "Tags", itemLabel: "tag" },
+    hooks: { label: "Webhooks", itemLabel: "hook" },
+    "hooks.event": { label: "Event" },
+    "hooks.url": { label: "URL", placeholder: "https://…" },
     notes: { kind: "textarea", hint: "optional · ≤140 chars" },
     autoscale: { label: "Auto-scale on demand" },
   },

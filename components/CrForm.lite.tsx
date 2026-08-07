@@ -2,7 +2,7 @@ import { useStore, Show, For } from "@builder.io/mitosis";
 
 export interface CrFormField {
   name: string;
-  /** Which control renders: text · email · url · number · select · textarea · checkbox · json. */
+  /** text · email · url · number · select · textarea · checkbox · group · array. */
   kind: string;
   label: string;
   required?: boolean;
@@ -10,6 +10,11 @@ export interface CrFormField {
   hint?: string;
   /** For `select`: the choices. */
   options?: { value: string; label: string }[];
+  /** For `group`: the nested fields. */
+  fields?: CrFormField[];
+  /** For `array`: the descriptor of a single item (a scalar field or a group). */
+  item?: CrFormField;
+  itemLabel?: string;
   min?: number;
   max?: number;
   step?: number | string;
@@ -21,51 +26,75 @@ export interface CrFormField {
 export interface CrFormProps {
   /** The Form Model — plain field descriptors (from the headless forms core). */
   fields: CrFormField[];
-  /** Seed values (uncontrolled thereafter; the form manages its own state). */
   values?: Record<string, any>;
-  /** Validator: `(values) => { [name]: message }` — an empty object means valid.
-   *  Wire the ArkType/JSON-Schema validator from `lib/forms` here. */
+  /** `(values) => { [dottedPath]: message }` — {} means valid. Wire lib/forms here. */
   validate?: (values: Record<string, any>) => Record<string, string>;
   submitLabel?: string;
   title?: string;
   disabled?: boolean;
-  /** id prefix for field/label/description ids (default "cr-form"). */
   id?: string;
   onChange?: (values: Record<string, any>) => void;
   onSubmit?: (values: Record<string, any>) => void;
 }
 
-/* CrForm — a schema-driven form. Feed it a Form Model (field descriptors) and a
- * validate() function and it renders + validates the whole form: it owns
- * value/touched/error state, validates on blur and on submit, and re-checks a
- * field on change once it has been touched (so an error clears as you fix it).
+/* CrForm — a schema-driven form. Feed it a Form Model (which may nest: `group`
+ * fields hold sub-fields, `array` fields repeat an item) and a validate()
+ * function; it renders + validates the whole thing. It owns value/touched/error
+ * state (keyed by dotted path, so `members.1.email` addresses one array item's
+ * field), validates on blur + submit, and re-checks a field on change once
+ * touched.
  *
- * It is deliberately schema-AGNOSTIC — it never imports ArkType. The headless
- * `lib/forms` core turns an ArkType type OR a JSON Schema into the `fields` model
- * and the `validate` callback; this component just renders and orchestrates, so
- * it stays portable across all six framework targets. State + helpers are METHODS
- * (a getter would run before the store initialises on Qwik). See references/forms.md. */
+ * Nesting is rendered from a FLAT render-list computed by walking the model + the
+ * current values — the recursion lives in JS (`build`), the DOM stays flat and
+ * indented by depth. That sidesteps component self-recursion (awkward across the
+ * six targets) while supporting arbitrary depth. It never imports ArkType. State
+ * + helpers are METHODS (a getter would run before the store initialises on
+ * Qwik). See references/forms.md. */
 export default function CrForm(props: CrFormProps) {
   const state = useStore({
     vals: props.values || {},
     errs: {},
     touched: {},
     submitted: false,
-    cid(name: string): string {
-      return (props.id || "cr-form") + "-" + name;
+
+    // ── path helpers (path is an array of string keys / numeric indices) ──
+    key(path: any[]): string {
+      return path.join(".");
     },
-    v(name: string): any {
-      const x = state.vals[name];
-      return x == null ? "" : x;
+    cid(path: any[]): string {
+      return (props.id || "cr-form") + "-" + path.join("-");
     },
-    showErr(name: string): string {
-      return state.submitted || state.touched[name] ? state.errs[name] || "" : "";
+    getDeep(root: any, path: any[]): any {
+      let cur = root;
+      for (const seg of path) {
+        if (cur == null) return undefined;
+        cur = cur[seg];
+      }
+      return cur;
     },
-    descId(field: CrFormField): string | undefined {
-      if (state.showErr(field.name)) return state.cid(field.name) + "-err";
-      if (field.hint) return state.cid(field.name) + "-hint";
+    setDeep(root: any, path: any[], value: any): any {
+      if (path.length === 0) return value;
+      const head = path[0];
+      const isIndex = typeof head === "number";
+      const base = root == null ? (isIndex ? [] : {}) : root;
+      const clone = Array.isArray(base) ? base.slice() : { ...base };
+      clone[head] = state.setDeep(clone[head], path.slice(1), value);
+      return clone;
+    },
+    at(path: any[]): any {
+      const v = state.getDeep(state.vals, path);
+      return v == null ? "" : v;
+    },
+    showErr(path: any[]): string {
+      const k = state.key(path);
+      return state.submitted || state.touched[k] ? state.errs[k] || "" : "";
+    },
+    descId(path: any[]): string | undefined {
+      if (state.showErr(path)) return state.cid(path) + "-err";
       return undefined;
     },
+
+    // ── kind helpers ──
     isText(kind: string): boolean {
       return kind === "text" || kind === "email" || kind === "url";
     },
@@ -75,28 +104,85 @@ export default function CrForm(props: CrFormProps) {
     opts(field: CrFormField): { value: string; label: string }[] {
       return field.options || [];
     },
-    // Always validate the value we're about to commit, never a fresh read of
-    // state — a store read right after assignment returns the PRE-update value
-    // (React batches the setter), which would lag validation a field behind.
-    setField(name: string, value: any) {
-      const next = { ...state.vals, [name]: value };
+    emptyItem(item: CrFormField): any {
+      if (item.kind === "group") return {};
+      if (item.kind === "checkbox") return false;
+      return "";
+    },
+
+    // ── the flat render-list (recursion in JS, flat DOM) ──
+    build(fields: CrFormField[], prefix: any[], depth: number, out: any[]) {
+      for (const f of fields) {
+        const path = prefix.concat([f.name]);
+        if (f.kind === "group") {
+          out.push({ t: "group", path, field: f, depth });
+          state.build(f.fields || [], path, depth + 1, out);
+        } else if (f.kind === "array") {
+          out.push({ t: "array", path, field: f, depth });
+          const arr = state.getDeep(state.vals, path) || [];
+          for (let i = 0; i < arr.length; i++) {
+            const itemPath = path.concat([i]);
+            const isGroup = f.item && f.item.kind === "group";
+            if (isGroup) {
+              // object item: a header row (with remove) + the item's fields
+              out.push({ t: "item", path: itemPath, field: f, index: i, depth: depth + 1 });
+              state.build(f.item.fields || [], itemPath, depth + 2, out);
+            } else {
+              // scalar item: a single field row carrying an inline remove
+              out.push({ t: "field", path: itemPath, field: f.item, depth: depth + 1, scalarItem: true });
+            }
+          }
+        } else {
+          out.push({ t: "field", path, field: f, depth });
+        }
+      }
+    },
+    rows(): any[] {
+      const out: any[] = [];
+      state.build(props.fields || [], [], 0, out);
+      return out;
+    },
+    pad(depth: number): string {
+      return depth * 14 + "px";
+    },
+
+    // ── mutation + validation ──
+    revalidate(nextVals: any) {
+      if (props.validate) state.errs = props.validate(nextVals) || {};
+    },
+    setField(path: any[], value: any) {
+      const next = state.setDeep(state.vals, path, value);
       state.vals = next;
       if (props.onChange) props.onChange(next);
-      if ((state.submitted || state.touched[name]) && props.validate) state.errs = props.validate(next) || {};
+      if (state.submitted || state.touched[state.key(path)]) state.revalidate(next);
     },
-    blur(name: string) {
-      state.touched = { ...state.touched, [name]: true };
-      if (props.validate) state.errs = props.validate(state.vals) || {};
+    blur(path: any[]) {
+      state.touched = { ...state.touched, [state.key(path)]: true };
+      state.revalidate(state.vals);
+    },
+    addItem(path: any[], item: CrFormField) {
+      const arr = state.getDeep(state.vals, path) || [];
+      const next = state.setDeep(state.vals, path, arr.concat([state.emptyItem(item)]));
+      state.vals = next;
+      if (props.onChange) props.onChange(next);
+    },
+    removeItem(path: any[], index: number) {
+      const arr = (state.getDeep(state.vals, path) || []).slice();
+      arr.splice(index, 1);
+      const next = state.setDeep(state.vals, path, arr);
+      state.vals = next;
+      if (props.onChange) props.onChange(next);
+      if (state.submitted) state.revalidate(next);
     },
     submit(event: any) {
       event.preventDefault();
       const values = state.vals;
       state.submitted = true;
-      const t: Record<string, boolean> = {};
-      for (const f of props.fields) t[f.name] = true;
-      state.touched = t;
       const e = props.validate ? props.validate(values) || {} : {};
       state.errs = e;
+      const t: Record<string, boolean> = {};
+      for (const k of Object.keys(e)) t[k] = true;
+      state.touched = t;
       if (Object.keys(e).length === 0 && props.onSubmit) props.onSubmit(values);
     },
   });
@@ -106,115 +192,152 @@ export default function CrForm(props: CrFormProps) {
       <Show when={props.title}>
         <h3 class="cr-form__title">{props.title}</h3>
       </Show>
-      <For each={props.fields}>
-        {(f: CrFormField) => (
-          <div class={"cr-field" + (state.showErr(f.name) ? " cr-field--error" : "")}>
-            <Show when={f.kind === "checkbox"}>
-              <label class="cr-check">
-                <input
-                  type="checkbox"
-                  name={f.name}
-                  checked={state.v(f.name) === true}
-                  disabled={props.disabled}
-                  aria-describedby={state.descId(f)}
-                  onChange={(event) => state.setField(f.name, (event.target as HTMLInputElement).checked)}
-                  onBlur={() => state.blur(f.name)}
-                />
-                {f.label}
-              </label>
+      <For each={state.rows()}>
+        {(row: any) => (
+          <div
+            class={"cr-form__row cr-form__row--" + row.t + (row.t === "field" && state.showErr(row.path) ? " cr-field--error" : "")}
+            style={{ paddingLeft: state.pad(row.depth) }}
+          >
+            {/* group header */}
+            <Show when={row.t === "group"}>
+              <div class="cr-form__grouphead">{row.field.label}</div>
             </Show>
 
-            <Show when={f.kind !== "checkbox"}>
-              <label class="cr-field__label" for={state.cid(f.name)}>
-                {f.label}
-                <Show when={f.required}>
-                  <span class="cr-field__req" aria-hidden="true"> *</span>
+            {/* array header + add */}
+            <Show when={row.t === "array"}>
+              <div class="cr-form__arrayhead">
+                <span class="cr-form__grouphead">{row.field.label}</span>
+                <button type="button" class="cr-btn cr-btn--sm cr-btn--ghost" disabled={props.disabled} onClick={() => state.addItem(row.path, row.field.item)}>
+                  + add
+                </button>
+              </div>
+            </Show>
+
+            {/* array item header (object items) + remove */}
+            <Show when={row.t === "item"}>
+              <div class="cr-form__itemhead">
+                <span class="cr-form__itemidx">{(row.field.itemLabel || "#") + " " + (row.index + 1)}</span>
+                <button type="button" class="cr-btn cr-btn--sm cr-btn--ghost cr-btn--sig-err" disabled={props.disabled} onClick={() => state.removeItem(row.path.slice(0, -1), row.index)}>
+                  remove
+                </button>
+              </div>
+            </Show>
+
+            {/* leaf field */}
+            <Show when={row.t === "field"}>
+              <Show when={row.field.kind === "checkbox"}>
+                <label class="cr-check">
+                  <input
+                    type="checkbox"
+                    checked={state.at(row.path) === true}
+                    disabled={props.disabled}
+                    aria-describedby={state.descId(row.path)}
+                    onChange={(event) => state.setField(row.path, (event.target as HTMLInputElement).checked)}
+                    onBlur={() => state.blur(row.path)}
+                  />
+                  {row.field.label}
+                </label>
+              </Show>
+
+              <Show when={row.field.kind !== "checkbox"}>
+                <Show when={!row.scalarItem}>
+                  <label class="cr-field__label" for={state.cid(row.path)}>
+                    {row.field.label}
+                    <Show when={row.field.required}>
+                      <span class="cr-field__req" aria-hidden="true"> *</span>
+                    </Show>
+                  </label>
                 </Show>
-              </label>
 
-              <Show when={state.isText(f.kind)}>
-                <input
-                  id={state.cid(f.name)}
-                  name={f.name}
-                  class="cr-input"
-                  type={state.inputType(f.kind)}
-                  value={state.v(f.name)}
-                  placeholder={f.placeholder}
-                  disabled={props.disabled}
-                  required={f.required}
-                  aria-required={f.required ? "true" : undefined}
-                  aria-invalid={state.showErr(f.name) ? "true" : "false"}
-                  aria-describedby={state.descId(f)}
-                  onInput={(event) => state.setField(f.name, (event.target as HTMLInputElement).value)}
-                  onBlur={() => state.blur(f.name)}
-                />
+                <div class="cr-form__control">
+                  <Show when={state.isText(row.field.kind)}>
+                    <input
+                      id={state.cid(row.path)}
+                      class="cr-input"
+                      type={state.inputType(row.field.kind)}
+                      value={state.at(row.path)}
+                      placeholder={row.field.placeholder}
+                      disabled={props.disabled}
+                      required={row.field.required}
+                      aria-required={row.field.required ? "true" : undefined}
+                      aria-invalid={state.showErr(row.path) ? "true" : "false"}
+                      aria-describedby={state.descId(row.path)}
+                      onInput={(event) => state.setField(row.path, (event.target as HTMLInputElement).value)}
+                      onBlur={() => state.blur(row.path)}
+                    />
+                  </Show>
+
+                  <Show when={row.field.kind === "number"}>
+                    <input
+                      id={state.cid(row.path)}
+                      class="cr-input"
+                      type="number"
+                      value={state.at(row.path)}
+                      placeholder={row.field.placeholder}
+                      disabled={props.disabled}
+                      required={row.field.required}
+                      min={row.field.min}
+                      max={row.field.max}
+                      step={row.field.step}
+                      aria-required={row.field.required ? "true" : undefined}
+                      aria-invalid={state.showErr(row.path) ? "true" : "false"}
+                      aria-describedby={state.descId(row.path)}
+                      onInput={(event) => state.setField(row.path, (event.target as HTMLInputElement).value)}
+                      onBlur={() => state.blur(row.path)}
+                    />
+                  </Show>
+
+                  <Show when={row.field.kind === "select"}>
+                    <select
+                      id={state.cid(row.path)}
+                      class="cr-select"
+                      value={state.at(row.path)}
+                      disabled={props.disabled}
+                      required={row.field.required}
+                      aria-required={row.field.required ? "true" : undefined}
+                      aria-invalid={state.showErr(row.path) ? "true" : "false"}
+                      aria-describedby={state.descId(row.path)}
+                      onChange={(event) => state.setField(row.path, (event.target as HTMLSelectElement).value)}
+                      onBlur={() => state.blur(row.path)}
+                    >
+                      <option value="">{row.field.placeholder || "Select…"}</option>
+                      <For each={state.opts(row.field)}>
+                        {(o: { value: string; label: string }) => <option value={o.value}>{o.label}</option>}
+                      </For>
+                    </select>
+                  </Show>
+
+                  <Show when={row.field.kind === "textarea" || row.field.kind === "json"}>
+                    <textarea
+                      id={state.cid(row.path)}
+                      class="cr-textarea"
+                      value={state.at(row.path)}
+                      placeholder={row.field.placeholder}
+                      disabled={props.disabled}
+                      required={row.field.required}
+                      aria-required={row.field.required ? "true" : undefined}
+                      aria-invalid={state.showErr(row.path) ? "true" : "false"}
+                      aria-describedby={state.descId(row.path)}
+                      onInput={(event) => state.setField(row.path, (event.target as HTMLTextAreaElement).value)}
+                      onBlur={() => state.blur(row.path)}
+                    ></textarea>
+                  </Show>
+
+                  {/* scalar array item: an inline remove */}
+                  <Show when={row.scalarItem}>
+                    <button type="button" class="cr-btn cr-btn--sm cr-btn--ghost cr-btn--sig-err" disabled={props.disabled} onClick={() => state.removeItem(row.path.slice(0, -1), row.path[row.path.length - 1])}>
+                      ✕
+                    </button>
+                  </Show>
+                </div>
               </Show>
 
-              <Show when={f.kind === "number"}>
-                <input
-                  id={state.cid(f.name)}
-                  name={f.name}
-                  class="cr-input"
-                  type="number"
-                  value={state.v(f.name)}
-                  placeholder={f.placeholder}
-                  disabled={props.disabled}
-                  required={f.required}
-                  min={f.min}
-                  max={f.max}
-                  step={f.step}
-                  aria-required={f.required ? "true" : undefined}
-                  aria-invalid={state.showErr(f.name) ? "true" : "false"}
-                  aria-describedby={state.descId(f)}
-                  onInput={(event) => state.setField(f.name, (event.target as HTMLInputElement).value)}
-                  onBlur={() => state.blur(f.name)}
-                />
+              <Show when={row.field.hint && !state.showErr(row.path)}>
+                <span class="cr-field__hint">{row.field.hint}</span>
               </Show>
-
-              <Show when={f.kind === "select"}>
-                <select
-                  id={state.cid(f.name)}
-                  name={f.name}
-                  class="cr-select"
-                  value={state.v(f.name)}
-                  disabled={props.disabled}
-                  required={f.required}
-                  aria-required={f.required ? "true" : undefined}
-                  aria-invalid={state.showErr(f.name) ? "true" : "false"}
-                  aria-describedby={state.descId(f)}
-                  onChange={(event) => state.setField(f.name, (event.target as HTMLSelectElement).value)}
-                  onBlur={() => state.blur(f.name)}
-                >
-                  <option value="">{f.placeholder || "Select…"}</option>
-                  <For each={state.opts(f)}>
-                    {(o: { value: string; label: string }) => <option value={o.value}>{o.label}</option>}
-                  </For>
-                </select>
+              <Show when={state.showErr(row.path)}>
+                <span class="cr-field__error" id={state.cid(row.path) + "-err"} role="alert">{state.showErr(row.path)}</span>
               </Show>
-
-              <Show when={f.kind === "textarea" || f.kind === "json"}>
-                <textarea
-                  id={state.cid(f.name)}
-                  name={f.name}
-                  class="cr-textarea"
-                  value={state.v(f.name)}
-                  placeholder={f.placeholder}
-                  disabled={props.disabled}
-                  required={f.required}
-                  aria-required={f.required ? "true" : undefined}
-                  aria-invalid={state.showErr(f.name) ? "true" : "false"}
-                  aria-describedby={state.descId(f)}
-                  onInput={(event) => state.setField(f.name, (event.target as HTMLTextAreaElement).value)}
-                  onBlur={() => state.blur(f.name)}
-                ></textarea>
-              </Show>
-            </Show>
-
-            <Show when={f.hint && !state.showErr(f.name)}>
-              <span class="cr-field__hint" id={state.cid(f.name) + "-hint"}>{f.hint}</span>
-            </Show>
-            <Show when={state.showErr(f.name)}>
-              <span class="cr-field__error" id={state.cid(f.name) + "-err"} role="alert">{state.showErr(f.name)}</span>
             </Show>
           </div>
         )}
