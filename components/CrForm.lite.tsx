@@ -323,6 +323,16 @@ export default function CrForm(props: CrFormProps) {
       return depth * 14 + "px";
     },
 
+    /* Cheap gate for the error summary — a scan of the (small) error maps, with
+     * NO model walk. The full errorList() (which walks the render-list to pair
+     * each error with a field label) then runs only when a summary is actually
+     * shown, not on every keystroke. */
+    hasSummary(): boolean {
+      if (props.errorSummary === false) return false;
+      if (state.submitted) for (const k in state.errs) if (state.errs[k]) return true;
+      if (props.errors) for (const k in props.errors) if (props.errors[k]) return true;
+      return false;
+    },
     /* Form-level error summary: every current error paired with its field label,
      * for the role=alert region + in-page links after a failed submit. */
     errorList(): any[] {
@@ -454,7 +464,7 @@ export default function CrForm(props: CrFormProps) {
       <Show when={props.title}>
         <h3 class="cr-form__title">{props.title}</h3>
       </Show>
-      <Show when={props.errorSummary !== false && state.errorList().length > 0}>
+      <Show when={state.hasSummary()}>
         <div class="cr-form__summary" role="alert">
           <span class="cr-form__summary-title">{state.errorList().length + " to fix"}</span>
           <ul class="cr-form__summary-list">
