@@ -1,0 +1,124 @@
+/* ============================================================================
+ * CONTROL ROOM — Structure layer  (GENERATED — do not edit by hand)
+ * The brand-agnostic FEATURE layer: spacing, borders, shadows, type, motion,
+ * component tokens + global baseline. Pair with ONE theme from dist/themes/*.css
+ * (or your own brand — see references/theming.md). Source: tokens/tokens.json.
+ * ==========================================================================*/
+
+:root {
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-px: 1px;
+  --space-0-5: 2px;
+  --text-2xs: 10px;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-md: 15px;
+  --text-lg: 19px;
+  --text-xl: clamp(28px, 5.5vw, 52px);
+  --leading-tight: 1.05;
+  --leading-normal: 1.6;
+  --leading-display: 0.9;
+  --radius-none: 0px;
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sticky: 50;
+  --z-overlay: 100;
+  --z-modal: 1000;
+  --brd-hair: 1.5px;
+  --brd: 2px;
+  --brd-heavy: 3px;
+  --brd-brush: 5px;
+  --shadow-off-sm: 2px;
+  --shadow-off: 4px;
+  --shadow-off-lg: 6px;
+  --state-disabled-op: 0.45;
+  --state-hover-mix: 12%;
+  --row-h: 34px;
+  --focus-w: 3px;
+  --focus-offset: 2px;
+  --motion-intensity: 1;
+  --decoration-intensity: 1;
+  --radius: 0px;
+  --halftone-size: 7px;
+  --breach-radius: 14px;
+  --breach-blur: 26px;
+  --breach-glow-size: 40px;
+  --font-sans: "CR Sans", "Archivo", "Arial Black", "Helvetica Neue", system-ui, sans-serif;
+  --font-display: "CR Display", "Saira Condensed", "Archivo Narrow", "Oswald", var(--font-sans);
+  --font-mono: "CR Mono", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --type-display-weight: 900;
+  --type-display-tracking: -0.038em;
+  --type-display-leading: 0.9;
+  --type-display-transform: uppercase;
+  --type-data-size: 13px;
+  --type-data-size-sm: 11px;
+  --type-label-tracking: 0.07em;
+  --type-label-transform: uppercase;
+  --dur-press: 120ms;
+  --dur-fast: 160ms;
+  --dur-med: 260ms;
+  --dur-ambient: 3200ms;
+  --ease-snap: cubic-bezier(0.2, 0, 0, 1);
+  --ease-step: steps(3, jump-none);
+  --tick-ambient: 180ms;
+  --cr-btn-pad-x: var(--space-4);
+  --cr-btn-pad-y: var(--space-2);
+  --cr-btn-gap: var(--space-2);
+  --cr-btn-bg: var(--sig-wait);
+  --cr-btn-fg: var(--on-sig);
+  --cr-btn-size: var(--text-sm);
+  --cr-panel-pad: var(--space-3);
+  --cr-panel-bg: var(--panel);
+  --cr-panel-gap: var(--space-3);
+  --cr-chip-pad-x: var(--space-2);
+  --cr-chip-pad-y: var(--space-0-5);
+  --cr-chip-bg: var(--sig-done);
+  --cr-chip-fg: var(--on-sig);
+  --cr-row-pad-y: var(--space-2);
+  --cr-row-gap: var(--space-3);
+  --cr-hero-pad: var(--space-4);
+  --cr-hero-gap: var(--space-4);
+  --cr-hero-bg: var(--sig-accent);
+  --cr-hero-fg: var(--on-accent);
+  --cr-nav-w: 180px;
+}
+
+/* ── GLOBAL BASELINE ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+/* Focus is a first-class signal, not an afterthought. */
+*:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
+/* Motion is opt-out at the system level. */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+/* Loudness dial — a product setting, not a user preference. The default look is the
+   loud "showcase" profile; set data-intensity="calm" on <html> for an 8-hour
+   operations profile: no non-essential animation, decorative texture toned down.
+   Wire new decorative layers to var(--decoration-intensity) so they follow it. */
+:root[data-intensity="calm"] { --motion-intensity: 0; --decoration-intensity: 0.4; }
+:root[data-intensity="calm"] *,
+:root[data-intensity="calm"] *::before,
+:root[data-intensity="calm"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+}

@@ -38,6 +38,8 @@ jobs:
         run: npm run verify:types
       - name: Forms core gate (ArkType ⇄ JSON Schema + validation)
         run: npm run test:forms
+      - name: Theme core gate (contract + brand validation + contrast)
+        run: npm run test:theme
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
       - name: Accessibility gate (axe, all four themes)
