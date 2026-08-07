@@ -30,8 +30,15 @@ export interface CrFormProps {
   /** The Form Model — plain field descriptors (from the headless forms core). */
   fields: CrFormField[];
   values?: Record<string, any>;
-  /** `(values) => { [dottedPath]: message }` — {} means valid. Wire lib/forms here. */
+  /** `(values) => { [dottedPath]: message }` — {} means valid. Wire lib/forms here.
+   *  Synchronous; use it in targets where a function prop can return a value
+   *  (React/Vue/Svelte/Solid/Angular). */
   validate?: (values: Record<string, any>) => Record<string, string>;
+  /** Controlled errors keyed by dotted path — always shown, merged over the
+   *  internal validator's. Use this to feed back server-side errors, or to drive
+   *  validation entirely from the parent (the Qwik-friendly path: validate in an
+   *  async onChange/onSubmit handler and pass the result back here). */
+  errors?: Record<string, string>;
   submitLabel?: string;
   title?: string;
   disabled?: boolean;
@@ -97,7 +104,9 @@ export default function CrForm(props: CrFormProps) {
     },
     showErr(path: any[]): string {
       const k = state.key(path);
-      return state.submitted || state.touched[k] ? state.errs[k] || "" : "";
+      const own = state.submitted || state.touched[k] ? state.errs[k] || "" : "";
+      const ext = props.errors ? props.errors[k] || "" : ""; /* controlled errors always show */
+      return own || ext;
     },
     descId(path: any[]): string | undefined {
       if (state.showErr(path)) return state.cid(path) + "-err";

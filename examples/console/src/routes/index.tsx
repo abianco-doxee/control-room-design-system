@@ -39,7 +39,35 @@ import {
   CrTree,
   CrDateTime,
   CrCronField,
+  CrForm,
 } from "../../../../dist/frameworks/qwik";
+import { defineForm, type as ark } from "../../../../lib/forms/index.js";
+
+/* A schema-driven "new session" form, defined once. The ArkType type is the
+ * single source of truth — it yields the render model AND the validator. In Qwik,
+ * a function prop can't return a value across the QRL boundary, so we DON'T pass
+ * CrForm a `validate`; instead we validate inside the (async) onSubmit/onChange
+ * QRLs and feed the result back through CrForm's controlled `errors` prop. The
+ * `model` is plain serializable data, so it crosses the boundary fine. */
+const NEW_SESSION = defineForm(
+  ark({
+    name: "string >= 2",
+    region: "'eu-west' | 'us-east' | 'ap-south'",
+    replicas: "1 <= number.integer <= 32",
+    autoscale: "boolean",
+    "notes?": "string <= 140",
+  }),
+  {
+    order: ["name", "region", "replicas", "autoscale", "notes"],
+    overrides: {
+      name: { label: "Session name", hint: "lowercase, no spaces", placeholder: "nova-07" },
+      region: { label: "Region", kind: "autocomplete" }, // searchable enum (serializable — no source fn)
+      replicas: { hint: "1–32 workers" },
+      autoscale: { label: "Auto-scale on demand" },
+      notes: { kind: "textarea", hint: "optional · ≤140 chars" },
+    },
+  },
+);
 
 type Sev = "crit" | "warn" | "work" | "ok" | "idle";
 type State = "working" | "waiting" | "idle" | "error" | "done";
@@ -64,7 +92,9 @@ const SESSIONS: Session[] = [
 const THEMES = ["dark", "light", "extreme", "phosphor"] as const;
 
 export default component$(() => {
-  const ui = useStore({ theme: "dark", modal: false, page: 1, palette: false, density: "cozy", refresh: 30, drawer: false, scope: "all", worker: "", retries: 5, cron: "0 2 * * *", startAt: "" });
+  const ui = useStore({ theme: "dark", modal: false, page: 1, palette: false, density: "cozy", refresh: 30, drawer: false, scope: "all", worker: "", retries: 5, cron: "0 2 * * *", startAt: "", newOpen: false });
+  // controlled state for the schema-driven "new session" form
+  const newForm = useStore<{ errors: Record<string, string>; submitted: boolean }>({ errors: {}, submitted: false });
 
   const FLEET = [
     {
@@ -278,9 +308,43 @@ export default component$(() => {
           class="cr-panel cr-panel--major"
           style="padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-3)"
         >
-          <h2 style="font-family:var(--font-display);text-transform:uppercase;font-size:var(--text-md);margin:0">
-            Live sessions
-          </h2>
+          <div style="display:flex;align-items:center;gap:var(--space-3)">
+            <h2 style="font-family:var(--font-display);text-transform:uppercase;font-size:var(--text-md);margin:0;flex:1">
+              Live sessions
+            </h2>
+            <CrButton size="sm" emphasis="outline" onClick={$(() => (ui.newOpen = !ui.newOpen))}>
+              {ui.newOpen ? "× close" : "+ new session"}
+            </CrButton>
+          </div>
+
+          {/* Schema-driven form (ArkType) rendered inline as a disclosure. In Qwik a
+              function prop can't return a value across the QRL boundary, so we don't
+              pass CrForm a `validate`; we validate inside the async onChange/onSubmit
+              QRLs and feed the result back through CrForm's controlled `errors`. */}
+          {ui.newOpen && (
+            <div class="cr-panel cr-panel--inset" style="padding:var(--space-4)">
+              <CrForm
+                fields={NEW_SESSION.model.fields}
+                errors={newForm.errors}
+                title="Provision a session"
+                submitLabel="Create session"
+                onChange={$((vals: Record<string, unknown>) => {
+                  if (newForm.submitted) newForm.errors = NEW_SESSION.validate(vals).errors;
+                })}
+                onSubmit={$((vals: Record<string, unknown>) => {
+                  newForm.submitted = true;
+                  const r = NEW_SESSION.validate(vals);
+                  newForm.errors = r.errors;
+                  if (r.valid) {
+                    ui.newOpen = false;
+                    newForm.submitted = false;
+                    newForm.errors = {};
+                    pushToast("done", "session " + String((r.data as { name?: string }).name) + " created");
+                  }
+                })}
+              />
+            </div>
+          )}
           {SESSIONS.map((s) => (
             <div key={s.id} class="cr-row" style="display:flex;align-items:center;gap:var(--space-3)">
               <CrSigil seed={s.id} state={s.state} size={40} />
@@ -473,6 +537,7 @@ export default component$(() => {
           <CrButton emphasis="outline" onClick={$(() => (ui.modal = false))}>dismiss</CrButton>
         </div>
       </CrModal>
+
     </div>
   );
 });
