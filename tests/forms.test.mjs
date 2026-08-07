@@ -165,6 +165,13 @@ test("nested overrides + source passthrough via dotted paths", () => {
   assert.equal(region.source, src);
 });
 
+test("conditional `when` predicate passes through to the model", () => {
+  const S = type({ notify: "boolean", "contact?": "string.email" });
+  const when = (v) => v.notify === true;
+  const { model } = defineForm(S, { overrides: { contact: { when } } });
+  assert.equal(model.fields.find((f) => f.name === "contact").when, when);
+});
+
 test("roundtrip: ArkType → JSON Schema → ArkType still validates", () => {
   const js = toJsonSchema(ArkSchema);
   const back = toArkType(js);

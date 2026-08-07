@@ -104,6 +104,22 @@ test.describe("component browser — live islands", () => {
     await expect(form.locator("#cr-form-endpoint-err")).toBeVisible();
   });
 
+  test("conditional field shows/hides and is pruned from validation", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const form = page.locator('[data-island="form"]');
+    const notify = form.locator(".cr-check input[type=checkbox]").first();
+
+    await expect(form.locator("#cr-form-contact")).toHaveCount(0); // hidden when notify is off
+    await notify.check();
+    await expect(form.locator("#cr-form-contact")).toHaveCount(1); // conditional field appears
+    await form.locator("#cr-form-contact").fill("nope");
+    await form.locator('button[type="submit"]').click();
+    await expect(form.locator("#cr-form-contact-err")).toBeVisible(); // validated while visible
+    await notify.uncheck();
+    await expect(form.locator("#cr-form-contact")).toHaveCount(0); // hidden → pruned, no lingering error
+  });
+
   test("editing a control prop re-renders the live component", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
