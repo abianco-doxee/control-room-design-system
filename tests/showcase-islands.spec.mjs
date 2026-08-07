@@ -120,6 +120,31 @@ test.describe("component browser — live islands", () => {
     await expect(form.locator("#cr-form-contact")).toHaveCount(0); // hidden → pruned, no lingering error
   });
 
+  test("validation modes + dirty/reset", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const form = page.locator('[data-island="form"]');
+    const reset = form.locator('button[type="button"]', { hasText: "Reset" });
+    const endpoint = form.locator("#cr-form-endpoint");
+
+    // default mode is "blur": typing an invalid value into a pristine field does
+    // NOT error yet — the field validates first on blur.
+    await expect(reset).toHaveCount(0); // pristine → no Reset button
+    await endpoint.fill("nope");
+    await expect(form.locator("#cr-form-endpoint-err")).toHaveCount(0); // not touched yet
+    await endpoint.blur();
+    await expect(form.locator("#cr-form-endpoint-err")).toBeVisible(); // blur → first validation
+
+    // now dirty → a Reset button appears; clicking it restores the seed values
+    // and clears every error/summary.
+    await expect(reset).toBeVisible();
+    await reset.click();
+    await expect(endpoint).toHaveValue("");
+    await expect(form.locator("#cr-form-endpoint-err")).toHaveCount(0);
+    await expect(form.locator(".cr-form__summary")).toHaveCount(0);
+    await expect(reset).toHaveCount(0); // pristine again
+  });
+
   test("editing a control prop re-renders the live component", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
