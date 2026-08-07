@@ -997,6 +997,15 @@ carries a direct category label — identity is never colour-alone, which is als
 the required relief for the palette's few CVD/contrast *warnings*. Status tones on
 a stacked bar are always paired with a text label.
 
+**Hover layer.** Line and bar charts ship a pointer layer by default — progressive
+enhancement that renders nothing at rest, so it never touches the static page or
+the a11y tree. On the line chart a pointer snaps a dashed crosshair to the nearest
+sample, drops a dot on every series, and docks a tooltip reading each series'
+value at that x. On the bar chart the nearest bar stays lit while the rest dim,
+and a tooltip reads its label + value. It stays on under the `calm` profile
+(interaction feedback, not idle motion); keyboard / AT users get the same numbers
+from the figure's spoken summary.
+
 > **Palette note.** The signal hues are max-neon by design (Law 2), so they sit
 > brighter than a generic mid-lightness categorical band — an accepted house
 > deviation, the same palette the whole system ships and gates via
