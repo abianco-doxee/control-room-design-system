@@ -136,6 +136,40 @@ fine:
 
 See `examples/console` for a live "provision a session" form wired this way.
 
+### Validation modes
+
+By default a field **first validates on blur**, then **re-checks on every change**
+once it has validated (so an error clears as you fix it). Two props tune that:
+
+| prop | when | values |
+| --- | --- | --- |
+| `mode` | when a field validates the **first** time | `"blur"` (default) · `"change"` · `"submit"` |
+| `revalidateMode` | when an already-validated field **re-checks** | `"change"` (default) · `"blur"` |
+
+`mode="submit"` holds all field-level errors until the first submit — quiet while
+typing, strict at the end. `revalidateMode="blur"` stops mid-edit revalidation but
+still clears a showing error on change (RHF's behaviour). Whatever the modes, a
+submit always validates every (visible) field.
+
+### Dirty & reset
+
+`CrForm` tracks whether its values differ from the seed `values` it was given.
+While the form is **dirty** it shows a **Reset** button that restores those seed
+values and clears all errors / touched / pending state (fire `onReset` to hear
+about it). Turn the button off with `resettable={false}`, relabel it with
+`resetLabel`.
+
+```tsx
+<CrForm
+  fields={form.model.fields}
+  values={existing}          /* seed → "dirty" and Reset are measured against this */
+  mode="submit"              /* stay quiet until the first submit */
+  revalidateMode="change"
+  resetLabel="Discard changes"
+  onReset={() => trackDiscard()}
+/>
+```
+
 ### Conditional fields
 
 Give a field a `when(values) => boolean` (via `overrides`) and it renders **and

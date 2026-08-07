@@ -50,6 +50,15 @@ export interface CrFormProps {
   /** Show a form-level error summary (role=alert, links to fields) after a failed
    *  submit. Default true. */
   errorSummary?: boolean;
+  /** When a field FIRST validates: "blur" (default) · "change" · "submit". */
+  mode?: string;
+  /** After a field has validated once, when it re-checks: "change" (default) · "blur". */
+  revalidateMode?: string;
+  /** Show a Reset button (→ back to the seed `values`) while the form is dirty.
+   *  Default true. */
+  resettable?: boolean;
+  resetLabel?: string;
+  onReset?: () => void;
   title?: string;
   disabled?: boolean;
   id?: string;
@@ -74,6 +83,8 @@ export interface CrFormProps {
 export default function CrForm(props: CrFormProps) {
   const state = useStore({
     vals: props.values || {},
+    /* the seed values — `dirty()` compares against this, `reset()` restores it */
+    initial: props.values || {},
     errs: {},
     touched: {},
     submitted: false,
@@ -333,6 +344,43 @@ export default function CrForm(props: CrFormProps) {
       return props.submitLabel || "Submit";
     },
 
+    /* ── validation modes ──
+     * `mode` = when a field FIRST validates (blur | change | submit);
+     * `revalidateMode` = once it has validated once, when it re-checks
+     * (change | blur). A field that has errored is always live-revalidated so a
+     * fix clears the message as expected. */
+    mode(): string {
+      return props.mode || "blur";
+    },
+    revalidateMode(): string {
+      return props.revalidateMode || "change";
+    },
+    isLive(path: any[]): boolean {
+      /* "live" = already validated once (touched or a submit has happened) */
+      return state.submitted || !!state.touched[state.key(path)];
+    },
+
+    /* ── dirty / reset ── */
+    dirty(): boolean {
+      return JSON.stringify(state.vals) !== JSON.stringify(state.initial);
+    },
+    reset() {
+      const base = JSON.parse(JSON.stringify(state.initial || {}));
+      state.vals = base;
+      state.errs = {};
+      state.touched = {};
+      state.submitted = false;
+      state.submitting = false;
+      state.acQuery = {};
+      state.acLabel = {};
+      state.acOpen = {};
+      state.acResults = {};
+      state.acLoading = {};
+      state.acActive = {};
+      if (props.onChange) props.onChange(base);
+      if (props.onReset) props.onReset();
+    },
+
     /* ── mutation + validation (validate may be sync OR async) ── */
     revalidate(nextVals: any) {
       if (props.validate) Promise.resolve(props.validate(state.pruned(nextVals)) || {}).then((e: any) => { state.errs = e || {}; });
@@ -341,11 +389,25 @@ export default function CrForm(props: CrFormProps) {
       const next = state.setDeep(state.vals, path, value);
       state.vals = next;
       if (props.onChange) props.onChange(next);
-      if (state.submitted || state.touched[state.key(path)]) state.revalidate(next);
+      const k = state.key(path);
+      if (state.isLive(path)) {
+        /* already validated once — re-check on change if that's the revalidate mode */
+        if (state.revalidateMode() === "change" || state.errs[k]) state.revalidate(next);
+      } else if (state.mode() === "change") {
+        /* first validation happens on change */
+        state.touched = { ...state.touched, [k]: true };
+        state.revalidate(next);
+      }
     },
     blur(path: any[]) {
-      state.touched = { ...state.touched, [state.key(path)]: true };
-      state.revalidate(state.vals);
+      const k = state.key(path);
+      if (state.isLive(path)) {
+        if (state.revalidateMode() === "blur") state.revalidate(state.vals);
+      } else if (state.mode() === "blur") {
+        state.touched = { ...state.touched, [k]: true };
+        state.revalidate(state.vals);
+      }
+      /* mode "submit": neither blur nor change validates before the first submit */
     },
     addItem(path: any[], item: CrFormField) {
       const arr = state.getDeep(state.vals, path) || [];
@@ -606,6 +668,11 @@ export default function CrForm(props: CrFormProps) {
         <button type="submit" class="cr-btn" disabled={props.disabled || state.submitting} aria-busy={state.submitting ? "true" : undefined}>
           {state.submitBtnLabel()}
         </button>
+        <Show when={props.resettable !== false && state.dirty()}>
+          <button type="button" class="cr-btn cr-btn--ghost" disabled={props.disabled || state.submitting} onClick={() => state.reset()}>
+            {props.resetLabel || "Reset"}
+          </button>
+        </Show>
       </div>
     </form>
   );
