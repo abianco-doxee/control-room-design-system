@@ -20,7 +20,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, basename } from "node:path";
-import { themeCss, mergeTheme, validateTheme, checkThemeContrast } from "../lib/theme/index.js";
+import { themeCss, mergeTheme, validateTheme, checkThemeContrast, deriveOnColors } from "../lib/theme/index.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BRANDS = join(ROOT, "brands");
@@ -62,7 +62,10 @@ function resolveBase(ref, seen) {
 function resolveBrand(brand, seen = new Set()) {
   const base = resolveBase(brand.$extends, seen);
   const overrides = Object.fromEntries(Object.entries(brand).filter(([k]) => !k.startsWith("$")));
-  return { vars: mergeTheme(base, overrides), meta: brand };
+  /* auto-pick on-* for anything the brand didn't hand-set, re-deriving where it
+   * recoloured the underlying fill (so inherited on-colours can't go stale). */
+  const vars = deriveOnColors(mergeTheme(base, overrides), { changed: Object.keys(overrides) });
+  return { vars, meta: brand };
 }
 
 function brandFiles() {
