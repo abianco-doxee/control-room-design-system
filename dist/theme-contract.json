@@ -1,0 +1,205 @@
+{
+  "$generated": true,
+  "$description": "Control Room theme contract — the appearance surface a theme/brand must define. Components reference ONLY these roles, so any complete theme reskins the whole system. See references/theming.md.",
+  "source": "tokens/tokens.json",
+  "version": "1.0.0",
+  "defaultTheme": "dark",
+  "selector": "html[data-theme]",
+  "roles": [
+    {
+      "cssVar": "--ground",
+      "group": "surface",
+      "role": "page background, furthest back",
+      "required": true
+    },
+    {
+      "cssVar": "--board",
+      "group": "surface",
+      "role": "instrument / work surface",
+      "required": true
+    },
+    {
+      "cssVar": "--panel",
+      "group": "surface",
+      "role": "raised card / panel",
+      "required": true
+    },
+    {
+      "cssVar": "--panel-2",
+      "group": "surface",
+      "role": "recessed / inset region",
+      "required": true
+    },
+    {
+      "cssVar": "--rail",
+      "group": "surface",
+      "role": "navigation rail background",
+      "required": true
+    },
+    {
+      "cssVar": "--ink",
+      "group": "text",
+      "role": "primary text",
+      "required": true
+    },
+    {
+      "cssVar": "--muted",
+      "group": "text",
+      "role": "secondary / label text",
+      "required": true
+    },
+    {
+      "cssVar": "--rail-ink",
+      "group": "text",
+      "role": "text on the rail",
+      "required": true
+    },
+    {
+      "cssVar": "--on-sig",
+      "group": "text",
+      "role": "text/icon placed on a signal fill",
+      "required": true
+    },
+    {
+      "cssVar": "--on-err",
+      "group": "text",
+      "role": "text/icon on an error (--sig-err) fill; white in light, dark elsewhere",
+      "required": true
+    },
+    {
+      "cssVar": "--on-accent",
+      "group": "text",
+      "role": "text/icon on an accent (--sig-accent) fill",
+      "required": true
+    },
+    {
+      "cssVar": "--on-accent-2",
+      "group": "text",
+      "role": "text on the second accent",
+      "required": true
+    },
+    {
+      "cssVar": "--on-idle",
+      "group": "text",
+      "role": "text/icon on an idle (--sig-idle) fill",
+      "required": true
+    },
+    {
+      "cssVar": "--border",
+      "group": "line",
+      "role": "contour / outline (near-black)",
+      "required": true
+    },
+    {
+      "cssVar": "--mass",
+      "group": "line",
+      "role": "black as a large fill area (Law 1)",
+      "required": true
+    },
+    {
+      "cssVar": "--shadow-col",
+      "group": "line",
+      "role": "hard offset shadow color",
+      "required": true
+    },
+    {
+      "cssVar": "--sig-work",
+      "group": "signal",
+      "role": "",
+      "required": true
+    },
+    {
+      "cssVar": "--sig-wait",
+      "group": "signal",
+      "role": "",
+      "required": true
+    },
+    {
+      "cssVar": "--sig-done",
+      "group": "signal",
+      "role": "",
+      "required": true
+    },
+    {
+      "cssVar": "--sig-err",
+      "group": "signal",
+      "role": "",
+      "required": true
+    },
+    {
+      "cssVar": "--sig-idle",
+      "group": "signal",
+      "role": "",
+      "required": true
+    },
+    {
+      "cssVar": "--sig-accent",
+      "group": "signal",
+      "role": "",
+      "required": true
+    },
+    {
+      "cssVar": "--sig-accent-2",
+      "group": "signal",
+      "role": "",
+      "required": true
+    },
+    {
+      "cssVar": "--stage",
+      "group": "keyed",
+      "role": "calm/nominal keyed stage flood (Law 2)",
+      "required": true
+    },
+    {
+      "cssVar": "--stage-ink",
+      "group": "keyed",
+      "role": "text on the stage flood",
+      "required": true
+    },
+    {
+      "cssVar": "--drip",
+      "group": "keyed",
+      "role": "house glitch / decay hue (Law 3)",
+      "required": true
+    },
+    {
+      "cssVar": "--halftone",
+      "group": "texture",
+      "role": "hardware texture; legal inside a bezel only (Law 6)",
+      "required": true
+    },
+    {
+      "cssVar": "--dither",
+      "group": "texture",
+      "role": "ordered 1-bit dither (hardware only, Law 6/3)",
+      "required": true
+    },
+    {
+      "cssVar": "--scanline",
+      "group": "texture",
+      "role": "CRT scanlines (hardware only)",
+      "required": true
+    },
+    {
+      "cssVar": "--crosshatch",
+      "group": "texture",
+      "role": "±45° cross-hatch (hardware only, Law 4/6)",
+      "required": true
+    },
+    {
+      "cssVar": "--field",
+      "group": "texture",
+      "role": "whisper block-shade drafting field for dead background space",
+      "required": true
+    }
+  ],
+  "chassisOverridable": [
+    "--brd-hair",
+    "--brd",
+    "--brd-heavy",
+    "--brd-brush",
+    "--shadow-off-sm",
+    "--shadow-off",
+    "--shadow-off-lg"
+  ]
+}

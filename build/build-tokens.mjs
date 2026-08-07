@@ -17,6 +17,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { themeCss, THEME_ROLES, CHASSIS_OVERRIDABLE } from "../lib/theme/index.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = join(ROOT, "tokens", "tokens.json");
@@ -131,6 +132,87 @@ async function buildCss() {
   }
   css += BASELINE;
   return css;
+}
+
+/* ── 3b. the feature ⇄ appearance split ──────────────────────────────────
+ * The same tokens, emitted as two independent layers so a consumer can keep the
+ * structure and swap only the appearance:
+ *   - dist/structure.css   — brand-AGNOSTIC: primitives, chassis, type, motion,
+ *     component tokens + the global baseline. Ship once; never changes with brand.
+ *   - dist/themes/<t>.css  — one theme = just the semantic role values (+ any
+ *     chassis override). This is the ONLY thing a brand replaces.
+ * dist/control-room.css stays the all-in-one bundle (back-compat). */
+
+const STRUCTURE_BANNER = `/* ============================================================================
+ * CONTROL ROOM — Structure layer  (GENERATED — do not edit by hand)
+ * The brand-agnostic FEATURE layer: spacing, borders, shadows, type, motion,
+ * component tokens + global baseline. Pair with ONE theme from dist/themes/*.css
+ * (or your own brand — see references/theming.md). Source: tokens/tokens.json.
+ * ==========================================================================*/\n`;
+
+function structureCss() {
+  const body = Object.entries(base)
+    .map(([name, value]) => `  --${name}: ${value};`)
+    .join("\n");
+  return `${STRUCTURE_BANNER}\n:root {\n${body}\n}\n${BASELINE}`;
+}
+
+const THEME_BANNER = (theme) => `/* Control Room theme: ${theme} (GENERATED). Appearance layer only — pair with
+ * dist/structure.css. Source: tokens/tokens.json → npm run build:tokens. */\n`;
+
+// one standalone theme file: the semantic role values (dark also claims :root).
+function splitThemeCss(theme) {
+  const selector = theme === src.meta.defaultTheme
+    ? `:root, :root[data-theme="${theme}"]`
+    : `:root[data-theme="${theme}"]`;
+  return THEME_BANNER(theme) + themeCss(theme, themeVars(theme), { selector, scheme: SCHEME[theme] });
+}
+
+/* ── 3c. the theme contract (machine-readable appearance surface) ─────────
+ * Every semantic role a complete theme must fill — the boundary a brand author
+ * writes to. Derived straight from tokens.json's semantic tier; a node test keeps
+ * it in lock-step with lib/theme's THEME_ROLES. */
+function themeContract() {
+  const GROUPS = ["surface", "text", "line", "signal", "keyed", "texture"];
+  const roles = [];
+  for (const group of GROUPS) {
+    for (const v of Object.values(src.semantic[group] || {})) {
+      if (!v || typeof v.cssVar !== "string") continue;
+      roles.push({ cssVar: v.cssVar, group, role: v.role || "", required: true });
+    }
+  }
+  return JSON.stringify(
+    {
+      $generated: true,
+      $description:
+        "Control Room theme contract — the appearance surface a theme/brand must define. " +
+        "Components reference ONLY these roles, so any complete theme reskins the whole system. " +
+        "See references/theming.md.",
+      source: "tokens/tokens.json",
+      version: src.meta.version,
+      defaultTheme: src.meta.defaultTheme,
+      selector: src.meta.selector,
+      roles,
+      chassisOverridable: CHASSIS_OVERRIDABLE,
+    },
+    null,
+    2,
+  ) + "\n";
+}
+
+/* Guard: the contract derived from tokens.json must match lib/theme's runtime copy
+ * so the two never drift (also asserted from the test suite). */
+function assertContractInSync() {
+  const fromTokens = JSON.parse(themeContract()).roles.map((r) => r.cssVar);
+  const fromLib = THEME_ROLES.map((r) => r.cssVar);
+  const a = JSON.stringify(fromTokens);
+  const b = JSON.stringify(fromLib);
+  if (a !== b) {
+    throw new Error(
+      "Theme contract drift: tokens.json semantic roles ≠ lib/theme THEME_ROLES.\n" +
+        `  tokens: ${a}\n  lib:    ${b}`,
+    );
+  }
 }
 
 /* ── 4. flat json ────────────────────────────────────────────────────────── */
@@ -249,6 +331,8 @@ function twTheme() {
 
 /* ── 6. write / check ───────────────────────────────────────────────────── */
 
+assertContractInSync();
+
 const css = await buildCss();
 const flat = flatJson();
 const dtcgJson = dtcg();
@@ -257,9 +341,12 @@ const twThemeCss = twTheme();
 // [path relative to repo root, content]
 const targets = [
   ["dist/control-room.css", css],
+  ["dist/structure.css", structureCss()],
+  ["dist/theme-contract.json", themeContract()],
   ["dist/tw-theme.css", twThemeCss],
   ["dist/tokens.flat.json", flat],
   ["design-tokens/control-room.tokens.json", dtcgJson],
+  ...THEMES.map((t) => [`dist/themes/${t}.css`, splitThemeCss(t)]),
 ];
 
 if (CHECK) {

@@ -1,0 +1,36 @@
+/* Control Room theme: phosphor (GENERATED). Appearance layer only — pair with
+ * dist/structure.css. Source: tokens/tokens.json → npm run build:tokens. */
+:root[data-theme="phosphor"] {
+  color-scheme: dark;
+  --ground: #020a04;
+  --board: #041207;
+  --panel: #06180a;
+  --panel-2: #0a2210;
+  --ink: #43ff7a;
+  --muted: #2fac55;
+  --border: #031a08;
+  --rail: #020a04;
+  --rail-ink: #43ff7a;
+  --sig-work: #43ff7a;
+  --sig-accent: #b6ff00;
+  --sig-accent-2: #00e6a8;
+  --sig-done: #00e05a;
+  --sig-wait: #a8ff3e;
+  --sig-err: #eaff40;
+  --sig-idle: #12602c;
+  --on-sig: #020a04;
+  --on-err: #020a04;
+  --on-accent: #020a04;
+  --on-accent-2: #06050c;
+  --on-idle: #ffffff;
+  --shadow-col: #031a08;
+  --mass: #010603;
+  --stage: #0d7a34;
+  --stage-ink: #d9ffe6;
+  --drip: #43ff7a;
+  --halftone: radial-gradient(circle at center, rgba(67,255,122,0.16) 1.7px, transparent 2.2px);
+  --dither: repeating-conic-gradient(rgba(67,255,122,0.14) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
+  --scanline: repeating-linear-gradient(0deg, rgba(67,255,122,0.13) 0 1px, transparent 1px 3px);
+  --crosshatch: repeating-linear-gradient(45deg, rgba(67,255,122,0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(67,255,122,0.16) 0 1px, transparent 1px 6px);
+  --field: repeating-conic-gradient(rgba(67,255,122,0.05) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
+}
