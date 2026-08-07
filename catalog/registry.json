@@ -974,7 +974,10 @@
           "number",
           "select",
           "textarea",
-          "checkbox"
+          "checkbox",
+          "autocomplete",
+          "group",
+          "array"
         ]
       },
       "tokens": [
@@ -999,7 +1002,11 @@
         "arktype",
         "json schema",
         "schema",
-        "fields"
+        "fields",
+        "nested",
+        "array",
+        "autocomplete",
+        "combobox"
       ]
     },
     {

@@ -67,11 +67,18 @@ test.describe("component browser — live islands", () => {
     await form.locator('button[type="submit"]').click();
     expect(await form.locator(".cr-field__error").count()).toBeGreaterThanOrEqual(4);
 
-    // fix every field — including the nested `limits` group — then submit
+    // fix every field, incl. the nested `limits` group and the two autocompletes
     await form.locator("#cr-form-name").fill("nova-01");
     await form.locator("#cr-form-endpoint").fill("https://eu.example.com");
     await form.locator("#cr-form-replicas").fill("4");
-    await form.locator("#cr-form-region").selectOption("eu-west");
+    // region: searchable enum (static source) — type + pick
+    await form.locator("#cr-form-region").fill("eu");
+    await form.locator("#cr-form-region-list [role=option]").first().click();
+    // owner: ASYNC source — type, wait for the remote list, pick
+    await form.locator("#cr-form-owner").fill("ada");
+    await expect(form.locator("#cr-form-owner-list [role=option]").first()).toContainText("Ada");
+    await form.locator("#cr-form-owner-list [role=option]").first().click();
+    await expect(form.locator("#cr-form-owner")).toHaveValue(/Ada/);
     await form.locator("#cr-form-limits-cpu").fill("2");
     await form.locator("#cr-form-limits-memGB").fill("8");
     await form.locator('button[type="submit"]').click();
@@ -79,6 +86,8 @@ test.describe("component browser — live islands", () => {
     const result = form.locator("pre").filter({ hasText: "submitted" });
     await expect(result).toContainText('"replicas": 4'); // number, not "4"
     await expect(result).toContainText('"cpu": 2'); // nested group, coerced to number
+    await expect(result).toContainText('"owner": "ada"'); // autocomplete stores the VALUE, not the label
+    await expect(result).toContainText('"region": "eu-west"');
 
     // an invalid value re-fails on change once the field has been touched
     await form.locator("#cr-form-endpoint").fill("nope");
