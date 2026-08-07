@@ -294,6 +294,17 @@ announced (`role="alert"`); hint text is linked the same way. The submit path us
   so an ArkType-sourced `select` lists options alphabetically. Pass
   `overrides[name].options` (or author via JSON Schema, which preserves order) to
   control it.
+- **Controlled re-render (by design).** `CrForm` is a *controlled* form: a
+  keystroke updates the value store and the field subtree re-renders, so per-render
+  work is O(visible fields). Libraries like React-Hook-Form dodge this with
+  *uncontrolled* inputs and per-field subscriptions — but that leans on
+  React-specific refs/context, and this component compiles to **six** frameworks
+  from one source, where that machinery has no portable equivalent. The trade is
+  deliberate: universal targets over micro-tuned re-renders. In practice it's a
+  non-issue for typical forms (dozens of fields); the error-summary walk is gated
+  so it never runs on the typing path, and hidden `when` fields drop out of the
+  render entirely. For an unusually large form (hundreds of live fields) prefer
+  splitting it into steps/sections rather than rendering it all at once.
 - **Predicate constraints degrade on export.** Some ArkType constraints are
   predicates (e.g. `string.url` validates via `new URL()`) with no exact JSON
   Schema form. Export keeps a known `format` where ArkType has one (`url` →
