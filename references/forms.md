@@ -93,6 +93,25 @@ change once it has been touched** (so an error clears as you fix it):
 />
 ```
 
+### Submit lifecycle, async validation & error summary
+
+`validate` and `onSubmit` may be **async** (return a Promise) — a server-side
+uniqueness check, a remote submit. While either is in flight the submit button
+enters a **pending** state (disabled, `aria-busy`, showing `pendingLabel`), so a
+slow submit can't be double-fired. After a failed submit, `CrForm` also renders a
+form-level **error summary** (`role="alert"`) listing every problem with an
+in-page link to the offending field; it clears when the form validates. Turn it
+off with `errorSummary={false}`.
+
+```tsx
+<CrForm
+  fields={form.model.fields}
+  validate={async (v) => ({ ...form.validate(v).errors, ...(await nameTaken(v.name) ? { name: "Already in use" } : {}) })}
+  onSubmit={async (v) => { await api.createSession(form.validate(v).data); }}
+  pendingLabel="Creating…"
+/>
+```
+
 ### Controlled errors (server-side & Qwik)
 
 Besides the synchronous `validate` prop, `CrForm` accepts a controlled **`errors`**
