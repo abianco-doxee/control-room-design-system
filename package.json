@@ -17,11 +17,16 @@
     "SKILL.md",
     "README.md",
     "utils",
-    "lib"
+    "lib",
+    "brands"
   ],
   "exports": {
     "./tokens.json": "./tokens/tokens.json",
     "./css": "./dist/control-room.css",
+    "./structure.css": "./dist/structure.css",
+    "./themes/*": "./dist/themes/*",
+    "./theme-contract": "./dist/theme-contract.json",
+    "./theme": "./lib/theme/index.js",
     "./components": "./styles/components.css",
     "./tailwind.css": "./styles/tailwind.css",
     "./tw-theme.css": "./dist/tw-theme.css",
@@ -43,6 +48,7 @@
   },
   "scripts": {
     "build:tokens": "node build/build-tokens.mjs",
+    "build:theme": "node build/build-theme.mjs",
     "build:palette": "node build/build-palette.mjs",
     "build:tw": "tailwindcss -i build/tailwind-input.css -o dist/utilities.css",
     "build:components": "mitosis build && node build/build-fix-qwik.mjs && node build/build-fix-react.mjs && node build/build-barrels.mjs",
@@ -52,10 +58,11 @@
     "build:content": "node build/build-docs-content.mjs",
     "prebuild:site": "npm run build:content",
     "build:site": "astro build",
-    "build": "npm run build:tokens && npm run build:tw && npm run build:catalog && npm run build:gallery && npm run build:components && npm run build:showcase && npm run build:content && astro build",
+    "build": "npm run build:tokens && npm run build:theme && npm run build:tw && npm run build:catalog && npm run build:gallery && npm run build:components && npm run build:showcase && npm run build:content && astro build",
     "dev": "npm run build:content && astro dev",
     "preview": "astro preview",
     "verify:tokens": "node build/build-tokens.mjs --check",
+    "verify:theme": "node build/build-theme.mjs --check",
     "verify:catalog": "node build/build-catalog.mjs --check",
     "verify:types": "tsc -p build/tsconfig.frameworks.json",
     "verify:palette": "node build/build-palette.mjs --check",
@@ -69,9 +76,10 @@
     "test:visual": "playwright test tests/visual.spec.mjs",
     "test:visual:update": "playwright test tests/visual.spec.mjs --update-snapshots",
     "test:forms": "node --test tests/forms.test.mjs",
+    "test:theme": "node --test tests/theme.test.mjs",
     "changeset": "changeset",
     "version": "changeset version",
-    "verify": "npm run verify:tokens && npm run verify:palette && npm run verify:catalog && npm run skills:check"
+    "verify": "npm run verify:tokens && npm run verify:theme && npm run verify:palette && npm run verify:catalog && npm run skills:check"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",

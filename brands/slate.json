@@ -1,0 +1,34 @@
+{
+  "$schema": "../dist/theme-contract.json",
+  "$label": "Slate · neutral corporate re-skin",
+  "$description": "A worked example brand. It extends the built-in `dark` theme and overrides only the appearance roles it wants to change — surfaces, text and the signal ramp go desaturated-professional. It touches NO component CSS and NO structure token; the whole system reskins from this one file. Build it with `npm run build:theme` → dist/themes/slate.css.",
+  "$extends": "dark",
+  "$scheme": "dark",
+
+  "ground": "#0e1116",
+  "board": "#141922",
+  "panel": "#1b222d",
+  "panel-2": "#232c39",
+  "ink": "#e8edf4",
+  "muted": "#8a97a8",
+  "rail": "#0a0d12",
+  "rail-ink": "#cdd6e2",
+
+  "sig-work": "#3b9eff",
+  "sig-wait": "#e0a54a",
+  "sig-done": "#35c98d",
+  "sig-err": "#e5484d",
+  "sig-idle": "#6b7688",
+  "sig-accent": "#6d7cff",
+  "sig-accent-2": "#4db6c9",
+
+  "on-sig": "#0b0e13",
+  "on-err": "#ffffff",
+  "on-accent": "#ffffff",
+  "on-accent-2": "#0b0e13",
+  "on-idle": "#ffffff",
+
+  "stage": "#2f7d4f",
+  "stage-ink": "#eafff2",
+  "drip": "#4db6c9"
+}
