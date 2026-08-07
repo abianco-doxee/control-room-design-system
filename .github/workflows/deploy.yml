@@ -36,6 +36,8 @@ jobs:
         run: npm run build:components
       - name: Type-check compiled React output (codegen guard)
         run: npm run verify:types
+      - name: Forms core gate (ArkType ⇄ JSON Schema + validation)
+        run: npm run test:forms
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
       - name: Accessibility gate (axe, all four themes)

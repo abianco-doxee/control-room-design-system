@@ -363,6 +363,15 @@
 .cr-field__hint { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); }
 .cr-field__error { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--ink); }
 .cr-field__error::before { content: "\2717 "; color: var(--sig-err); font-weight: 800; }
+.cr-field__req { color: var(--sig-err); }
+
+/* ── Form (schema-driven; renders a stack of fields + a submit action) ───── */
+.cr-form { display: flex; flex-direction: column; gap: var(--space-4); }
+.cr-form__title {
+  margin: 0; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg);
+  text-transform: uppercase; letter-spacing: -0.01em; color: var(--ink);
+}
+.cr-form__actions { display: flex; gap: var(--space-2); margin-top: var(--space-1); }
 
 /* ── Text input / textarea / select ────────────────────────────────────── */
 .cr-input, .cr-textarea, .cr-select {

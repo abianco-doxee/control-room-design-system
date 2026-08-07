@@ -5,12 +5,12 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 64,
+    "count": 65,
     "categories": {
       "action": 1,
       "behavior": 1,
       "chart": 4,
-      "forms": 12,
+      "forms": 13,
       "identity": 2,
       "layout": 7,
       "media": 8,
@@ -20,7 +20,7 @@
       "state": 12
     },
     "lifecycles": {
-      "stable": 63,
+      "stable": 64,
       "experimental": 1
     }
   },
@@ -440,6 +440,51 @@
         "picker",
         "schedule",
         "form"
+      ]
+    },
+    {
+      "id": "form",
+      "name": "Form",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Schema-driven form. Feed it a Form Model + a validate() function (built by the headless forms core from an ArkType type OR a JSON Schema) and it renders and validates the whole form — value/touched/error state, validate on blur + submit, re-check on change once touched.",
+      "spec": "references/forms.md",
+      "variants": {
+        "kind": [
+          "text",
+          "email",
+          "url",
+          "number",
+          "select",
+          "textarea",
+          "checkbox"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--ink",
+          "description": "labels"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error border/marker/required"
+        },
+        {
+          "cssVar": "--board",
+          "description": "control surface"
+        }
+      ],
+      "keywords": [
+        "form",
+        "form builder",
+        "validation",
+        "validator",
+        "arktype",
+        "json schema",
+        "schema",
+        "fields"
       ]
     },
     {
