@@ -88,9 +88,36 @@ npm run build:theme acme       # just one
 npm run build:theme --check    # CI: fail if any dist/themes/*.css is stale
 ```
 
-The worked example `brands/slate.json` — a neutral corporate re-skin — reskins the
-entire component browser (try the **slate ▸** switch) touching **no** component CSS
-and **no** structure token.
+Two worked examples reskin the entire component browser (try the **slate ▸** and
+**porcelain ▸** switches), each touching **no** component CSS and **no** structure
+token:
+
+- `brands/slate.json` — a neutral corporate re-skin on the **dark** base, with
+  hand-picked `--on-*` text colours.
+- `brands/porcelain.json` — a light corporate re-skin on the **light** base that
+  declares only surfaces + signal hues and lets the build **auto-derive** every
+  `--on-*` (see below).
+
+### Auto-derived on-colours
+
+You rarely need to hand-pick the text colour that sits on each fill. Omit any
+`--on-*` role and the build fills it by choosing whichever ink (near-black or
+near-white) has the higher WCAG contrast on that fill. It also **re-derives** an
+on-colour you inherited from an `$extends` base when your brand recolours the fill
+underneath it — so an inherited `--on-accent` can't go stale after you change
+`--sig-accent`. A `--on-*` you *do* set by hand is always left untouched.
+
+```jsonc
+{
+  "$extends": "light",
+  "sig-accent": "#4338ca"   // change the fill…
+  // …omit "on-accent" — the build derives #ffffff (best contrast on #4338ca)
+}
+```
+
+Programmatically it's `deriveOnColors(vars, { changed })` (and `autoOnColor(fill)`),
+run automatically by `defineTheme` and `build:theme`; pass `deriveOnColors: false`
+to `defineTheme` to opt out.
 
 ### Programmatic authoring (`@control-room/design-system/theme`)
 

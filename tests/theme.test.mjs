@@ -13,6 +13,9 @@ import {
   defineTheme,
   contrastRatio,
   checkThemeContrast,
+  autoOnColor,
+  deriveOnColors,
+  ON_PAIRS,
 } from "../lib/theme/index.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -97,6 +100,33 @@ test("defineTheme: extends dark, validates, renders, contrast-checks", () => {
   assert.throws(() => defineTheme("bad", { ground: "#000" }), /missing required roles/);
 });
 
+test("autoOnColor picks the more legible ink for a fill", () => {
+  assert.equal(autoOnColor("#f9ad00"), "#06050c", "dark ink on a light amber fill");
+  assert.equal(autoOnColor("#4338ca"), "#ffffff", "white ink on a deep indigo fill");
+});
+
+test("deriveOnColors: fills missing, re-derives changed fills, keeps hand-set", () => {
+  const base = { "sig-accent": "#4338ca", "on-accent": "#ffffff", "sig-wait": "#f9ad00", "on-sig": "#06050c" };
+
+  // (a) missing on-colour is filled
+  const filled = deriveOnColors({ ...base, "on-sig": undefined });
+  assert.equal(filled["on-sig"], "#06050c");
+
+  // (b) inherited on-colour is re-derived when the brand changed its fill
+  const rederived = deriveOnColors(
+    { ...base, "sig-accent": "#fff2cc" }, // brand recoloured the accent to a pale fill
+    { changed: ["sig-accent"] },
+  );
+  assert.equal(rederived["on-accent"], "#06050c", "stale white flipped to dark for the pale fill");
+
+  // (c) a hand-set on-colour is never touched, even if its fill changed
+  const kept = deriveOnColors(
+    { ...base, "sig-accent": "#fff2cc", "on-accent": "#123456" },
+    { changed: ["sig-accent", "on-accent"] },
+  );
+  assert.equal(kept["on-accent"], "#123456", "author-set on-colour preserved");
+});
+
 test("the worked brand (brands/slate.json) is valid, complete, and legible", () => {
   const slate = read("brands/slate.json");
   const base = {};
@@ -109,6 +139,29 @@ test("the worked brand (brands/slate.json) is valid, complete, and legible", () 
   assert.equal(v.valid, true, `slate missing: ${v.missing.join(", ")}`);
   const c = checkThemeContrast(vars);
   assert.equal(c.ok, true, `slate contrast failures: ${JSON.stringify(c.failures)}`);
+});
+
+test("porcelain brand (extends light, on-colours auto-derived) is complete + legible", () => {
+  const porcelain = read("brands/porcelain.json");
+  assert.equal(porcelain.$extends, "light");
+  // the brand file declares NO on-* — they're derived by the build
+  for (const on of Object.keys(ON_PAIRS)) assert.equal(on in porcelain, false, `${on} should be omitted, not authored`);
+
+  const light = tokens.themes.light;
+  const base = {};
+  for (const [k, v] of Object.entries(light)) if (!k.startsWith("$")) base[k] = v;
+  const overrides = Object.fromEntries(Object.entries(porcelain).filter(([k]) => !k.startsWith("$")));
+  const vars = deriveOnColors(mergeTheme(base, overrides), { changed: Object.keys(overrides) });
+
+  const v = validateTheme(vars);
+  assert.equal(v.valid, true, `porcelain missing: ${v.missing.join(", ")}`);
+  const c = checkThemeContrast(vars);
+  assert.equal(c.ok, true, `porcelain contrast failures: ${JSON.stringify(c.failures)}`);
+  // every derived on-colour clears AA-large (3:1) against its own fill
+  for (const [on, fill] of Object.entries(ON_PAIRS)) {
+    const r = contrastRatio(vars[on], vars[fill]);
+    if (r != null) assert.ok(r >= 3, `${on} on ${fill} = ${r.toFixed(2)} (< 3)`);
+  }
 });
 
 test("generated dist/themes/slate.css carries every merged role (build not stale)", () => {

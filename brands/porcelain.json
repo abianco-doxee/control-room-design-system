@@ -1,0 +1,28 @@
+{
+  "$schema": "../dist/theme-contract.json",
+  "$label": "Porcelain · light corporate re-skin",
+  "$description": "A second worked brand — and a second base. It extends the built-in `light` theme and declares only surfaces + the signal ramp; every `--on-*` text colour is OMITTED and auto-derived by the build (whichever ink is more legible on each fill). Dark nav rail on a clean paper app. Build with `npm run build:theme` → dist/themes/porcelain.css.",
+  "$extends": "light",
+  "$scheme": "light",
+
+  "ground": "#f4f5f7",
+  "board": "#eceef2",
+  "panel": "#ffffff",
+  "panel-2": "#f2f4f8",
+  "ink": "#14161c",
+  "muted": "#5b6270",
+  "rail": "#14161c",
+  "rail-ink": "#eef1f6",
+
+  "sig-work": "#1d74d6",
+  "sig-wait": "#b8730a",
+  "sig-done": "#0f8a5f",
+  "sig-err": "#cc2b3d",
+  "sig-idle": "#6b7280",
+  "sig-accent": "#4338ca",
+  "sig-accent-2": "#0e7490",
+
+  "stage": "#128a52",
+  "stage-ink": "#ffffff",
+  "drip": "#0e7490"
+}
