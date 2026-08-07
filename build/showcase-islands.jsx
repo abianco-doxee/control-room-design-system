@@ -157,11 +157,28 @@ const STACK_SEGS = [
 // Schema-driven form demo — one ArkType schema is the source of truth; the same
 // form is also derived from its exported JSON Schema to prove the bridge runs
 // both ways (identical model + validation, either source).
+// A fake async data source (stands in for a remote lookup). Latest-wins ordering
+// in CrForm means out-of-order responses can't clobber the list.
+const OWNERS = [
+  { value: "ada", label: "Ada Lovelace · ada@ops" },
+  { value: "grace", label: "Grace Hopper · grace@ops" },
+  { value: "alan", label: "Alan Turing · alan@ops" },
+  { value: "katherine", label: "Katherine Johnson · kat@ops" },
+  { value: "margaret", label: "Margaret Hamilton · mh@ops" },
+];
+const searchOwners = (q) =>
+  new Promise((resolve) => {
+    const query = (q || "").trim().toLowerCase();
+    const hits = query ? OWNERS.filter((o) => o.label.toLowerCase().includes(query)) : OWNERS;
+    setTimeout(() => resolve(hits), 140); // simulate network latency
+  });
+
 const SessionSchema = ark({
   name: "string >= 2",
   endpoint: "string.url",
   replicas: "1 <= number.integer <= 32",
   region: "'eu-west' | 'us-east' | 'ap-south'",
+  owner: "string >= 2",
   limits: { cpu: "1 <= number <= 64", memGB: "number > 0" }, // nested group
   "tags?": "string[]", // scalar array
   "hooks?": ark({ event: "'deploy' | 'scale' | 'error'", url: "string.url" }).array(), // object array
@@ -169,12 +186,13 @@ const SessionSchema = ark({
   autoscale: "boolean",
 });
 const FORM_OVERRIDES = {
-  order: ["name", "endpoint", "replicas", "region", "limits", "tags", "hooks", "notes", "autoscale"],
+  order: ["name", "endpoint", "replicas", "region", "owner", "limits", "tags", "hooks", "notes", "autoscale"],
   overrides: {
     name: { label: "Session name", hint: "lowercase, no spaces", placeholder: "nova-01" },
     endpoint: { label: "Endpoint URL", placeholder: "https://…" },
     replicas: { hint: "1–32 workers" },
-    region: { label: "Region" },
+    region: { label: "Region", kind: "autocomplete" }, // searchable enum (static source)
+    owner: { label: "Owner", kind: "autocomplete", source: searchOwners, placeholder: "search people…", hint: "async source" },
     limits: { label: "Resource limits" },
     "limits.cpu": { label: "vCPU", hint: "1–64" },
     "limits.memGB": { label: "Memory (GB)" },
