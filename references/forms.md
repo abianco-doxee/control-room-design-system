@@ -218,6 +218,36 @@ Nested overrides use the dotted path (no array index): `overrides["limits.cpu"] 
 { label: "vCPU" }`, `overrides["hooks.url"] = { placeholder: "https://…" }`. An
 array override may set `itemLabel` for the per-item header.
 
+### Composition — `$ref`, `allOf`, `oneOf`/`anyOf`
+
+Real-world JSON Schemas rarely inline everything. The core resolves the three
+composition keywords when converting a JSON Schema (either the one you author or
+the one ArkType exports, which itself uses `$ref`/`$defs` for reused types):
+
+- **`$ref`** — local pointers (`#/$defs/Address`, `#/definitions/…`) are resolved
+  against the root schema, so a shared definition renders + validates wherever it's
+  referenced. (Remote `$ref` URLs are not fetched — resolve them before authoring.)
+- **`allOf`** — every branch is merged into one schema: `properties` combine and
+  `required` unions. This is the "extend a base" pattern (a `Timestamped` mixin plus
+  the entity's own fields become one flat field set).
+- **`oneOf` / `anyOf`** — become a validating ArkType **union**: a value is accepted
+  if it satisfies any branch. For rendering, the field takes the widget of its first
+  non-null branch (so `[Address, null]` renders the Address group) while validation
+  still honours the whole union.
+
+```ts
+defineForm({
+  $defs: { Address: { type: "object", properties: { city: { type: "string" } }, required: ["city"] } },
+  allOf: [
+    { type: "object", properties: { name: { type: "string", minLength: 2 } }, required: ["name"] },
+    { type: "object", properties: { billing: { $ref: "#/$defs/Address" } }, required: ["billing"] },
+  ],
+});
+```
+
+Cyclic `$ref` (a definition that references itself) is not expanded — the walker
+builds a finite Form Model, so model a recursive shape as a bounded nesting instead.
+
 ### Autocomplete — searchable / async select
 
 A select can draw its options from a **source** instead of a fixed list — give a
