@@ -276,6 +276,8 @@ const ISLAND_IDS = new Set([
   "empty-error-state", "panel", "icon",
   // charts
   "sparkline", "line-chart", "bar-chart", "stacked-bar",
+  // schema-driven form
+  "form",
 ]);
 
 function stageHtml(id) {

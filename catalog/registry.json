@@ -959,6 +959,50 @@
       ]
     },
     {
+      "id": "form",
+      "name": "Form",
+      "category": "forms",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Schema-driven form. Feed it a Form Model + a validate() function (built by the headless forms core from an ArkType type OR a JSON Schema) and it renders and validates the whole form — value/touched/error state, validate on blur + submit, re-check on change once touched.",
+      "spec": "references/forms.md",
+      "variants": {
+        "kind": [
+          "text",
+          "email",
+          "url",
+          "number",
+          "select",
+          "textarea",
+          "checkbox"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--ink",
+          "description": "labels"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error border/marker/required"
+        },
+        {
+          "cssVar": "--board",
+          "description": "control surface"
+        }
+      ],
+      "keywords": [
+        "form",
+        "form builder",
+        "validation",
+        "validator",
+        "arktype",
+        "json schema",
+        "schema",
+        "fields"
+      ]
+    },
+    {
       "id": "input",
       "name": "Text Input",
       "category": "forms",

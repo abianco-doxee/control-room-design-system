@@ -29,6 +29,7 @@ const PAGES = [
   ["references/tokens.md", "reference", "tokens", "Tokens"],
   ["references/tailwind.md", "reference", "tailwind", "Tailwind-first"],
   ["references/components.md", "reference", "components", "Component Library"],
+  ["references/forms.md", "reference", "forms", "Forms — validation (ArkType · JSON Schema)"],
   ["references/motion.md", "reference", "motion", "Motion"],
   ["references/accessibility.md", "reference", "accessibility", "Accessibility"],
   ["references/seeded-cat.md", "reference", "seeded-cat", "Seeded Pixel-Cat"],
