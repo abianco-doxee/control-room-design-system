@@ -172,6 +172,70 @@ test("conditional `when` predicate passes through to the model", () => {
   assert.equal(model.fields.find((f) => f.name === "contact").when, when);
 });
 
+test("composition: $ref into $defs (model group + validation)", () => {
+  const schema = {
+    type: "object",
+    $defs: {
+      Address: {
+        type: "object",
+        properties: { city: { type: "string", minLength: 1 }, zip: { type: "string" } },
+        required: ["city"],
+      },
+    },
+    properties: {
+      name: { type: "string", minLength: 2 },
+      billing: { $ref: "#/$defs/Address" },
+    },
+    required: ["name", "billing"],
+  };
+  const { model, validate } = defineForm(schema);
+  const billing = model.fields.find((f) => f.name === "billing");
+  assert.equal(billing.kind, "group", "$ref to an object schema becomes a group");
+  assert.equal(billing.fields.find((f) => f.name === "city").kind, "text");
+
+  const bad = validate({ name: "Ada", billing: { city: "", zip: "1" } });
+  assert.equal(bad.valid, false);
+  assert.ok(bad.errors["billing.city"], "nested error keyed through the $ref");
+
+  const ok = validate({ name: "Ada", billing: { city: "Berlin", zip: "10115" } });
+  assert.equal(ok.valid, true);
+});
+
+test("composition: allOf merges properties + required (extend a base)", () => {
+  const schema = {
+    $defs: {
+      Timestamped: { type: "object", properties: { createdAt: { type: "string" } }, required: ["createdAt"] },
+    },
+    allOf: [
+      { $ref: "#/$defs/Timestamped" },
+      { type: "object", properties: { name: { type: "string", minLength: 2 } }, required: ["name"] },
+    ],
+  };
+  const { model, validate } = defineForm(schema);
+  const names = model.fields.map((f) => f.name).sort();
+  assert.deepEqual(names, ["createdAt", "name"], "allOf branches merge into one field set");
+  assert.equal(model.fields.find((f) => f.name === "name").required, true);
+  assert.equal(model.fields.find((f) => f.name === "createdAt").required, true);
+
+  assert.equal(validate({ name: "x", createdAt: "t" }).valid, false, "min-length from one branch enforced");
+  assert.equal(validate({ name: "Ada" }).valid, false, "required from the other branch enforced");
+  assert.equal(validate({ name: "Ada", createdAt: "2020" }).valid, true);
+});
+
+test("composition: anyOf builds a validating union", () => {
+  const schema = {
+    type: "object",
+    properties: {
+      id: { anyOf: [{ type: "string", minLength: 1 }, { type: "integer", minimum: 1 }] },
+    },
+    required: ["id"],
+  };
+  const { validate } = defineForm(schema);
+  assert.equal(validate({ id: "abc" }).valid, true, "string branch accepted");
+  assert.equal(validate({ id: "7" }).valid, true, "a non-empty value satisfies the union");
+  assert.equal(validate({ id: "" }).valid, false, "empty required union value rejected");
+});
+
 test("roundtrip: ArkType → JSON Schema → ArkType still validates", () => {
   const js = toJsonSchema(ArkSchema);
   const back = toArkType(js);
