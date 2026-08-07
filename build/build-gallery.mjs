@@ -103,7 +103,7 @@ function lineChartSvg(series, labels, { area = true, height = 140, label = "line
     ? `<figcaption class="cr-chart__legend">${series.map((s, si) => `<span class="cr-chart__key"><span class="cr-chart__sw" style="background:${hue(s.signal, si)}" aria-hidden="true"></span>${s.name}</span>`).join("")}</figcaption>`
     : "";
   const summary = label + " — " + series.map((s) => s.name + " latest " + s.data[s.data.length - 1]).join(", ");
-  return `<figure class="cr-linechart" role="img" aria-label="${summary}"><svg class="cr-linechart__plot" viewBox="0 0 ${W} ${H}" aria-hidden="true" focusable="false">${gridSvg}${seriesSvg}${ticks}</svg>${legend}</figure>`;
+  return `<figure class="cr-chart cr-linechart" role="img" aria-label="${summary}"><svg class="cr-linechart__plot" viewBox="0 0 ${W} ${H}" aria-hidden="true" focusable="false">${gridSvg}${seriesSvg}${ticks}</svg>${legend}</figure>`;
 }
 function barChartSvg(data, { target, showValues = true, height = 140, label = "bar chart" } = {}) {
   const W = 320, H = height, L = 6, R = 6, T = 14, B = 18, plotW = W - L - R, plotH = H - T - B, base = T + plotH;
@@ -119,7 +119,7 @@ function barChartSvg(data, { target, showValues = true, height = 140, label = "b
   }).join("");
   const tline = target !== undefined ? `<line class="cr-chart__target" x1="${L}" y1="${(base - Math.max(0, Math.min(1, target / max)) * plotH).toFixed(2)}" x2="${W - R}" y2="${(base - Math.max(0, Math.min(1, target / max)) * plotH).toFixed(2)}" vector-effect="non-scaling-stroke"/>` : "";
   const summary = label + " — " + data.map((d) => d.label + " " + d.value).join(", ");
-  return `<figure class="cr-barchart" role="img" aria-label="${summary}"><svg class="cr-barchart__plot" viewBox="0 0 ${W} ${H}" aria-hidden="true" focusable="false"><line class="cr-chart__grid" x1="${L}" y1="${base}" x2="${W - R}" y2="${base}" vector-effect="non-scaling-stroke"/>${bars}${tline}</svg></figure>`;
+  return `<figure class="cr-chart cr-barchart" role="img" aria-label="${summary}"><svg class="cr-barchart__plot" viewBox="0 0 ${W} ${H}" aria-hidden="true" focusable="false"><line class="cr-chart__grid" x1="${L}" y1="${base}" x2="${W - R}" y2="${base}" vector-effect="non-scaling-stroke"/>${bars}${tline}</svg></figure>`;
 }
 function stackedBar(segments, { label, showLegend = true } = {}) {
   const total = segments.reduce((a, s) => a + s.value, 0) || 1;
