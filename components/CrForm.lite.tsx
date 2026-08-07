@@ -30,21 +30,28 @@ export interface CrFormProps {
   /** The Form Model — plain field descriptors (from the headless forms core). */
   fields: CrFormField[];
   values?: Record<string, any>;
-  /** `(values) => { [dottedPath]: message }` — {} means valid. Wire lib/forms here.
-   *  Synchronous; use it in targets where a function prop can return a value
+  /** `(values) => errors | Promise<errors>` where errors is `{ [dottedPath]: msg }`
+   *  ({} = valid). May be **async** (return a Promise) for server-side checks.
+   *  Wire lib/forms here in targets where a function prop can return a value
    *  (React/Vue/Svelte/Solid/Angular). */
-  validate?: (values: Record<string, any>) => Record<string, string>;
+  validate?: (values: Record<string, any>) => Record<string, string> | Promise<Record<string, string>>;
   /** Controlled errors keyed by dotted path — always shown, merged over the
    *  internal validator's. Use this to feed back server-side errors, or to drive
    *  validation entirely from the parent (the Qwik-friendly path: validate in an
    *  async onChange/onSubmit handler and pass the result back here). */
   errors?: Record<string, string>;
   submitLabel?: string;
+  /** Submit-button label while an async submit/validate is in flight. */
+  pendingLabel?: string;
+  /** Show a form-level error summary (role=alert, links to fields) after a failed
+   *  submit. Default true. */
+  errorSummary?: boolean;
   title?: string;
   disabled?: boolean;
   id?: string;
   onChange?: (values: Record<string, any>) => void;
-  onSubmit?: (values: Record<string, any>) => void;
+  /** May be async — the submit button shows its pending state until it settles. */
+  onSubmit?: (values: Record<string, any>) => void | Promise<void>;
 }
 
 /* CrForm — a schema-driven form. Feed it a Form Model (which may nest: `group`
@@ -66,6 +73,7 @@ export default function CrForm(props: CrFormProps) {
     errs: {},
     touched: {},
     submitted: false,
+    submitting: false,
     /* autocomplete transient UI state, keyed by dotted field path */
     acQuery: {},
     acLabel: {},
@@ -271,9 +279,30 @@ export default function CrForm(props: CrFormProps) {
       return depth * 14 + "px";
     },
 
-    /* ── mutation + validation ── */
+    /* Form-level error summary: every current error paired with its field label,
+     * for the role=alert region + in-page links after a failed submit. */
+    errorList(): any[] {
+      const labelByKey: Record<string, string> = {};
+      const list = state.rows();
+      for (const r of list) if (r.t === "field") labelByKey[state.key(r.path)] = r.field.label;
+      const merged: Record<string, string> = {};
+      if (state.submitted) for (const k in state.errs) if (state.errs[k]) merged[k] = state.errs[k];
+      if (props.errors) for (const k in props.errors) if (props.errors[k]) merged[k] = props.errors[k];
+      return Object.keys(merged).map((k) => ({
+        key: k,
+        label: labelByKey[k] || k,
+        msg: merged[k],
+        cid: (props.id || "cr-form") + "-" + k.split(".").join("-"),
+      }));
+    },
+    submitBtnLabel(): string {
+      if (state.submitting) return props.pendingLabel || "Submitting…";
+      return props.submitLabel || "Submit";
+    },
+
+    /* ── mutation + validation (validate may be sync OR async) ── */
     revalidate(nextVals: any) {
-      if (props.validate) state.errs = props.validate(nextVals) || {};
+      if (props.validate) Promise.resolve(props.validate(nextVals) || {}).then((e: any) => { state.errs = e || {}; });
     },
     setField(path: any[], value: any) {
       const next = state.setDeep(state.vals, path, value);
@@ -303,12 +332,24 @@ export default function CrForm(props: CrFormProps) {
       event.preventDefault();
       const values = state.vals;
       state.submitted = true;
-      const e = props.validate ? props.validate(values) || {} : {};
-      state.errs = e;
-      const t: Record<string, boolean> = {};
-      for (const k of Object.keys(e)) t[k] = true;
-      state.touched = t;
-      if (Object.keys(e).length === 0 && props.onSubmit) props.onSubmit(values);
+      state.submitting = true;
+      /* validate may be sync or async — normalise with Promise.resolve; the
+       * button stays in its pending state until validate AND onSubmit settle. */
+      Promise.resolve(props.validate ? props.validate(values) || {} : {}).then((e: any) => {
+        const errs = e || {};
+        state.errs = errs;
+        const t: Record<string, boolean> = {};
+        for (const k of Object.keys(errs)) t[k] = true;
+        state.touched = t;
+        if (Object.keys(errs).length === 0 && props.onSubmit) {
+          Promise.resolve(props.onSubmit(values)).then(
+            () => { state.submitting = false; },
+            () => { state.submitting = false; },
+          );
+        } else {
+          state.submitting = false;
+        }
+      });
     },
   });
 
@@ -316,6 +357,18 @@ export default function CrForm(props: CrFormProps) {
     <form class="cr-form" noValidate onSubmit={(event) => state.submit(event)}>
       <Show when={props.title}>
         <h3 class="cr-form__title">{props.title}</h3>
+      </Show>
+      <Show when={props.errorSummary !== false && state.errorList().length > 0}>
+        <div class="cr-form__summary" role="alert">
+          <span class="cr-form__summary-title">{state.errorList().length + " to fix"}</span>
+          <ul class="cr-form__summary-list">
+            <For each={state.errorList()}>
+              {(e: { key: string; label: string; msg: string; cid: string }) => (
+                <li><a class="cr-form__summary-link" href={"#" + e.cid}>{e.label}</a> — {e.msg}</li>
+              )}
+            </For>
+          </ul>
+        </div>
       </Show>
       <For each={state.rows()}>
         {(row: any) => (
@@ -516,8 +569,8 @@ export default function CrForm(props: CrFormProps) {
         )}
       </For>
       <div class="cr-form__actions">
-        <button type="submit" class="cr-btn" disabled={props.disabled}>
-          {props.submitLabel || "Submit"}
+        <button type="submit" class="cr-btn" disabled={props.disabled || state.submitting} aria-busy={state.submitting ? "true" : undefined}>
+          {state.submitBtnLabel()}
         </button>
       </div>
     </form>
