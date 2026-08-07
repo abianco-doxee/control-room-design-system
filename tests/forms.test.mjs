@@ -106,6 +106,65 @@ test("required empty field reports an error (not silently valid)", () => {
   assert.ok(r.errors.email);
 });
 
+test("nested objects + arrays: model shape, dotted error paths, coercion", () => {
+  const Nested = type({
+    name: "string >= 2",
+    address: { city: "string >= 1", zip: "string" },
+    tags: "string[]",
+    members: type({ email: "string.email", admin: "boolean" }).array(),
+  });
+  const { model, validate } = defineForm(Nested);
+
+  // model: group + array kinds with nested descriptors
+  const byName = Object.fromEntries(model.fields.map((f) => [f.name, f]));
+  assert.equal(byName.address.kind, "group");
+  assert.equal(byName.address.fields.find((f) => f.name === "city").kind, "text");
+  assert.equal(byName.tags.kind, "array");
+  assert.equal(byName.tags.item.kind, "text");
+  assert.equal(byName.members.kind, "array");
+  assert.equal(byName.members.item.kind, "group");
+  assert.equal(byName.members.item.fields.find((f) => f.name === "admin").kind, "checkbox");
+
+  // dotted error paths (with array index) + nested coercion (member.admin → bool)
+  const bad = validate({
+    name: "Ada",
+    address: { city: "", zip: "1" },
+    tags: ["ok"],
+    members: [{ email: "a@b.co", admin: "on" }, { email: "nope", admin: "" }],
+  });
+  assert.equal(bad.valid, false);
+  assert.ok(bad.errors["address.city"], "nested object error keyed by dotted path");
+  assert.ok(bad.errors["members.1.email"], "array item error keyed with index");
+  assert.equal(bad.errors["members.0.email"], undefined, "valid item has no error");
+
+  const ok = validate({
+    name: "Ada",
+    address: { city: "Berlin", zip: "10115" },
+    tags: ["a", "b"],
+    members: [{ email: "a@b.co", admin: "on" }],
+  });
+  assert.equal(ok.valid, true);
+  assert.equal(ok.data.members[0].admin, true, "nested checkbox coerced to boolean");
+  assert.deepEqual(ok.data.tags, ["a", "b"]);
+});
+
+test("nested overrides + source passthrough via dotted paths", () => {
+  const S = type({ address: { city: "string" }, region: "'eu' | 'us'" });
+  const src = async () => [];
+  const { model } = defineForm(S, {
+    overrides: {
+      "address.city": { label: "Town", hint: "municipality" },
+      region: { kind: "autocomplete", source: src },
+    },
+  });
+  const city = model.fields.find((f) => f.name === "address").fields[0];
+  assert.equal(city.label, "Town");
+  assert.equal(city.hint, "municipality");
+  const region = model.fields.find((f) => f.name === "region");
+  assert.equal(region.kind, "autocomplete");
+  assert.equal(region.source, src);
+});
+
 test("roundtrip: ArkType → JSON Schema → ArkType still validates", () => {
   const js = toJsonSchema(ArkSchema);
   const back = toArkType(js);
