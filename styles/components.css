@@ -530,6 +530,26 @@
 .cr-chart__key { display: inline-flex; align-items: center; gap: var(--space-1); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--ink); }
 .cr-chart__sw { width: 10px; height: 10px; border: var(--brd-hair) solid var(--border); flex: none; }
 
+/* Hover layer — crosshair + cursor dots (SVG) and a top-docked tooltip (HTML).
+ * Progressive enhancement: nothing renders until pointer-over, so the static
+ * page and visual baselines are unaffected. Interaction feedback, so it stays
+ * on under the calm profile. */
+.cr-chart { position: relative; }
+.cr-chart__cross { stroke: color-mix(in srgb, var(--ink) 55%, transparent); stroke-width: 1; stroke-dasharray: 2 2; }
+.cr-chart__cursor { stroke: var(--panel-2); stroke-width: 1.5; }
+.cr-chart__tip {
+  position: absolute; top: var(--space-1); transform: translateX(-50%); z-index: 2; pointer-events: none;
+  display: flex; flex-direction: column; gap: 2px; padding: var(--space-1) var(--space-2);
+  background: var(--panel); border: var(--brd) solid var(--border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  font-family: var(--font-mono); font-size: var(--text-xs); white-space: nowrap;
+}
+.cr-chart__tip-x { color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.cr-chart__tip-row { display: inline-flex; align-items: center; gap: var(--space-1); color: var(--ink); }
+.cr-chart__tip-sw { width: 9px; height: 9px; border: var(--brd-hair) solid var(--border); flex: none; }
+.cr-chart__tip-n { color: var(--ink); }
+.cr-chart__tip-v { color: var(--ink); font-weight: 700; margin-left: auto; padding-left: var(--space-2); }
+
 /* Line chart */
 .cr-linechart { margin: 0; }
 .cr-linechart__plot { display: block; width: 100%; height: auto; background: var(--panel-2); border: var(--brd-hair) solid var(--border); }

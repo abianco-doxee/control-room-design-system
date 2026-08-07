@@ -43,7 +43,7 @@
     "build:tokens": "node build/build-tokens.mjs",
     "build:palette": "node build/build-palette.mjs",
     "build:tw": "tailwindcss -i build/tailwind-input.css -o dist/utilities.css",
-    "build:components": "mitosis build && node build/build-fix-qwik.mjs && node build/build-barrels.mjs",
+    "build:components": "mitosis build && node build/build-fix-qwik.mjs && node build/build-fix-react.mjs && node build/build-barrels.mjs",
     "build:catalog": "node build/build-catalog.mjs",
     "build:gallery": "node build/build-gallery.mjs",
     "build:showcase": "node build/build-showcase.mjs",
