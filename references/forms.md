@@ -136,6 +136,24 @@ fine:
 
 See `examples/console` for a live "provision a session" form wired this way.
 
+### Conditional fields
+
+Give a field a `when(values) => boolean` (via `overrides`) and it renders **and
+validates only when the predicate holds** for the current values. A hidden field
+is pruned from the validated payload, so a hidden required field never errors and
+its stale value isn't submitted:
+
+```ts
+defineForm(schema, {
+  overrides: {
+    notify: { label: "Notify on change" },
+    contact: { label: "Contact email", when: (v) => v.notify === true },
+  },
+});
+```
+
+`when` reads the whole form's values, so visibility can depend on any other field.
+
 ### Field kinds
 
 Inferred from the schema (overridable): `text` · `email` · `url` · `number` ·
