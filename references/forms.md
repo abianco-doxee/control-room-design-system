@@ -93,6 +93,30 @@ change once it has been touched** (so an error clears as you fix it):
 />
 ```
 
+### Controlled errors (server-side & Qwik)
+
+Besides the synchronous `validate` prop, `CrForm` accepts a controlled **`errors`**
+map (dotted path → message) that is always shown, merged over the internal
+validator's. Use it to surface **server-side** errors after a submit, or to drive
+validation entirely from the parent.
+
+The parent-driven path is what makes `CrForm` work under **Qwik**, whose function
+props are async QRLs that can't return a value across the resumability boundary
+(so a synchronous `validate` prop can't be called there). Instead, validate inside
+the async `onChange` / `onSubmit` handler and feed the result back through
+`errors` — the Form Model is plain serializable data, so it crosses the boundary
+fine:
+
+```tsx
+<CrForm
+  fields={form.model.fields}
+  errors={state.errors}
+  onSubmit$={(v) => { const r = form.validate(v); state.errors = r.errors; if (r.valid) create(r.data); }}
+/>
+```
+
+See `examples/console` for a live "provision a session" form wired this way.
+
 ### Field kinds
 
 Inferred from the schema (overridable): `text` · `email` · `url` · `number` ·
