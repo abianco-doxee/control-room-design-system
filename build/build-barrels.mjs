@@ -39,12 +39,25 @@ for (const [target, { ext, index }] of Object.entries(TARGETS)) {
     .map((f) => f.slice(0, -(ext.length + 1)))
     .sort();
 
+  // TypeScript targets carry an exported `<Name>Props` interface per component; a
+  // typed package re-exports those types alongside the component so consumers get
+  // `import { CrButton, type CrButtonProps }` from the one entry point.
+  const isTs = target === "react" || target === "qwik";
+  const hasPropsType = (name) => {
+    if (!isTs) return false;
+    const src = readFileSync(join(compDir, `${name}.${ext}`), "utf8");
+    return new RegExp(`export\\s+(?:interface|type)\\s+${name}Props\\b`).test(src);
+  };
+
   const lines = names.map((name) => {
     // Angular emits `export default class` + a named `<Name>Module`; re-export both.
     if (target === "angular") {
       return `export { default as ${name}, ${name}Module } from "./components/${name}.${ext}";`;
     }
-    return `export { default as ${name} } from "./components/${name}.${ext}";`;
+    const value = `export { default as ${name} } from "./components/${name}.${ext}";`;
+    return hasPropsType(name)
+      ? `${value}\nexport type { ${name}Props } from "./components/${name}.${ext}";`
+      : value;
   });
 
   const body = HEADER + lines.join("\n") + "\n";

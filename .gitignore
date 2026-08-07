@@ -9,6 +9,8 @@ dist/utilities.css
 
 # Mitosis framework output — build artifact (npm run build:components)
 dist/frameworks/
+# Compiled, publishable framework packages (derived from dist/frameworks via build:pkg)
+dist/pkg/
 
 # Astro / Starlight build output & cache (site output goes to site-dist/)
 site-dist/

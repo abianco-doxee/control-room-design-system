@@ -1,0 +1,60 @@
+// Consumability gate for the compiled React package (node:test).
+// Run: npm run test:pkg   (pretest:pkg builds dist/pkg/react first)
+//
+// Proves the named exports are REAL: it imports the built package exactly as a
+// consumer would (`import { CrButton } from ".../react"`), renders a component to
+// HTML through react-dom/server, and confirms the typed declarations ship. This is
+// the difference between "compiles" and "installable".
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { existsSync, readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import * as CR from "../dist/pkg/react/index.js";
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+const PKG = join(ROOT, "dist", "pkg", "react");
+
+test("the package exposes every component as a named export", () => {
+  // a representative spread across categories
+  const expected = ["CrButton", "CrPanel", "CrChip", "CrForm", "CrCombobox", "CrTabs", "CrBarChart", "CrSigil"];
+  for (const name of expected) {
+    assert.equal(typeof CR[name], "function", `${name} should be a named export function`);
+  }
+  // and the full barrel is substantial (all 61 components)
+  const fns = Object.keys(CR).filter((k) => typeof CR[k] === "function");
+  assert.ok(fns.length >= 60, `expected ~61 component exports, got ${fns.length}`);
+});
+
+test("a named export renders to correct Control Room markup", () => {
+  const html = renderToStaticMarkup(
+    createElement(CR.CrButton, { signal: "accent", emphasis: "outline" }, "Deploy"),
+  );
+  assert.match(html, /<button/);
+  assert.match(html, /class="cr-btn cr-btn--outline cr-btn--sig-accent"/, `got: ${html}`);
+  assert.match(html, />Deploy</);
+});
+
+test("a controlled component renders with its a11y wiring intact", () => {
+  const html = renderToStaticMarkup(
+    createElement(CR.CrChip, { signal: "done" }, "merged"),
+  );
+  assert.match(html, /cr-chip/);
+  assert.match(html, />merged</);
+});
+
+test("typed declarations ship alongside the JS", () => {
+  assert.ok(existsSync(join(PKG, "index.d.ts")), "index.d.ts present");
+  assert.ok(existsSync(join(PKG, "index.js")), "index.js present");
+  const idx = readFileSync(join(PKG, "index.d.ts"), "utf8");
+  assert.match(idx, /export \{ default as CrButton \}/);
+  assert.match(idx, /export type \{ CrButtonProps \}/, "prop types re-exported from the entry");
+  // declaration re-exports must resolve (.js, not .tsx — no source ships)
+  assert.doesNotMatch(idx, /\.tsx"/, "no .tsx specifiers leak into the shipped types");
+
+  const btn = readFileSync(join(PKG, "components", "CrButton.d.ts"), "utf8");
+  assert.match(btn, /export interface CrButtonProps/);
+  assert.match(btn, /emphasis\?:/);
+});
