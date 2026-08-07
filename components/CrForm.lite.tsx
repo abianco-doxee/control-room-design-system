@@ -18,6 +18,10 @@ export interface CrFormField {
   /** For `autocomplete`: options come from a static array, the field's enum
    *  `options`, or an async `(query) => Promise<{value,label}[]>`. */
   source?: { value: string; label: string }[] | ((query: string) => any);
+  /** Conditional visibility — the field renders (and validates) only when this
+   *  returns true for the current form values. Hidden fields are pruned from the
+   *  validated payload, so a hidden required field never errors. */
+  when?: (values: Record<string, any>) => boolean;
   min?: number;
   max?: number;
   step?: number | string;
@@ -137,6 +141,34 @@ export default function CrForm(props: CrFormProps) {
       return "";
     },
 
+    /* ── conditional visibility ── */
+    isHidden(field: CrFormField, values: any): boolean {
+      return field.when ? !field.when(values || {}) : false;
+    },
+    /* A copy of `values` with hidden fields (and their subtrees) removed, so a
+     * hidden required field never errors and its stale value isn't submitted.
+     * `ctx` is the full form values the visibility predicates read. */
+    pruneFields(fields: CrFormField[], values: any, ctx: any): any {
+      const out: Record<string, any> = {};
+      for (const f of fields) {
+        if (state.isHidden(f, ctx)) continue;
+        const v = values ? values[f.name] : undefined;
+        if (f.kind === "group") {
+          out[f.name] = state.pruneFields(f.fields || [], v || {}, ctx);
+        } else if (f.kind === "array") {
+          out[f.name] = Array.isArray(v)
+            ? v.map((it: any) => (f.item && f.item.kind === "group" ? state.pruneFields(f.item.fields || [], it || {}, ctx) : it))
+            : v;
+        } else if (v !== undefined) {
+          out[f.name] = v;
+        }
+      }
+      return out;
+    },
+    pruned(values: any): any {
+      return state.pruneFields(props.fields || [], values, values);
+    },
+
     /* ── autocomplete (a select whose options come from a `source`) ──
      * source is a static array, or the field's enum `options`, or an async
      * (query) => Promise<{value,label}[]>. A real async source should debounce /
@@ -246,6 +278,7 @@ export default function CrForm(props: CrFormProps) {
     /* ── the flat render-list (recursion in JS, flat DOM) ── */
     build(fields: CrFormField[], prefix: any[], depth: number, out: any[]) {
       for (const f of fields) {
+        if (state.isHidden(f, state.vals)) continue;
         const path = prefix.concat([f.name]);
         if (f.kind === "group") {
           out.push({ t: "group", path, field: f, depth });
@@ -302,7 +335,7 @@ export default function CrForm(props: CrFormProps) {
 
     /* ── mutation + validation (validate may be sync OR async) ── */
     revalidate(nextVals: any) {
-      if (props.validate) Promise.resolve(props.validate(nextVals) || {}).then((e: any) => { state.errs = e || {}; });
+      if (props.validate) Promise.resolve(props.validate(state.pruned(nextVals)) || {}).then((e: any) => { state.errs = e || {}; });
     },
     setField(path: any[], value: any) {
       const next = state.setDeep(state.vals, path, value);
@@ -335,14 +368,15 @@ export default function CrForm(props: CrFormProps) {
       state.submitting = true;
       /* validate may be sync or async — normalise with Promise.resolve; the
        * button stays in its pending state until validate AND onSubmit settle. */
-      Promise.resolve(props.validate ? props.validate(values) || {} : {}).then((e: any) => {
+      const payload = state.pruned(values); /* drop hidden fields from validation + submit */
+      Promise.resolve(props.validate ? props.validate(payload) || {} : {}).then((e: any) => {
         const errs = e || {};
         state.errs = errs;
         const t: Record<string, boolean> = {};
         for (const k of Object.keys(errs)) t[k] = true;
         state.touched = t;
         if (Object.keys(errs).length === 0 && props.onSubmit) {
-          Promise.resolve(props.onSubmit(values)).then(
+          Promise.resolve(props.onSubmit(payload)).then(
             () => { state.submitting = false; },
             () => { state.submitting = false; },
           );

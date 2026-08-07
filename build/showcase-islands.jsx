@@ -179,6 +179,8 @@ const SessionSchema = ark({
   replicas: "1 <= number.integer <= 32",
   region: "'eu-west' | 'us-east' | 'ap-south'",
   owner: "string >= 2",
+  notify: "boolean",
+  "contact?": "string.email", // conditional — shown only when notify is on
   limits: { cpu: "1 <= number <= 64", memGB: "number > 0" }, // nested group
   "tags?": "string[]", // scalar array
   "hooks?": ark({ event: "'deploy' | 'scale' | 'error'", url: "string.url" }).array(), // object array
@@ -186,13 +188,15 @@ const SessionSchema = ark({
   autoscale: "boolean",
 });
 const FORM_OVERRIDES = {
-  order: ["name", "endpoint", "replicas", "region", "owner", "limits", "tags", "hooks", "notes", "autoscale"],
+  order: ["name", "endpoint", "replicas", "region", "owner", "notify", "contact", "limits", "tags", "hooks", "notes", "autoscale"],
   overrides: {
     name: { label: "Session name", hint: "lowercase, no spaces", placeholder: "nova-01" },
     endpoint: { label: "Endpoint URL", placeholder: "https://…" },
     replicas: { hint: "1–32 workers" },
     region: { label: "Region", kind: "autocomplete" }, // searchable enum (static source)
     owner: { label: "Owner", kind: "autocomplete", source: searchOwners, placeholder: "search people…", hint: "async source" },
+    notify: { label: "Notify on state change" },
+    contact: { label: "Contact email", when: (v) => v.notify === true, hint: "conditional — shown when notify is on" },
     limits: { label: "Resource limits" },
     "limits.cpu": { label: "vCPU", hint: "1–64" },
     "limits.memGB": { label: "Memory (GB)" },
