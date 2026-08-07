@@ -1193,8 +1193,14 @@ outside click. The active row shows an ascii `▸` marker.
 
 ```tsx
 <CrCombobox value={worker} options={workers} placeholder="worker…" onChange={setWorker} />
+<CrCombobox source={(q) => fetch(`/api/workers?q=${q}`).then(r => r.json())} onChange={setWorker} />
 ```
 
+- **Two source modes.** Pass a static `options` list (filtered client-side) **or**
+  an async `source(query) => Promise<{value,label}[]>` for a remote lookup — the
+  source filters its own results (and should debounce / order them); the field
+  shows a `searching…` row while it resolves. The same source model drives
+  `CrForm`'s `autocomplete` field kind (see [Forms](forms.md#autocomplete)).
 - **MUST** keep `aria-expanded`/`aria-activedescendant` in sync and give each option
   `role="option"`. It seeds its text from `value` on mount; selecting emits the
   value.

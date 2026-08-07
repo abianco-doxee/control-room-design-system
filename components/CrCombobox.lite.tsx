@@ -6,7 +6,11 @@ export interface CrComboOption {
 }
 
 export interface CrComboboxProps {
-  options: CrComboOption[];
+  /** Static option list (filtered client-side). Omit when using `source`. */
+  options?: CrComboOption[];
+  /** Async data source: `(query) => Promise<CrComboOption[]>`. When set, it — not
+   *  `options` — supplies (and filters) the results per keystroke. */
+  source?: (query: string) => any;
   /** Selected value (controlled out; the field seeds its text from it). */
   value?: string;
   placeholder?: string;
@@ -15,10 +19,14 @@ export interface CrComboboxProps {
   onChange?: (value: string) => void;
 }
 
-/* Autocomplete: an input (role=combobox) filtering a listbox. Focus stays in the
+/* Autocomplete: an input (role=combobox) over a listbox. Focus stays in the
  * field; ↑/↓ move the active option (aria-activedescendant), Enter selects, Esc
  * closes. A scrim closes it on outside click. The active row shows an ascii ▸.
- * Filtered results are a useStore METHOD (a getter would run before the store
+ *
+ * Two source modes: a static `options` list (filtered here as you type), or an
+ * async `source(query)` for a remote lookup (the source does its own filtering;
+ * it should also debounce / order its responses — the component renders whatever
+ * resolves). Results are a useStore METHOD (a getter would run before the store
  * exists under Qwik). Styling via .cr-combobox. */
 export default function CrCombobox(props: CrComboboxProps) {
   const inputRef = useRef(null);
@@ -27,15 +35,39 @@ export default function CrCombobox(props: CrComboboxProps) {
     query: "",
     open: false,
     active: 0,
+    loading: false,
+    loaded: [],
     results(): CrComboOption[] {
+      if (props.source) return state.loaded;
       const q = state.query.trim().toLowerCase();
-      if (!q) return props.options;
-      return props.options.filter((o: CrComboOption) => o.label.toLowerCase().includes(q));
+      const opts = props.options || [];
+      if (!q) return opts;
+      return opts.filter((o: CrComboOption) => o.label.toLowerCase().includes(q));
+    },
+    load(query: string) {
+      if (!props.source) return;
+      state.loading = true;
+      Promise.resolve(props.source(query)).then(
+        (res: any) => {
+          state.loaded = res || [];
+          state.loading = false;
+          state.active = 0;
+        },
+        () => {
+          state.loaded = [];
+          state.loading = false;
+        },
+      );
     },
     onQuery(v: string) {
       state.query = v;
       state.open = true;
       state.active = 0;
+      if (props.source) state.load(v);
+    },
+    openList() {
+      state.open = true;
+      if (props.source && state.loaded.length === 0) state.load(state.query || "");
     },
     close() {
       state.open = false;
@@ -69,7 +101,7 @@ export default function CrCombobox(props: CrComboboxProps) {
   });
 
   onMount(() => {
-    const match = props.options.find((o: CrComboOption) => o.value === props.value);
+    const match = (props.options || []).find((o: CrComboOption) => o.value === props.value);
     if (match) state.query = match.label;
   });
 
@@ -88,12 +120,15 @@ export default function CrCombobox(props: CrComboboxProps) {
         placeholder={props.placeholder || "Search…"}
         value={state.query}
         onInput={(event) => state.onQuery((event.target as HTMLInputElement).value)}
-        onFocus={() => (state.open = true)}
+        onFocus={() => state.openList()}
         onKeyDown={(event) => state.onKey(event)}
       />
       <Show when={state.open}>
         <button type="button" class="cr-combobox__scrim" aria-hidden="true" tabIndex={-1} onClick={() => state.close()}></button>
         <ul class="cr-combobox__list" id="cr-combobox-list" role="listbox">
+          <Show when={state.loading}>
+            <li class="cr-combobox__empty" aria-disabled="true">searching…</li>
+          </Show>
           <For each={state.results()}>
             {(opt: CrComboOption, i: number) => (
               <li
@@ -108,7 +143,7 @@ export default function CrCombobox(props: CrComboboxProps) {
               </li>
             )}
           </For>
-          <Show when={state.results().length === 0}>
+          <Show when={!state.loading && state.results().length === 0}>
             <li class="cr-combobox__empty" aria-disabled="true">no matches</li>
           </Show>
         </ul>

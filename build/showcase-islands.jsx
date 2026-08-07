@@ -228,8 +228,11 @@ const DEMOS = {
   },
   combobox: {
     tag: "CrCombobox",
-    defs: [T("text", "placeholder", "Search regions…"), T("text", "label", "Region")],
-    render: (s) => h(CrCombobox, { options: OPTIONS, label: s.label, placeholder: s.placeholder, onChange: () => {} }),
+    defs: [T("boolean", "async", false), T("text", "placeholder", "Search regions…"), T("text", "label", "Region")],
+    render: (s) =>
+      s.async
+        ? h(CrCombobox, { source: searchOwners, label: "Owner", placeholder: "search people…", onChange: () => {} })
+        : h(CrCombobox, { options: OPTIONS, label: s.label, placeholder: s.placeholder, onChange: () => {} }),
   },
   palette: {
     tag: "CrPalette",
