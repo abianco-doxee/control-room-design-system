@@ -19,13 +19,22 @@ import { browserScript } from "./gallery-scripts.mjs";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const tokensCss = readFileSync(join(ROOT, "dist", "control-room.css"), "utf8");
 const componentsCss = readFileSync(join(ROOT, "styles", "components.css"), "utf8");
-/* The `slate` BRAND is not in the built-in bundle — it's an external brand file
- * (brands/slate.json → dist/themes/slate.css). Appending it proves the whole
- * browser reskins to a brand via one appearance file + data-theme, no component
- * change. See references/theming.md. */
-const slateThemeCss = existsSync(join(ROOT, "dist", "themes", "slate.css"))
-  ? readFileSync(join(ROOT, "dist", "themes", "slate.css"), "utf8")
-  : "";
+/* External BRANDS (brands/*.json → dist/themes/<name>.css) live outside the
+ * built-in bundle. Appending each proves the whole browser reskins to a brand via
+ * one appearance file + data-theme, with no component change. See theming.md. */
+const BUILTIN_THEMES = new Set(["dark", "light", "extreme", "phosphor"]);
+const themesDir = join(ROOT, "dist", "themes");
+const brandThemes = existsSync(themesDir)
+  ? readdirSync(themesDir)
+      .filter((f) => f.endsWith(".css"))
+      .map((f) => f.slice(0, -4))
+      .filter((n) => !BUILTIN_THEMES.has(n))
+      .sort()
+  : [];
+const brandThemeCss = brandThemes.map((n) => readFileSync(join(themesDir, `${n}.css`), "utf8")).join("\n");
+const brandButtons = brandThemes
+  .map((n) => `    <button data-set="${n}" aria-pressed="false" title="external brand — brands/${n}.json">${n} ▸</button>`)
+  .join("\n");
 const catalog = JSON.parse(readFileSync(join(ROOT, "catalog", "catalog.json"), "utf8"));
 
 let displayFace = "";
@@ -358,7 +367,7 @@ const html = `<!doctype html>
 <style>
 ${displayFace}
 ${tokensCss}
-${slateThemeCss}
+${brandThemeCss}
 ${componentsCss}
 /* browser chrome (not part of the shipped system) */
 * { box-sizing: border-box; }
@@ -443,7 +452,7 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
     <button data-set="light" aria-pressed="false">light</button>
     <button data-set="extreme" aria-pressed="false">extreme</button>
     <button data-set="phosphor" aria-pressed="false">phosphor</button>
-    <button data-set="slate" aria-pressed="false" title="external brand — brands/slate.json">slate ▸</button>
+${brandButtons}
   </div>
 </div>
 <div class="wrap">
