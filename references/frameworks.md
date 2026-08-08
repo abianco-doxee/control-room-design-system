@@ -35,6 +35,26 @@ each entry as a consumer would — React renders through `react-dom/server`, Qwi
 loads its named exports, Vue's SFCs are structurally verified — and asserts the
 typed declarations ship.
 
+## Runtime verification (the "six frameworks" claim, proven)
+
+"Compiles to six frameworks" is only worth anything if each target actually *runs*.
+Two gates back it up:
+
+| target | verified how | gate |
+| --- | --- | --- |
+| React | SSR-rendered via `react-dom/server`; markup + props asserted | `test:pkg` |
+| Vue | compiled SFC → `@vue/server-renderer`; markup + props asserted | `test:frameworks` |
+| Svelte | compiled (`svelte/compiler`, ssr) → `.render()`; markup asserted | `test:frameworks` |
+| Solid | compiled (`babel-preset-solid`, ssr) → `renderToString`; markup asserted | `test:frameworks` |
+| Qwik | imported as a consumer; named exports load | `test:pkg` |
+| Angular | compiled + barrel built (structural) | `build:components` |
+
+`test:frameworks` (harness in `build/render-fw.mjs`) feeds each target's compiled
+output through its **own** compiler + server renderer and asserts real Control Room
+markup with props driving the output — so a component that renders under React but
+breaks under Svelte/Solid/Vue can't slip through. Angular remains build-verified
+only (its runtime needs a heavier platform-server harness) — the one honest gap.
+
 ## Coverage
 
 **Every component** is authored in Mitosis (`components/*.lite.tsx`) — Panel,
