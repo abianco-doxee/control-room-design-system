@@ -8,7 +8,7 @@
 // pkg gate; Qwik by its import gate. Together: all six targets verified.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { RENDERERS } from "../build/render-fw.mjs";
+import { RENDERERS, instantiateAngular } from "../build/render-fw.mjs";
 
 // components that render cleanly headless (no children needed), with any required props
 const BREADTH = [
@@ -46,3 +46,20 @@ for (const [fw, render] of Object.entries(RENDERERS)) {
     assert.notEqual(low, high, `${fw}: different values must produce different markup`);
   });
 }
+
+// Angular: full SSR needs the Angular build linker (not viable in plain Node), so
+// we verify the component's LOGIC executes on the real @angular/core instead.
+test("angular: CrButton logic executes on @angular/core (@Input getter + @Output)", async () => {
+  const { instance } = await instantiateAngular("CrButton", { signal: "accent", emphasis: "outline", size: "sm" });
+  assert.equal(instance.cls, "cr-btn cr-btn--outline cr-btn--sig-accent cr-btn--sm", "@Input-driven class getter runs");
+  assert.equal(typeof instance.onClick.emit, "function", "@Output is a real EventEmitter");
+});
+
+test("angular: a spread instantiates on @angular/core with cr- templates", async () => {
+  for (const name of ["CrPanel", "CrChip", "CrAlert", "CrProgress", "CrDataGrid"]) {
+    const { instance, source } = await instantiateAngular(name, {});
+    assert.ok(instance, `${name} instantiated`);
+    assert.match(source, /@Component\(/, `${name} is an Angular component`);
+    assert.match(source, /cr-/, `${name} template carries cr- markup`);
+  }
+});

@@ -47,13 +47,16 @@ Two gates back it up:
 | Svelte | compiled (`svelte/compiler`, ssr) → `.render()`; markup asserted | `test:frameworks` |
 | Solid | compiled (`babel-preset-solid`, ssr) → `renderToString`; markup asserted | `test:frameworks` |
 | Qwik | imported as a consumer; named exports load | `test:pkg` |
-| Angular | compiled + barrel built (structural) | `build:components` |
+| Angular | instantiated on real `@angular/core`; `@Input`-driven getter + `@Output` executed | `test:frameworks` |
 
 `test:frameworks` (harness in `build/render-fw.mjs`) feeds each target's compiled
-output through its **own** compiler + server renderer and asserts real Control Room
-markup with props driving the output — so a component that renders under React but
-breaks under Svelte/Solid/Vue can't slip through. Angular remains build-verified
-only (its runtime needs a heavier platform-server harness) — the one honest gap.
+output through its **own** compiler + runtime and asserts real Control Room markup /
+logic with props driving the output — so a component that works under React but
+breaks under Svelte/Solid/Vue/Angular can't slip through. Angular can't be
+SSR-rendered in plain Node (its distributed packages are partially-compiled and need
+the Angular build linker), so its component **logic** is executed on the real
+`@angular/core` instead — a genuine runtime check, one notch below full template
+render. **All six targets are now verified at runtime.**
 
 ## Coverage
 
