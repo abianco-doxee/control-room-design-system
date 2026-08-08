@@ -174,6 +174,32 @@ that, so they change a brand's *character*, not just its palette. Chassis tokens
 optional — omit them and the brand inherits the structure layer unchanged.
 Build-time; presets in `build/chassis.mjs`.
 
+### Type — fonts & display character (`$fonts`)
+
+The last non-colour identity axis. `$fonts` sets the three font families; the
+display/label *character* (weight, tracking, transform) is set with the type tokens
+directly:
+
+```jsonc
+{
+  "$fonts": {
+    "display": "'Helvetica Neue', Arial, sans-serif",
+    "sans": "'Helvetica Neue', Arial, sans-serif",
+    "mono": "'IBM Plex Mono', ui-monospace, monospace"
+  },
+  "type-display-transform": "none",      // mixed-case masthead instead of UPPERCASE
+  "type-display-tracking": "-0.01em"
+}
+```
+
+Brandable type tokens: `--font-sans`, `--font-display`, `--font-mono`,
+`--type-display-weight` / `-tracking` / `-leading` / `-transform`,
+`--type-label-tracking` / `-transform`. The **base sizes** stay in the structure
+layer — they carry density/layout, not brand. A brand supplying a custom family
+**must load that font itself** (the app bundles it); the token value is just a CSS
+font stack, so always include a fallback. That's the type half of
+`brands/boardroom.json`. Generator in `build/type.mjs`.
+
 ### Signal voice (`$signalTone`)
 
 The signal roles are a **state channel** — `--sig-err` *means* failing — so a brand

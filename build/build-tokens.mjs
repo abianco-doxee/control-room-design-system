@@ -17,7 +17,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { themeCss, THEME_ROLES, CHASSIS_OVERRIDABLE } from "../lib/theme/index.js";
+import { themeCss, THEME_ROLES, CHASSIS_OVERRIDABLE, TYPE_OVERRIDABLE } from "../lib/theme/index.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = join(ROOT, "tokens", "tokens.json");
@@ -194,6 +194,7 @@ function themeContract() {
       selector: src.meta.selector,
       roles,
       chassisOverridable: CHASSIS_OVERRIDABLE,
+      typeOverridable: TYPE_OVERRIDABLE,
     },
     null,
     2,
