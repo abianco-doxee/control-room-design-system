@@ -22,9 +22,27 @@ import {
   CrButton, CrChoice, CrField, CrInput, CrTextarea, CrBreadcrumb, CrToast,
   CrKbd, CrAlert, CrChip, CrEmptyState, CrMeter, CrProgress, CrStatusDot,
   CrTag, CrSessionRow, CrPanel, CrIcon,
-  CrSparkline, CrLineChart, CrBarChart, CrStackedBar, CrForm,
+  CrSparkline, CrLineChart, CrBarChart, CrStackedBar, CrForm, CrDataGrid,
 } from "../dist/frameworks/react/index.ts";
 import { defineForm, type as ark } from "../lib/forms/index.js";
+
+// A big, deterministic dataset to exercise the data grid's virtualization.
+const GRID_REGIONS = ["eu-west", "us-east", "ap-south", "sa-east"];
+const GRID_STATES = ["working", "waiting", "done", "error", "idle"];
+const GRID_ROWS = Array.from({ length: 2000 }, (_, i) => ({
+  id: i + 1,
+  host: "node-" + String(1000 + i),
+  region: GRID_REGIONS[i % GRID_REGIONS.length],
+  cpu: (i * 37) % 100,
+  status: GRID_STATES[i % GRID_STATES.length],
+}));
+const GRID_COLS = [
+  { key: "id", label: "ID", sortable: true, align: "end", width: "70px" },
+  { key: "host", label: "Host", sortable: true, width: "1fr" },
+  { key: "region", label: "Region", sortable: true, width: "110px" },
+  { key: "cpu", label: "CPU %", sortable: true, align: "end", width: "90px" },
+  { key: "status", label: "Status", sortable: true, width: "110px" },
+];
 
 const ICON_NAMES = ["play", "pause", "stop", "retry", "deploy", "scan", "search", "alert", "error", "done", "clock", "cpu", "logs", "filter", "sliders", "close", "chevron", "plus", "minus", "trash", "external", "copy", "session", "menu"];
 
@@ -493,6 +511,24 @@ const DEMOS = {
           h("summary", { style: { fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--muted)", cursor: "pointer" } }, "exported JSON Schema"),
           h("pre", { className: "pg__code" }, JSON.stringify(FORM_ARK.jsonSchema, null, 2))));
     },
+  },
+  datagrid: {
+    tag: "CrDataGrid",
+    defs: [T("boolean", "selectable", true)],
+    extra: { picked: 0 },
+    render: (s, set) =>
+      h("div", { style: { display: "grid", gap: "10px" } },
+        h("p", { className: "pg__note", style: { margin: 0 } },
+          GRID_ROWS.length.toLocaleString() + " rows, virtualized — only the visible slice is in the DOM. Sort a column; select rows."),
+        h(CrDataGrid, {
+          columns: GRID_COLS,
+          rows: GRID_ROWS,
+          rowKey: "id",
+          selectable: s.selectable,
+          height: 300,
+          onSelectionChange: (keys) => set("picked", keys.length),
+        }),
+        h("p", { className: "pg__note", style: { margin: 0 } }, s.picked + " selected")),
   },
   input: {
     tag: "CrInput",

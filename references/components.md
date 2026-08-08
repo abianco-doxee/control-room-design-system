@@ -380,6 +380,45 @@ checkbox column and toggles `tr[aria-selected]` (the row washes to `--sig-work`)
 
 ---
 
+## Data grid {#data-grid}
+
+**Purpose.** A dense, **virtualized** table for large datasets — thousands of rows
+that scroll smoothly because only the rows in (or near) the viewport are in the DOM.
+Use **Table** for small, static tabular data; reach for **`CrDataGrid`** when the
+row count is large or unbounded.
+
+```tsx
+<CrDataGrid
+  columns={[
+    { key: "id", label: "ID", sortable: true, align: "end", width: "70px" },
+    { key: "host", label: "Host", sortable: true, width: "1fr" },
+    { key: "cpu", label: "CPU %", sortable: true, align: "end", width: "90px" },
+  ]}
+  rows={rows}          /* any[]; 10k rows is fine */
+  rowKey="id"          /* stable selection key (default: index) */
+  selectable            /* leading checkbox column + select-all */
+  height={320}          /* scroll viewport px */
+  rowHeight={34}        /* fixed row height — the virtualization basis */
+  onSortChange={(key, dir) => {}}
+  onSelectionChange={(keys) => {}}
+/>
+```
+
+- **Virtualization** is fixed-row-height: a sizer preserves the full scroll height
+  and the visible window is offset with `translateY`. Row height must be uniform
+  (`rowHeight`); variable-height rows aren't supported.
+- **Sorting** cycles a sortable header asc → desc → none (stable; copies the array,
+  never mutates the caller's). Emits `onSortChange`.
+- **Selection** is a checkbox column with select-all; keys come from `rowKey`.
+  Emits `onSelectionChange(keys)`.
+- It's a **div-grid** (`role="grid"` with `row`/`columnheader`/`gridcell`,
+  `aria-sort`, `aria-rowcount`, `aria-selected`), not a `<table>`, so the
+  virtualization offset composes cleanly across all targets. Header controls and
+  checkboxes are native/focusable; **full arrow-key cell navigation is a planned
+  follow-up** (today: Tab + Enter/Space on the header buttons and checkboxes).
+
+---
+
 ## Tabs {#tabs}
 
 **Purpose.** Switch between sibling views. A `role=tablist` of buttons with a

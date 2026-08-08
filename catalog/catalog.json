@@ -5,14 +5,14 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 65,
+    "count": 66,
     "categories": {
       "action": 1,
       "behavior": 1,
       "chart": 4,
       "forms": 13,
       "identity": 2,
-      "layout": 7,
+      "layout": 8,
       "media": 8,
       "navigation": 6,
       "overlay": 9,
@@ -20,7 +20,7 @@
       "state": 12
     },
     "lifecycles": {
-      "stable": 64,
+      "stable": 65,
       "experimental": 1
     }
   },
@@ -1056,6 +1056,53 @@
         "definition",
         "key-value",
         "detail"
+      ]
+    },
+    {
+      "id": "datagrid",
+      "name": "Data grid",
+      "kind": "component",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A dense, VIRTUALIZED data grid for large datasets: only the rows in (or near) the viewport are in the DOM, so thousands of rows scroll smoothly. Fixed row height; sortable headers (asc → desc → none, stable); optional row selection (checkbox column + select-all + aria-selected); sticky header; grid a11y (role=grid/row/columnheader/gridcell, aria-sort, aria-rowcount). Div-grid (not a <table>) so virtualization offsets cleanly across all targets.",
+      "spec": "references/components.md#data-grid",
+      "variants": {
+        "prop": [
+          "columns",
+          "rows",
+          "selectable",
+          "height",
+          "rowHeight",
+          "rowKey"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "grid + row fill"
+        },
+        {
+          "cssVar": "--panel",
+          "description": "sticky header"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "selected row + sort glyph"
+        }
+      ],
+      "keywords": [
+        "data grid",
+        "datagrid",
+        "table",
+        "virtualized",
+        "virtualization",
+        "windowing",
+        "sortable",
+        "selection",
+        "rows",
+        "dataset",
+        "sticky header"
       ]
     },
     {

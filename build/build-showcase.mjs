@@ -294,6 +294,8 @@ const ISLAND_IDS = new Set([
   "sparkline", "line-chart", "bar-chart", "stacked-bar",
   // schema-driven form
   "form",
+  // data grid
+  "datagrid",
 ]);
 
 function stageHtml(id) {
