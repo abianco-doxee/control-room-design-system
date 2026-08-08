@@ -18,6 +18,8 @@ import {
   ON_PAIRS,
 } from "../lib/theme/index.js";
 import { surfaceRamp } from "../build/ramp.mjs";
+import { toneSignals, SIGNAL_KEYS } from "../build/signals.mjs";
+import { oklch } from "culori";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => JSON.parse(readFileSync(join(ROOT, p), "utf8"));
@@ -162,6 +164,46 @@ test("ember brand ($ramp + accent, extends dark) is complete + legible", () => {
   assert.equal(v.valid, true, `ember missing: ${v.missing.join(", ")}`);
   const c = checkThemeContrast(vars);
   assert.equal(c.ok, true, `ember contrast failures: ${JSON.stringify(c.failures)}`);
+});
+
+test("toneSignals lowers chroma while preserving hue (state semantics)", () => {
+  const neonDark = {};
+  for (const [k, v] of Object.entries(tokens.themes.dark)) if (!k.startsWith("$")) neonDark[k] = v;
+
+  assert.deepEqual(toneSignals(neonDark, "neon"), {}, "neon is identity (no changes)");
+
+  const muted = toneSignals(neonDark, "muted");
+  for (const k of ["sig-work", "sig-err", "sig-done"]) {
+    const before = oklch(neonDark[k]);
+    const after = oklch(muted[k]);
+    assert.ok(after.c < before.c, `${k}: chroma should drop when muted`);
+    const dh = Math.abs((after.h || 0) - (before.h || 0));
+    assert.ok(dh < 8 || dh > 352, `${k}: hue preserved (Δ=${dh.toFixed(1)}°)`);
+  }
+
+  // a hand-set signal is skipped
+  const skipped = toneSignals(neonDark, "muted", new Set(["sig-err"]));
+  assert.equal(skipped["sig-err"], undefined, "skipped role is not toned");
+  assert.ok(skipped["sig-work"], "non-skipped role still toned");
+});
+
+test("harbor brand ($ramp + muted signals, extends dark) is complete + legible", () => {
+  const harbor = read("brands/harbor.json");
+  const dark = tokens.themes.dark;
+  const base = {};
+  for (const [k, v] of Object.entries(dark)) if (!k.startsWith("$")) base[k] = v;
+  const surfaces = surfaceRamp(harbor.$ramp, "dark");
+  const overrides = Object.fromEntries(Object.entries(harbor).filter(([k]) => !k.startsWith("$")));
+  const signals = toneSignals(mergeTheme(base, surfaces), harbor.$signalTone, new Set(Object.keys(overrides)));
+  const changed = [...Object.keys(overrides), ...Object.keys(signals)];
+  const vars = deriveOnColors(mergeTheme(mergeTheme(mergeTheme(base, surfaces), signals), overrides), { changed });
+
+  assert.notEqual(vars["sig-work"], base["sig-work"], "inherited signal was re-voiced");
+  assert.equal(vars["sig-accent"], "#3aa0b0", "explicit accent kept (not toned)");
+  const v = validateTheme(vars);
+  assert.equal(v.valid, true, `harbor missing: ${v.missing.join(", ")}`);
+  const c = checkThemeContrast(vars);
+  assert.equal(c.ok, true, `harbor contrast failures: ${JSON.stringify(c.failures)}`);
 });
 
 test("the worked brand (brands/slate.json) is valid, complete, and legible", () => {
