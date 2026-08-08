@@ -1040,6 +1040,14 @@ labelled at the left gutter in monospace tick ink, formatted compactly (`1.5k`,
 `target`). The same nice-scale math backs the static gallery SVGs, so the
 hand-rendered and live charts share one y-axis.
 
+**Log y-scale (line chart).** Set `yScale="log"` for a base-10 axis — the right
+choice when a metric spans orders of magnitude (latency p50→p99, payload sizes).
+The domain snaps to powers of ten and ticks are `1·2·5×10ᵏ` (few decades) or plain
+powers of ten (many), labelled with the usual compact format (`10`, `1k`, `100k`).
+Log needs positive data: values `≤ 0` are clamped to the axis floor, and a series
+with no positive values falls back to the linear scale. Bar charts stay linear —
+they're baseline-anchored at zero, where log is undefined.
+
 **Continuous / calendar x-axis (line chart).** By default the line chart's x-axis
 is **categorical** — samples are evenly spaced and labelled from `labels`. Pass an
 `x` array of numbers (parallel to each sample index) to switch to a **real

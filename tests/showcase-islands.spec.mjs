@@ -303,13 +303,16 @@ test.describe("component browser — live islands", () => {
     expect(await visible(), "series restored").toBe(2);
   });
 
+  // Select the playground <select> that owns a given option value (reorder-proof).
+  const pick = (island, optionValue) =>
+    island.locator(`.pg__controls select:has(option[value="${optionValue}"])`);
+
   test("line chart clock axis labels ticks as clock times", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
     const island = page.locator('[data-island="line-chart"]');
 
-    // switch the x-scale to the sub-day clock axis (first select in the panel)
-    await island.locator(".pg__controls select").first().selectOption("clock");
+    await pick(island, "clock").selectOption("clock");
     await page.waitForTimeout(40);
 
     const labels = await island.locator(".cr-chart__tick").allTextContents();
@@ -324,8 +327,8 @@ test.describe("component browser — live islands", () => {
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
     const island = page.locator('[data-island="line-chart"]');
 
-    // switch to the calendar axis (default span is 5 months → monthly ticks)
-    await island.locator(".pg__controls select").first().selectOption("calendar");
+    // default span is 5 months → monthly ticks
+    await pick(island, "calendar").selectOption("calendar");
     await page.waitForTimeout(40);
 
     const labels = (await island.locator(".cr-chart__tick").allTextContents()).map((t) => t.trim());
@@ -340,16 +343,30 @@ test.describe("component browser — live islands", () => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
     const island = page.locator('[data-island="line-chart"]');
-    const selects = island.locator(".pg__controls select");
 
-    await selects.first().selectOption("calendar"); // xScale
-    await selects.nth(2).selectOption("it");         // xLocale (xScale, calSpan, xLocale, xWeek)
+    await pick(island, "calendar").selectOption("calendar");
+    await pick(island, "it").selectOption("it");
     await page.waitForTimeout(40);
 
     const labels = (await island.locator(".cr-chart__tick").allTextContents()).map((t) => t.trim());
     const itMonths = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
     const hit = labels.filter((t) => itMonths.includes(t.replace(/ '\d\d/, "")));
     expect(hit.length, `italian month ticks: ${labels.join("|")}`).toBeGreaterThan(2);
+  });
+
+  test("line chart log y-scale ticks span decades on powers of ten", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const island = page.locator('[data-island="line-chart"]');
+
+    await pick(island, "log").selectOption("log");
+    await page.waitForTimeout(40);
+
+    const labels = (await island.locator(".cr-chart__ytick").allTextContents()).map((t) => t.trim());
+    // wide-range series → the axis should reach from tens to thousands
+    expect(labels.some((t) => /^\d+$/.test(t) && Number(t) <= 10), `low decade: ${labels.join("|")}`).toBeTruthy();
+    expect(labels.some((t) => /k$/.test(t)), `high decade (k): ${labels.join("|")}`).toBeTruthy();
+    expect(labels.length, "several log ticks").toBeGreaterThan(2);
   });
 
   test("popover is collision-positioned and stays within the viewport", async ({ page }) => {

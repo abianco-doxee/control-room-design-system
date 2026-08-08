@@ -159,6 +159,8 @@ const LINE_SERIES = [
   { name: "errors", data: [2, 3, 2, 5, 4, 3, 6, 4], signal: "err" },
 ];
 const LINE_LABELS = ["09", "10", "11", "12", "13", "14", "15", "16"];
+// Wide-range series (spans ~3 decades) to show off the log y-scale.
+const LOG_SERIES = [{ name: "p99 latency", data: [8, 45, 220, 1800, 130, 12, 600, 5200], signal: "work" }];
 // Epoch-ms x-values (15-min cadence from a fixed base) for the clock (sub-day) axis.
 const LINE_X = (() => {
   const base = Date.UTC(2026, 0, 1, 9, 0, 0), step = 15 * 60 * 1000;
@@ -476,6 +478,7 @@ const DEMOS = {
     defs: [
       T("boolean", "area", true),
       T("boolean", "axis", true),
+      T("enum", "yScale", "linear", { options: ["linear", "log"] }),
       T("enum", "xScale", "categorical", { options: ["categorical", "clock", "calendar"] }),
       T("enum", "calSpan", "5 months", { options: ["6 weeks", "5 months", "1 year"] }),
       T("enum", "xLocale", "en", { options: ["en", "it"] }),
@@ -486,7 +489,10 @@ const DEMOS = {
       T("text", "label", "Throughput vs errors"),
     ],
     render: (s) => {
-      const common = { area: s.area, axis: s.axis, unit: s.unit, height: s.height, label: s.label };
+      const common = { area: s.area, axis: s.axis, yScale: s.yScale, unit: s.unit, height: s.height, label: s.label };
+      if (s.yScale === "log" && s.xScale !== "calendar") {
+        return h(CrLineChart, { series: LOG_SERIES, labels: LINE_LABELS, ...common });
+      }
       if (s.xScale === "calendar") {
         const ds = s.calSpan === "6 weeks" ? CAL_WK : s.calSpan === "1 year" ? CAL_YR : CAL_MO;
         return h(CrLineChart, {
