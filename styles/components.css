@@ -820,6 +820,8 @@
 .cr-cron__out { display: flex; align-items: center; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); }
 .cr-cron__out::before { content: "\2192"; color: var(--muted); }   /* → */
 .cr-cron__out--err { color: var(--sig-err); }
+.cr-cron--error .cr-cron__input { border-color: var(--sig-err); border-width: var(--brd-heavy); }
+.cr-cron__input:disabled { opacity: var(--state-disabled-op); cursor: not-allowed; }
 .cr-cron__presets { display: flex; gap: var(--space-1); flex-wrap: wrap; }
 .cr-cron__preset { font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 700; background: var(--panel-2); color: var(--muted); border: var(--brd-hair) solid var(--border); padding: var(--space-0-5) var(--space-2); cursor: pointer; }
 .cr-cron__preset:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }

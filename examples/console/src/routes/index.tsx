@@ -457,11 +457,12 @@ export default component$(() => {
         {/* maintenance schedule — cron (translated live by cronstrue) + a start time */}
         <section class="cr-panel" style="padding:var(--space-4);display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-4);align-items:start">
           <div>
-            <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">restart schedule (cron)</p>
             <CrCronField
+              id="new-cron"
+              label="Restart schedule (cron)"
               value={ui.cron}
-              description={cronDesc.value.text}
-              invalid={cronDesc.value.bad}
+              description={cronDesc.value.bad ? undefined : cronDesc.value.text}
+              error={cronDesc.value.bad ? cronDesc.value.text : undefined}
               onChange={$((v: string) => (ui.cron = v))}
               presets={[
                 { label: "hourly", cron: "0 * * * *" },
