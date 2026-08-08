@@ -297,8 +297,14 @@ body {
 .cr-panel,
 .cr-btn,
 .cr-hero,
-.cr-bezel,
+.cr-bezel { border-radius: var(--radius); }
 .cr-drip { border-radius: var(--radius-none); }
+/* Roundable surfaces — a brand's --radius (default 0px) rounds these; circular
+ * indicators, decorative shapes and the sanctioned breach keep their own radius.
+ * Declared early so a component's own border-radius still wins where it sets one. */
+.cr-btn, .cr-chip, .cr-tag, .cr-panel, .cr-menu, .cr-popover, .cr-toast, .cr-alert,
+.cr-well, .cr-card, .cr-badge, .cr-kbd, .cr-combobox__input, .cr-combobox__list,
+.cr-cron__input, .cr-cron__preset { border-radius: var(--radius); }
 
 /* ── Panel ─────────────────────────────────────────────────────────────── */
 .cr-panel {
@@ -485,7 +491,7 @@ body {
 .cr-masthead {
   border: var(--brd-heavy) solid var(--border);
   box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
-  background: var(--panel); padding: var(--space-5) var(--space-6); border-radius: var(--radius-none);
+  background: var(--panel); padding: var(--space-5) var(--space-6); border-radius: var(--radius);
 }
 .cr-masthead__eyebrow {
   font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
@@ -675,7 +681,7 @@ body {
 /* ── Text input / textarea / select ────────────────────────────────────── */
 .cr-input, .cr-textarea, .cr-select {
   width: 100%; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink);
-  background: var(--board); border: var(--brd) solid var(--border); border-radius: var(--radius-none);
+  background: var(--board); border: var(--brd) solid var(--border); border-radius: var(--radius);
   padding: var(--space-2) var(--space-3);
 }
 .cr-input::placeholder, .cr-textarea::placeholder { color: var(--muted); }
@@ -725,13 +731,13 @@ body {
 .cr-modal {
   border: var(--brd-brush) solid var(--border); background: var(--panel); color: var(--ink);
   box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
-  padding: 0; max-width: min(92vw, 34rem); border-radius: var(--radius-none);
+  padding: 0; max-width: min(92vw, 34rem); border-radius: var(--radius);
 }
 .cr-modal::backdrop { background: color-mix(in srgb, var(--mass) 72%, transparent); }
 
 /* ── Command palette (⌘K) ───────────────────────────────────────────────── */
 .cr-palette {
-  padding: 0; width: min(92vw, 34rem); margin: 12vh auto auto; border-radius: var(--radius-none);
+  padding: 0; width: min(92vw, 34rem); margin: 12vh auto auto; border-radius: var(--radius);
   border: var(--brd-heavy) solid var(--border); background: var(--panel); color: var(--ink);
   box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
 }
@@ -935,7 +941,7 @@ body {
 
 /* ── Drawer / sheet (edge panel on native dialog) ───────────────────────── */
 .cr-drawer {
-  position: fixed; inset: 0 0 0 auto; margin: 0; padding: 0; border-radius: var(--radius-none);
+  position: fixed; inset: 0 0 0 auto; margin: 0; padding: 0; border-radius: var(--radius);
   height: 100vh; max-height: 100vh; width: min(92vw, 26rem);
   border: 0; border-left: var(--brd-brush) solid var(--border); background: var(--panel); color: var(--ink);
   box-shadow: calc(var(--shadow-off-lg) * -1) 0 0 var(--shadow-col);
