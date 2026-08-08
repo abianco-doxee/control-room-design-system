@@ -86,6 +86,22 @@ const fmtTick = (v) => {
   if (a >= 1000) return (Math.round(v / 100) / 10) + "k";
   return String(Math.round(v * 100) / 100);
 };
+const niceTime = (lo, hi, maxTicks) => {
+  const S = 1000, M = 60 * S, H = 60 * M, D = 24 * H;
+  const steps = [S, 2 * S, 5 * S, 10 * S, 15 * S, 30 * S, M, 2 * M, 5 * M, 10 * M, 15 * M, 30 * M, H, 2 * H, 3 * H, 6 * H, 12 * H, D, 2 * D, 7 * D];
+  const span = (hi - lo) || 1;
+  let step = steps[steps.length - 1];
+  for (const s of steps) { if (span / s <= maxTicks - 1) { step = s; break; } }
+  const first = Math.ceil(lo / step) * step, ticks = [];
+  for (let v = first; v <= hi + step * 0.5; v += step) ticks.push(v);
+  return ticks;
+};
+const fmtX = (v, time) => {
+  if (!time) return fmtTick(v);
+  const d = new Date(v), p = (x) => (x < 10 ? "0" + x : "" + x);
+  const hm = p(d.getUTCHours()) + ":" + p(d.getUTCMinutes());
+  return d.getUTCSeconds() ? hm + ":" + p(d.getUTCSeconds()) : hm;
+};
 function sparkSvg(data, { signal = "work", area = true, height = 32, label = "trend" } = {}) {
   const W = 120, pad = 3, H = height, n = data.length;
   const min = Math.min(...data), max = Math.max(...data), range = (max - min) || 1, innerH = H - pad * 2;
@@ -101,37 +117,48 @@ function sparkSvg(data, { signal = "work", area = true, height = 32, label = "tr
     + `<polyline class="cr-spark__line" points="${line}" vector-effect="non-scaling-stroke"/>`
     + `<circle class="cr-spark__dot" cx="${last.x.toFixed(2)}" cy="${last.y.toFixed(2)}" r="2.4" vector-effect="non-scaling-stroke"/></svg></span>`;
 }
-function lineChartSvg(series, labels, { area = true, height = 140, label = "line chart", axis = true, unit = "" } = {}) {
+function lineChartSvg(series, labels, { area = true, height = 140, label = "line chart", axis = true, unit = "", x = null, xTime = false } = {}) {
   const W = 320, H = height, L = axis ? 30 : 8, R = 8, T = 10, B = 18, plotW = W - L - R, plotH = H - T - B;
+  const xs = x && x.length ? x : null, continuous = !!xs;
   let dlo = Infinity, dhi = -Infinity;
   for (const s of series) for (const v of s.data) { if (v < dlo) dlo = v; if (v > dhi) dhi = v; }
   if (!isFinite(dlo)) { dlo = 0; dhi = 1; }
   const sc = niceScale(dlo, dhi, 5), lo = sc.min, hi = sc.max, range = (hi - lo) || 1;
-  const xAt = (i, n) => L + (n <= 1 ? plotW / 2 : (i / (n - 1)) * plotW);
   const yAt = (v) => T + (1 - (v - lo) / range) * plotH;
+  let xmin = 0, xmax = 1, xticks = [];
+  if (continuous) {
+    xmin = Math.min(...xs); xmax = Math.max(...xs);
+    xticks = xTime ? niceTime(xmin, xmax, 5) : niceScale(xmin, xmax, 5).ticks.filter((t) => t >= xmin && t <= xmax);
+  }
+  const xspan = (xmax - xmin) || 1;
+  const xAtV = (v) => L + ((v - xmin) / xspan) * plotW;
+  const xAtI = (i, n) => L + (n <= 1 ? plotW / 2 : (i / (n - 1)) * plotW);
   const gridSvg = sc.ticks.map((v) => {
     const gy = yAt(v).toFixed(2);
     return `<line class="cr-chart__grid" x1="${L}" y1="${gy}" x2="${W - R}" y2="${gy}" vector-effect="non-scaling-stroke"/>`
       + (axis ? `<text class="cr-chart__ytick" x="${L - 5}" y="${(yAt(v) + 3).toFixed(2)}" text-anchor="end">${fmtTick(v)}${unit}</text>` : "");
   }).join("");
   const seriesSvg = series.map((s, si) => {
-    const color = hue(s.signal, si), n = s.data.length;
-    const pts = s.data.map((v, i) => ({ x: xAt(i, n), y: yAt(v) }));
+    const color = hue(s.signal, si), lim = continuous ? Math.min(s.data.length, xs.length) : s.data.length;
+    const pts = [];
+    for (let i = 0; i < lim; i++) pts.push({ x: continuous ? xAtV(xs[i]) : xAtI(i, lim), y: yAt(s.data[i]) });
     const line = pts.map((p) => p.x.toFixed(2) + "," + p.y.toFixed(2)).join(" ");
     let ap = "M " + pts[0].x.toFixed(2) + "," + (T + plotH).toFixed(2);
     for (const p of pts) ap += " L " + p.x.toFixed(2) + "," + p.y.toFixed(2);
-    ap += " L " + pts[n - 1].x.toFixed(2) + "," + (T + plotH).toFixed(2) + " Z";
-    const e = pts[n - 1];
+    ap += " L " + pts[pts.length - 1].x.toFixed(2) + "," + (T + plotH).toFixed(2) + " Z";
+    const e = pts[pts.length - 1];
     return (area ? `<path class="cr-linechart__area" d="${ap}" style="fill:${color}"/>` : "")
       + `<polyline class="cr-linechart__line" points="${line}" style="stroke:${color}" vector-effect="non-scaling-stroke"/>`
       + `<circle class="cr-linechart__end" cx="${e.x.toFixed(2)}" cy="${e.y.toFixed(2)}" r="2.6" style="fill:${color}" vector-effect="non-scaling-stroke"/>`;
   }).join("");
-  const ticks = labels.map((t, i) => `<text class="cr-chart__tick" x="${xAt(i, labels.length).toFixed(2)}" y="${H - 5}" text-anchor="middle">${t}</text>`).join("");
+  const ticks = continuous
+    ? xticks.map((v) => `<line class="cr-chart__grid cr-chart__grid--v" x1="${xAtV(v).toFixed(2)}" y1="${T}" x2="${xAtV(v).toFixed(2)}" y2="${(T + plotH).toFixed(2)}" vector-effect="non-scaling-stroke"/><text class="cr-chart__tick" x="${xAtV(v).toFixed(2)}" y="${H - 5}" text-anchor="middle">${fmtX(v, xTime)}</text>`).join("")
+    : (labels || []).map((t, i) => `<text class="cr-chart__tick" x="${xAtI(i, labels.length).toFixed(2)}" y="${H - 5}" text-anchor="middle">${t}</text>`).join("");
   const legend = series.length > 1
-    ? `<figcaption class="cr-chart__legend">${series.map((s, si) => `<span class="cr-chart__key"><span class="cr-chart__sw" style="background:${hue(s.signal, si)}" aria-hidden="true"></span>${s.name}</span>`).join("")}</figcaption>`
+    ? `<figcaption class="cr-chart__legend">${series.map((s, si) => `<button type="button" class="cr-chart__key" aria-pressed="true"><span class="cr-chart__sw" style="background:${hue(s.signal, si)}" aria-hidden="true"></span>${s.name}</button>`).join("")}</figcaption>`
     : "";
   const summary = label + " — " + series.map((s) => s.name + " latest " + s.data[s.data.length - 1]).join(", ");
-  return `<figure class="cr-chart cr-linechart" role="img" aria-label="${summary}"><svg class="cr-linechart__plot" viewBox="0 0 ${W} ${H}" aria-hidden="true" focusable="false">${gridSvg}${seriesSvg}${ticks}</svg>${legend}</figure>`;
+  return `<figure class="cr-chart cr-linechart"><div class="cr-linechart__graphic" role="img" aria-label="${summary}"><svg class="cr-linechart__plot" viewBox="0 0 ${W} ${H}" aria-hidden="true" focusable="false">${gridSvg}${seriesSvg}${ticks}</svg></div>${legend}</figure>`;
 }
 function barChartSvg(data, { target, showValues = true, height = 140, label = "bar chart", axis = true, unit = "" } = {}) {
   const W = 320, H = height, L = axis ? 30 : 6, R = 6, T = 14, B = 18, plotW = W - L - R, plotH = H - T - B, base = T + plotH;
@@ -182,6 +209,16 @@ const chartsSection = `
             { name: "throughput", data: [12, 18, 15, 22, 19, 26, 24, 31], signal: "work" },
             { name: "errors", data: [2, 3, 2, 5, 4, 3, 6, 4], signal: "err" },
           ], ["09", "10", "11", "12", "13", "14", "15", "16"], { label: "Throughput vs errors" })}
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:6px">latency p95 · continuous time axis</div>
+          ${lineChartSvg([
+            { name: "p95", data: [120, 180, 150, 220, 190, 260, 240, 310], signal: "work" },
+          ], null, {
+            label: "p95 latency over time", unit: "ms",
+            x: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => Date.UTC(2026, 0, 1, 9, 0, 0) + i * 15 * 60 * 1000),
+            xTime: true,
+          })}
         </div>
         <div>
           <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:6px">sessions by region · target 35</div>
