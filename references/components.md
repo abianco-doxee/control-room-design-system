@@ -1030,6 +1030,16 @@ sharp at any width), a **recessive grid** (`--ink` mixed to ~16%),
 fills, labels/legends in **text ink — never the series colour**, and **one
 y-axis, ever** (no dual-scale charts — split into two figures instead).
 
+**Numbered y-axis.** Line and bar charts derive a **"nice" scale** — the domain is
+rounded out to whole 1/2/5×10ᵏ tick steps (the classic Heckbert algorithm), so the
+gridlines land on human numbers rather than raw data extremes. Each gridline is
+labelled at the left gutter in monospace tick ink, formatted compactly (`1.5k`,
+`2M`); pass `unit` to suffix them (`"ms"`, `"%"`). The axis is on by default — set
+`axis={false}` for a sparkline-style bare plot. Force the extents with `min`/`max`
+(line) or `max` (bar) to pin the scale; otherwise it fits the data (and the bar
+`target`). The same nice-scale math backs the static gallery SVGs, so the
+hand-rendered and live charts share one y-axis.
+
 Series colour follows the **entity**: pass a `signal` tone, or omit it to take
 the next hue in a **fixed categorical order** (`work · accent-2 · accent · wait ·
 done`) — never cycled, so a filtered-out series never repaints the survivors. That
@@ -1067,8 +1077,8 @@ shape of a trend, with a data-end dot. Stretches to fill its box.
 
 ### Line chart {#line-chart}
 
-**Purpose.** A time series. Recessive grid, a 2px line + data-end dot per series,
-tick labels, and a legend for ≥ 2 series.
+**Purpose.** A time series. Numbered nice-scale y-axis, recessive grid, a 2px line
++ data-end dot per series, x-tick labels, and a legend for ≥ 2 series.
 
 ```tsx
 <CrLineChart
@@ -1085,9 +1095,9 @@ tick labels, and a legend for ≥ 2 series.
 
 ### Bar chart {#bar-chart}
 
-**Purpose.** Magnitude across categories. Baseline-anchored bars, rounded
-data-ends, a 2px gap, optional dashed **target** line (a budget / SLO), and
-monospace value + category labels.
+**Purpose.** Magnitude across categories. Numbered nice-scale y-axis,
+baseline-anchored bars, rounded data-ends, a 2px gap, optional dashed **target**
+line (a budget / SLO), and monospace value + category labels.
 
 ```tsx
 <CrBarChart
