@@ -308,8 +308,8 @@ test.describe("component browser — live islands", () => {
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
     const island = page.locator('[data-island="line-chart"]');
 
-    // switch the x-scale to the sub-day clock axis
-    await island.locator(".pg__controls select").selectOption("clock");
+    // switch the x-scale to the sub-day clock axis (first select in the panel)
+    await island.locator(".pg__controls select").first().selectOption("clock");
     await page.waitForTimeout(40);
 
     const labels = await island.locator(".cr-chart__tick").allTextContents();
@@ -324,8 +324,8 @@ test.describe("component browser — live islands", () => {
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
     const island = page.locator('[data-island="line-chart"]');
 
-    // switch to the calendar (multi-month) axis
-    await island.locator(".pg__controls select").selectOption("calendar");
+    // switch to the calendar axis (default span is 5 months → monthly ticks)
+    await island.locator(".pg__controls select").first().selectOption("calendar");
     await page.waitForTimeout(40);
 
     const labels = (await island.locator(".cr-chart__tick").allTextContents()).map((t) => t.trim());
@@ -334,6 +334,22 @@ test.describe("component browser — live islands", () => {
     // the tooltip stamp reads a calendar date+time on hover
     await island.locator(".cr-linechart__plot").hover();
     await expect(island.locator(".cr-chart__tip-x")).toBeVisible();
+  });
+
+  test("line chart calendar axis localises tick labels (Italian)", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const island = page.locator('[data-island="line-chart"]');
+    const selects = island.locator(".pg__controls select");
+
+    await selects.first().selectOption("calendar"); // xScale
+    await selects.nth(2).selectOption("it");         // xLocale (xScale, calSpan, xLocale, xWeek)
+    await page.waitForTimeout(40);
+
+    const labels = (await island.locator(".cr-chart__tick").allTextContents()).map((t) => t.trim());
+    const itMonths = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
+    const hit = labels.filter((t) => itMonths.includes(t.replace(/ '\d\d/, "")));
+    expect(hit.length, `italian month ticks: ${labels.join("|")}`).toBeGreaterThan(2);
   });
 
   test("popover is collision-positioned and stays within the viewport", async ({ page }) => {
