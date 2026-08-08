@@ -186,6 +186,36 @@ test.describe("component browser — live islands", () => {
     await expect(page.locator("[data-island]:not([data-island-ready])")).toHaveCount(0);
   });
 
+  test("data grid virtualizes, sorts, and selects", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const grid = page.locator('[data-island="datagrid"]');
+    const rows = grid.locator(".cr-grid__row");
+
+    // virtualization: 2000 rows in the data, only a small window in the DOM
+    const rendered = await rows.count();
+    expect(rendered, "windowed row count").toBeGreaterThan(5);
+    expect(rendered, "far fewer than the 2000-row dataset").toBeLessThan(60);
+
+    // sort by ID descending (first sortable header: click twice → desc)
+    const idHeader = grid.locator('[role="columnheader"] .cr-grid__sort').first();
+    await idHeader.click(); // asc
+    await idHeader.click(); // desc
+    const firstIdDesc = await rows.first().locator(".cr-grid__cell").nth(1).innerText();
+    expect(Number(firstIdDesc), "top row is the max id after desc sort").toBe(2000);
+
+    // scroll the viewport → the windowed rows change (virtualization live)
+    const firstBefore = await rows.first().getAttribute("aria-rowindex");
+    await grid.locator(".cr-grid__viewport").evaluate((el) => (el.scrollTop = 4000));
+    await page.waitForTimeout(60);
+    const firstAfter = await rows.first().getAttribute("aria-rowindex");
+    expect(firstAfter, "window shifted on scroll").not.toBe(firstBefore);
+
+    // select-all via the header checkbox → selection count reflects the whole set
+    await grid.locator('[role="columnheader"] input[type="checkbox"]').check();
+    await expect(grid.locator(".pg__note").last()).toContainText("2000 selected");
+  });
+
   test("popover is collision-positioned and stays within the viewport", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));

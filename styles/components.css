@@ -1271,3 +1271,24 @@
 .cr-bg--field { background-image: var(--field); background-repeat: repeat; }
 
 @media (prefers-reduced-motion: reduce) { .cr-breach--alive { animation: none; } }
+
+/* ── Data grid (virtualized) — dense table for large datasets ─────────────── */
+.cr-grid { border: var(--brd) solid var(--border); background: var(--board); font-family: var(--font-mono); display: flex; flex-direction: column; overflow: hidden; }
+.cr-grid__head { display: grid; align-items: center; position: sticky; top: 0; z-index: var(--z-raised); background: var(--panel); border-bottom: var(--brd-heavy) solid var(--border); }
+.cr-grid__viewport { overflow-y: auto; overflow-x: hidden; position: relative; }
+.cr-grid__sizer { position: relative; width: 100%; }
+.cr-grid__rows { position: absolute; inset-inline: 0; top: 0; }
+.cr-grid__row { display: grid; align-items: center; border-bottom: var(--brd-hair) solid color-mix(in srgb, var(--border) 55%, transparent); background: var(--board); }
+.cr-grid__row:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), var(--board)); }
+.cr-grid__row[aria-selected="true"] { background: color-mix(in srgb, var(--sig-work) 16%, var(--board)); }
+.cr-grid__cell { display: flex; align-items: center; min-width: 0; padding: 0 var(--space-3); font-size: var(--text-sm); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cr-grid__cell > * { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.cr-grid__cell--start { justify-content: flex-start; text-align: start; }
+.cr-grid__cell--end { justify-content: flex-end; text-align: end; font-variant-numeric: tabular-nums; }
+.cr-grid__cell--center { justify-content: center; text-align: center; }
+.cr-grid__cell--check { justify-content: center; padding: 0; }
+.cr-grid__head .cr-grid__cell { font-size: var(--text-2xs); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); height: var(--row-h); }
+.cr-grid__sort { font: inherit; font-size: var(--text-2xs); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; align-items: center; gap: var(--space-1); }
+.cr-grid__sort:hover { color: var(--ink); }
+.cr-grid__glyph { color: var(--sig-work); font-size: var(--text-2xs); }
+.cr-grid__empty { padding: var(--space-4); color: var(--muted); text-align: center; font-size: var(--text-sm); }
