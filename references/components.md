@@ -404,9 +404,11 @@ row count is large or unbounded.
 />
 ```
 
-- **Virtualization** is fixed-row-height: a sizer preserves the full scroll height
-  and the visible window is offset with `translateY`. Row height must be uniform
-  (`rowHeight`); variable-height rows aren't supported.
+- **Virtualization**: a sizer preserves the full scroll height and the visible
+  window is offset with `translateY`. `rowHeight` is a fixed number (fast O(1) path)
+  **or** a `(row, index) => number` function for **variable-height rows** — the
+  offsets come from a prefix-sum and the window from a binary search. Heights must be
+  deterministic from the row.
 - **Sorting** cycles a sortable header asc → desc → none (stable; copies the array,
   never mutates the caller's). Emits `onSortChange`.
 - **Selection** is a checkbox column with select-all; keys come from `rowKey`.

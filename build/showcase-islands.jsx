@@ -514,18 +514,20 @@ const DEMOS = {
   },
   datagrid: {
     tag: "CrDataGrid",
-    defs: [T("boolean", "selectable", true)],
+    defs: [T("boolean", "selectable", true), T("boolean", "variableRows", false)],
     extra: { picked: 0 },
     render: (s, set) =>
       h("div", { style: { display: "grid", gap: "10px" } },
         h("p", { className: "pg__note", style: { margin: 0 } },
-          GRID_ROWS.length.toLocaleString() + " rows, virtualized — only the visible slice is in the DOM. Sort a column; select rows."),
+          GRID_ROWS.length.toLocaleString() + " rows, virtualized — only the visible slice is in the DOM. Sort a column; select rows"
+          + (s.variableRows ? "; rows are variable-height." : ".")),
         h(CrDataGrid, {
           columns: GRID_COLS,
           rows: GRID_ROWS,
           rowKey: "id",
           selectable: s.selectable,
           height: 300,
+          rowHeight: s.variableRows ? (row) => 30 + (row.cpu % 4) * 14 : 34,
           onSelectionChange: (keys) => set("picked", keys.length),
         }),
         h("p", { className: "pg__note", style: { margin: 0 } }, s.picked + " selected")),

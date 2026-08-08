@@ -216,6 +216,22 @@ test.describe("component browser — live islands", () => {
     await expect(grid.locator(".pg__note").last()).toContainText("2000 selected");
   });
 
+  test("data grid supports variable-height rows (still virtualized)", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const island = page.locator('[data-island="datagrid"]');
+    const rows = island.locator(".cr-grid__row");
+
+    // turn on variable rows via the playground control
+    await island.locator('.pg__controls input[type="checkbox"]').last().check();
+    await page.waitForTimeout(60);
+
+    // rows now have differing heights (prefix-sum layout), and it's still windowed
+    const heights = await rows.evaluateAll((els) => els.slice(0, 12).map((e) => Math.round(e.getBoundingClientRect().height)));
+    expect(new Set(heights).size, `varied row heights: ${heights.join(",")}`).toBeGreaterThan(1);
+    expect(await rows.count(), "still virtualized, not all 2000").toBeLessThan(60);
+  });
+
   test("data grid keyboard navigation (arrow keys move an active cell)", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
