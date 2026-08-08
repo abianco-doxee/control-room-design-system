@@ -216,6 +216,32 @@ test.describe("component browser — live islands", () => {
     await expect(grid.locator(".pg__note").last()).toContainText("2000 selected");
   });
 
+  test("data grid keyboard navigation (arrow keys move an active cell)", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const grid = page.locator('[data-island="datagrid"] .cr-grid');
+
+    await grid.focus();
+    const active = () => grid.getAttribute("aria-activedescendant");
+    const first = await active();
+    expect(first, "focusing the grid activates a cell").toBeTruthy();
+
+    // arrow right/down move the active descendant, and the active cell gets the ring
+    await grid.press("ArrowRight");
+    await grid.press("ArrowDown");
+    const moved = await active();
+    expect(moved, "active cell changed after arrows").not.toBe(first);
+    await expect(page.locator("#" + moved)).toHaveClass(/cr-grid__cell--active/);
+
+    // PageDown jumps deep into the set — and virtualization scrolls it into view
+    await grid.press("PageDown");
+    await grid.press("PageDown");
+    const deep = await active();
+    const deepRow = Number(deep.split("-c-")[1].split("-")[0]);
+    expect(deepRow, "paged past the first window").toBeGreaterThan(10);
+    await expect(page.locator("#" + deep)).toBeVisible(); // scrolled into the rendered window
+  });
+
   test("popover is collision-positioned and stays within the viewport", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));

@@ -413,9 +413,12 @@ row count is large or unbounded.
   Emits `onSelectionChange(keys)`.
 - It's a **div-grid** (`role="grid"` with `row`/`columnheader`/`gridcell`,
   `aria-sort`, `aria-rowcount`, `aria-selected`), not a `<table>`, so the
-  virtualization offset composes cleanly across all targets. Header controls and
-  checkboxes are native/focusable; **full arrow-key cell navigation is a planned
-  follow-up** (today: Tab + Enter/Space on the header buttons and checkboxes).
+  virtualization offset composes cleanly across all targets.
+- **Keyboard**: the grid is a single tab stop and uses the WAI-ARIA
+  **active-descendant** pattern — arrow keys / Home / End / PageUp / PageDown move an
+  active cell (tracked in state, surfaced via `aria-activedescendant`, ringed with
+  `.cr-grid__cell--active`), scrolling it into view even when it was virtualized out.
+  Header sort buttons and row checkboxes are also natively Tab-focusable.
 
 ---
 
