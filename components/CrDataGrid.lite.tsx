@@ -21,8 +21,10 @@ export interface CrDataGridProps {
   selectable?: boolean;
   /** scroll viewport height in px (default 320). */
   height?: number;
-  /** fixed row height in px — the basis for virtualization (default 34). */
-  rowHeight?: number;
+  /** row height in px — a fixed number (fast path, default 34) OR a
+   *  `(row, index) => number` for **variable-height rows** (prefix-sum + binary
+   *  search windowing). Heights must be deterministic from the row. */
+  rowHeight?: number | ((row: any, index: number) => number);
   emptyLabel?: string;
   onSortChange?: (key: string, dir: string) => void;
   onSelectionChange?: (keys: string[]) => void;
@@ -47,10 +49,25 @@ export default function CrDataGrid(props: CrDataGridProps) {
     scrollTop: 0,
 
     rowH(): number {
-      return props.rowHeight || 34;
+      return typeof props.rowHeight === "number" ? props.rowHeight : 34;
     },
     viewportH(): number {
       return props.height || 320;
+    },
+    /* variable-height mode: rowHeight is a (row,index)=>number function */
+    isVar(): boolean {
+      return typeof props.rowHeight === "function";
+    },
+    rowPx(row: any, index: number): number {
+      const rh: any = props.rowHeight;
+      return typeof rh === "function" ? rh(row, index) || 34 : rh || 34;
+    },
+    /* prefix[i] = pixel offset of row i (length n+1); only built in variable mode */
+    prefix(): number[] {
+      const arr = state.sorted();
+      const p: number[] = [0];
+      for (let i = 0; i < arr.length; i++) p.push(p[i] + state.rowPx(arr[i], i));
+      return p;
     },
     keyOf(row: any, index: number): string {
       return props.rowKey ? String(row[props.rowKey]) : String(index);
@@ -101,21 +118,45 @@ export default function CrDataGrid(props: CrDataGridProps) {
       state.scrollTop = (event.target as HTMLElement).scrollTop;
     },
     totalH(): number {
-      return props.rows.length * state.rowH();
+      if (!state.isVar()) return props.rows.length * state.rowH();
+      const p = state.prefix();
+      return p[p.length - 1];
     },
     start(): number {
       const overscan = 4;
-      return Math.max(0, Math.floor(state.scrollTop / state.rowH()) - overscan);
+      if (!state.isVar()) return Math.max(0, Math.floor(state.scrollTop / state.rowH()) - overscan);
+      /* binary search for the last row whose offset is <= scrollTop */
+      const p = state.prefix();
+      let lo = 0;
+      let hi = p.length - 1;
+      let ans = 0;
+      while (lo <= hi) {
+        const mid = (lo + hi) >> 1;
+        if (p[mid] <= state.scrollTop) {
+          ans = mid;
+          lo = mid + 1;
+        } else {
+          hi = mid - 1;
+        }
+      }
+      return Math.max(0, ans - overscan);
     },
     windowRows(): any[] {
-      const rh = state.rowH();
-      /* rows across the viewport + overscan at both ends */
-      const count = Math.ceil(state.viewportH() / rh) + 8;
       const s = state.start();
-      return state.sorted().slice(s, s + count);
+      const arr = state.sorted();
+      if (!state.isVar()) {
+        const count = Math.ceil(state.viewportH() / state.rowH()) + 8; /* + overscan both ends */
+        return arr.slice(s, s + count);
+      }
+      const p = state.prefix();
+      const limit = state.scrollTop + state.viewportH();
+      let e = s;
+      while (e < arr.length && p[e] < limit) e++;
+      return arr.slice(s, Math.min(arr.length, e + 4));
     },
     offsetY(): number {
-      return state.start() * state.rowH();
+      if (!state.isVar()) return state.start() * state.rowH();
+      return state.prefix()[state.start()];
     },
     absIndex(i: number): number {
       return state.start() + i;
@@ -177,8 +218,16 @@ export default function CrDataGrid(props: CrDataGridProps) {
     scrollRowIntoView(r: number) {
       const vp: any = vpRef;
       if (!vp) return;
-      const rh = state.rowH();
-      const top = r * rh;
+      let top: number;
+      let rh: number;
+      if (state.isVar()) {
+        const p = state.prefix();
+        top = p[r];
+        rh = p[r + 1] - p[r];
+      } else {
+        rh = state.rowH();
+        top = r * rh;
+      }
       const cur = vp.scrollTop;
       if (top < cur) {
         vp.scrollTop = top;
@@ -276,7 +325,7 @@ export default function CrDataGrid(props: CrDataGridProps) {
                   role="row"
                   aria-rowindex={state.absIndex(i) + 1}
                   aria-selected={props.selectable ? (state.isSelected(row, state.absIndex(i)) ? "true" : "false") : undefined}
-                  style={{ gridTemplateColumns: state.template(), height: state.rowH() + "px" }}
+                  style={{ gridTemplateColumns: state.template(), height: state.rowPx(row, state.absIndex(i)) + "px" }}
                 >
                   <Show when={props.selectable}>
                     <div
