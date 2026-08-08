@@ -276,6 +276,49 @@ test.describe("component browser — live islands", () => {
     expect(await yticks.count(), "axis toggled off").toBe(0);
   });
 
+  test("line chart legend isolates and restores a series on click", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const island = page.locator('[data-island="line-chart"]');
+    const keys = island.locator(".cr-chart__legend .cr-chart__key");
+    await expect(keys, "one interactive key per series").toHaveCount(2);
+
+    const visible = () =>
+      island
+        .locator(".cr-linechart__line")
+        .evaluateAll((els) => els.filter((e) => e.closest("g").style.display !== "none").length);
+    expect(await visible(), "both series drawn at rest").toBe(2);
+
+    // click the first legend key → its series is hidden and the key reads muted
+    await keys.first().click();
+    await page.waitForTimeout(40);
+    await expect(keys.first()).toHaveClass(/cr-chart__key--off/);
+    await expect(keys.first()).toHaveAttribute("aria-pressed", "false");
+    expect(await visible(), "one series hidden after toggle").toBe(1);
+
+    // click again → restored
+    await keys.first().click();
+    await page.waitForTimeout(40);
+    await expect(keys.first()).toHaveAttribute("aria-pressed", "true");
+    expect(await visible(), "series restored").toBe(2);
+  });
+
+  test("line chart continuous time axis labels ticks as clock times", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const island = page.locator('[data-island="line-chart"]');
+
+    // enable the time axis (checkbox order: area, axis, timeAxis)
+    await island.locator('.pg__controls input[type="checkbox"]').nth(2).check();
+    await page.waitForTimeout(40);
+
+    const labels = await island.locator(".cr-chart__tick").allTextContents();
+    const clocks = labels.filter((t) => /^\d{2}:\d{2}(:\d{2})?$/.test(t.trim()));
+    expect(clocks.length, `clock-formatted x-ticks: ${labels.join("|")}`).toBeGreaterThan(1);
+    // continuous mode draws vertical gridlines at the ticks
+    expect(await island.locator(".cr-chart__grid--v").count(), "vertical gridlines").toBeGreaterThan(0);
+  });
+
   test("popover is collision-positioned and stays within the viewport", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));

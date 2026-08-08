@@ -1040,6 +1040,27 @@ labelled at the left gutter in monospace tick ink, formatted compactly (`1.5k`,
 `target`). The same nice-scale math backs the static gallery SVGs, so the
 hand-rendered and live charts share one y-axis.
 
+**Continuous / time x-axis (line chart).** By default the line chart's x-axis is
+**categorical** — samples are evenly spaced and labelled from `labels`. Pass an `x`
+array of numbers (parallel to each sample index) to switch to a **real continuous
+x-scale**: points then sit at their value, faint vertical gridlines mark nice x
+ticks, and the crosshair snaps to the nearest sample by x-distance. Add `xTime` to
+treat `x` as **epoch-ms** — ticks are then aligned to **round clock intervals**
+(…30s · 1m · 5m · 1h · 1d…, chosen to keep the count sane) and labelled `HH:MM`
+(UTC, so the build and the browser agree). This is a linear time scale, not a
+calendar (no month/DST bucketing); for spans beyond a few days, pre-bucket and
+label via `x`.
+
+**Interactive legend (line chart).** For ≥ 2 series the legend keys are **buttons**:
+click one to isolate/restore that series. Hidden series drop out of the plot, the
+tooltip, and the auto y-domain — so isolating one **refits the y-scale** to what's
+visible. Keys are keyboard-operable with a visible focus ring and carry
+`aria-pressed`; the muted `--off` state is not colour-alone (opacity + strike). The
+`role="img"` + spoken summary lives on the graphic wrapper, **not** the figure, so
+the interactive legend is never nested inside an image subtree (axe
+`nested-interactive`-clean). The static gallery renders the keys as buttons for
+markup parity; the toggling itself is a runtime behaviour of the compiled component.
+
 Series colour follows the **entity**: pass a `signal` tone, or omit it to take
 the next hue in a **fixed categorical order** (`work · accent-2 · accent · wait ·
 done`) — never cycled, so a filtered-out series never repaints the survivors. That
@@ -1077,10 +1098,12 @@ shape of a trend, with a data-end dot. Stretches to fill its box.
 
 ### Line chart {#line-chart}
 
-**Purpose.** A time series. Numbered nice-scale y-axis, recessive grid, a 2px line
-+ data-end dot per series, x-tick labels, and a legend for ≥ 2 series.
+**Purpose.** A time series. Numbered nice-scale y-axis, a categorical **or**
+continuous/time x-axis, recessive grid, a 2px line + data-end dot per series, and an
+**interactive legend** (click to isolate) for ≥ 2 series.
 
 ```tsx
+{/* Categorical x-axis (evenly spaced, labelled) */}
 <CrLineChart
   series={[
     { name: "throughput", data: [12,18,15,22,19,26,24,31], signal: "work" },
@@ -1088,10 +1111,18 @@ shape of a trend, with a data-end dot. Stretches to fill its box.
   ]}
   labels={["09","10","11","12","13","14","15","16"]}
   area label="Throughput vs errors" />
+
+{/* Continuous time x-axis: samples sit at their timestamp, ticks snap to
+    round clock intervals */}
+<CrLineChart
+  series={[{ name: "p95", data: [120,180,150,220,190,260,240,310], signal: "work" }]}
+  x={times /* epoch-ms, parallel to each sample */}
+  xTime unit="ms" label="p95 latency over time" />
 ```
 
 - One shared y-scale. If two measures differ wildly in magnitude (e.g. throughput
-  vs a 0–100 %), **don't** add a second axis — show two charts or index to a base.
+  vs a 0–100 %), **don't** add a second axis — isolate one via the legend, show two
+  charts, or index to a base.
 
 ### Bar chart {#bar-chart}
 
