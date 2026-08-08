@@ -1292,3 +1292,6 @@
 .cr-grid__sort:hover { color: var(--ink); }
 .cr-grid__glyph { color: var(--sig-work); font-size: var(--text-2xs); }
 .cr-grid__empty { padding: var(--space-4); color: var(--muted); text-align: center; font-size: var(--text-sm); }
+.cr-grid:focus { outline: none; }
+.cr-grid:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -1px; }
+.cr-grid__cell--active { outline: var(--focus-w) solid var(--sig-work); outline-offset: calc(-1 * var(--focus-w)); position: relative; z-index: 1; }

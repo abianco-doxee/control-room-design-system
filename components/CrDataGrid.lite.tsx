@@ -11,6 +11,8 @@ export interface CrGridColumn {
 }
 
 export interface CrDataGridProps {
+  /** Ties the active-cell id together for keyboard nav (default "cr-grid"). */
+  id?: string;
   columns: CrGridColumn[];
   rows: any[];
   /** row field used as the stable key (default: the row index). */
@@ -150,10 +152,85 @@ export default function CrDataGrid(props: CrDataGridProps) {
     selCount(): number {
       return Object.keys(state.sel).length;
     },
+
+    /* ── keyboard navigation (WAI-ARIA grid, active-descendant) ──
+     * The grid is one tab stop; arrow keys move an ACTIVE cell (fr,fc) tracked in
+     * state and surfaced via aria-activedescendant, so nav survives virtualization
+     * (no focus() on a possibly-unrendered cell — we just scroll it into view). */
+    fr: -1,
+    fc: 0,
+    gid(): string {
+      return props.id || "cr-grid";
+    },
+    colCount(): number {
+      return props.columns.length + (props.selectable ? 1 : 0);
+    },
+    cellId(r: number, c: number): string {
+      return state.gid() + "-c-" + r + "-" + c;
+    },
+    activeId(): string | undefined {
+      return state.fr >= 0 ? state.cellId(state.fr, state.fc) : undefined;
+    },
+    isActive(r: number, c: number): boolean {
+      return r === state.fr && c === state.fc;
+    },
+    scrollRowIntoView(r: number) {
+      const vp: any = vpRef;
+      if (!vp) return;
+      const rh = state.rowH();
+      const top = r * rh;
+      const cur = vp.scrollTop;
+      if (top < cur) {
+        vp.scrollTop = top;
+        state.scrollTop = top;
+      } else if (top + rh > cur + state.viewportH()) {
+        const nt = top + rh - state.viewportH();
+        vp.scrollTop = nt;
+        state.scrollTop = nt;
+      }
+    },
+    onGridFocus() {
+      if (state.fr < 0 && props.rows.length > 0) {
+        state.fr = state.start();
+        state.fc = 0;
+      }
+    },
+    onGridKey(event: any) {
+      const rowsN = props.rows.length;
+      const cols = state.colCount();
+      if (rowsN === 0) return;
+      let r = state.fr < 0 ? state.start() : state.fr;
+      let c = state.fc;
+      const page = Math.max(1, Math.floor(state.viewportH() / state.rowH()) - 1);
+      const key = event.key;
+      let handled = true;
+      if (key === "ArrowDown") r = Math.min(rowsN - 1, r + 1);
+      else if (key === "ArrowUp") r = Math.max(0, r - 1);
+      else if (key === "ArrowRight") c = Math.min(cols - 1, c + 1);
+      else if (key === "ArrowLeft") c = Math.max(0, c - 1);
+      else if (key === "Home") c = 0;
+      else if (key === "End") c = cols - 1;
+      else if (key === "PageDown") r = Math.min(rowsN - 1, r + page);
+      else if (key === "PageUp") r = Math.max(0, r - page);
+      else handled = false;
+      if (!handled) return;
+      event.preventDefault();
+      state.fr = r;
+      state.fc = c;
+      state.scrollRowIntoView(r);
+    },
   });
 
   return (
-    <div class="cr-grid" role="grid" aria-rowcount={props.rows.length}>
+    <div
+      class="cr-grid"
+      role="grid"
+      aria-rowcount={props.rows.length}
+      tabIndex={0}
+      aria-activedescendant={state.activeId()}
+      onFocus={() => state.onGridFocus()}
+      onKeyDown={(event) => state.onGridKey(event)}
+    >
       <div class="cr-grid__head" role="row" style={{ gridTemplateColumns: state.template() }}>
         <Show when={props.selectable}>
           <div class="cr-grid__cell cr-grid__cell--check" role="columnheader">
@@ -202,7 +279,11 @@ export default function CrDataGrid(props: CrDataGridProps) {
                   style={{ gridTemplateColumns: state.template(), height: state.rowH() + "px" }}
                 >
                   <Show when={props.selectable}>
-                    <div class="cr-grid__cell cr-grid__cell--check" role="gridcell">
+                    <div
+                      class={"cr-grid__cell cr-grid__cell--check" + (state.isActive(state.absIndex(i), 0) ? " cr-grid__cell--active" : "")}
+                      role="gridcell"
+                      id={state.cellId(state.absIndex(i), 0)}
+                    >
                       <input
                         type="checkbox"
                         aria-label="Select row"
@@ -212,8 +293,12 @@ export default function CrDataGrid(props: CrDataGridProps) {
                     </div>
                   </Show>
                   <For each={props.columns}>
-                    {(col: CrGridColumn) => (
-                      <div class={"cr-grid__cell cr-grid__cell--" + state.align(col)} role="gridcell">
+                    {(col: CrGridColumn, ci: number) => (
+                      <div
+                        class={"cr-grid__cell cr-grid__cell--" + state.align(col) + (state.isActive(state.absIndex(i), (props.selectable ? 1 : 0) + ci) ? " cr-grid__cell--active" : "")}
+                        role="gridcell"
+                        id={state.cellId(state.absIndex(i), (props.selectable ? 1 : 0) + ci)}
+                      >
                         {row[col.key]}
                       </div>
                     )}
