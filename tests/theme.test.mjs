@@ -18,7 +18,7 @@ import {
   ON_PAIRS,
 } from "../lib/theme/index.js";
 import { surfaceRamp } from "../build/ramp.mjs";
-import { toneSignals, SIGNAL_KEYS } from "../build/signals.mjs";
+import { toneSignals, fitSignals, SIGNAL_KEYS } from "../build/signals.mjs";
 import { oklch } from "culori";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -204,6 +204,31 @@ test("harbor brand ($ramp + muted signals, extends dark) is complete + legible",
   assert.equal(v.valid, true, `harbor missing: ${v.missing.join(", ")}`);
   const c = checkThemeContrast(vars);
   assert.equal(c.ok, true, `harbor contrast failures: ${JSON.stringify(c.failures)}`);
+});
+
+test("fitSignals nudges only the signals that fail contrast on the surface", () => {
+  const vars = { panel: "#ffffff", "sig-work": "#00d3fb", "sig-accent": "#4338ca" };
+  const fitted = fitSignals(vars, { against: "panel", min: 3 });
+  assert.ok(fitted["sig-work"], "low-contrast cyan on white got fitted");
+  assert.ok(contrastRatio(fitted["sig-work"], "#ffffff") >= 3, "fitted signal clears 3:1");
+  assert.equal(fitted["sig-accent"], undefined, "already-legible indigo is left alone");
+});
+
+test("$modes emits a dark + light pair (aurora); the light mode fits its signals", () => {
+  const dark = readFileSync(join(ROOT, "dist/themes/aurora.css"), "utf8");
+  const light = readFileSync(join(ROOT, "dist/themes/aurora-light.css"), "utf8");
+  const pick = (css, k) => (css.match(new RegExp(`--${k}: (#[0-9a-f]{6})`)) || [])[1];
+
+  assert.match(dark, /:root\[data-theme="aurora"\]/);
+  assert.match(light, /:root\[data-theme="aurora-light"\]/);
+
+  const lPanel = pick(light, "panel");
+  const lWork = pick(light, "sig-work");
+  assert.ok(lPanel && lWork, "light mode has panel + sig-work");
+  assert.notEqual(lWork, pick(dark, "sig-work"), "light mode re-fit the neon signal");
+  assert.ok(contrastRatio(lWork, lPanel) >= 3, "fitted signal clears 3:1 on the light panel");
+  // shared brand identity carries across modes (explicit accent untouched)
+  assert.equal(pick(light, "sig-accent"), pick(dark, "sig-accent"), "brand accent shared across modes");
 });
 
 test("the worked brand (brands/slate.json) is valid, complete, and legible", () => {

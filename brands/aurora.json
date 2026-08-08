@@ -1,0 +1,26 @@
+{
+  "$schema": "../dist/theme-contract.json",
+  "$label": "Aurora · one brand, dark + light",
+  "$description": "A single brand definition that emits BOTH a dark and a light theme via `$modes`. Shared identity (indigo/cyan accents, cool-indigo surfaces from `$ramp`) lives at the top level; each mode adds only what differs. The light mode keeps the same neon signal ramp but turns on `$fitSignals`, so those bright signals are auto-darkened to stay legible on the near-white surfaces. Build → dist/themes/aurora.css (dark) + dist/themes/aurora-light.css.",
+  "$extends": "dark",
+  "$scheme": "dark",
+  "$ramp": "#0f1420",
+
+  "sig-accent": "#7c5cff",
+  "sig-accent-2": "#22d3ee",
+  "ink": "#e9ecf6",
+  "muted": "#9aa0b8",
+  "rail-ink": "#e3e6f2",
+
+  "$modes": {
+    "dark": {},
+    "light": {
+      "$scheme": "light",
+      "$ramp": "#eef1f8",
+      "$fitSignals": true,
+      "ink": "#161a26",
+      "muted": "#5a6076",
+      "rail-ink": "#eef1f8"
+    }
+  }
+}

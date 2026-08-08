@@ -276,6 +276,82 @@ body {
   animation-iteration-count: 1 !important;
 }
 
+/* Control Room brand: aurora — Aurora · one brand, dark + light (GENERATED
+ * from brands/aurora.json). Appearance layer only — pair with dist/structure.css.
+ * Regenerate: npm run build:theme. */
+:root[data-theme="aurora"] {
+  color-scheme: dark;
+  --ground: #0b0f18;
+  --board: #141822;
+  --panel: #1d212b;
+  --panel-2: #292e38;
+  --ink: #e9ecf6;
+  --muted: #9aa0b8;
+  --border: #000000;
+  --rail: #040712;
+  --rail-ink: #e3e6f2;
+  --sig-work: #00d3fb;
+  --sig-accent: #7c5cff;
+  --sig-accent-2: #22d3ee;
+  --sig-done: #00deaa;
+  --sig-wait: #f9ad00;
+  --sig-err: #f45058;
+  --sig-idle: #848496;
+  --on-sig: #06050c;
+  --on-err: #06050c;
+  --on-accent: #06050c;
+  --on-accent-2: #06050c;
+  --on-idle: #06050c;
+  --shadow-col: #000000;
+  --mass: #000000;
+  --stage: #49de78;
+  --stage-ink: #04140a;
+  --drip: #4affc8;
+  --halftone: radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);
+  --dither: repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
+  --scanline: repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);
+  --crosshatch: repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);
+  --field: repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
+}
+
+/* Control Room brand: aurora-light — Aurora · one brand, dark + light (GENERATED
+ * from brands/aurora.json). Appearance layer only — pair with dist/structure.css.
+ * Regenerate: npm run build:theme. */
+:root[data-theme="aurora-light"] {
+  color-scheme: light;
+  --ground: #ebeef5;
+  --board: #e3e6ed;
+  --panel: #fdfdff;
+  --panel-2: #f0f3fa;
+  --ink: #161a26;
+  --muted: #5a6076;
+  --border: #000000;
+  --rail: #0d0f15;
+  --rail-ink: #eef1f8;
+  --sig-work: #009cba;
+  --sig-accent: #7c5cff;
+  --sig-accent-2: #22d3ee;
+  --sig-done: #00a57d;
+  --sig-wait: #c18500;
+  --sig-err: #f45058;
+  --sig-idle: #848496;
+  --on-sig: #06050c;
+  --on-err: #06050c;
+  --on-accent: #06050c;
+  --on-accent-2: #06050c;
+  --on-idle: #06050c;
+  --shadow-col: #000000;
+  --mass: #000000;
+  --stage: #49de78;
+  --stage-ink: #04140a;
+  --drip: #4affc8;
+  --halftone: radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);
+  --dither: repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
+  --scanline: repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);
+  --crosshatch: repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);
+  --field: repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
+}
+
 /* Control Room brand: ember — Ember · warm dark, surfaces from one tone (GENERATED
  * from brands/ember.json). Appearance layer only — pair with dist/structure.css.
  * Regenerate: npm run build:theme. */
@@ -1777,6 +1853,8 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
     <button data-set="light" aria-pressed="false">light</button>
     <button data-set="extreme" aria-pressed="false">extreme</button>
     <button data-set="phosphor" aria-pressed="false">phosphor</button>
+    <button data-set="aurora" aria-pressed="false" title="external brand — brands/aurora.json">aurora ▸</button>
+    <button data-set="aurora-light" aria-pressed="false" title="external brand — brands/aurora-light.json">aurora-light ▸</button>
     <button data-set="ember" aria-pressed="false" title="external brand — brands/ember.json">ember ▸</button>
     <button data-set="harbor" aria-pressed="false" title="external brand — brands/harbor.json">harbor ▸</button>
     <button data-set="porcelain" aria-pressed="false" title="external brand — brands/porcelain.json">porcelain ▸</button>
