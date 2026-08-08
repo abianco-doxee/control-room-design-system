@@ -1126,6 +1126,14 @@ it exclusive; `↑`/`↓`/`Home`/`End` move between headers (`Enter`/`Space` tog
 floating panel; a transparent full-viewport scrim closes it on outside click, `Esc`
 closes and returns focus to the trigger. Use **Menu** for a list of actions.
 
+**Positioning.** The panel is **collision-aware**: on open it anchors to the
+trigger, **flips** above when there's no room below, and **shifts** horizontally to
+stay in the viewport (never clipping off-screen), tagging itself with
+`data-placement`. The algorithm is exported for your own overlays as
+`@control-room/design-system/position` — `computePosition` (pure geometry, unit-
+tested), `place(anchor, floating, opts)`, and `autoPlace(...)` (keeps it pinned on
+scroll/resize). No dependency on Floating UI.
+
 ```tsx
 <CrPopover label="filters ▾" title="Queue filters">
   <label><input type="checkbox" class="cr-check" /> failing</label>
