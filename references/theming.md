@@ -119,6 +119,30 @@ Programmatically it's `deriveOnColors(vars, { changed })` (and `autoOnColor(fill
 run automatically by `defineTheme` and `build:theme`; pass `deriveOnColors: false`
 to `defineTheme` to opt out.
 
+### Surface ramp from one tone (`$ramp`)
+
+Surfaces should read as one material at different depths, not five hand-tuned
+hexes. Give a brand `$ramp` (a single base surface tone) and the build derives the
+whole ladder — `--ground`, `--board`, `--panel`, `--panel-2`, `--rail` — by walking
+**OKLCH lightness** (perceptually even), keeping the tone's hue and a whisper of its
+chroma so the set carries your tint. Direction follows `$scheme` (dark: ground
+deepest, panels lift; light: ground bright, panel near-white); `--rail` stays a deep
+tone for a dark nav on any scheme. Any surface you set explicitly still wins.
+
+```jsonc
+{
+  "$extends": "dark",
+  "$scheme": "dark",
+  "$ramp": "#141013",        // one warm base tone → the whole surface ladder
+  "sig-accent": "#ff6a3d"     // + your key; signals/on-colours inherit or derive
+}
+```
+
+That's essentially the entire `brands/ember.json` — a full theme from a base tone
+plus an accent. Precedence is `$extends` base < `$ramp` surfaces < explicit roles.
+`$ramp` is a **build-time** authoring feature (it uses OKLCH conversion); the
+generator lives in `build/ramp.mjs`.
+
 ### Programmatic authoring (`@control-room/design-system/theme`)
 
 The build path is thin wrapping over a framework-agnostic core you can call

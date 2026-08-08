@@ -21,6 +21,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 
 import { fileURLToPath } from "node:url";
 import { dirname, join, basename } from "node:path";
 import { themeCss, mergeTheme, validateTheme, checkThemeContrast, deriveOnColors } from "../lib/theme/index.js";
+import { surfaceRamp } from "./ramp.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BRANDS = join(ROOT, "brands");
@@ -62,9 +63,16 @@ function resolveBase(ref, seen) {
 function resolveBrand(brand, seen = new Set()) {
   const base = resolveBase(brand.$extends, seen);
   const overrides = Object.fromEntries(Object.entries(brand).filter(([k]) => !k.startsWith("$")));
+  /* $ramp: derive the surface ladder (ground…rail) from one base tone in OKLCH.
+   * Precedence: $extends base < ramp surfaces < explicit role overrides. */
+  let surfaces = {};
+  if (brand.$ramp) {
+    const baseTone = typeof brand.$ramp === "string" ? brand.$ramp : brand.$ramp.base;
+    surfaces = surfaceRamp(baseTone, brand.$scheme || "dark");
+  }
   /* auto-pick on-* for anything the brand didn't hand-set, re-deriving where it
    * recoloured the underlying fill (so inherited on-colours can't go stale). */
-  const vars = deriveOnColors(mergeTheme(base, overrides), { changed: Object.keys(overrides) });
+  const vars = deriveOnColors(mergeTheme(mergeTheme(base, surfaces), overrides), { changed: Object.keys(overrides) });
   return { vars, meta: brand };
 }
 
