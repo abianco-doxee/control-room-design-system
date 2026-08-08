@@ -1,0 +1,1687 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Control Room — Brand Preview</title>
+<style>/* ============================================================================
+ * CONTROL ROOM — Structure layer  (GENERATED — do not edit by hand)
+ * The brand-agnostic FEATURE layer: spacing, borders, shadows, type, motion,
+ * component tokens + global baseline. Pair with ONE theme from dist/themes/*.css
+ * (or your own brand — see references/theming.md). Source: tokens/tokens.json.
+ * ==========================================================================*/
+
+:root {
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-px: 1px;
+  --space-0-5: 2px;
+  --text-2xs: 10px;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-md: 15px;
+  --text-lg: 19px;
+  --text-xl: clamp(28px, 5.5vw, 52px);
+  --leading-tight: 1.05;
+  --leading-normal: 1.6;
+  --leading-display: 0.9;
+  --radius-none: 0px;
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sticky: 50;
+  --z-overlay: 100;
+  --z-modal: 1000;
+  --brd-hair: 1.5px;
+  --brd: 2px;
+  --brd-heavy: 3px;
+  --brd-brush: 5px;
+  --shadow-off-sm: 2px;
+  --shadow-off: 4px;
+  --shadow-off-lg: 6px;
+  --state-disabled-op: 0.45;
+  --state-hover-mix: 12%;
+  --row-h: 34px;
+  --focus-w: 3px;
+  --focus-offset: 2px;
+  --motion-intensity: 1;
+  --decoration-intensity: 1;
+  --radius: 0px;
+  --halftone-size: 7px;
+  --breach-radius: 14px;
+  --breach-blur: 26px;
+  --breach-glow-size: 40px;
+  --font-sans: "CR Sans", "Archivo", "Arial Black", "Helvetica Neue", system-ui, sans-serif;
+  --font-display: "CR Display", "Saira Condensed", "Archivo Narrow", "Oswald", var(--font-sans);
+  --font-mono: "CR Mono", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --type-display-weight: 900;
+  --type-display-tracking: -0.038em;
+  --type-display-leading: 0.9;
+  --type-display-transform: uppercase;
+  --type-data-size: 13px;
+  --type-data-size-sm: 11px;
+  --type-label-tracking: 0.07em;
+  --type-label-transform: uppercase;
+  --dur-press: 120ms;
+  --dur-fast: 160ms;
+  --dur-med: 260ms;
+  --dur-ambient: 3200ms;
+  --ease-snap: cubic-bezier(0.2, 0, 0, 1);
+  --ease-step: steps(3, jump-none);
+  --tick-ambient: 180ms;
+  --cr-btn-pad-x: var(--space-4);
+  --cr-btn-pad-y: var(--space-2);
+  --cr-btn-gap: var(--space-2);
+  --cr-btn-bg: var(--sig-wait);
+  --cr-btn-fg: var(--on-sig);
+  --cr-btn-size: var(--text-sm);
+  --cr-panel-pad: var(--space-3);
+  --cr-panel-bg: var(--panel);
+  --cr-panel-gap: var(--space-3);
+  --cr-chip-pad-x: var(--space-2);
+  --cr-chip-pad-y: var(--space-0-5);
+  --cr-chip-bg: var(--sig-done);
+  --cr-chip-fg: var(--on-sig);
+  --cr-row-pad-y: var(--space-2);
+  --cr-row-gap: var(--space-3);
+  --cr-hero-pad: var(--space-4);
+  --cr-hero-gap: var(--space-4);
+  --cr-hero-bg: var(--sig-accent);
+  --cr-hero-fg: var(--on-accent);
+  --cr-nav-w: 180px;
+}
+
+/* ── GLOBAL BASELINE ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+/* Focus is a first-class signal, not an afterthought. */
+*:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
+/* Motion is opt-out at the system level. */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+/* Loudness dial — a product setting, not a user preference. The default look is the
+   loud "showcase" profile; set data-intensity="calm" on <html> for an 8-hour
+   operations profile: no non-essential animation, decorative texture toned down.
+   Wire new decorative layers to var(--decoration-intensity) so they follow it. */
+:root[data-intensity="calm"] { --motion-intensity: 0; --decoration-intensity: 0.4; }
+:root[data-intensity="calm"] *,
+:root[data-intensity="calm"] *::before,
+:root[data-intensity="calm"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+}
+
+/* ============================================================================
+ * CONTROL ROOM — Component layer
+ *
+ * Consumable component classes, built on the 3-tier token pipeline:
+ *   primitive scales (--space-*, --text-*, --leading-*)  →
+ *   semantic (--panel, --sig-*, --on-*)                   →
+ *   component tokens (--cr-btn-*, --cr-panel-* …)         →  these classes.
+ *
+ * Import token layer first:
+ *   <link rel="stylesheet" href="dist/control-room.css">   <!-- tokens -->
+ *   <link rel="stylesheet" href="styles/components.css">    <!-- this file -->
+ *
+ * No raw px — every size/space is a scale token. Override a component's look by
+ * setting its --cr-<component>-* tokens; radius 0, hard offset shadow only.
+ * ==========================================================================*/
+
+.cr-panel,
+.cr-btn,
+.cr-hero,
+.cr-bezel,
+.cr-drip { border-radius: var(--radius-none); }
+
+/* ── Panel ─────────────────────────────────────────────────────────────── */
+.cr-panel {
+  background: var(--cr-panel-bg);
+  border: var(--brd) solid var(--border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  padding: var(--cr-panel-pad);
+}
+.cr-panel--major { border-width: var(--brd-heavy); }
+.cr-panel--inset { background: var(--panel-2); box-shadow: none; }
+.cr-panel__title {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink); margin: 0 0 var(--space-2);
+}
+
+/* ── Button (snap-press) ───────────────────────────────────────────────── */
+.cr-btn {
+  --cr-btn-tint: var(--ink);   /* colour for outline/ghost/link (a signal overrides it) */
+  display: inline-flex; align-items: center; gap: var(--cr-btn-gap);
+  font-family: var(--font-mono); font-size: var(--cr-btn-size); font-weight: 800; letter-spacing: 0.03em;
+  padding: var(--cr-btn-pad-y) var(--cr-btn-pad-x); cursor: pointer;
+  background: var(--cr-btn-bg); color: var(--cr-btn-fg);
+  border: var(--brd-heavy) solid var(--border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  transition: transform 0.05s, box-shadow 0.05s, background 0.1s;
+}
+.cr-btn:active { transform: translate(var(--shadow-off), var(--shadow-off)); box-shadow: 0 0 0 var(--shadow-col); }
+/* disabled: flatten off the surface (drop the hard shadow), dim, block the press */
+.cr-btn:disabled, .cr-btn[disabled] {
+  opacity: var(--state-disabled-op); cursor: not-allowed;
+  box-shadow: none; transform: none; filter: saturate(0.5);
+}
+.cr-btn--sm { --cr-btn-pad-x: var(--space-3); --cr-btn-pad-y: var(--space-1); --cr-btn-size: var(--text-xs); }
+
+/* ── EMPHASIS (gravity) — form, not colour ─────────────────────────────────
+ * solid (default, primary) is the filled+shadowed base above. */
+/* text is the tint shifted toward the theme ink so a signal colour stays AA on any
+ * surface; the pure signal still reads on the BORDER (outline) and hover wash. */
+.cr-btn { --cr-btn-ink: color-mix(in srgb, var(--cr-btn-tint) 66%, var(--ink)); }
+.cr-btn--outline { background: transparent; color: var(--cr-btn-ink); border: var(--brd) solid var(--cr-btn-tint); box-shadow: none; }
+.cr-btn--outline:hover:not(:disabled) { background: color-mix(in srgb, var(--cr-btn-tint) 14%, transparent); }
+.cr-btn--ghost { background: transparent; color: var(--cr-btn-ink); border-color: transparent; box-shadow: none; }
+.cr-btn--ghost:hover:not(:disabled) { background: color-mix(in srgb, var(--cr-btn-tint) 12%, transparent); }
+.cr-btn--link { background: transparent; color: var(--cr-btn-ink); border: 0; box-shadow: none;
+  padding-left: 0; padding-right: 0; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 2px; }
+.cr-btn--link:hover:not(:disabled) { filter: brightness(1.18); }
+/* outline/ghost/link don't snap-press off a shadow they don't have */
+.cr-btn--outline:active, .cr-btn--ghost:active, .cr-btn--link:active { transform: none; box-shadow: none; }
+
+/* ── SIGNAL (colour key) — sets the solid fill AND the outline/ghost/link tint ─ */
+.cr-btn--sig-work    { --cr-btn-bg: var(--sig-work);     --cr-btn-fg: var(--on-sig);      --cr-btn-tint: var(--sig-work); }
+.cr-btn--sig-wait    { --cr-btn-bg: var(--sig-wait);     --cr-btn-fg: var(--on-sig);      --cr-btn-tint: var(--sig-wait); }
+.cr-btn--sig-done    { --cr-btn-bg: var(--sig-done);     --cr-btn-fg: var(--on-sig);      --cr-btn-tint: var(--sig-done); }
+.cr-btn--sig-err     { --cr-btn-bg: var(--sig-err);      --cr-btn-fg: var(--on-err);      --cr-btn-tint: var(--sig-err); }
+.cr-btn--sig-accent  { --cr-btn-bg: var(--sig-accent);   --cr-btn-fg: var(--on-accent);   --cr-btn-tint: var(--sig-accent); }
+.cr-btn--sig-accent2 { --cr-btn-bg: var(--sig-accent-2); --cr-btn-fg: var(--on-accent-2); --cr-btn-tint: var(--sig-accent-2); }
+
+/* ── Chip ──────────────────────────────────────────────────────────────── */
+.cr-chip {
+  display: inline-block; font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700;
+  padding: var(--cr-chip-pad-y) var(--cr-chip-pad-x);
+  background: var(--cr-chip-bg); color: var(--cr-chip-fg); border: var(--brd) solid var(--border);
+}
+.cr-chip--alt { --cr-chip-bg: var(--sig-work); }
+
+/* ── Tag (inline status) ───────────────────────────────────────────────── */
+.cr-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 800;
+  padding: var(--space-0-5) var(--space-2); border: 1.5px solid var(--border);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+/* Canonical tone vocabulary — matches the signal ramp (Law 2), the same words a
+ * StatusDot / Toast / Chip asserts: done · work · wait · err · idle · accent. */
+.cr-tag--done   { background: var(--sig-done); color: var(--on-sig); }
+.cr-tag--work   { background: var(--sig-work); color: var(--on-sig); }
+.cr-tag--wait   { background: var(--sig-wait); color: var(--on-sig); }
+.cr-tag--err    { background: var(--sig-err);  color: var(--on-err); }
+.cr-tag--idle   { background: var(--sig-idle); color: var(--on-idle); }
+.cr-tag--accent { background: var(--sig-accent); color: var(--on-accent); }
+
+/* ── StatusDot (a square — radius 0) ───────────────────────────────────── */
+.cr-dot { display: inline-block; width: var(--space-2); height: var(--space-2); border: 1.5px solid var(--border); }
+
+/* ── SessionRow ────────────────────────────────────────────────────────── */
+.cr-row {
+  display: flex; align-items: center; gap: var(--cr-row-gap); padding: var(--cr-row-pad-y) 0;
+  border-bottom: 1.5px solid color-mix(in srgb, var(--border) 18%, transparent);
+}
+.cr-row:last-child { border-bottom: none; }
+.cr-row__name { flex: 1; font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 600; color: var(--ink); }
+.cr-row__status { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--muted); }
+
+/* ── Hero (keyed focal region) ─────────────────────────────────────────── */
+.cr-hero {
+  display: flex; align-items: center; gap: var(--cr-hero-gap);
+  background: var(--cr-hero-bg); color: var(--cr-hero-fg);
+  border: var(--brd) solid var(--border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col); padding: var(--cr-hero-pad);
+}
+.cr-hero--wait { --cr-hero-bg: var(--sig-wait); --cr-hero-fg: var(--on-sig); }
+.cr-hero--err  { --cr-hero-bg: var(--sig-err); --cr-hero-fg: var(--on-err); }
+.cr-hero--calm { --cr-hero-bg: var(--stage); --cr-hero-fg: var(--stage-ink); }
+.cr-hero__big  { font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); line-height: var(--leading-tight); letter-spacing: var(--type-display-tracking); }
+.cr-hero__sub  { font-family: var(--font-mono); font-size: var(--text-sm); margin-top: var(--space-0-5); }
+
+/* ── Bezel + screen (the only texture host) ────────────────────────────── */
+.cr-bezel {
+  border: var(--brd-brush) solid var(--border); background: var(--panel-2); padding: var(--space-3);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+}
+.cr-bezel__rivets { display: flex; justify-content: space-between; margin-bottom: var(--space-2); }
+.cr-bezel__rivets i { width: var(--space-2); height: var(--space-2); background: var(--border); display: block; }
+.cr-bezel__screen {
+  position: relative; isolation: isolate;
+  background: var(--board); border: var(--brd) solid var(--border); padding: var(--space-4);
+  font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink);
+}
+/* CRT halftone rides BEHIND the text (own layer, toned + dialable) so the readout
+ * stays crisp — texture under body text is a readability tax, not a feature. */
+.cr-bezel__screen::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image: var(--halftone); background-size: var(--halftone-size) var(--halftone-size);
+  opacity: calc(0.55 * var(--decoration-intensity, 1));
+}
+
+/* ── Diagonal primitives (Law 4 — shape carries meaning, never decoration) ──
+ * Four shapes, four fixed meanings, max 15° off-axis. The arrow-rail below is
+ * the fourth (sequence). See references/components.md#diagonal-primitives. */
+.cr-chev { position: relative; padding-left: var(--space-6); }
+.cr-chev::before {
+  content: ""; position: absolute; left: var(--space-2); top: 50%; transform: translateY(-50%);
+  width: 0; height: 0; border-left: 9px solid var(--cr-chev-c, var(--sig-work));
+  border-top: 6px solid transparent; border-bottom: 6px solid transparent; pointer-events: none;
+}
+.cr-notch {
+  background: var(--sig-wait); color: var(--on-sig);
+  padding: var(--space-2) var(--space-3); border: var(--brd) solid var(--border);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 11px), calc(100% - 11px) 100%, 0 100%);
+}
+.cr-wedge { position: relative; }
+.cr-wedge::after {
+  content: ""; position: absolute; top: 0; right: 0; width: var(--space-3); height: 100%;
+  background: var(--cr-wedge-c, var(--sig-work)); pointer-events: none;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+/* ── Arrow-rail (sequence, Law 4) ──────────────────────────────────────── */
+.cr-rail { display: flex; }
+.cr-rail__step {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700;
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-5);
+  background: var(--panel); color: var(--ink); border: var(--brd) solid var(--border); margin-left: -10px;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%, 10px 50%);
+}
+.cr-rail__step:first-child { margin-left: 0; }
+.cr-rail__step--on { background: var(--sig-work); color: var(--on-sig); }
+
+/* ── Drip / error surface (Law 3) ──────────────────────────────────────── */
+.cr-drip { position: relative; border: var(--brd) solid var(--border); background: var(--sig-err); color: var(--on-err); padding: var(--space-4); }
+/* the surface actually DRIPS — uneven columns of the fill bleed past the bottom
+ * edge, hard-outlined to stay neobrutalist. Follows the loudness dial. */
+.cr-drip::after {
+  content: ""; position: absolute; left: calc(var(--brd) * -1); right: calc(var(--brd) * -1);
+  top: 100%; height: 22px; pointer-events: none;
+  opacity: var(--decoration-intensity, 1);
+  background:
+    radial-gradient(7px 20px at 10% 0, var(--sig-err) 62%, transparent 64%),
+    radial-gradient(5px 11px at 26% 0, var(--sig-err) 62%, transparent 64%),
+    radial-gradient(8px 15px at 45% 0, var(--sig-err) 62%, transparent 64%),
+    radial-gradient(5px 22px at 63% 0, var(--sig-err) 62%, transparent 64%),
+    radial-gradient(6px 9px at 80% 0, var(--sig-err) 62%, transparent 64%),
+    radial-gradient(7px 17px at 93% 0, var(--sig-err) 62%, transparent 64%);
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 1.5px 0 var(--border));
+}
+.cr-drip__title { font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
+.cr-drip__sub { font-family: var(--font-mono); font-size: var(--text-xs); margin-top: var(--space-0-5); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cr-btn { transition: none; }
+}
+
+/* ── Masthead (stark title card) ────────────────────────────────────────── */
+.cr-masthead {
+  border: var(--brd-heavy) solid var(--border);
+  box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
+  background: var(--panel); padding: var(--space-5) var(--space-6); border-radius: var(--radius-none);
+}
+.cr-masthead__eyebrow {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.14em; color: var(--sig-accent); margin: 0 0 var(--space-2);
+}
+.cr-masthead__title {
+  font-family: var(--font-display);
+  font-weight: 900; font-size: var(--text-xl); line-height: var(--leading-display);
+  letter-spacing: -0.038em; text-transform: uppercase; margin: 0; color: var(--ink);
+}
+
+/* Registration marks: .cr-mark is the ink-weight corner-tick preset of .cr-trim
+ * (structure, never a signal — Law 2). The shared implementation lives with
+ * .cr-trim in the decoration section. See design-language.md#signatures. */
+
+/* ── Nav rail ───────────────────────────────────────────────────────────── */
+.cr-nav {
+  width: var(--cr-nav-w); flex-shrink: 0; background: var(--rail);
+  border-right: var(--brd-heavy) solid var(--border); padding: var(--space-3) 0;
+}
+.cr-nav__brand {
+  font-family: var(--font-mono); font-weight: 900; font-size: var(--text-sm); line-height: 1.15;
+  padding: 0 var(--space-4) var(--space-4); color: var(--rail-ink);
+}
+.cr-nav__list { list-style: none; margin: 0; padding: 0; }
+.cr-nav__item {
+  display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4);
+  color: var(--rail-ink); text-decoration: none; font-family: var(--font-mono);
+  font-size: var(--text-sm); font-weight: 700; border-left: 3px solid transparent; cursor: pointer;
+}
+.cr-nav__item:hover { background: color-mix(in srgb, var(--rail-ink) 10%, transparent); }
+.cr-nav__item[aria-current="page"], .cr-nav__item--active {
+  background: var(--sig-accent); color: var(--on-accent); border-left-color: var(--border);
+}
+.cr-nav__badge {
+  margin-left: auto; font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 800;
+  background: var(--sig-err); color: var(--on-err); padding: 0 var(--space-1); border: 1.5px solid var(--border);
+}
+
+/* ── Table ──────────────────────────────────────────────────────────────── */
+.cr-table {
+  width: 100%; border-collapse: collapse; font-size: var(--text-base);
+  border: var(--brd) solid var(--border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col); background: var(--panel);
+}
+.cr-table th, .cr-table td {
+  text-align: left; padding: var(--space-2) var(--space-3);
+  border-bottom: var(--brd-hair) solid color-mix(in srgb, var(--border) 15%, transparent);
+}
+.cr-table tbody tr:last-child td, .cr-table tr:last-child td { border-bottom: none; }
+.cr-table th {
+  font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted); font-weight: 800;
+}
+.cr-table td { color: var(--ink); }
+/* sticky header (opt-in) — wrap the table in a scroll box for it to bite */
+.cr-table--sticky thead th { position: sticky; top: 0; z-index: 1; background: var(--panel); }
+/* sortable header — a real <button> inside the <th> (keyboard-operable) */
+.cr-table__sortable {
+  display: inline-flex; align-items: center; gap: var(--space-1); width: 100%;
+  background: transparent; border: 0; padding: 0; cursor: pointer; user-select: none;
+  white-space: nowrap; font: inherit; color: inherit; text-transform: inherit;
+  letter-spacing: inherit; text-align: left;
+}
+.cr-table__sortable:hover { color: var(--ink); }
+.cr-table__ind { color: var(--sig-work); font-weight: 900; margin-left: var(--space-1); }
+/* row hover + selection */
+.cr-table tbody tr:hover td { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-table tbody tr[aria-selected="true"] td { background: color-mix(in srgb, var(--sig-work) 18%, transparent); }
+.cr-table__sel { width: var(--space-8); text-align: center; }
+
+/* ── Tabs ──────────────────────────────────────────────────────────────── */
+.cr-tabs { display: flex; gap: 0; border-bottom: var(--brd) solid var(--border); }
+.cr-tab {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: var(--space-2) var(--space-4); background: transparent; color: var(--muted);
+  border: 0; border-bottom: var(--brd-heavy) solid transparent; margin-bottom: calc(var(--brd) * -1);
+  cursor: pointer;
+}
+.cr-tab:hover { color: var(--ink); }
+.cr-tab--on { color: var(--ink); border-bottom-color: var(--sig-work); }
+
+/* ── Meter (capacity / utilisation bar) ─────────────────────────────────── */
+.cr-meter { --cr-meter-c: var(--sig-work); display: flex; align-items: center; gap: var(--space-2); }
+.cr-meter__label {
+  font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); min-width: 6ch;
+}
+.cr-meter__track {
+  flex: 1; display: block; height: var(--space-2); background: var(--panel-2);
+  border: var(--brd-hair) solid var(--border);
+}
+.cr-meter__fill { display: block; height: 100%; background: var(--cr-meter-c); }
+.cr-meter--work { --cr-meter-c: var(--sig-work); }
+.cr-meter--wait { --cr-meter-c: var(--sig-wait); }
+.cr-meter--done { --cr-meter-c: var(--sig-done); }
+.cr-meter--err  { --cr-meter-c: var(--sig-err); }
+.cr-meter--idle { --cr-meter-c: var(--sig-idle); }
+
+/* ── Keyed contact sheet (Law 2) ───────────────────────────────────────── */
+.cr-tiles {
+  display: grid; gap: 0; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  border: var(--brd-brush) solid var(--border);
+}
+.cr-tile {
+  aspect-ratio: 1; position: relative; display: flex; align-items: flex-end; padding: var(--space-2);
+  overflow: hidden; border-right: var(--brd) solid var(--border); border-bottom: var(--brd) solid var(--border);
+  font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 700; text-transform: uppercase;
+}
+.cr-tile--work { background: var(--sig-work); color: var(--on-sig); }
+.cr-tile--wait { background: var(--sig-wait); color: var(--on-sig); }
+.cr-tile--done { background: var(--sig-done); color: var(--on-sig); }
+.cr-tile--err  { background: var(--sig-err);  color: var(--on-err); }
+.cr-tile--idle { background: var(--sig-idle); color: var(--on-idle); }
+.cr-tile--stage{ background: var(--stage);    color: var(--stage-ink); }
+
+/* ── Interaction states (Law 7 — event-driven, settles) ────────────────── */
+.cr-row--event { animation: cr-rowglitch 0.4s steps(3) 1; }
+@keyframes cr-rowglitch {
+  0%, 100% { transform: translateX(0); filter: none; }
+  33% { transform: translateX(-2px); filter: hue-rotate(20deg); }
+  66% { transform: translateX(2px); }
+}
+.cr-chip--stamp { animation: cr-stamp 0.18s ease-out 1; }
+@keyframes cr-stamp { 0% { transform: scale(1.18); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
+.cr-btn--kick { position: relative; }
+.cr-btn--kick::after {
+  content: ""; position: absolute; inset: -3px; border: 3px solid var(--sig-work);
+  opacity: 0; animation: cr-kick 0.2s ease-out 1;
+}
+@keyframes cr-kick { 0% { opacity: 0.9; transform: translate(-2px, 0); } 100% { opacity: 0; transform: translate(2px, 0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .cr-row--event, .cr-chip--stamp, .cr-btn--kick::after { animation: none; }
+}
+
+/* ── Instrument shell (composes rail + board) ──────────────────────────── */
+.cr-instrument {
+  display: flex; border: var(--brd-brush) solid var(--border);
+  box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
+  background: var(--board); overflow: hidden;
+}
+.cr-instrument__board {
+  flex: 1; min-width: 0; padding: var(--space-4);
+  display: flex; flex-direction: column; gap: var(--space-4);
+}
+
+/* ── Form field wrapper ────────────────────────────────────────────────── */
+.cr-field { display: flex; flex-direction: column; gap: var(--space-1); }
+.cr-field__label {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
+  text-transform: uppercase; letter-spacing: var(--type-label-tracking); color: var(--ink);
+}
+.cr-field__hint { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); }
+.cr-field__error { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--ink); }
+.cr-field__error::before { content: "\2717 "; color: var(--sig-err); font-weight: 800; }
+.cr-field__req { color: var(--sig-err); }
+
+/* ── Form (schema-driven; renders a stack of fields + a submit action) ───── */
+.cr-form { display: flex; flex-direction: column; gap: var(--space-4); }
+.cr-form__title {
+  margin: 0; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg);
+  text-transform: uppercase; letter-spacing: -0.01em; color: var(--ink);
+}
+.cr-form__actions { display: flex; gap: var(--space-2); margin-top: var(--space-1); }
+/* form-level error summary — appears after a failed submit; links jump to fields */
+.cr-form__summary { border: var(--brd) solid var(--sig-err); background: color-mix(in srgb, var(--sig-err) 12%, var(--panel)); padding: var(--space-2) var(--space-3); display: flex; flex-direction: column; gap: var(--space-1); }
+.cr-form__summary-title { font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--sig-err); }
+.cr-form__summary-list { margin: 0; padding-left: var(--space-4); font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--ink); display: flex; flex-direction: column; gap: 2px; }
+.cr-form__summary-link { color: var(--ink); text-underline-offset: 2px; }
+/* nesting: rows carry a depth pad; groups/array-items get a left rule so nested
+ * structure reads at a glance without real DOM nesting */
+.cr-form__row { display: flex; flex-direction: column; gap: var(--space-1); }
+.cr-form__row--group, .cr-form__row--array { margin-top: var(--space-1); }
+.cr-form__row--item { border-left: var(--brd) solid var(--border); }
+.cr-form__grouphead {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
+  border-bottom: var(--brd-hair) solid var(--border); padding-bottom: 2px;
+}
+.cr-form__arrayhead, .cr-form__itemhead { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.cr-form__itemidx { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.cr-form__control { display: flex; align-items: center; gap: var(--space-2); }
+.cr-form__control .cr-input, .cr-form__control .cr-select, .cr-form__control .cr-textarea { flex: 1; }
+
+/* ── Text input / textarea / select ────────────────────────────────────── */
+.cr-input, .cr-textarea, .cr-select {
+  width: 100%; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink);
+  background: var(--board); border: var(--brd) solid var(--border); border-radius: var(--radius-none);
+  padding: var(--space-2) var(--space-3);
+}
+.cr-input::placeholder, .cr-textarea::placeholder { color: var(--muted); }
+.cr-textarea { min-height: var(--space-16); resize: vertical; }
+.cr-input:disabled, .cr-textarea:disabled, .cr-select:disabled { opacity: 0.5; cursor: not-allowed; }
+.cr-field--error .cr-input,
+.cr-field--error .cr-textarea,
+.cr-field--error .cr-select { border-color: var(--sig-err); border-width: var(--brd-heavy); }
+
+/* ── Checkbox / radio (square — Law 1) ─────────────────────────────────── */
+.cr-check {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); cursor: pointer;
+}
+.cr-check input {
+  appearance: none; -webkit-appearance: none; margin: 0;
+  width: var(--space-4); height: var(--space-4); flex-shrink: 0;
+  border: var(--brd) solid var(--border); background: var(--board);
+  display: inline-grid; place-content: center; cursor: pointer;
+}
+.cr-check input:checked { background: var(--sig-work); }
+.cr-check input:checked::after {
+  content: ""; width: var(--space-2); height: var(--space-2); background: var(--on-sig);
+}
+.cr-check input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Switch (button[role=switch]) ──────────────────────────────────────── */
+.cr-switch {
+  display: inline-flex; align-items: center; gap: var(--space-2); cursor: pointer;
+  font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 700; color: var(--ink);
+  background: none; border: none; padding: 0;
+}
+.cr-switch__track {
+  position: relative; display: inline-block; width: var(--space-8); height: var(--space-4);
+  background: var(--panel-2); border: var(--brd) solid var(--border);
+}
+.cr-switch__track::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: var(--space-4);
+  background: var(--muted); transition: left var(--dur-press), background var(--dur-press);
+}
+.cr-switch[aria-checked="true"] .cr-switch__track { background: var(--sig-done); }
+.cr-switch[aria-checked="true"] .cr-switch__track::after { left: calc(100% - var(--space-4)); background: var(--on-sig); }
+
+@media (prefers-reduced-motion: reduce) { .cr-switch__track::after { transition: none; } }
+
+/* ── Modal (native <dialog> — free focus-trap + Esc + backdrop) ────────── */
+.cr-modal {
+  border: var(--brd-brush) solid var(--border); background: var(--panel); color: var(--ink);
+  box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
+  padding: 0; max-width: min(92vw, 34rem); border-radius: var(--radius-none);
+}
+.cr-modal::backdrop { background: color-mix(in srgb, var(--mass) 72%, transparent); }
+
+/* ── Command palette (⌘K) ───────────────────────────────────────────────── */
+.cr-palette {
+  padding: 0; width: min(92vw, 34rem); margin: 12vh auto auto; border-radius: var(--radius-none);
+  border: var(--brd-heavy) solid var(--border); background: var(--panel); color: var(--ink);
+  box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
+}
+.cr-palette::backdrop { background: color-mix(in srgb, var(--mass) 72%, transparent); }
+.cr-palette__box { display: flex; flex-direction: column; }
+.cr-palette__input {
+  font-family: var(--font-mono); font-size: var(--text-md); padding: var(--space-3) var(--space-4);
+  background: var(--board); color: var(--ink); border: 0; border-bottom: var(--brd) solid var(--border);
+  outline: none;
+}
+.cr-palette__input::placeholder { color: var(--muted); }
+.cr-palette__list { list-style: none; margin: 0; padding: var(--space-1); max-height: 52vh; overflow: auto; }
+.cr-palette__item {
+  display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-3);
+  font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); cursor: pointer;
+}
+.cr-palette__item--active { background: var(--sig-work); color: var(--on-sig); }
+.cr-palette__item--active .cr-kbd { border-color: currentColor; color: inherit; background: color-mix(in srgb, currentColor 16%, transparent); box-shadow: none; }
+.cr-palette__label { flex: 1; }
+.cr-palette__group { font-size: var(--text-2xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.cr-palette__item--active .cr-palette__group { color: inherit; }
+.cr-palette__empty { padding: var(--space-3) var(--space-4); font-family: var(--font-mono); color: var(--muted); }
+
+/* ── Alert / callout (inline message, keyed to a signal) ────────────────── */
+.cr-alert {
+  --cr-alert-key: var(--sig-work);
+  display: flex; gap: var(--space-3); align-items: flex-start;
+  border: var(--brd) solid var(--border); border-left: var(--brd-brush) solid var(--cr-alert-key);
+  background: var(--panel); padding: var(--space-3) var(--space-4);
+  box-shadow: var(--shadow-off-sm) var(--shadow-off-sm) 0 var(--shadow-col);
+}
+.cr-alert--info { --cr-alert-key: var(--sig-work); }
+.cr-alert--wait { --cr-alert-key: var(--sig-wait); }
+.cr-alert--done { --cr-alert-key: var(--sig-done); }
+.cr-alert--err  { --cr-alert-key: var(--sig-err); }
+.cr-alert__icon { width: var(--space-3); height: var(--space-3); background: var(--cr-alert-key); border: var(--brd-hair) solid var(--border); margin-top: var(--space-0-5); flex-shrink: 0; }
+.cr-alert__body { flex: 1; min-width: 0; }
+.cr-alert__title { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; letter-spacing: -0.01em; font-size: var(--text-md); margin: 0 0 var(--space-0-5); color: var(--ink); }
+.cr-alert__msg { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); margin: 0; }
+.cr-alert__close {
+  font-family: var(--font-mono); cursor: pointer; background: transparent; color: inherit;
+  border: var(--brd-hair) solid currentColor; padding: 0 var(--space-1); line-height: 1.4;
+}
+
+/* ── Radio group (a square — radius 0; filled when checked) ──────────────── */
+.cr-radiogroup { display: flex; flex-direction: column; gap: var(--space-2); }
+.cr-radiogroup--row { flex-direction: row; flex-wrap: wrap; gap: var(--space-4); }
+.cr-radio {
+  display: inline-flex; align-items: center; gap: var(--space-2); cursor: pointer;
+  font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink);
+  background: transparent; border: 0; padding: 0; text-align: left;
+}
+.cr-radio__box { position: relative; width: var(--space-3); height: var(--space-3); flex-shrink: 0; background: var(--panel-2); border: var(--brd) solid var(--border); }
+.cr-radio[aria-checked="true"] .cr-radio__box::after { content: ""; position: absolute; inset: 3px; background: var(--sig-work); }
+.cr-radio[disabled] { opacity: var(--state-disabled-op); cursor: not-allowed; }
+
+/* ── Slider (styled native range — keyboard for free) ───────────────────── */
+.cr-slider { -webkit-appearance: none; appearance: none; width: 100%; height: var(--space-2); background: var(--panel-2); border: var(--brd-hair) solid var(--border); cursor: pointer; }
+.cr-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: var(--space-3); height: var(--space-4); background: var(--sig-work); border: var(--brd) solid var(--border); box-shadow: var(--space-px) var(--brd-hair) 0 var(--shadow-col); }
+.cr-slider::-moz-range-thumb { width: var(--space-3); height: var(--space-4); border-radius: 0; background: var(--sig-work); border: var(--brd) solid var(--border); }
+.cr-slider:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
+
+/* ── Progress (task progress; determinate + indeterminate) ──────────────── */
+.cr-progress { --cr-prog-c: var(--sig-work); height: var(--space-2); background: var(--panel-2); border: var(--brd-hair) solid var(--border); overflow: hidden; }
+.cr-progress--wait { --cr-prog-c: var(--sig-wait); }
+.cr-progress--done { --cr-prog-c: var(--sig-done); }
+.cr-progress--err  { --cr-prog-c: var(--sig-err); }
+.cr-progress__fill { display: block; height: 100%; width: 0; background: var(--cr-prog-c); }
+.cr-progress--indeterminate .cr-progress__fill {
+  width: 38%;
+  background-image: repeating-linear-gradient(45deg, var(--cr-prog-c) 0 8px, color-mix(in srgb, var(--cr-prog-c) 60%, var(--border)) 8px 16px);
+  animation: cr-prog-slide 1.1s linear infinite;
+}
+@keyframes cr-prog-slide { from { transform: translateX(-110%); } to { transform: translateX(320%); } }
+@media (prefers-reduced-motion: reduce) { .cr-progress--indeterminate .cr-progress__fill { animation: none; width: 100%; } }
+
+/* ── Charts — sparkline · line · bar · stacked (SVG plots + token hues) ─────
+ * House rules from the dataviz method, tuned to the signal palette: thin marks,
+ * a crisp non-scaling 2px stroke, baseline-anchored bars with rounded data-ends,
+ * a recessive grid, a 2px surface gap between fills, legends/labels in text ink
+ * (never the series colour), and one y-axis only. Series colour is set inline
+ * from a signal token; text/grid/axis colours live here. */
+
+/* Sparkline — inline micro line/area (no axes) */
+.cr-spark { --cr-spark-c: var(--sig-work); display: inline-block; width: 120px; height: 32px; vertical-align: middle; color: var(--cr-spark-c); }
+.cr-spark__svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.cr-spark__line { fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: miter; stroke-linecap: square; }
+.cr-spark__area { fill: currentColor; opacity: 0.14; }
+.cr-spark__dot { fill: currentColor; stroke: var(--panel); stroke-width: 1; }
+.cr-spark--work { --cr-spark-c: var(--sig-work); }
+.cr-spark--wait { --cr-spark-c: var(--sig-wait); }
+.cr-spark--done { --cr-spark-c: var(--sig-done); }
+.cr-spark--err  { --cr-spark-c: var(--sig-err); }
+.cr-spark--idle { --cr-spark-c: var(--sig-idle); }
+.cr-spark--accent  { --cr-spark-c: var(--sig-accent); }
+.cr-spark--accent2 { --cr-spark-c: var(--sig-accent-2); }
+
+/* Shared plot furniture — grid, axis ticks, value + target */
+.cr-chart__grid { stroke: color-mix(in srgb, var(--ink) 16%, transparent); stroke-width: 1; }
+.cr-chart__target { stroke: var(--sig-err); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.cr-chart__tick { fill: var(--muted); font-family: var(--font-mono); font-size: 9px; letter-spacing: -0.02em; }
+.cr-chart__val { fill: var(--ink); font-family: var(--font-mono); font-size: 9px; font-weight: 700; }
+.cr-chart__legend { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-3); margin: var(--space-1) 0 0; padding: 0; }
+.cr-chart__key { display: inline-flex; align-items: center; gap: var(--space-1); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--ink); }
+.cr-chart__sw { width: 10px; height: 10px; border: var(--brd-hair) solid var(--border); flex: none; }
+
+/* Hover layer — crosshair + cursor dots (SVG) and a top-docked tooltip (HTML).
+ * Progressive enhancement: nothing renders until pointer-over, so the static
+ * page and visual baselines are unaffected. Interaction feedback, so it stays
+ * on under the calm profile. */
+.cr-chart { position: relative; }
+.cr-chart__cross { stroke: color-mix(in srgb, var(--ink) 55%, transparent); stroke-width: 1; stroke-dasharray: 2 2; }
+.cr-chart__cursor { stroke: var(--panel-2); stroke-width: 1.5; }
+.cr-chart__tip {
+  position: absolute; top: var(--space-1); transform: translateX(-50%); z-index: 2; pointer-events: none;
+  display: flex; flex-direction: column; gap: 2px; padding: var(--space-1) var(--space-2);
+  background: var(--panel); border: var(--brd) solid var(--border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  font-family: var(--font-mono); font-size: var(--text-xs); white-space: nowrap;
+}
+.cr-chart__tip-x { color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.cr-chart__tip-row { display: inline-flex; align-items: center; gap: var(--space-1); color: var(--ink); }
+.cr-chart__tip-sw { width: 9px; height: 9px; border: var(--brd-hair) solid var(--border); flex: none; }
+.cr-chart__tip-n { color: var(--ink); }
+.cr-chart__tip-v { color: var(--ink); font-weight: 700; margin-left: auto; padding-left: var(--space-2); }
+
+/* Line chart */
+.cr-linechart { margin: 0; }
+.cr-linechart__plot { display: block; width: 100%; height: auto; background: var(--panel-2); border: var(--brd-hair) solid var(--border); }
+.cr-linechart__line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.cr-linechart__area { opacity: 0.12; stroke: none; }
+.cr-linechart__end { stroke: var(--panel-2); stroke-width: 1; }
+
+/* Bar chart */
+.cr-barchart { margin: 0; }
+.cr-barchart__plot { display: block; width: 100%; height: auto; background: var(--panel-2); border: var(--brd-hair) solid var(--border); }
+.cr-barchart__bar { stroke: var(--panel-2); stroke-width: 1; }
+
+/* Stacked bar — "stacked progress" */
+.cr-stack { display: flex; flex-direction: column; gap: var(--space-1); }
+.cr-stack__label { font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.cr-stack__bar { display: flex; gap: 2px; height: var(--space-3); background: var(--panel-2); border: var(--brd-hair) solid var(--border); overflow: hidden; }
+.cr-stack__seg { display: block; min-width: 3px; background: var(--sig-idle); }
+.cr-stack__seg--work { background: var(--sig-work); }
+.cr-stack__seg--wait { background: var(--sig-wait); }
+.cr-stack__seg--done { background: var(--sig-done); }
+.cr-stack__seg--err  { background: var(--sig-err); }
+.cr-stack__seg--idle { background: var(--sig-idle); }
+.cr-stack__seg--accent  { background: var(--sig-accent); }
+.cr-stack__seg--accent2 { background: var(--sig-accent-2); }
+.cr-stack__legend { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); }
+.cr-stack__key { display: inline-flex; align-items: center; gap: var(--space-1); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--ink); }
+.cr-stack__sw { width: 10px; height: 10px; border: var(--brd-hair) solid var(--border); flex: none; }
+.cr-stack__kl { color: var(--ink); }
+.cr-stack__kv { color: var(--ink); font-weight: 700; }
+.cr-stack__kp { color: var(--muted); }
+
+/* ── Skeleton (loading placeholder — blocky pulse, never rounded) ────────── */
+.cr-skeleton { background: var(--panel-2); border: var(--brd-hair) solid color-mix(in srgb, var(--border) 30%, transparent); animation: cr-skel-pulse 1.4s ease-in-out infinite; }
+.cr-skeleton--line { height: var(--space-2); }
+.cr-skeleton--text { height: var(--space-3); }
+.cr-skeleton--block { height: var(--space-10); }
+@keyframes cr-skel-pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.9; } }
+@media (prefers-reduced-motion: reduce) { .cr-skeleton { animation: none; } }
+
+/* ── Data / description list (key → value readout) ──────────────────────── */
+.cr-dl { display: grid; grid-template-columns: max-content 1fr; gap: var(--space-1) var(--space-4); margin: 0; }
+.cr-dl__k { font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.cr-dl__v { margin: 0; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); }
+
+/* ── Accordion (collapsible sections) ───────────────────────────────────── */
+.cr-accordion { border: var(--brd) solid var(--border); background: var(--panel); }
+.cr-accordion__item + .cr-accordion__item { border-top: var(--brd) solid var(--border); }
+.cr-accordion__header {
+  width: 100%; display: flex; align-items: center; gap: var(--space-2); justify-content: space-between;
+  background: transparent; border: 0; cursor: pointer; padding: var(--space-3) var(--space-4);
+  font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 700; color: var(--ink);
+  text-transform: uppercase; letter-spacing: 0.04em; text-align: left;
+}
+.cr-accordion__header:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-accordion__chevron {
+  display: inline-block; width: 0; height: 0; flex-shrink: 0;
+  border-left: 7px solid var(--muted); border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+  transition: transform var(--dur-press);
+}
+.cr-accordion__header[aria-expanded="true"] .cr-accordion__chevron { transform: rotate(90deg); border-left-color: var(--sig-work); }
+.cr-accordion__panel { padding: 0 var(--space-4) var(--space-4); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .cr-accordion__chevron { transition: none; } }
+
+/* ── Popover (generic anchored overlay) ─────────────────────────────────── */
+.cr-popover { position: relative; display: inline-block; }
+.cr-popover__scrim { position: fixed; inset: 0; z-index: var(--z-overlay); background: transparent; border: 0; cursor: default; }
+.cr-popover__panel {
+  position: absolute; top: calc(100% + var(--space-1)); left: 0; z-index: calc(var(--z-overlay) + 1);
+  min-width: 15rem; max-width: min(92vw, 22rem); background: var(--panel); color: var(--ink);
+  border: var(--brd) solid var(--border); box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  padding: var(--space-3) var(--space-4);
+}
+.cr-popover__panel--right { left: auto; right: 0; }
+.cr-popover__panel:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
+
+/* ── Drawer / sheet (edge panel on native dialog) ───────────────────────── */
+.cr-drawer {
+  position: fixed; inset: 0 0 0 auto; margin: 0; padding: 0; border-radius: var(--radius-none);
+  height: 100vh; max-height: 100vh; width: min(92vw, 26rem);
+  border: 0; border-left: var(--brd-brush) solid var(--border); background: var(--panel); color: var(--ink);
+  box-shadow: calc(var(--shadow-off-lg) * -1) 0 0 var(--shadow-col);
+}
+.cr-drawer--left { inset: 0 auto 0 0; border-left: 0; border-right: var(--brd-brush) solid var(--border); box-shadow: var(--shadow-off-lg) 0 0 var(--shadow-col); }
+.cr-drawer::backdrop { background: color-mix(in srgb, var(--mass) 72%, transparent); }
+.cr-drawer[open] { animation: cr-drawer-in var(--dur-press) ease-out; }
+.cr-drawer--left[open] { animation-name: cr-drawer-in-l; }
+@keyframes cr-drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes cr-drawer-in-l { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) { .cr-drawer[open] { animation: none; } }
+.cr-drawer__box { display: flex; flex-direction: column; height: 100%; }
+.cr-drawer__head { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: var(--brd) solid var(--border); }
+.cr-drawer__title { flex: 1; margin: 0; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
+.cr-drawer__close { font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1; cursor: pointer; background: var(--panel); color: var(--ink); border: var(--brd) solid var(--border); padding: var(--space-1) var(--space-2); }
+.cr-drawer__body { flex: 1; overflow: auto; padding: var(--space-4); }
+
+/* ── Breadcrumb (ascii "/" separators) ──────────────────────────────────── */
+.cr-breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--text-xs); margin: 0; padding: 0; list-style: none; }
+.cr-breadcrumb__item { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--muted); }
+.cr-breadcrumb__item + .cr-breadcrumb__item::before { content: "/"; color: color-mix(in srgb, var(--muted) 55%, transparent); }
+.cr-breadcrumb__link { color: var(--muted); text-decoration: none; }
+.cr-breadcrumb__link:hover { color: var(--ink); text-decoration: underline; }
+.cr-breadcrumb__item[aria-current="page"] { color: var(--ink); font-weight: 700; }
+
+/* ── Segmented control (single-select toggle group) ─────────────────────── */
+.cr-segmented { display: inline-flex; border: var(--brd) solid var(--border); }
+.cr-segmented__opt {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.04em; padding: var(--space-1) var(--space-3); background: var(--panel); color: var(--muted);
+  border: 0; border-left: var(--brd-hair) solid var(--border); cursor: pointer;
+}
+.cr-segmented__opt:first-child { border-left: 0; }
+.cr-segmented__opt:hover { color: var(--ink); }
+.cr-segmented__opt[aria-checked="true"] { background: var(--sig-work); color: var(--on-sig); }
+
+/* ── Combobox (autocomplete input + listbox) ────────────────────────────── */
+.cr-combobox { position: relative; display: inline-block; width: 100%; max-width: 20rem; }
+.cr-combobox__scrim { position: fixed; inset: 0; z-index: var(--z-overlay); background: transparent; border: 0; }
+.cr-combobox__input {
+  width: 100%; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink);
+  background: var(--board); border: var(--brd) solid var(--border); padding: var(--space-2) var(--space-3);
+}
+.cr-combobox__list {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: calc(var(--z-overlay) + 1);
+  list-style: none; margin: 0; padding: var(--space-1); max-height: 40vh; overflow: auto;
+  background: var(--panel); border: var(--brd) solid var(--border); border-top: 0;
+  box-shadow: var(--shadow-off-sm) var(--shadow-off-sm) 0 var(--shadow-col);
+}
+.cr-combobox__opt { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-2); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); cursor: pointer; }
+.cr-combobox__opt::before { content: "\25B8"; color: var(--sig-work); opacity: 0; }
+.cr-combobox__opt--active { background: var(--sig-work); color: var(--on-sig); }
+.cr-combobox__opt--active::before { color: currentColor; opacity: 1; }
+.cr-combobox__empty { padding: var(--space-2); font-family: var(--font-mono); color: var(--muted); }
+
+/* ── Number field (input + −/+ steppers) ────────────────────────────────── */
+.cr-numberfield { display: inline-flex; border: var(--brd) solid var(--border); background: var(--board); }
+.cr-numberfield__input {
+  width: 4rem; text-align: center; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink);
+  background: transparent; border: 0; outline: none; padding: var(--space-1); -moz-appearance: textfield;
+}
+.cr-numberfield__input::-webkit-outer-spin-button, .cr-numberfield__input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.cr-numberfield__btn {
+  width: var(--space-6); font-family: var(--font-mono); font-size: var(--text-md); font-weight: 800; line-height: 1;
+  background: var(--panel); color: var(--ink); border: 0; cursor: pointer;
+}
+.cr-numberfield__btn:first-child { border-right: var(--brd-hair) solid var(--border); }
+.cr-numberfield__btn:last-child { border-left: var(--brd-hair) solid var(--border); }
+.cr-numberfield__btn:hover:not([disabled]) { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-numberfield__btn[disabled] { opacity: var(--state-disabled-op); cursor: not-allowed; }
+
+/* ── ASCII separators & lists ───────────────────────────────────────────── */
+.cr-sep { border: 0; height: 0; border-top: var(--brd-hair) dashed color-mix(in srgb, var(--border) 60%, transparent); margin: var(--space-3) 0; }
+.cr-sep--dot { border-top-style: dotted; border-top-width: var(--brd); }
+.cr-sep--double { height: var(--space-0-5); border-top: var(--brd-hair) solid var(--border); border-bottom: var(--brd-hair) solid var(--border); }
+/* labeled rule — ── LABEL ── */
+.cr-sep-label { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-4) 0; font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+.cr-sep-label::before, .cr-sep-label::after { content: ""; flex: 1; border-top: var(--brd-hair) dashed color-mix(in srgb, var(--border) 60%, transparent); }
+/* ascii-marker list */
+.cr-list { list-style: none; margin: 0; padding: 0; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); }
+.cr-list__item { display: flex; gap: var(--space-2); padding: var(--space-0-5) 0; }
+.cr-list__item::before { content: "\25B8"; color: var(--sig-work); flex-shrink: 0; }   /* ▸ */
+.cr-list--dot .cr-list__item::before { content: "\00B7"; color: var(--muted); }          /* · */
+.cr-list--tick .cr-list__item::before { content: "\00BB"; color: var(--sig-work); }       /* » */
+.cr-list--plus .cr-list__item::before { content: "+"; color: var(--muted); }
+/* dot-leader row — label ······· value */
+.cr-leader { display: flex; align-items: baseline; font-family: var(--font-mono); font-size: var(--text-sm); gap: var(--space-2); }
+.cr-leader__k { color: var(--muted); }
+.cr-leader__fill { flex: 1; align-self: center; border-bottom: var(--brd) dotted color-mix(in srgb, var(--muted) 55%, transparent); }
+.cr-leader__v { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* ── ASCII rules · meters · spinner (first-class ASCII vocabulary) ───────────
+ * Real characters, not borders — the house ASCII voice, monospace + tabular. */
+.cr-rule { font-family: var(--font-mono); color: color-mix(in srgb, var(--muted) 70%, transparent);
+  line-height: 1; overflow: hidden; white-space: nowrap; user-select: none; }
+.cr-rule::before { content: "\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500"; }         /* ──── */
+.cr-rule--hatch::before { content: "\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591"; }  /* ▓▒░ */
+.cr-rule--dot::before   { content: "\00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7"; letter-spacing: 2px; }
+
+/* ASCII progress/meter — a real block-glyph bar driven by --v (0..1). */
+.cr-ascii-bar { position: relative; display: inline-block; font-family: var(--font-mono); font-size: var(--text-sm);
+  color: color-mix(in srgb, var(--muted) 55%, transparent); letter-spacing: 1px; line-height: 1; user-select: none; }
+.cr-ascii-bar::before { content: "\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1"; }  /* ▱×20 track */
+.cr-ascii-bar__fill { position: absolute; top: 0; left: 0; overflow: hidden; white-space: nowrap;
+  width: calc(var(--v, 0) * 100%); color: var(--sig-work); }
+.cr-ascii-bar__fill::before { content: "\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0"; letter-spacing: 1px; }  /* ▰×20 fill */
+
+/* ASCII spinner — cycles braille frames (honors reduced motion + the motion dial). */
+.cr-ascii-spin { font-family: var(--font-mono); color: var(--sig-work); }
+.cr-ascii-spin::before { content: "\28CB"; animation: cr-braille 0.8s steps(1, jump-none) infinite; }
+@keyframes cr-braille {
+  0%   { content: "\280B"; } 12.5% { content: "\2819"; } 25%  { content: "\2839"; } 37.5% { content: "\2838"; }
+  50%  { content: "\283C"; } 62.5% { content: "\2834"; } 75%  { content: "\2826"; } 87.5% { content: "\2827"; }
+}
+@media (prefers-reduced-motion: reduce) { .cr-ascii-spin::before { animation: none; content: "\28FF"; } }
+
+/* ASCII/braille density backdrop — the default texture for empty & loading states.
+ * A masked braille tile so it themes to --muted and follows the loudness dial. */
+.cr-empty { position: relative; isolation: isolate; overflow: hidden;
+  --cr-braille: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2272%22%20height=%2254%22%20viewBox=%220%200%2072%2054%22%3E%3Ctext%20x=%226%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠁%3C/text%3E%3Ctext%20x=%2218%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠒%3C/text%3E%3Ctext%20x=%2230%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠹%3C/text%3E%3Ctext%20x=%2242%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠶%3C/text%3E%3Ctext%20x=%2254%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠇%3C/text%3E%3Ctext%20x=%2266%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠘%3C/text%3E%3Ctext%20x=%226%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠠%3C/text%3E%3Ctext%20x=%2218%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠉%3C/text%3E%3Ctext%20x=%2230%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠛%3C/text%3E%3Ctext%20x=%2242%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠿%3C/text%3E%3Ctext%20x=%2254%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠄%3C/text%3E%3Ctext%20x=%2266%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠧%3C/text%3E%3Ctext%20x=%226%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠁%3C/text%3E%3Ctext%20x=%2218%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠒%3C/text%3E%3Ctext%20x=%2230%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠹%3C/text%3E%3Ctext%20x=%2242%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠶%3C/text%3E%3Ctext%20x=%2254%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠇%3C/text%3E%3Ctext%20x=%2266%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠘%3C/text%3E%3C/svg%3E"); }
+.cr-empty::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: color-mix(in srgb, var(--muted) 45%, transparent);
+  -webkit-mask: var(--cr-braille) 0 0 / 72px 54px repeat; mask: var(--cr-braille) 0 0 / 72px 54px repeat;
+  opacity: calc(0.5 * var(--decoration-intensity, 1)); }
+
+/* ── Hover card (rich hover/focus reveal) ───────────────────────────────── */
+.cr-hovercard { position: relative; display: inline-flex; }
+.cr-hovercard__trigger { cursor: default; border-bottom: var(--brd-hair) dashed var(--muted); }
+.cr-hovercard__panel {
+  position: absolute; top: calc(100% + var(--space-2)); left: 0; z-index: var(--z-overlay);
+  min-width: 16rem; max-width: min(92vw, 22rem);
+  background: var(--panel); color: var(--ink); border: var(--brd) solid var(--border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col); padding: var(--space-3) var(--space-4);
+  opacity: 0; visibility: hidden; transition: opacity var(--dur-press); transition-delay: 0.12s;
+}
+.cr-hovercard__panel--right { left: auto; right: 0; }
+.cr-hovercard:hover .cr-hovercard__panel, .cr-hovercard:focus-within .cr-hovercard__panel { opacity: 1; visibility: visible; }
+@media (prefers-reduced-motion: reduce) { .cr-hovercard__panel { transition: none; } }
+
+/* ── Tree (hierarchical, flattened visible rows) ────────────────────────── */
+.cr-tree { list-style: none; margin: 0; padding: 0; font-family: var(--font-mono); font-size: var(--text-sm); }
+.cr-tree__item { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-0-5) var(--space-2); cursor: pointer; color: var(--ink); }
+.cr-tree__item:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-tree__item[aria-selected="true"] { background: color-mix(in srgb, var(--sig-work) 20%, transparent); }
+.cr-tree__item:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -3px; }
+.cr-tree__twist { width: 0; height: 0; flex-shrink: 0; border-left: 6px solid var(--muted); border-top: 5px solid transparent; border-bottom: 5px solid transparent; transition: transform var(--dur-press); }
+.cr-tree__item[aria-expanded="true"] .cr-tree__twist { transform: rotate(90deg); border-left-color: var(--sig-work); }
+.cr-tree__lead { width: 6px; flex-shrink: 0; color: color-mix(in srgb, var(--muted) 60%, transparent); text-align: center; }
+@media (prefers-reduced-motion: reduce) { .cr-tree__twist { transition: none; } }
+
+/* ── DateTime (styled native datetime-local) ────────────────────────────── */
+.cr-datetime {
+  font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); background: var(--board);
+  border: var(--brd) solid var(--border); padding: var(--space-2) var(--space-3);
+}
+.cr-datetime:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
+.cr-datetime::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.7; }
+
+/* ── Cron field (expression input + human-readable readout) ─────────────── */
+.cr-cron { display: flex; flex-direction: column; gap: var(--space-2); }
+.cr-cron__input { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); background: var(--board); border: var(--brd) solid var(--border); padding: var(--space-2) var(--space-3); }
+.cr-cron__out { display: flex; align-items: center; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); }
+.cr-cron__out::before { content: "\2192"; color: var(--muted); }   /* → */
+.cr-cron__out--err { color: var(--sig-err); }
+.cr-cron__presets { display: flex; gap: var(--space-1); flex-wrap: wrap; }
+.cr-cron__preset { font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 700; background: var(--panel-2); color: var(--muted); border: var(--brd-hair) solid var(--border); padding: var(--space-0-5) var(--space-2); cursor: pointer; }
+.cr-cron__preset:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-modal__head {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-3) var(--space-4); border-bottom: var(--brd) solid var(--border);
+}
+.cr-modal__title { flex: 1; margin: 0; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
+.cr-modal__close {
+  font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1; cursor: pointer;
+  background: var(--panel); color: var(--ink); border: var(--brd) solid var(--border);
+  padding: var(--space-0-5) var(--space-2);
+}
+.cr-modal__body { padding: var(--space-4); font-size: var(--text-base); }
+
+/* ── Toast (keyed to a signal; role=status/alert) ──────────────────────── */
+.cr-toast {
+  display: flex; align-items: center; gap: var(--space-3);
+  border: var(--brd) solid var(--border); box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  padding: var(--space-2) var(--space-3); font-family: var(--font-mono); font-size: var(--text-sm);
+  background: var(--sig-work); color: var(--on-sig);
+}
+.cr-toast--done { background: var(--sig-done); color: var(--on-sig); }
+.cr-toast--wait { background: var(--sig-wait); color: var(--on-sig); }
+.cr-toast--err  { background: var(--sig-err);  color: var(--on-err); }
+.cr-toast__msg { flex: 1; }
+.cr-toast__close {
+  font-family: var(--font-mono); cursor: pointer; background: transparent; color: inherit;
+  border: var(--brd-hair) solid currentColor; padding: 0 var(--space-1); line-height: 1.4;
+}
+
+/* ── Toast region (stacks toasts in a screen corner) ────────────────────── */
+.cr-toast-region {
+  position: fixed; z-index: var(--z-overlay); display: flex; flex-direction: column;
+  gap: var(--space-2); max-width: min(92vw, 30rem); pointer-events: none;
+}
+.cr-toast-region > * { pointer-events: auto; }
+.cr-toast-region--tr { top: var(--space-4); right: var(--space-4); }
+.cr-toast-region--br { bottom: var(--space-4); right: var(--space-4); }
+.cr-toast-region--tl { top: var(--space-4); left: var(--space-4); }
+.cr-toast-region--bl { bottom: var(--space-4); left: var(--space-4); }
+/* bottom-anchored regions stack newest nearest the corner */
+.cr-toast-region--br, .cr-toast-region--bl { flex-direction: column-reverse; }
+
+/* ── Menu (dropdown) ────────────────────────────────────────────────────── */
+.cr-menu { position: relative; display: inline-block; }
+.cr-menu__scrim { position: fixed; inset: 0; z-index: var(--z-overlay); background: transparent; border: 0; cursor: default; }
+.cr-menu__panel {
+  position: absolute; top: calc(100% + var(--space-1)); left: 0; z-index: calc(var(--z-overlay) + 1);
+  min-width: 12rem; background: var(--panel); border: var(--brd) solid var(--border);
+  box-shadow: var(--shadow-off-sm) var(--shadow-off-sm) 0 var(--shadow-col);
+  display: flex; flex-direction: column; padding: var(--space-1);
+}
+.cr-menu__panel--right { left: auto; right: 0; }
+.cr-menu__item {
+  font-family: var(--font-mono); font-size: var(--text-sm); text-align: left;
+  background: transparent; border: 0; color: var(--ink); cursor: pointer;
+  padding: var(--space-1) var(--space-2);
+}
+.cr-menu__item:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-menu__item--danger { color: var(--sig-err); }
+.cr-menu__sep { height: var(--brd-hair); background: color-mix(in srgb, var(--border) 30%, transparent); margin: var(--space-1) 0; }
+
+/* ── Pagination ─────────────────────────────────────────────────────────── */
+.cr-pager { display: flex; align-items: center; gap: var(--space-1); font-family: var(--font-mono); }
+.cr-pager__btn {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700;
+  min-width: var(--space-6); padding: var(--space-1) var(--space-2);
+  background: var(--panel); color: var(--ink); border: var(--brd-hair) solid var(--border); cursor: pointer;
+}
+.cr-pager__btn:hover:not([disabled]):not(.cr-pager__btn--on) {
+  background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent);
+}
+.cr-pager__btn--on { background: var(--sig-work); color: var(--on-sig); border-color: var(--border); }
+.cr-pager__btn[disabled] { opacity: var(--state-disabled-op); cursor: not-allowed; }
+.cr-pager__ellipsis { color: var(--muted); padding: 0 var(--space-1); }
+
+/* ── Key-hint badges (keycaps) ──────────────────────────────────────────────
+ * A tiny hard-edged keycap for a keyboard shortcut. Decorative (aria-hidden) —
+ * the actual binding is announced via aria-keyshortcuts on the action. Main
+ * actions show a keycap always; secondary ones use --hint, revealed on hover /
+ * focus of a `.cr-keys-host`, or globally when the root is "peeking"
+ * (`:root[data-cr-keys="on"]` — see the CrKeyHints hold-to-reveal behavior). */
+.cr-kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: var(--space-4); height: var(--space-4); padding: 0 var(--space-1);
+  margin-left: var(--space-1); font-family: var(--font-mono); font-size: var(--text-2xs);
+  font-weight: 800; text-transform: uppercase; line-height: 1; white-space: nowrap;
+  background: var(--panel-2); color: var(--muted); border: var(--brd-hair) solid var(--border);
+  box-shadow: var(--space-px) var(--brd-hair) 0 var(--shadow-col);
+}
+/* on a signal-filled surface (inside a filled button) — key off currentColor */
+.cr-kbd--on {
+  background: color-mix(in srgb, currentColor 16%, transparent); color: inherit;
+  border-color: currentColor; box-shadow: none;
+}
+/* secondary — hidden until revealed (no layout shift: opacity, not display) */
+.cr-kbd--hint { opacity: 0; transition: opacity var(--dur-press); }
+.cr-keys-host:hover .cr-kbd--hint,
+.cr-keys-host:focus-within .cr-kbd--hint,
+:root[data-cr-keys="on"] .cr-kbd--hint { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .cr-kbd--hint { transition: none; } }
+
+/* ── Tooltip (CSS reveal on hover/focus; role=tooltip + aria-describedby) ─ */
+.cr-tooltip { position: relative; display: inline-flex; }
+.cr-tooltip__trigger { cursor: help; border-bottom: 1.5px dotted var(--muted); }
+.cr-tooltip__bubble {
+  position: absolute; bottom: calc(100% + var(--space-2)); left: 50%; transform: translateX(-50%);
+  min-width: max-content; max-width: 16rem; z-index: var(--z-overlay);
+  background: var(--panel-2); color: var(--ink); border: var(--brd) solid var(--border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  padding: var(--space-1) var(--space-2); font-family: var(--font-mono); font-size: var(--text-xs);
+  opacity: 0; visibility: hidden; transition: opacity var(--dur-press);
+}
+.cr-tooltip:hover .cr-tooltip__bubble,
+.cr-tooltip:focus-within .cr-tooltip__bubble { opacity: 1; visibility: visible; }
+@media (prefers-reduced-motion: reduce) { .cr-tooltip__bubble { transition: none; } }
+
+/* ── Texture utilities (hardware only — Law 6) ─────────────────────────────
+ * Apply to a bezel/screen/hardware surface, NEVER a flat content field. All
+ * three read as the neo-print / CRT grain; theme-keyed via the texture tokens. */
+/* All fill edge-to-edge (repeat, from the origin). Pair with a background-color. */
+.cr-tex--halftone, .cr-tex--dither, .cr-tex--scan, .cr-tex--cross, .cr-tex--glass {
+  background-repeat: repeat; background-position: 0 0; background-attachment: local;
+  /* Follows the loudness dial — 1 (default/showcase) is a no-op; the `calm` ops
+     profile tones the texture down. These are decorative texture layers by design. */
+  opacity: var(--decoration-intensity, 1);
+}
+.cr-tex--halftone { background-image: var(--halftone); background-size: var(--halftone-size) var(--halftone-size); }
+.cr-tex--dither   { background-image: var(--dither); }
+.cr-tex--scan     { background-image: var(--scanline); }
+/* a stacked "aged glass" — halftone + scanlines together, the house hardware wash */
+.cr-tex--glass    { background-image: var(--scanline), var(--halftone); background-size: auto, var(--halftone-size) var(--halftone-size); }
+
+/* ── Icon (CrIcon) — house operational glyph set ───────────────────────────
+ * 24×24, currentColor, single 2px stroke, square caps. Inherits text colour and
+ * aligns to the text baseline; never shrinks in a flex row. */
+.cr-icon { display: inline-block; vertical-align: -0.15em; flex-shrink: 0; }
+
+/* ── Ambient loops (Law 7 — alive at rest; low-fps, hardware-bound) ─────────
+ * Opt-in classes. All are OFF under prefers-reduced-motion (global rule in
+ * control-room.css already kills animations; these add the keyframes). */
+@keyframes cr-scan  { from { top: -18px; } to { top: 100%; } }
+@keyframes cr-pulse { 0% { box-shadow: 0 0 0 0 var(--_pulse, var(--sig-work)); } 100% { box-shadow: 0 0 0 12px transparent; } }
+@keyframes cr-drift { to { background-position: var(--halftone-size, 6px 6px); } }
+@keyframes cr-flick { 50% { opacity: 0.45; } }
+
+/* a thin CRT sweep bar; host must be position:relative + overflow:hidden */
+.cr-anim-scan { position: relative; overflow: hidden; }
+/* travels the FULL height: `top` is a %-of-container, so from -18px to 100% sweeps
+ * the whole element (translateY(100%) only moved the 18px stripe by its own height).
+ * Subtler by default and follows the loudness dial. */
+.cr-anim-scan::after {
+  content: ""; position: absolute; left: 0; right: 0; top: -18px; height: 18px;
+  background: linear-gradient(var(--sig-work), transparent);
+  opacity: calc(0.16 * var(--decoration-intensity, 1));
+  animation: cr-scan 3.6s linear infinite; pointer-events: none;
+}
+/* a slow expanding ring on a signal dot; set --_pulse to a signal to re-key */
+.cr-anim-pulse { animation: cr-pulse 2.4s ease-out infinite; }
+/* halftone/dither surface that slowly drifts one cell */
+.cr-anim-drift { animation: cr-drift 6s linear infinite; }
+/* a ticker/cursor flicker for a live readout */
+.cr-anim-flick { animation: cr-flick 1.1s steps(2, jump-none) infinite; }
+
+/* ── Governed motion: glitch · attention · interaction · 3D break ───────────
+ * All transform/opacity/shadow only (60fps), all opt-in, all silenced by the
+ * global reduced-motion rule and the `calm` intensity profile. See motion.md. */
+
+/* GLITCH — datamosh RGB-split + slice. Set data-text to the element's text.
+ * Hover-triggered by default; `--on` runs continuously (use only for alerts). */
+.cr-glitch { position: relative; }
+.cr-glitch::before, .cr-glitch::after {
+  content: attr(data-text); position: absolute; left: 0; top: 0; pointer-events: none;
+  clip-path: inset(0 0 100% 0); opacity: 0.9;
+}
+.cr-glitch:hover::before, .cr-glitch--on::before { color: var(--sig-work); animation: cr-glitch-a 0.5s var(--ease-step, steps(3)) infinite; }
+.cr-glitch:hover::after,  .cr-glitch--on::after  { color: var(--sig-accent); animation: cr-glitch-b 0.55s var(--ease-step, steps(3)) infinite; }
+@keyframes cr-glitch-a {
+  0%,100% { clip-path: inset(0 0 100% 0); transform: translate(0,0); }
+  20% { clip-path: inset(10% 0 60% 0); transform: translate(-2px,0); }
+  45% { clip-path: inset(50% 0 20% 0); transform: translate(2px,0); }
+  70% { clip-path: inset(80% 0 5% 0);  transform: translate(-1px,0); }
+}
+@keyframes cr-glitch-b {
+  0%,100% { clip-path: inset(100% 0 0 0); transform: translate(0,0); }
+  30% { clip-path: inset(60% 0 15% 0); transform: translate(2px,0); }
+  55% { clip-path: inset(20% 0 55% 0); transform: translate(-2px,0); }
+  80% { clip-path: inset(5% 0 80% 0);  transform: translate(1px,0); }
+}
+/* Chroma variant — a faint always-on RGB fringe so an element reads as "signal"
+ * even at rest; the slice animation still fires on hover / --on. The fringe is
+ * decoration-only (aria owns the real text) and fades with --decoration-intensity. */
+.cr-glitch--chroma::before, .cr-glitch--chroma::after {
+  clip-path: none; opacity: calc(0.32 * var(--decoration-intensity, 1)); mix-blend-mode: screen;
+}
+.cr-glitch--chroma::before { color: var(--sig-err); transform: translate(-0.6px, 0); }
+.cr-glitch--chroma::after  { color: var(--sig-work); transform: translate(0.6px, 0); }
+.cr-glitch--chroma:hover::before, .cr-glitch--chroma.cr-glitch--on::before { opacity: 0.9; }
+.cr-glitch--chroma:hover::after,  .cr-glitch--chroma.cr-glitch--on::after  { opacity: 0.9; }
+
+/* CURSED — zalgo decay (Law 3, T3). The clean text lives on the element as an
+ * aria-label; the JS painter replaces the visible glyphs with an aria-hidden,
+ * combining-mark-corrupted span (MAX 2 marks/glyph). We only style the corrupted
+ * layer here — tinted toward danger, with room for the marks to overshoot the box. */
+.cr-cursed { color: var(--sig-err); line-height: 1.9; overflow: visible; }
+.cr-cursed > [aria-hidden] { display: inline-block; }
+
+/* ATTENTION — a slow breathing glow that pulls the eye to a primary/active item.
+ * Keys to the element's signal via --cr-attn (default accent). Deliberately calm. */
+.cr-attention { animation: cr-attention var(--dur-ambient, 3.2s) ease-in-out infinite; }
+@keyframes cr-attention {
+  0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--cr-attn, var(--sig-accent)) 55%, transparent); }
+  50%     { box-shadow: 0 0 10px 2px color-mix(in srgb, var(--cr-attn, var(--sig-accent)) 65%, transparent); }
+}
+
+/* INTERACTION — a keyed edge sweep for a focusable surface (row/card/nav item). */
+.cr-keyed { position: relative; overflow: hidden; }
+.cr-keyed::after {
+  content: ""; position: absolute; left: 0; bottom: 0; height: 2px; width: 100%;
+  background: var(--sig-work); transform: scaleX(0); transform-origin: left;
+  transition: transform var(--dur-fast, 160ms) var(--ease-snap, ease);
+}
+.cr-keyed:hover::after, .cr-keyed:focus-visible::after { transform: scaleX(1); }
+
+/* 3D — a sanctioned break of the flat plane (like the Law-9 breach: use sparingly).
+ * A hover tilt in perspective; `--live` adds a slow idle float to draw attention. */
+.cr-tilt { transition: transform var(--dur-fast, 160ms) var(--ease-snap, ease); transform-style: preserve-3d; will-change: transform; }
+.cr-tilt:hover { transform: perspective(600px) rotateX(5deg) rotateY(-7deg) translateZ(6px); }
+.cr-tilt--live { animation: cr-float3d 6s ease-in-out infinite; }
+@keyframes cr-float3d {
+  0%,100% { transform: perspective(600px) rotateX(3deg) rotateY(-4deg); }
+  50%     { transform: perspective(600px) rotateX(-3deg) rotateY(4deg); }
+}
+
+/* ── Severity shapes (Law 4 — shape carries meaning; sides ∝ 1/danger) ──────
+ * A second channel next to colour: the polygon's side-count encodes focus.
+ * Fewer sides = more danger (triangle = act now); more sides = calmer; the
+ * circle is fully at rest. Works in monochrome (phosphor) and for colour-blind
+ * readers where the hue alone can't. Colour defaults to the matching signal but
+ * is orthogonal — set --cr-sev-fill to decouple. */
+.cr-sev {
+  display: inline-block; width: var(--space-4); height: var(--space-4);
+  background: var(--cr-sev-fill, var(--sig-idle)); flex-shrink: 0;
+}
+.cr-sev--crit { --cr-sev-fill: var(--sig-err);  clip-path: polygon(50% 0, 100% 100%, 0 100%); }              /* 3 · act now */
+.cr-sev--warn { --cr-sev-fill: var(--sig-wait); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }      /* 4 · attend  */
+.cr-sev--work { --cr-sev-fill: var(--sig-work); clip-path: polygon(50% 0,98% 35%,79% 100%,21% 100%,2% 35%); } /* 5 · working */
+.cr-sev--ok   { --cr-sev-fill: var(--sig-done); clip-path: polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%); } /* 6 · nominal */
+.cr-sev--idle { --cr-sev-fill: var(--sig-idle); border-radius: 50%; }                                        /* ∞ · at rest */
+
+/* ── Hardware chrome vocabulary (Law 6 — detail that proves real hardware) ──
+ * Decorative; apply on a bezel / rail / masthead, never on a flat data field.
+ * All are aria-hidden by intent — they carry no information a label doesn't. */
+.cr-rivet {
+  width: var(--space-3); height: var(--space-3); background: var(--rail-ink);
+  border: 1.5px solid var(--border); border-radius: 50%;
+  box-shadow: inset 1px 1px 0 color-mix(in srgb, #fff 22%, transparent), inset -1px -1px 0 color-mix(in srgb, #000 55%, transparent);
+}
+.cr-rivet--hex  { border-radius: 0; clip-path: polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%); }
+.cr-rivet--slot { position: relative; }
+.cr-rivet--slot::after { content: ""; position: absolute; inset: 42% 20%; background: var(--border); }
+.cr-vent   { width: var(--space-10); height: var(--space-5); border: 1.5px solid var(--border);
+             background: repeating-linear-gradient(var(--rail-ink) 0 2px, var(--mass) 2px 4px); }
+.cr-port   { width: var(--space-6); height: var(--space-4); background: var(--mass); border: var(--brd) solid var(--rail-ink); position: relative; }
+.cr-port::after { content: ""; position: absolute; inset: 3px 5px; background: var(--rail-ink); }
+.cr-stripe { height: var(--space-4); border: 1.5px solid var(--border);
+             background: repeating-linear-gradient(45deg, var(--sig-wait) 0 8px, var(--mass) 8px 16px); }
+.cr-seam   { height: 4px; border-top: 1px solid var(--rail-ink); border-bottom: 1px solid var(--mass); background: var(--panel-2); }
+.cr-plate  { display: inline-block; font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: 0.14em;
+             text-transform: uppercase; color: var(--muted); border: 1px solid var(--rail-ink); padding: 1px var(--space-2); }
+.cr-tally  { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.24em; color: var(--ink); }
+/* more fasteners + indicators (variance for hand-composed chrome) */
+.cr-screw  { width: var(--space-3); height: var(--space-3); border-radius: 50%; background: var(--rail-ink);
+             border: 1.5px solid var(--border); position: relative; }
+.cr-screw::after { content: ""; position: absolute; inset: 44% 18%; background: var(--border); }   /* single slot */
+.cr-screw--x::before { content: ""; position: absolute; inset: 18% 44%; background: var(--border); }/* + cross slot */
+.cr-bolt   { width: var(--space-3); height: var(--space-3); background: var(--rail-ink); border: 1.5px solid var(--border); }
+.cr-led    { width: var(--space-2); height: var(--space-2); border-radius: 50%; border: 1px solid var(--border);
+             background: var(--cr-led, var(--sig-work));
+             box-shadow: inset 0 0 0 1px color-mix(in srgb, #fff 35%, transparent); }  /* solid indicator, no glow */
+.cr-led--wait { --cr-led: var(--sig-wait); } .cr-led--done { --cr-led: var(--sig-done); }
+.cr-led--err { --cr-led: var(--sig-err); }   .cr-led--idle { --cr-led: var(--sig-idle); }
+.cr-grille { width: var(--space-6); height: var(--space-5); border: 1.5px solid var(--border);
+             background: repeating-linear-gradient(90deg, var(--rail-ink) 0 1.5px, var(--mass) 1.5px 3px); }  /* vertical grille */
+
+/* ── Richer texture — crosshatch (× diagonals) + duotone (cross-colours) ────
+ * Answers "not just dots": cross-hatching from ±45° diagonals (Law 4 energy),
+ * and a two-colour ordered dither that mixes two signals. Hardware only. */
+.cr-tex--cross { background-image: var(--crosshatch); }
+.cr-tex--duo {
+  background-image:
+    repeating-conic-gradient(var(--cr-duo-a, var(--sig-accent)) 0% 25%, transparent 0% 50%),
+    repeating-conic-gradient(from 90deg, var(--cr-duo-b, var(--sig-accent-2)) 0% 25%, transparent 0% 50%);
+  background-size: 5px 5px, 5px 5px; background-position: 0 0, 2.5px 2.5px;
+}
+
+/* ── The Breach (Law 9 — the one sanctioned rule-break per screen) ──────────
+ * Everything else obeys the laws; the breach is the single element licensed to
+ * use the forbidden vocabulary — a soft corner, a blurred blob, a colour glow,
+ * a gradient — to mark the ONE most exceptional thing. It only reads because
+ * everything around it is hard-edged. Rare by contract: one breach per screen.
+ * Colour keys to a signal (default accent); set --cr-breach to re-key. */
+/* the rim angle is a registered property so the conic gradient can interpolate */
+@property --cr-breach-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
+.cr-breach {
+  --cr-breach: var(--sig-accent);         /* primary neon hue  */
+  --cr-breach-2: var(--sig-accent-2);     /* the paired hue (acid) — the neon pairing */
+  --cr-breach-fill: var(--panel);         /* interior; --wash swaps this for a tint */
+  position: relative;
+  border-radius: var(--breach-radius);
+  /* the corner is a SQUIRCLE (superellipse), not a plain arc — the one place the
+   * system softens (the Law-9 breach). corner-shape keeps the glow + rim following
+   * the shape automatically and falls back to the plain radius where unsupported.
+   * Radius-0 holds everywhere else in the system. */
+  corner-shape: superellipse(4);
+  border: 3px solid transparent;
+  /* Layered backgrounds (top → bottom): opaque interior clipped to padding-box;
+   * bright SPOTS riding the border (counter-rotating); the rotating neon RIM.
+   * Both conic layers show only in the 3px border ring — the fill covers the
+   * interior, so text stays legible. */
+  background:
+    linear-gradient(var(--cr-breach-fill), var(--cr-breach-fill)) padding-box,
+    conic-gradient(from calc(var(--cr-breach-angle) * -1.7),
+      transparent 0 3%, #fff 3% 5%, transparent 5% 36%, #fff 36% 38%,
+      transparent 38% 69%, #fff 69% 71%, transparent 71%) border-box,
+    conic-gradient(from var(--cr-breach-angle),
+      var(--cr-breach), var(--cr-breach-2), var(--cr-breach)) border-box;
+  background-color: var(--cr-breach-fill);  /* explicit opaque interior for contrast tooling */
+  /* dual-hue neon glow halo — magenta near, acid far (box-shadow stays outside) */
+  box-shadow:
+    0 0 calc(var(--breach-glow-size) * 0.9) color-mix(in srgb, var(--cr-breach) 70%, transparent),
+    0 0 calc(var(--breach-glow-size) * 2.4) color-mix(in srgb, var(--cr-breach-2) 42%, transparent);
+  animation: cr-breach-spin var(--breach-spin, 9s) linear infinite;     /* the rim rotates   */
+}
+@keyframes cr-breach-spin { to { --cr-breach-angle: 360deg; } }
+/* re-key the primary hue to a signal (the pair stays acid unless overridden) */
+.cr-breach--work   { --cr-breach: var(--sig-work);  --cr-breach-2: var(--sig-accent); }
+.cr-breach--wait   { --cr-breach: var(--sig-wait);  --cr-breach-2: var(--sig-accent); }
+.cr-breach--done   { --cr-breach: var(--sig-done);  --cr-breach-2: var(--sig-accent-2); }
+.cr-breach--err    { --cr-breach: var(--sig-err);   --cr-breach-2: var(--sig-accent); }
+.cr-breach--accent2{ --cr-breach: var(--sig-accent-2); --cr-breach-2: var(--sig-accent); }
+/* subtle interior tint — the strike is the rim + glow, so text stays legible */
+.cr-breach--wash {
+  --cr-breach-fill: color-mix(in srgb, var(--cr-breach) 16%, var(--panel));
+}
+/* a living dual-hue glow on top of the rotating rim — opt-in */
+.cr-breach--alive { animation: cr-breach-spin var(--breach-spin, 9s) linear infinite, cr-breath 3.6s ease-in-out infinite; }
+@keyframes cr-breath {
+  0%, 100% { box-shadow:
+    0 0 calc(var(--breach-glow-size) * 0.7) color-mix(in srgb, var(--cr-breach) 55%, transparent),
+    0 0 calc(var(--breach-glow-size) * 1.6) color-mix(in srgb, var(--cr-breach-2) 35%, transparent); }
+  50%      { box-shadow:
+    0 0 calc(var(--breach-glow-size) * 1.3) color-mix(in srgb, var(--cr-breach) 85%, transparent),
+    0 0 calc(var(--breach-glow-size) * 3) color-mix(in srgb, var(--cr-breach-2) 60%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) { .cr-breach, .cr-breach--alive { animation: none; } }
+
+/* a standalone soft luminous accent — the antithesis of the hard pixel.
+ * Purely decorative (aria-hidden); use to underline a single distinctive item. */
+.cr-blob {
+  width: var(--space-10); height: var(--space-10); border-radius: 50%;
+  background: radial-gradient(closest-side, var(--cr-breach, var(--sig-accent)), transparent 70%);
+  filter: blur(calc(var(--breach-blur) * 0.5)); pointer-events: none;
+}
+
+/* ── Scroll-bound progress rail (pure-CSS scroll-driven animation) ──────────
+ * Width is bound to scroll position via `animation-timeline: scroll()` — no JS,
+ * no scroll listener. Default binds to the document; add .cr-scrollbar--local on
+ * an element inside a scroll container to bind to the NEAREST scroller instead. */
+.cr-scrollbar {
+  position: fixed; inset: 0 0 auto 0; height: 3px; z-index: var(--z-overlay);
+  transform: scaleX(0); transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--sig-accent), var(--sig-accent-2));
+  animation: cr-scrollfill linear both;
+  animation-timeline: scroll(root block);
+}
+.cr-scrollbar--local { position: sticky; animation-timeline: scroll(nearest block); }
+@keyframes cr-scrollfill { to { transform: scaleX(1); } }
+/* the global reduced-motion rule sets `animation: none`, which would freeze the
+ * rail at empty — so hide it rather than leave a stuck bar. */
+@media (prefers-reduced-motion: reduce) { .cr-scrollbar { display: none; } }
+
+/* ── ASCII / pixel decoration for DEAD SPACE (never touches content) ─────────
+ * Everything here is decoration: aria-hidden, non-interactive, whisper contrast,
+ * mask-faded away from text. Give the host `position: relative` and put real
+ * content above with `position: relative; z-index: 1`. See references/decoration.md. */
+
+/* seeded density field (the CrAscii canvas) — sits behind, faded off the text */
+.cr-ascii {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; user-select: none;
+  opacity: 0.5; overflow: hidden;
+}
+.cr-ascii > canvas { display: block; width: 100%; height: 100%; }
+.cr-ascii--mask-l    { -webkit-mask-image: linear-gradient(90deg, transparent, #000 62%); mask-image: linear-gradient(90deg, transparent, #000 62%); }
+.cr-ascii--mask-r    { -webkit-mask-image: linear-gradient(90deg, #000 38%, transparent); mask-image: linear-gradient(90deg, #000 38%, transparent); }
+.cr-ascii--mask-edge { -webkit-mask-image: radial-gradient(120% 120% at 50% 50%, #000 38%, transparent 86%); mask-image: radial-gradient(120% 120% at 50% 50%, #000 38%, transparent 86%); }
+
+/* telemetry frame trim — corner brackets on any surface (structure, not signal).
+ * .cr-mark is the ink-weight preset used for registration ticks on a primary
+ * readout (structure, never a signal — Law 2); it is the same primitive with a
+ * heavier border and a wider offset, so the two share one implementation. */
+.cr-trim { --cr-trim-c: var(--muted); --cr-trim-sz: 12px; --cr-trim-w: 2px; --cr-trim-off: calc(var(--cr-trim-w) * -1); position: relative; }
+.cr-mark { --cr-trim-c: var(--border); --cr-trim-sz: var(--space-3); --cr-trim-w: var(--brd); --cr-trim-off: calc(var(--space-2) * -1); position: relative; }
+.cr-trim::before, .cr-trim::after,
+.cr-mark::before, .cr-mark::after {
+  content: ""; position: absolute; width: var(--cr-trim-sz); height: var(--cr-trim-sz);
+  border: var(--cr-trim-w) solid var(--cr-trim-c); pointer-events: none;
+}
+.cr-trim::before, .cr-mark::before { top: var(--cr-trim-off); left: var(--cr-trim-off); border-right: 0; border-bottom: 0; }
+.cr-trim::after,  .cr-mark::after  { bottom: var(--cr-trim-off); right: var(--cr-trim-off); border-left: 0; border-top: 0; }
+/* opt into all four corners (adds TR + BL via a background of L-marks) */
+.cr-trim--4 {
+  background-image:
+    linear-gradient(var(--cr-trim-c), var(--cr-trim-c)), linear-gradient(var(--cr-trim-c), var(--cr-trim-c)),
+    linear-gradient(var(--cr-trim-c), var(--cr-trim-c)), linear-gradient(var(--cr-trim-c), var(--cr-trim-c));
+  background-repeat: no-repeat;
+  background-size:
+    var(--cr-trim-sz) var(--cr-trim-w), var(--cr-trim-w) var(--cr-trim-sz),
+    var(--cr-trim-sz) var(--cr-trim-w), var(--cr-trim-w) var(--cr-trim-sz);
+  background-position: top right, top right, bottom left, bottom left;
+}
+
+/* a fine tick-ruler edge (FUI) — short ticks every 8px, tall every 40px */
+.cr-ruler {
+  height: var(--space-2); pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, var(--muted) 0 1px, transparent 1px 40px) bottom / 100% 100% no-repeat,
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--muted) 55%, transparent) 0 1px, transparent 1px 8px) bottom / 100% 55% no-repeat;
+  opacity: 0.7;
+}
+
+/* seeded decorative telemetry string (CrTelemetry) */
+.cr-telemetry {
+  font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: 0.12em;
+  color: var(--muted); user-select: none; white-space: nowrap;
+}
+
+/* whisper drafting field for large dead background regions */
+.cr-bg--field { background-image: var(--field); background-repeat: repeat; }
+
+@media (prefers-reduced-motion: reduce) { .cr-breach--alive { animation: none; } }
+
+.brand-dark{color-scheme:dark;--ground:#0f0327;--board:#15092f;--panel:#1d133a;--panel-2:#271d45;--ink:#e6e6f2;--muted:#8a8aa6;--border:#000000;--rail:#050509;--rail-ink:#c8c8de;--sig-work:#00d3fb;--sig-accent:#ff1a9d;--sig-accent-2:#9ad335;--sig-done:#00deaa;--sig-wait:#f9ad00;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
+.brand-light{color-scheme:light;--ground:#eaeaf2;--board:#e2e2e9;--panel:#fbfbff;--panel-2:#f2f3fa;--ink:#0b0b12;--muted:#55556b;--border:#000000;--rail:#0b0b12;--rail-ink:#ecebe3;--sig-work:#0891b2;--sig-accent:#cf007e;--sig-accent-2:#663e9e;--sig-done:#0d9488;--sig-wait:#d97706;--sig-err:#e11d48;--sig-idle:#7e7e94;--on-sig:#0b0b12;--on-err:#ffffff;--on-accent:#ffffff;--on-accent-2:#f4f2ff;--on-idle:#0b0b12;--shadow-col:#000000;--mass:#0b0b12;--stage:#00a344;--stage-ink:#04140a;--drip:#0a7f5c;--halftone:radial-gradient(circle at center, rgba(0,0,0,0.13) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(0,0,0,0.11) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(0,0,0,0.045) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
+.brand-extreme{color-scheme:dark;--ground:#150021;--board:#20012e;--panel:#2b0b3a;--panel-2:#361747;--ink:#fdf0ff;--muted:#c79ad6;--border:#000000;--rail:#ff2e97;--rail-ink:#0c0510;--sig-work:#5cddff;--sig-accent:#ff2fa0;--sig-accent-2:#a0e300;--sig-done:#00edb5;--sig-wait:#ffbd4f;--sig-err:#fc4351;--sig-idle:#8a80a0;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#0bf272;--stage-ink:#12061a;--drip:#00f0ff;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.18) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.15) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(0,240,255,0.12) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.05) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--brd-hair:2px;--brd:3px;--brd-heavy:4px;--brd-brush:6px;--shadow-off-sm:3px;--shadow-off:6px;--shadow-off-lg:9px;--extra-purple:#a855f7;--extra-orange:#ff6b35}
+.brand-phosphor{color-scheme:dark;--ground:#020a04;--board:#041207;--panel:#06180a;--panel-2:#0a2210;--ink:#43ff7a;--muted:#2fac55;--border:#031a08;--rail:#020a04;--rail-ink:#43ff7a;--sig-work:#43ff7a;--sig-accent:#b6ff00;--sig-accent-2:#00e6a8;--sig-done:#00e05a;--sig-wait:#a8ff3e;--sig-err:#eaff40;--sig-idle:#12602c;--on-sig:#020a04;--on-err:#020a04;--on-accent:#020a04;--on-accent-2:#06050c;--on-idle:#ffffff;--shadow-col:#031a08;--mass:#010603;--stage:#0d7a34;--stage-ink:#d9ffe6;--drip:#43ff7a;--halftone:radial-gradient(circle at center, rgba(67,255,122,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(67,255,122,0.14) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(67,255,122,0.13) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(67,255,122,0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(67,255,122,0.16) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(67,255,122,0.05) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
+.brand-aurora{color-scheme:dark;--ground:#0b0f18;--board:#141822;--panel:#1d212b;--panel-2:#292e38;--ink:#e9ecf6;--muted:#9aa0b8;--border:#000000;--rail:#040712;--rail-ink:#e3e6f2;--sig-work:#00d3fb;--sig-accent:#7c5cff;--sig-accent-2:#22d3ee;--sig-done:#00deaa;--sig-wait:#f9ad00;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
+.brand-aurora-light{color-scheme:light;--ground:#ebeef5;--board:#e3e6ed;--panel:#fdfdff;--panel-2:#f0f3fa;--ink:#161a26;--muted:#5a6076;--border:#000000;--rail:#0d0f15;--rail-ink:#eef1f8;--sig-work:#009cba;--sig-accent:#7c5cff;--sig-accent-2:#22d3ee;--sig-done:#00a57d;--sig-wait:#c18500;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
+.brand-ember{color-scheme:dark;--ground:#120e11;--board:#1b171a;--panel:#242023;--panel-2:#312c30;--ink:#f4ece9;--muted:#a3908a;--border:#000000;--rail:#0a0609;--rail-ink:#f0e2dc;--sig-work:#00d3fb;--sig-accent:#ff6a3d;--sig-accent-2:#ffb020;--sig-done:#00deaa;--sig-wait:#f9ad00;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
+.brand-harbor{color-scheme:dark;--ground:#0a1114;--board:#121a1d;--panel:#1c2326;--panel-2:#282f33;--ink:#e6eef0;--muted:#8aa0a6;--border:#000000;--rail:#02080c;--rail-ink:#dbe8ea;--sig-work:#81cbe0;--sig-accent:#3aa0b0;--sig-accent-2:#aacb81;--sig-done:#82d0b3;--sig-wait:#dfb679;--sig-err:#cd7674;--sig-idle:#85858f;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
+.brand-porcelain{color-scheme:light;--ground:#f4f5f7;--board:#eceef2;--panel:#ffffff;--panel-2:#f2f4f8;--ink:#14161c;--muted:#5b6270;--border:#000000;--rail:#14161c;--rail-ink:#eef1f6;--sig-work:#1d74d6;--sig-accent:#4338ca;--sig-accent-2:#0e7490;--sig-done:#0f8a5f;--sig-wait:#b8730a;--sig-err:#cc2b3d;--sig-idle:#6b7280;--on-sig:#06050c;--on-err:#ffffff;--on-accent:#ffffff;--on-accent-2:#ffffff;--on-idle:#ffffff;--shadow-col:#000000;--mass:#0b0b12;--stage:#128a52;--stage-ink:#ffffff;--drip:#0e7490;--halftone:radial-gradient(circle at center, rgba(0,0,0,0.13) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(0,0,0,0.11) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(0,0,0,0.045) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
+.brand-slate{color-scheme:dark;--ground:#0e1116;--board:#141922;--panel:#1b222d;--panel-2:#232c39;--ink:#e8edf4;--muted:#8a97a8;--border:#000000;--rail:#0a0d12;--rail-ink:#cdd6e2;--sig-work:#3b9eff;--sig-accent:#6d7cff;--sig-accent-2:#4db6c9;--sig-done:#35c98d;--sig-wait:#e0a54a;--sig-err:#e5484d;--sig-idle:#6b7688;--on-sig:#0b0e13;--on-err:#ffffff;--on-accent:#ffffff;--on-accent-2:#0b0e13;--on-idle:#ffffff;--shadow-col:#000000;--mass:#000000;--stage:#2f7d4f;--stage-ink:#eafff2;--drip:#4db6c9;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
+
+  body{margin:0;background:#0b0b12;color:#e6e6f2;font-family:var(--font-mono),monospace;padding:24px;display:grid;gap:20px}
+  h1{font-family:var(--font-display,sans-serif);text-transform:uppercase;letter-spacing:-.02em;margin:0 0 4px}
+  .intro{color:#8a8aa6;font-size:12px;margin:0 0 8px;max-width:70ch;line-height:1.6}
+  section{border:2px solid var(--border,#000);background:var(--ground);color:var(--ink);padding:16px;display:grid;gap:12px}
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:var(--brd-hair,1.5px) solid var(--border);padding-bottom:8px}
+  header h2{margin:0;font-family:var(--font-display,sans-serif);text-transform:uppercase;font-size:18px}
+  header code{font-size:11px;color:var(--muted)}
+  header .scheme{margin-left:auto;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+  .row{display:flex;gap:10px;align-items:center}
+  .row .lbl{width:64px;flex:none;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+  .swatches{display:flex;gap:6px;flex-wrap:wrap}
+  .sw{min-width:80px;height:44px;border:var(--brd-hair,1.5px) solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 8px;font-size:11px}
+  .sw .ratio{font-size:10px;font-weight:800;padding:1px 4px}
+  .sw .ratio.ok{opacity:.7}
+  .sw .ratio.no{background:#f45058;color:#fff}
+  .samples{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-top:4px}
+</style></head>
+<body>
+<div><h1>Brand preview</h1>
+<p class="intro">Every theme (built-in + brand) rendered from its shipped appearance file: the surface ladder, the signal ramp with its on-colour text and measured WCAG contrast (green = ok, red = below target), and live components. Generated by build/build-brand-preview.mjs.</p></div>
+<section class="brand-dark">
+    <header><h2>dark · built-in</h2><code>data-theme="dark"</code>
+      <span class="scheme">dark</span></header>
+    <div class="row"><div class="lbl">surfaces</div><div class="swatches"><div class="sw" style="background:var(--ground);color:var(--ink)">
+    <span>ground</span><b class="ratio ok">16.0</b></div><div class="sw" style="background:var(--board);color:var(--ink)">
+    <span>board</span><b class="ratio ok">15.3</b></div><div class="sw" style="background:var(--panel);color:var(--ink)">
+    <span>panel</span><b class="ratio ok">14.1</b></div><div class="sw" style="background:var(--panel-2);color:var(--ink)">
+    <span>panel-2</span><b class="ratio ok">12.6</b></div><div class="sw" style="background:var(--rail);color:var(--rail-ink)">
+    <span>rail</span><b class="ratio ok">12.4</b></div></div></div>
+    <div class="row"><div class="lbl">signals</div><div class="swatches"><div class="sw" style="background:var(--sig-work);color:var(--on-sig)">
+    <span>work</span><b class="ratio ok">11.3</b></div><div class="sw" style="background:var(--sig-wait);color:var(--on-sig)">
+    <span>wait</span><b class="ratio ok">10.6</b></div><div class="sw" style="background:var(--sig-done);color:var(--on-sig)">
+    <span>done</span><b class="ratio ok">11.6</b></div><div class="sw" style="background:var(--sig-err);color:var(--on-err)">
+    <span>err</span><b class="ratio ok">5.9</b></div><div class="sw" style="background:var(--sig-idle);color:var(--on-idle)">
+    <span>idle</span><b class="ratio ok">5.5</b></div><div class="sw" style="background:var(--sig-accent);color:var(--on-accent)">
+    <span>accent</span><b class="ratio ok">5.7</b></div><div class="sw" style="background:var(--sig-accent-2);color:var(--on-accent-2)">
+    <span>accent2</span><b class="ratio ok">11.3</b></div></div></div>
+    <div class="samples">
+    <button class="cr-btn">Primary</button>
+    <button class="cr-btn cr-btn--outline cr-btn--sig-accent">Accent</button>
+    <button class="cr-btn cr-btn--ghost">Ghost</button>
+    <span class="cr-chip">chip</span>
+    <span class="cr-chip cr-chip--sig-err">error</span>
+    <div class="cr-panel" style="min-width:150px"><div class="cr-panel__body">Panel surface with <a href="#" style="color:var(--sig-work)">a link</a>.</div></div>
+  </div>
+  </section>
+<section class="brand-light">
+    <header><h2>light · built-in</h2><code>data-theme="light"</code>
+      <span class="scheme">light</span></header>
+    <div class="row"><div class="lbl">surfaces</div><div class="swatches"><div class="sw" style="background:var(--ground);color:var(--ink)">
+    <span>ground</span><b class="ratio ok">16.4</b></div><div class="sw" style="background:var(--board);color:var(--ink)">
+    <span>board</span><b class="ratio ok">15.2</b></div><div class="sw" style="background:var(--panel);color:var(--ink)">
+    <span>panel</span><b class="ratio ok">19.0</b></div><div class="sw" style="background:var(--panel-2);color:var(--ink)">
+    <span>panel-2</span><b class="ratio ok">17.7</b></div><div class="sw" style="background:var(--rail);color:var(--rail-ink)">
+    <span>rail</span><b class="ratio ok">16.4</b></div></div></div>
+    <div class="row"><div class="lbl">signals</div><div class="swatches"><div class="sw" style="background:var(--sig-work);color:var(--on-sig)">
+    <span>work</span><b class="ratio ok">5.3</b></div><div class="sw" style="background:var(--sig-wait);color:var(--on-sig)">
+    <span>wait</span><b class="ratio ok">6.2</b></div><div class="sw" style="background:var(--sig-done);color:var(--on-sig)">
+    <span>done</span><b class="ratio ok">5.2</b></div><div class="sw" style="background:var(--sig-err);color:var(--on-err)">
+    <span>err</span><b class="ratio ok">4.7</b></div><div class="sw" style="background:var(--sig-idle);color:var(--on-idle)">
+    <span>idle</span><b class="ratio ok">4.9</b></div><div class="sw" style="background:var(--sig-accent);color:var(--on-accent)">
+    <span>accent</span><b class="ratio ok">5.3</b></div><div class="sw" style="background:var(--sig-accent-2);color:var(--on-accent-2)">
+    <span>accent2</span><b class="ratio ok">6.9</b></div></div></div>
+    <div class="samples">
+    <button class="cr-btn">Primary</button>
+    <button class="cr-btn cr-btn--outline cr-btn--sig-accent">Accent</button>
+    <button class="cr-btn cr-btn--ghost">Ghost</button>
+    <span class="cr-chip">chip</span>
+    <span class="cr-chip cr-chip--sig-err">error</span>
+    <div class="cr-panel" style="min-width:150px"><div class="cr-panel__body">Panel surface with <a href="#" style="color:var(--sig-work)">a link</a>.</div></div>
+  </div>
+  </section>
+<section class="brand-extreme">
+    <header><h2>extreme · built-in</h2><code>data-theme="extreme"</code>
+      <span class="scheme">dark</span></header>
+    <div class="row"><div class="lbl">surfaces</div><div class="swatches"><div class="sw" style="background:var(--ground);color:var(--ink)">
+    <span>ground</span><b class="ratio ok">18.1</b></div><div class="sw" style="background:var(--board);color:var(--ink)">
+    <span>board</span><b class="ratio ok">17.3</b></div><div class="sw" style="background:var(--panel);color:var(--ink)">
+    <span>panel</span><b class="ratio ok">15.8</b></div><div class="sw" style="background:var(--panel-2);color:var(--ink)">
+    <span>panel-2</span><b class="ratio ok">13.9</b></div><div class="sw" style="background:var(--rail);color:var(--rail-ink)">
+    <span>rail</span><b class="ratio ok">5.8</b></div></div></div>
+    <div class="row"><div class="lbl">signals</div><div class="swatches"><div class="sw" style="background:var(--sig-work);color:var(--on-sig)">
+    <span>work</span><b class="ratio ok">12.8</b></div><div class="sw" style="background:var(--sig-wait);color:var(--on-sig)">
+    <span>wait</span><b class="ratio ok">12.2</b></div><div class="sw" style="background:var(--sig-done);color:var(--on-sig)">
+    <span>done</span><b class="ratio ok">13.3</b></div><div class="sw" style="background:var(--sig-err);color:var(--on-err)">
+    <span>err</span><b class="ratio ok">5.9</b></div><div class="sw" style="background:var(--sig-idle);color:var(--on-idle)">
+    <span>idle</span><b class="ratio ok">5.5</b></div><div class="sw" style="background:var(--sig-accent);color:var(--on-accent)">
+    <span>accent</span><b class="ratio ok">6.0</b></div><div class="sw" style="background:var(--sig-accent-2);color:var(--on-accent-2)">
+    <span>accent2</span><b class="ratio ok">13.0</b></div></div></div>
+    <div class="samples">
+    <button class="cr-btn">Primary</button>
+    <button class="cr-btn cr-btn--outline cr-btn--sig-accent">Accent</button>
+    <button class="cr-btn cr-btn--ghost">Ghost</button>
+    <span class="cr-chip">chip</span>
+    <span class="cr-chip cr-chip--sig-err">error</span>
+    <div class="cr-panel" style="min-width:150px"><div class="cr-panel__body">Panel surface with <a href="#" style="color:var(--sig-work)">a link</a>.</div></div>
+  </div>
+  </section>
+<section class="brand-phosphor">
+    <header><h2>phosphor · built-in</h2><code>data-theme="phosphor"</code>
+      <span class="scheme">dark</span></header>
+    <div class="row"><div class="lbl">surfaces</div><div class="swatches"><div class="sw" style="background:var(--ground);color:var(--ink)">
+    <span>ground</span><b class="ratio ok">15.1</b></div><div class="sw" style="background:var(--board);color:var(--ink)">
+    <span>board</span><b class="ratio ok">14.5</b></div><div class="sw" style="background:var(--panel);color:var(--ink)">
+    <span>panel</span><b class="ratio ok">13.8</b></div><div class="sw" style="background:var(--panel-2);color:var(--ink)">
+    <span>panel-2</span><b class="ratio ok">12.7</b></div><div class="sw" style="background:var(--rail);color:var(--rail-ink)">
+    <span>rail</span><b class="ratio ok">15.1</b></div></div></div>
+    <div class="row"><div class="lbl">signals</div><div class="swatches"><div class="sw" style="background:var(--sig-work);color:var(--on-sig)">
+    <span>work</span><b class="ratio ok">15.1</b></div><div class="sw" style="background:var(--sig-wait);color:var(--on-sig)">
+    <span>wait</span><b class="ratio ok">16.3</b></div><div class="sw" style="background:var(--sig-done);color:var(--on-sig)">
+    <span>done</span><b class="ratio ok">11.3</b></div><div class="sw" style="background:var(--sig-err);color:var(--on-err)">
+    <span>err</span><b class="ratio ok">18.0</b></div><div class="sw" style="background:var(--sig-idle);color:var(--on-idle)">
+    <span>idle</span><b class="ratio ok">7.7</b></div><div class="sw" style="background:var(--sig-accent);color:var(--on-accent)">
+    <span>accent</span><b class="ratio ok">16.5</b></div><div class="sw" style="background:var(--sig-accent-2);color:var(--on-accent-2)">
+    <span>accent2</span><b class="ratio ok">12.5</b></div></div></div>
+    <div class="samples">
+    <button class="cr-btn">Primary</button>
+    <button class="cr-btn cr-btn--outline cr-btn--sig-accent">Accent</button>
+    <button class="cr-btn cr-btn--ghost">Ghost</button>
+    <span class="cr-chip">chip</span>
+    <span class="cr-chip cr-chip--sig-err">error</span>
+    <div class="cr-panel" style="min-width:150px"><div class="cr-panel__body">Panel surface with <a href="#" style="color:var(--sig-work)">a link</a>.</div></div>
+  </div>
+  </section>
+<section class="brand-aurora">
+    <header><h2>Aurora · one brand, dark + light</h2><code>data-theme="aurora"</code>
+      <span class="scheme">dark · brand</span></header>
+    <div class="row"><div class="lbl">surfaces</div><div class="swatches"><div class="sw" style="background:var(--ground);color:var(--ink)">
+    <span>ground</span><b class="ratio ok">16.2</b></div><div class="sw" style="background:var(--board);color:var(--ink)">
+    <span>board</span><b class="ratio ok">15.0</b></div><div class="sw" style="background:var(--panel);color:var(--ink)">
+    <span>panel</span><b class="ratio ok">13.6</b></div><div class="sw" style="background:var(--panel-2);color:var(--ink)">
+    <span>panel-2</span><b class="ratio ok">11.5</b></div><div class="sw" style="background:var(--rail);color:var(--rail-ink)">
+    <span>rail</span><b class="ratio ok">16.2</b></div></div></div>
+    <div class="row"><div class="lbl">signals</div><div class="swatches"><div class="sw" style="background:var(--sig-work);color:var(--on-sig)">
+    <span>work</span><b class="ratio ok">11.3</b></div><div class="sw" style="background:var(--sig-wait);color:var(--on-sig)">
+    <span>wait</span><b class="ratio ok">10.6</b></div><div class="sw" style="background:var(--sig-done);color:var(--on-sig)">
+    <span>done</span><b class="ratio ok">11.6</b></div><div class="sw" style="background:var(--sig-err);color:var(--on-err)">
+    <span>err</span><b class="ratio ok">5.9</b></div><div class="sw" style="background:var(--sig-idle);color:var(--on-idle)">
+    <span>idle</span><b class="ratio ok">5.5</b></div><div class="sw" style="background:var(--sig-accent);color:var(--on-accent)">
+    <span>accent</span><b class="ratio ok">4.7</b></div><div class="sw" style="background:var(--sig-accent-2);color:var(--on-accent-2)">
+    <span>accent2</span><b class="ratio ok">11.2</b></div></div></div>
+    <div class="samples">
+    <button class="cr-btn">Primary</button>
+    <button class="cr-btn cr-btn--outline cr-btn--sig-accent">Accent</button>
+    <button class="cr-btn cr-btn--ghost">Ghost</button>
+    <span class="cr-chip">chip</span>
+    <span class="cr-chip cr-chip--sig-err">error</span>
+    <div class="cr-panel" style="min-width:150px"><div class="cr-panel__body">Panel surface with <a href="#" style="color:var(--sig-work)">a link</a>.</div></div>
+  </div>
+  </section>
+<section class="brand-aurora-light">
+    <header><h2>Aurora · one brand, dark + light</h2><code>data-theme="aurora-light"</code>
+      <span class="scheme">light · brand</span></header>
+    <div class="row"><div class="lbl">surfaces</div><div class="swatches"><div class="sw" style="background:var(--ground);color:var(--ink)">
+    <span>ground</span><b class="ratio ok">14.9</b></div><div class="sw" style="background:var(--board);color:var(--ink)">
+    <span>board</span><b class="ratio ok">13.9</b></div><div class="sw" style="background:var(--panel);color:var(--ink)">
+    <span>panel</span><b class="ratio ok">17.1</b></div><div class="sw" style="background:var(--panel-2);color:var(--ink)">
+    <span>panel-2</span><b class="ratio ok">15.6</b></div><div class="sw" style="background:var(--rail);color:var(--rail-ink)">
+    <span>rail</span><b class="ratio ok">16.9</b></div></div></div>
+    <div class="row"><div class="lbl">signals</div><div class="swatches"><div class="sw" style="background:var(--sig-work);color:var(--on-sig)">
+    <span>work</span><b class="ratio ok">6.2</b></div><div class="sw" style="background:var(--sig-wait);color:var(--on-sig)">
+    <span>wait</span><b class="ratio ok">6.4</b></div><div class="sw" style="background:var(--sig-done);color:var(--on-sig)">
+    <span>done</span><b class="ratio ok">6.5</b></div><div class="sw" style="background:var(--sig-err);color:var(--on-err)">
+    <span>err</span><b class="ratio ok">5.9</b></div><div class="sw" style="background:var(--sig-idle);color:var(--on-idle)">
+    <span>idle</span><b class="ratio ok">5.5</b></div><div class="sw" style="background:var(--sig-accent);color:var(--on-accent)">
+    <span>accent</span><b class="ratio ok">4.7</b></div><div class="sw" style="background:var(--sig-accent-2);color:var(--on-accent-2)">
+    <span>accent2</span><b class="ratio ok">11.2</b></div></div></div>
+    <div class="samples">
+    <button class="cr-btn">Primary</button>
+    <button class="cr-btn cr-btn--outline cr-btn--sig-accent">Accent</button>
+    <button class="cr-btn cr-btn--ghost">Ghost</button>
+    <span class="cr-chip">chip</span>
+    <span class="cr-chip cr-chip--sig-err">error</span>
+    <div class="cr-panel" style="min-width:150px"><div class="cr-panel__body">Panel surface with <a href="#" style="color:var(--sig-work)">a link</a>.</div></div>
+  </div>
+  </section>
+<section class="brand-ember">
+    <header><h2>Ember · warm dark, surfaces from one tone</h2><code>data-theme="ember"</code>
+      <span class="scheme">dark · brand</span></header>
+    <div class="row"><div class="lbl">surfaces</div><div class="swatches"><div class="sw" style="background:var(--ground);color:var(--ink)">
+    <span>ground</span><b class="ratio ok">16.4</b></div><div class="sw" style="background:var(--board);color:var(--ink)">
+    <span>board</span><b class="ratio ok">15.2</b></div><div class="sw" style="background:var(--panel);color:var(--ink)">
+    <span>panel</span><b class="ratio ok">13.8</b></div><div class="sw" style="background:var(--panel-2);color:var(--ink)">
+    <span>panel-2</span><b class="ratio ok">11.8</b></div><div class="sw" style="background:var(--rail);color:var(--rail-ink)">
+    <span>rail</span><b class="ratio ok">15.9</b></div></div></div>
+    <div class="row"><div class="lbl">signals</div><div class="swatches"><div class="sw" style="background:var(--sig-work);color:var(--on-sig)">
+    <span>work</span><b class="ratio ok">11.3</b></div><div class="sw" style="background:var(--sig-wait);color:var(--on-sig)">
+    <span>wait</span><b class="ratio ok">10.6</b></div><div class="sw" style="background:var(--sig-done);color:var(--on-sig)">
+    <span>done</span><b class="ratio ok">11.6</b></div><div class="sw" style="background:var(--sig-err);color:var(--on-err)">
+    <span>err</span><b class="ratio ok">5.9</b></div><div class="sw" style="background:var(--sig-idle);color:var(--on-idle)">
+    <span>idle</span><b class="ratio ok">5.5</b></div><div class="sw" style="background:var(--sig-accent);color:var(--on-accent)">
+    <span>accent</span><b class="ratio ok">7.1</b></div><div class="sw" style="background:var(--sig-accent-2);color:var(--on-accent-2)">
+    <span>accent2</span><b class="ratio ok">11.1</b></div></div></div>
+    <div class="samples">
+    <button class="cr-btn">Primary</button>
+    <button class="cr-btn cr-btn--outline cr-btn--sig-accent">Accent</button>
+    <button class="cr-btn cr-btn--ghost">Ghost</button>
+    <span class="cr-chip">chip</span>
+    <span class="cr-chip cr-chip--sig-err">error</span>
+    <div class="cr-panel" style="min-width:150px"><div class="cr-panel__body">Panel surface with <a href="#" style="color:var(--sig-work)">a link</a>.</div></div>
+  </div>
+  </section>
+<section class="brand-harbor">
+    <header><h2>Harbor · calm cool dark, muted signals</h2><code>data-theme="harbor"</code>
+      <span class="scheme">dark · brand</span></header>
+    <div class="row"><div class="lbl">surfaces</div><div class="swatches"><div class="sw" style="background:var(--ground);color:var(--ink)">
+    <span>ground</span><b class="ratio ok">16.2</b></div><div class="sw" style="background:var(--board);color:var(--ink)">
+    <span>board</span><b class="ratio ok">15.0</b></div><div class="sw" style="background:var(--panel);color:var(--ink)">
+    <span>panel</span><b class="ratio ok">13.5</b></div><div class="sw" style="background:var(--panel-2);color:var(--ink)">
+    <span>panel-2</span><b class="ratio ok">11.6</b></div><div class="sw" style="background:var(--rail);color:var(--rail-ink)">
+    <span>rail</span><b class="ratio ok">16.1</b></div></div></div>
+    <div class="row"><div class="lbl">signals</div><div class="swatches"><div class="sw" style="background:var(--sig-work);color:var(--on-sig)">
+    <span>work</span><b class="ratio ok">11.2</b></div><div class="sw" style="background:var(--sig-wait);color:var(--on-sig)">
+    <span>wait</span><b class="ratio ok">10.7</b></div><div class="sw" style="background:var(--sig-done);color:var(--on-sig)">
+    <span>done</span><b class="ratio ok">11.2</b></div><div class="sw" style="background:var(--sig-err);color:var(--on-err)">
+    <span>err</span><b class="ratio ok">6.2</b></div><div class="sw" style="background:var(--sig-idle);color:var(--on-idle)">
+    <span>idle</span><b class="ratio ok">5.6</b></div><div class="sw" style="background:var(--sig-accent);color:var(--on-accent)">
+    <span>accent</span><b class="ratio ok">6.6</b></div><div class="sw" style="background:var(--sig-accent-2);color:var(--on-accent-2)">
+    <span>accent2</span><b class="ratio ok">11.2</b></div></div></div>
+    <div class="samples">
+    <button class="cr-btn">Primary</button>
+    <button class="cr-btn cr-btn--outline cr-btn--sig-accent">Accent</button>
+    <button class="cr-btn cr-btn--ghost">Ghost</button>
+    <span class="cr-chip">chip</span>
+    <span class="cr-chip cr-chip--sig-err">error</span>
+    <div class="cr-panel" style="min-width:150px"><div class="cr-panel__body">Panel surface with <a href="#" style="color:var(--sig-work)">a link</a>.</div></div>
+  </div>
+  </section>
+<section class="brand-porcelain">
+    <header><h2>Porcelain · light corporate re-skin</h2><code>data-theme="porcelain"</code>
+      <span class="scheme">light · brand</span></header>
+    <div class="row"><div class="lbl">surfaces</div><div class="swatches"><div class="sw" style="background:var(--ground);color:var(--ink)">
+    <span>ground</span><b class="ratio ok">16.6</b></div><div class="sw" style="background:var(--board);color:var(--ink)">
+    <span>board</span><b class="ratio ok">15.6</b></div><div class="sw" style="background:var(--panel);color:var(--ink)">
+    <span>panel</span><b class="ratio ok">18.1</b></div><div class="sw" style="background:var(--panel-2);color:var(--ink)">
+    <span>panel-2</span><b class="ratio ok">16.4</b></div><div class="sw" style="background:var(--rail);color:var(--rail-ink)">
+    <span>rail</span><b class="ratio ok">16.0</b></div></div></div>
+    <div class="row"><div class="lbl">signals</div><div class="swatches"><div class="sw" style="background:var(--sig-work);color:var(--on-sig)">
+    <span>work</span><b class="ratio ok">4.4</b></div><div class="sw" style="background:var(--sig-wait);color:var(--on-sig)">
+    <span>wait</span><b class="ratio ok">5.3</b></div><div class="sw" style="background:var(--sig-done);color:var(--on-sig)">
+    <span>done</span><b class="ratio ok">4.7</b></div><div class="sw" style="background:var(--sig-err);color:var(--on-err)">
+    <span>err</span><b class="ratio ok">5.3</b></div><div class="sw" style="background:var(--sig-idle);color:var(--on-idle)">
+    <span>idle</span><b class="ratio ok">4.8</b></div><div class="sw" style="background:var(--sig-accent);color:var(--on-accent)">
+    <span>accent</span><b class="ratio ok">7.9</b></div><div class="sw" style="background:var(--sig-accent-2);color:var(--on-accent-2)">
+    <span>accent2</span><b class="ratio ok">5.4</b></div></div></div>
+    <div class="samples">
+    <button class="cr-btn">Primary</button>
+    <button class="cr-btn cr-btn--outline cr-btn--sig-accent">Accent</button>
+    <button class="cr-btn cr-btn--ghost">Ghost</button>
+    <span class="cr-chip">chip</span>
+    <span class="cr-chip cr-chip--sig-err">error</span>
+    <div class="cr-panel" style="min-width:150px"><div class="cr-panel__body">Panel surface with <a href="#" style="color:var(--sig-work)">a link</a>.</div></div>
+  </div>
+  </section>
+<section class="brand-slate">
+    <header><h2>Slate · neutral corporate re-skin</h2><code>data-theme="slate"</code>
+      <span class="scheme">dark · brand</span></header>
+    <div class="row"><div class="lbl">surfaces</div><div class="swatches"><div class="sw" style="background:var(--ground);color:var(--ink)">
+    <span>ground</span><b class="ratio ok">16.1</b></div><div class="sw" style="background:var(--board);color:var(--ink)">
+    <span>board</span><b class="ratio ok">15.0</b></div><div class="sw" style="background:var(--panel);color:var(--ink)">
+    <span>panel</span><b class="ratio ok">13.6</b></div><div class="sw" style="background:var(--panel-2);color:var(--ink)">
+    <span>panel-2</span><b class="ratio ok">12.0</b></div><div class="sw" style="background:var(--rail);color:var(--rail-ink)">
+    <span>rail</span><b class="ratio ok">13.3</b></div></div></div>
+    <div class="row"><div class="lbl">signals</div><div class="swatches"><div class="sw" style="background:var(--sig-work);color:var(--on-sig)">
+    <span>work</span><b class="ratio ok">6.9</b></div><div class="sw" style="background:var(--sig-wait);color:var(--on-sig)">
+    <span>wait</span><b class="ratio ok">8.9</b></div><div class="sw" style="background:var(--sig-done);color:var(--on-sig)">
+    <span>done</span><b class="ratio ok">9.1</b></div><div class="sw" style="background:var(--sig-err);color:var(--on-err)">
+    <span>err</span><b class="ratio ok">3.9</b></div><div class="sw" style="background:var(--sig-idle);color:var(--on-idle)">
+    <span>idle</span><b class="ratio ok">4.6</b></div><div class="sw" style="background:var(--sig-accent);color:var(--on-accent)">
+    <span>accent</span><b class="ratio ok">3.5</b></div><div class="sw" style="background:var(--sig-accent-2);color:var(--on-accent-2)">
+    <span>accent2</span><b class="ratio ok">8.1</b></div></div></div>
+    <div class="samples">
+    <button class="cr-btn">Primary</button>
+    <button class="cr-btn cr-btn--outline cr-btn--sig-accent">Accent</button>
+    <button class="cr-btn cr-btn--ghost">Ghost</button>
+    <span class="cr-chip">chip</span>
+    <span class="cr-chip cr-chip--sig-err">error</span>
+    <div class="cr-panel" style="min-width:150px"><div class="cr-panel__body">Panel surface with <a href="#" style="color:var(--sig-work)">a link</a>.</div></div>
+  </div>
+  </section>
+</body></html>

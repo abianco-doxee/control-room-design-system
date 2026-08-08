@@ -5,7 +5,7 @@ import { test, expect } from "@playwright/test";
 import { pathToFileURL } from "node:url";
 import { join } from "node:path";
 
-const PAGES = ["gallery.html", "components.html"];
+const PAGES = ["gallery.html", "components.html", "brands.html"];
 const WIDTHS = [375, 768, 1024];
 
 for (const file of PAGES) {
