@@ -369,6 +369,21 @@ test.describe("component browser — live islands", () => {
     expect(labels.length, "several log ticks").toBeGreaterThan(2);
   });
 
+  test("line chart market axis collapses idle gaps with break markers", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const island = page.locator('[data-island="line-chart"]');
+
+    await pick(island, "market").selectOption("market");
+    await page.waitForTimeout(40);
+
+    // overnight + weekend gaps are collapsed → dashed break markers appear
+    expect(await island.locator(".cr-chart__break").count(), "collapsed-gap markers").toBeGreaterThan(1);
+    // one tick per session day (Thu/Fri/Mon → 3), not a tick per hour
+    const dayTicks = (await island.locator(".cr-chart__tick").allTextContents()).map((t) => t.trim()).filter(Boolean);
+    expect(dayTicks.length, `day ticks: ${dayTicks.join("|")}`).toBeLessThanOrEqual(4);
+  });
+
   test("popover is collision-positioned and stays within the viewport", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
