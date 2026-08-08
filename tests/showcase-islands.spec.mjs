@@ -384,6 +384,21 @@ test.describe("component browser — live islands", () => {
     expect(dayTicks.length, `day ticks: ${dayTicks.join("|")}`).toBeLessThanOrEqual(4);
   });
 
+  test("line chart xFormat escape hatch overrides tick labels", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const island = page.locator('[data-island="line-chart"]');
+
+    await pick(island, "calendar").selectOption("calendar");
+    // customLabels is the only checkbox after area+axis; toggle it on
+    await island.locator('.pg__controls input[type="checkbox"]').last().check();
+    await page.waitForTimeout(40);
+
+    const labels = (await island.locator(".cr-chart__tick").allTextContents()).map((t) => t.trim());
+    const dmy = labels.filter((t) => /^\d{2}\/\d{2}$/.test(t));
+    expect(dmy.length, `custom DD/MM ticks: ${labels.join("|")}`).toBeGreaterThan(2);
+  });
+
   test("popover is collision-positioned and stays within the viewport", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
