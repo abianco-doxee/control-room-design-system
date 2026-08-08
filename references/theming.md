@@ -225,6 +225,14 @@ applyTheme(acmeVars, { name: "acme" });   // adds <style> + sets data-theme="acm
 - `contrastRatio(fg, bg)` / `checkThemeContrast(vars)` — WCAG ratios for the key
   text/fill pairings; gradient-valued roles are skipped, not failed.
 
+## Preview (proof sheet)
+
+`npm run build:brand-preview` → `public/brands.html`: every theme (built-in +
+brand, including `$modes` variants) rendered from its shipped appearance file — the
+surface ladder, the signal ramp with its on-colour text and **measured WCAG
+contrast** (green = ok, red = below target), and live components. Use it to eyeball
+a brand and confirm every text-on-fill pairing clears contrast before sign-off.
+
 ## Contrast
 
 `checkThemeContrast` (and `build:theme`) score the pairings a legible theme must
