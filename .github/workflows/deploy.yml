@@ -46,6 +46,8 @@ jobs:
         run: npm run test:theme
       - name: Positioning gate (collision-aware overlay placement)
         run: npm run test:position
+      - name: RTL-safe authoring guard (logical properties)
+        run: npm run test:rtl
       - name: Appearance-separation guard (no brand colour in the feature layer)
         run: npm run test:separation
       - name: Install Playwright Chromium
