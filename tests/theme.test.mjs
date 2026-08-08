@@ -17,6 +17,7 @@ import {
   deriveOnColors,
   ON_PAIRS,
 } from "../lib/theme/index.js";
+import { surfaceRamp } from "../build/ramp.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => JSON.parse(readFileSync(join(ROOT, p), "utf8"));
@@ -125,6 +126,42 @@ test("deriveOnColors: fills missing, re-derives changed fills, keeps hand-set", 
     { changed: ["sig-accent", "on-accent"] },
   );
   assert.equal(kept["on-accent"], "#123456", "author-set on-colour preserved");
+});
+
+test("surfaceRamp derives a coherent, correctly-ordered surface ladder", () => {
+  const dark = surfaceRamp("#141013", "dark");
+  const roles = ["ground", "board", "panel", "panel-2", "rail"];
+  for (const r of roles) assert.match(dark[r], /^#[0-9a-f]{6}$/i, `${r} is a hex colour`);
+  // lightness (proxy: contrast against black — higher = lighter) climbs
+  // ground < board < panel < panel-2 for a dark scheme
+  const L = (hex) => contrastRatio(hex, "#000000");
+  assert.ok(L(dark.ground) < L(dark.board), "board lifts above ground");
+  assert.ok(L(dark.board) < L(dark.panel), "panel lifts above board");
+  assert.ok(L(dark.panel) < L(dark["panel-2"]), "panel-2 lifts above panel");
+  assert.ok(L(dark.rail) <= L(dark.ground), "rail is the deepest tone");
+
+  // a light scheme inverts: surfaces are bright, rail stays deep
+  const light = surfaceRamp("#f4f5f7", "light");
+  assert.ok(L(light.panel) > L(light.ground), "light panel is brighter than ground");
+  assert.ok(L(light.rail) < L(light.ground), "rail stays a deep tone even on light");
+});
+
+test("ember brand ($ramp + accent, extends dark) is complete + legible", () => {
+  const ember = read("brands/ember.json");
+  const dark = tokens.themes.dark;
+  const base = {};
+  for (const [k, v] of Object.entries(dark)) if (!k.startsWith("$")) base[k] = v;
+  const surfaces = surfaceRamp(ember.$ramp, ember.$scheme || "dark");
+  const overrides = Object.fromEntries(Object.entries(ember).filter(([k]) => !k.startsWith("$")));
+  const vars = deriveOnColors(mergeTheme(mergeTheme(base, surfaces), overrides), { changed: Object.keys(overrides) });
+
+  // surfaces really came from the ramp (not the inherited dark values)
+  assert.equal(vars.ground, surfaces.ground);
+  assert.notEqual(vars.ground, base.ground);
+  const v = validateTheme(vars);
+  assert.equal(v.valid, true, `ember missing: ${v.missing.join(", ")}`);
+  const c = checkThemeContrast(vars);
+  assert.equal(c.ok, true, `ember contrast failures: ${JSON.stringify(c.failures)}`);
 });
 
 test("the worked brand (brands/slate.json) is valid, complete, and legible", () => {

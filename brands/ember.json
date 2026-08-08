@@ -1,0 +1,15 @@
+{
+  "$schema": "../dist/theme-contract.json",
+  "$label": "Ember · warm dark, surfaces from one tone",
+  "$description": "A brand authored from almost nothing: `$ramp` derives the whole surface ladder (ground→rail) from a single warm base tone in OKLCH, the signal ramp is inherited from `dark`, and only the accent + ink/muted are set. On-colours are auto-derived. Build with `npm run build:theme` → dist/themes/ember.css.",
+  "$extends": "dark",
+  "$scheme": "dark",
+  "$ramp": "#141013",
+
+  "ink": "#f4ece9",
+  "muted": "#a3908a",
+  "rail-ink": "#f0e2dc",
+
+  "sig-accent": "#ff6a3d",
+  "sig-accent-2": "#ffb020"
+}
