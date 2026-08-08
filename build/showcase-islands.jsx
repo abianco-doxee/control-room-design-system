@@ -159,10 +159,16 @@ const LINE_SERIES = [
   { name: "errors", data: [2, 3, 2, 5, 4, 3, 6, 4], signal: "err" },
 ];
 const LINE_LABELS = ["09", "10", "11", "12", "13", "14", "15", "16"];
-// Epoch-ms x-values (15-min cadence from a fixed base) for the continuous/time axis.
+// Epoch-ms x-values (15-min cadence from a fixed base) for the clock (sub-day) axis.
 const LINE_X = (() => {
   const base = Date.UTC(2026, 0, 1, 9, 0, 0), step = 15 * 60 * 1000;
   return LINE_LABELS.map((_, i) => base + i * step);
+})();
+// ~5 months of weekly samples for the calendar axis (monthly ticks in a real zone).
+const CAL = (() => {
+  const start = Date.UTC(2025, 0, 6), week = 7 * 24 * 3600 * 1000, x = [], data = [];
+  for (let i = 0; i < 22; i++) { x.push(start + i * week); data.push(80 + Math.round(18 * Math.sin(i / 2.5)) + (i % 4)); }
+  return { x, data };
 })();
 const BAR_DATA = [
   { label: "eu", value: 42 },
@@ -465,18 +471,25 @@ const DEMOS = {
     defs: [
       T("boolean", "area", true),
       T("boolean", "axis", true),
-      T("boolean", "timeAxis", false),
+      T("enum", "xScale", "categorical", { options: ["categorical", "clock", "calendar"] }),
       T("text", "unit", ""),
       T("number", "height", 140, { min: 90, max: 220 }),
       T("text", "label", "Throughput vs errors"),
     ],
-    render: (s) => h(CrLineChart, {
-      series: LINE_SERIES,
-      labels: s.timeAxis ? undefined : LINE_LABELS,
-      x: s.timeAxis ? LINE_X : undefined,
-      xTime: s.timeAxis,
-      area: s.area, axis: s.axis, unit: s.unit, height: s.height, label: s.label,
-    }),
+    render: (s) => {
+      const common = { area: s.area, axis: s.axis, unit: s.unit, height: s.height, label: s.label };
+      if (s.xScale === "calendar") {
+        return h(CrLineChart, {
+          series: [{ name: "budget", data: CAL.data, signal: "work" }],
+          x: CAL.x, xTime: true, xZone: "Europe/Rome",
+          ...common, unit: s.unit || "%", label: s.label === "Throughput vs errors" ? "Error budget (5 months)" : s.label,
+        });
+      }
+      if (s.xScale === "clock") {
+        return h(CrLineChart, { series: LINE_SERIES, x: LINE_X, xTime: true, xZone: "UTC", ...common });
+      }
+      return h(CrLineChart, { series: LINE_SERIES, labels: LINE_LABELS, ...common });
+    },
   },
   "bar-chart": {
     tag: "CrBarChart",

@@ -303,13 +303,13 @@ test.describe("component browser — live islands", () => {
     expect(await visible(), "series restored").toBe(2);
   });
 
-  test("line chart continuous time axis labels ticks as clock times", async ({ page }) => {
+  test("line chart clock axis labels ticks as clock times", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
     const island = page.locator('[data-island="line-chart"]');
 
-    // enable the time axis (checkbox order: area, axis, timeAxis)
-    await island.locator('.pg__controls input[type="checkbox"]').nth(2).check();
+    // switch the x-scale to the sub-day clock axis
+    await island.locator(".pg__controls select").selectOption("clock");
     await page.waitForTimeout(40);
 
     const labels = await island.locator(".cr-chart__tick").allTextContents();
@@ -317,6 +317,23 @@ test.describe("component browser — live islands", () => {
     expect(clocks.length, `clock-formatted x-ticks: ${labels.join("|")}`).toBeGreaterThan(1);
     // continuous mode draws vertical gridlines at the ticks
     expect(await island.locator(".cr-chart__grid--v").count(), "vertical gridlines").toBeGreaterThan(0);
+  });
+
+  test("line chart calendar axis labels multi-month ticks with month names", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const island = page.locator('[data-island="line-chart"]');
+
+    // switch to the calendar (multi-month) axis
+    await island.locator(".pg__controls select").selectOption("calendar");
+    await page.waitForTimeout(40);
+
+    const labels = (await island.locator(".cr-chart__tick").allTextContents()).map((t) => t.trim());
+    const months = labels.filter((t) => /^[A-Z][a-z]{2}( '\d\d)?$/.test(t));
+    expect(months.length, `month-name ticks: ${labels.join("|")}`).toBeGreaterThan(2);
+    // the tooltip stamp reads a calendar date+time on hover
+    await island.locator(".cr-linechart__plot").hover();
+    await expect(island.locator(".cr-chart__tip-x")).toBeVisible();
   });
 
   test("popover is collision-positioned and stays within the viewport", async ({ page }) => {
