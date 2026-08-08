@@ -62,6 +62,30 @@ const hue = (sig, i) => {
   const key = sig ? (sig === "accent2" ? "accent-2" : sig) : order[i % order.length];
   return "var(--sig-" + key + ")";
 };
+// Nice-scale helpers — mirror CrLineChart/CrBarChart so the static y-axis matches.
+const niceNum = (range, round) => {
+  const exp = Math.floor(Math.log10(range));
+  const f = range / Math.pow(10, exp);
+  let nf;
+  if (round) { if (f < 1.5) nf = 1; else if (f < 3) nf = 2; else if (f < 7) nf = 5; else nf = 10; }
+  else { if (f <= 1) nf = 1; else if (f <= 2) nf = 2; else if (f <= 5) nf = 5; else nf = 10; }
+  return nf * Math.pow(10, exp);
+};
+const niceScale = (lo, hi, maxTicks) => {
+  let a = lo, b = hi;
+  if (b <= a) b = a + 1;
+  const range = niceNum(b - a, false), step = niceNum(range / (maxTicks - 1), true);
+  const niceLo = Math.floor(a / step) * step, niceHi = Math.ceil(b / step) * step;
+  const ticks = [];
+  for (let v = niceLo; v <= niceHi + step * 0.5; v += step) ticks.push(Math.round(v / step) * step);
+  return { min: niceLo, max: niceHi, ticks };
+};
+const fmtTick = (v) => {
+  const a = Math.abs(v);
+  if (a >= 1000000) return (Math.round(v / 100000) / 10) + "M";
+  if (a >= 1000) return (Math.round(v / 100) / 10) + "k";
+  return String(Math.round(v * 100) / 100);
+};
 function sparkSvg(data, { signal = "work", area = true, height = 32, label = "trend" } = {}) {
   const W = 120, pad = 3, H = height, n = data.length;
   const min = Math.min(...data), max = Math.max(...data), range = (max - min) || 1, innerH = H - pad * 2;
@@ -77,15 +101,19 @@ function sparkSvg(data, { signal = "work", area = true, height = 32, label = "tr
     + `<polyline class="cr-spark__line" points="${line}" vector-effect="non-scaling-stroke"/>`
     + `<circle class="cr-spark__dot" cx="${last.x.toFixed(2)}" cy="${last.y.toFixed(2)}" r="2.4" vector-effect="non-scaling-stroke"/></svg></span>`;
 }
-function lineChartSvg(series, labels, { area = true, height = 140, label = "line chart" } = {}) {
-  const W = 320, H = height, L = 8, R = 8, T = 10, B = 18, plotW = W - L - R, plotH = H - T - B;
-  let lo = Infinity, hi = -Infinity;
-  for (const s of series) for (const v of s.data) { if (v < lo) lo = v; if (v > hi) hi = v; }
-  const range = (hi - lo) || 1;
+function lineChartSvg(series, labels, { area = true, height = 140, label = "line chart", axis = true, unit = "" } = {}) {
+  const W = 320, H = height, L = axis ? 30 : 8, R = 8, T = 10, B = 18, plotW = W - L - R, plotH = H - T - B;
+  let dlo = Infinity, dhi = -Infinity;
+  for (const s of series) for (const v of s.data) { if (v < dlo) dlo = v; if (v > dhi) dhi = v; }
+  if (!isFinite(dlo)) { dlo = 0; dhi = 1; }
+  const sc = niceScale(dlo, dhi, 5), lo = sc.min, hi = sc.max, range = (hi - lo) || 1;
   const xAt = (i, n) => L + (n <= 1 ? plotW / 2 : (i / (n - 1)) * plotW);
   const yAt = (v) => T + (1 - (v - lo) / range) * plotH;
-  const grid = [0, 0.5, 1].map((f) => (T + f * plotH).toFixed(2));
-  const gridSvg = grid.map((gy) => `<line class="cr-chart__grid" x1="${L}" y1="${gy}" x2="${W - R}" y2="${gy}" vector-effect="non-scaling-stroke"/>`).join("");
+  const gridSvg = sc.ticks.map((v) => {
+    const gy = yAt(v).toFixed(2);
+    return `<line class="cr-chart__grid" x1="${L}" y1="${gy}" x2="${W - R}" y2="${gy}" vector-effect="non-scaling-stroke"/>`
+      + (axis ? `<text class="cr-chart__ytick" x="${L - 5}" y="${(yAt(v) + 3).toFixed(2)}" text-anchor="end">${fmtTick(v)}${unit}</text>` : "");
+  }).join("");
   const seriesSvg = series.map((s, si) => {
     const color = hue(s.signal, si), n = s.data.length;
     const pts = s.data.map((v, i) => ({ x: xAt(i, n), y: yAt(v) }));
@@ -105,11 +133,16 @@ function lineChartSvg(series, labels, { area = true, height = 140, label = "line
   const summary = label + " — " + series.map((s) => s.name + " latest " + s.data[s.data.length - 1]).join(", ");
   return `<figure class="cr-chart cr-linechart" role="img" aria-label="${summary}"><svg class="cr-linechart__plot" viewBox="0 0 ${W} ${H}" aria-hidden="true" focusable="false">${gridSvg}${seriesSvg}${ticks}</svg>${legend}</figure>`;
 }
-function barChartSvg(data, { target, showValues = true, height = 140, label = "bar chart" } = {}) {
-  const W = 320, H = height, L = 6, R = 6, T = 14, B = 18, plotW = W - L - R, plotH = H - T - B, base = T + plotH;
-  let max = target || 0;
-  for (const d of data) if (d.value > max) max = d.value;
-  max = max || 1;
+function barChartSvg(data, { target, showValues = true, height = 140, label = "bar chart", axis = true, unit = "" } = {}) {
+  const W = 320, H = height, L = axis ? 30 : 6, R = 6, T = 14, B = 18, plotW = W - L - R, plotH = H - T - B, base = T + plotH;
+  let hi = target || 0;
+  for (const d of data) if (d.value > hi) hi = d.value;
+  const sc = niceScale(0, hi || 1, 5), max = sc.max;
+  const yAt = (v) => base - Math.max(0, Math.min(1, v / max)) * plotH;
+  const gridSvg = sc.ticks.map((v) =>
+    `<line class="cr-chart__grid" x1="${L}" y1="${yAt(v).toFixed(2)}" x2="${W - R}" y2="${yAt(v).toFixed(2)}" vector-effect="non-scaling-stroke"/>`
+    + (axis ? `<text class="cr-chart__ytick" x="${L - 5}" y="${(yAt(v) + 3).toFixed(2)}" text-anchor="end">${fmtTick(v)}${unit}</text>` : "")
+  ).join("");
   const n = data.length, gap = 2, bw = (plotW - gap * (n - 1)) / n;
   const bars = data.map((d, i) => {
     const h = Math.max(0, Math.min(1, d.value / max)) * plotH, x = L + i * (bw + gap), cx = x + bw / 2, color = hue(d.signal, i);
@@ -117,9 +150,9 @@ function barChartSvg(data, { target, showValues = true, height = 140, label = "b
       + (showValues ? `<text class="cr-chart__val" x="${cx.toFixed(2)}" y="${(base - h - 3).toFixed(2)}" text-anchor="middle">${d.value}</text>` : "")
       + `<text class="cr-chart__tick" x="${cx.toFixed(2)}" y="${H - 5}" text-anchor="middle">${d.label}</text>`;
   }).join("");
-  const tline = target !== undefined ? `<line class="cr-chart__target" x1="${L}" y1="${(base - Math.max(0, Math.min(1, target / max)) * plotH).toFixed(2)}" x2="${W - R}" y2="${(base - Math.max(0, Math.min(1, target / max)) * plotH).toFixed(2)}" vector-effect="non-scaling-stroke"/>` : "";
+  const tline = target !== undefined ? `<line class="cr-chart__target" x1="${L}" y1="${yAt(target).toFixed(2)}" x2="${W - R}" y2="${yAt(target).toFixed(2)}" vector-effect="non-scaling-stroke"/>` : "";
   const summary = label + " — " + data.map((d) => d.label + " " + d.value).join(", ");
-  return `<figure class="cr-chart cr-barchart" role="img" aria-label="${summary}"><svg class="cr-barchart__plot" viewBox="0 0 ${W} ${H}" aria-hidden="true" focusable="false"><line class="cr-chart__grid" x1="${L}" y1="${base}" x2="${W - R}" y2="${base}" vector-effect="non-scaling-stroke"/>${bars}${tline}</svg></figure>`;
+  return `<figure class="cr-chart cr-barchart" role="img" aria-label="${summary}"><svg class="cr-barchart__plot" viewBox="0 0 ${W} ${H}" aria-hidden="true" focusable="false">${gridSvg}${bars}${tline}</svg></figure>`;
 }
 function stackedBar(segments, { label, showLegend = true } = {}) {
   const total = segments.reduce((a, s) => a + s.value, 0) || 1;

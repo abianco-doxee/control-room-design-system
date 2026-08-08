@@ -459,20 +459,24 @@ const DEMOS = {
     tag: "CrLineChart",
     defs: [
       T("boolean", "area", true),
+      T("boolean", "axis", true),
+      T("text", "unit", ""),
       T("number", "height", 140, { min: 90, max: 220 }),
       T("text", "label", "Throughput vs errors"),
     ],
-    render: (s) => h(CrLineChart, { series: LINE_SERIES, labels: LINE_LABELS, area: s.area, height: s.height, label: s.label }),
+    render: (s) => h(CrLineChart, { series: LINE_SERIES, labels: LINE_LABELS, area: s.area, axis: s.axis, unit: s.unit, height: s.height, label: s.label }),
   },
   "bar-chart": {
     tag: "CrBarChart",
     defs: [
       T("boolean", "showValues", true),
+      T("boolean", "axis", true),
       T("number", "target", 35, { min: 0, max: 50 }),
+      T("text", "unit", ""),
       T("number", "height", 140, { min: 90, max: 220 }),
       T("text", "label", "Sessions by region"),
     ],
-    render: (s) => h(CrBarChart, { data: BAR_DATA, showValues: s.showValues, target: s.target, height: s.height, label: s.label }),
+    render: (s) => h(CrBarChart, { data: BAR_DATA, showValues: s.showValues, axis: s.axis, target: s.target, unit: s.unit, height: s.height, label: s.label }),
   },
   "stacked-bar": {
     tag: "CrStackedBar",
