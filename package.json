@@ -39,11 +39,20 @@
       "import": "./dist/pkg/react/index.js",
       "default": "./dist/pkg/react/index.js"
     },
-    "./vue": "./dist/frameworks/vue/index.ts",
+    "./vue": {
+      "types": "./dist/frameworks/vue/index.ts",
+      "vue": "./dist/frameworks/vue/index.ts",
+      "import": "./dist/frameworks/vue/index.ts",
+      "default": "./dist/frameworks/vue/index.ts"
+    },
     "./svelte": "./dist/frameworks/svelte/index.js",
     "./angular": "./dist/frameworks/angular/index.ts",
     "./solid": "./dist/frameworks/solid/index.jsx",
-    "./qwik": "./dist/frameworks/qwik/index.ts",
+    "./qwik": {
+      "types": "./dist/pkg/qwik/index.d.ts",
+      "import": "./dist/pkg/qwik/index.js",
+      "default": "./dist/pkg/qwik/index.js"
+    },
     "./frameworks/*": "./dist/frameworks/*",
     "./cn": {
       "types": "./utils/cn.d.ts",
@@ -86,7 +95,7 @@
     "test:theme": "node --test tests/theme.test.mjs",
     "test:separation": "node --test tests/appearance-separation.test.mjs",
     "pretest:pkg": "npm run build:pkg",
-    "test:pkg": "node --test tests/pkg-react.test.mjs",
+    "test:pkg": "node --test tests/pkg-react.test.mjs tests/pkg-qwik.test.mjs tests/pkg-vue.test.mjs",
     "changeset": "changeset",
     "version": "changeset version",
     "verify": "npm run verify:tokens && npm run verify:theme && npm run verify:palette && npm run verify:catalog && npm run skills:check"
@@ -95,6 +104,7 @@
     "@axe-core/playwright": "^4.12.1",
     "@builder.io/mitosis": "^0.14.0",
     "@builder.io/mitosis-cli": "^0.14.0",
+    "@builder.io/qwik": "^1.20.0",
     "@changesets/cli": "^2.31.1",
     "@fontsource/saira-condensed": "^5.3.0",
     "@playwright/test": "^1.62.1",
@@ -111,10 +121,15 @@
   },
   "peerDependencies": {
     "react": ">=18",
-    "react-dom": ">=18"
+    "react-dom": ">=18",
+    "@builder.io/qwik": ">=1.5",
+    "vue": ">=3.4"
   },
   "peerDependenciesMeta": {
-    "react-dom": { "optional": true }
+    "react": { "optional": true },
+    "react-dom": { "optional": true },
+    "@builder.io/qwik": { "optional": true },
+    "vue": { "optional": true }
   },
   "dependencies": {
     "@astrojs/starlight": "^0.41.6",
