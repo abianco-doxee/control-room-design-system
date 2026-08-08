@@ -7,6 +7,12 @@
   "$ramp": "#f5f6f9",
   "$shape": "soft",
   "$weight": "heavy",
+  "$fonts": {
+    "display": "'Helvetica Neue', Arial, sans-serif",
+    "sans": "'Helvetica Neue', Arial, sans-serif"
+  },
+  "type-display-transform": "none",
+  "type-display-tracking": "-0.01em",
 
   "ink": "#181b22",
   "muted": "#5c6472",

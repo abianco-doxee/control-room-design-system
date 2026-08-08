@@ -92,6 +92,10 @@ function section(t) {
       <span class="scheme">${esc(t.scheme)}${t.brand ? " · brand" : ""}</span></header>
     <div class="row"><div class="lbl">surfaces</div><div class="swatches">${surf}</div></div>
     <div class="row"><div class="lbl">signals</div><div class="swatches">${sig}</div></div>
+    <div class="row"><div class="lbl">type</div><div class="specimen">
+      <span class="disp">Aa</span>
+      <span class="data">0123 · nominal · SYSTEM READY</span>
+    </div></div>
     ${samples()}
   </section>`;
 }
@@ -118,6 +122,9 @@ const PAGE_CSS = `
   .sw .ratio.ok{opacity:.7}
   .sw .ratio.no{background:#f45058;color:#fff}
   .samples{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-top:4px}
+  .specimen{display:flex;align-items:baseline;gap:12px;min-height:36px}
+  .specimen .disp{font-family:var(--font-display);font-weight:var(--type-display-weight,900);letter-spacing:var(--type-display-tracking,-.03em);text-transform:var(--type-display-transform,uppercase);font-size:32px;line-height:1;color:var(--ink)}
+  .specimen .data{font-family:var(--font-mono);font-size:var(--text-sm,12px);color:var(--muted)}
 `;
 
 const html = `<!doctype html>

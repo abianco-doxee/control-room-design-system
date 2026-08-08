@@ -205,5 +205,16 @@
     "--focus-w",
     "--focus-offset",
     "--row-h"
+  ],
+  "typeOverridable": [
+    "--font-sans",
+    "--font-display",
+    "--font-mono",
+    "--type-display-weight",
+    "--type-display-tracking",
+    "--type-display-leading",
+    "--type-display-transform",
+    "--type-label-tracking",
+    "--type-label-transform"
   ]
 }
