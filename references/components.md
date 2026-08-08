@@ -1296,21 +1296,32 @@ owns the picker, keyboard, and locale.
 
 ## Cron field {#cron-field}
 
-**Purpose.** A cron-expression field for scheduling, with quick presets and a live
-**human-readable** readout. The translation is **injected** as `description` — the
-host computes it (e.g. with [cronstrue](https://github.com/bradymholt/cronstrue)) so
-the design system stays dependency-free.
+**Purpose.** A **proper form field** for cron scheduling: a real `<label for>` +
+input + quick presets + a live **human-readable** readout. The translation is
+**injected** — the host computes it (e.g. with
+[cronstrue](https://github.com/bradymholt/cronstrue)) so the design system stays
+parser-free — and passed as `description` when the expression parses, or as `error`
+when it doesn't. Validity is **message-driven** exactly like `CrField`: there is no
+hand-set `invalid` boolean; `error` sets `aria-invalid`, shows the message
+(`role="alert"`), and links it via `aria-describedby`. `id` is required (it ties the
+label, input and messages together); `required`, `disabled` and `onBlur` behave as
+on any field.
 
 ```tsx
 // host
 const d = (() => { try { return { text: cronstrue.toString(cron), bad: false }; }
-                   catch { return { text: "unrecognized", bad: true }; } })();
-<CrCronField value={cron} description={d.text} invalid={d.bad} onChange={setCron}
+                   catch { return { text: "unrecognized cron expression", bad: true }; } })();
+<CrCronField
+  id="restart-cron" label="Restart schedule" value={cron} onChange={setCron}
+  description={d.bad ? undefined : d.text}   // readout when valid
+  error={d.bad ? d.text : undefined}          // validation message when not
   presets={[{ label: "nightly 2am", cron: "0 2 * * *" }]} />
 ```
 
-- **SHOULD** compute `description` reactively (a `useComputed$` in Qwik, `useMemo` in
-  React) so it tracks the value; mark `invalid` on a parse failure.
+- **SHOULD** compute the translation reactively (`useComputed$` in Qwik, `useMemo`
+  in React) so it tracks the value, routing it to `description` or `error`.
+- **MUST NOT** hand-set validity — drive it from the parser's result via `error`,
+  the same contract as `CrField` / `CrForm`.
 
 ---
 

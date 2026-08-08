@@ -297,8 +297,8 @@ const DEMOS = {
   },
   "cron-field": {
     tag: "CrCronField",
-    defs: [T("text", "value", "0 9 * * 1-5"), T("text", "label", "Schedule"), T("boolean", "invalid", false)],
-    render: (s, set) => h(CrCronField, { value: s.value, presets: CRON_PRESETS, description: describeCron(s.value), label: s.label, invalid: s.invalid, onChange: (v) => set("value", v) }),
+    defs: [T("text", "value", "0 9 * * 1-5"), T("text", "label", "Schedule"), T("text", "error", "")],
+    render: (s, set) => h(CrCronField, { id: "cr-cron-demo", value: s.value, presets: CRON_PRESETS, description: s.error ? undefined : describeCron(s.value), error: s.error || undefined, label: s.label, onChange: (v) => set("value", v) }),
   },
   modal: {
     tag: "CrModal",

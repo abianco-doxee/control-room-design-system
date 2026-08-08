@@ -2482,14 +2482,16 @@
       "category": "forms",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "A cron-expression field with quick presets and a live human-readable readout. The translation is injected as `description` (compute with cronstrue in the host) so the design system stays dependency-free.",
+      "description": "A proper cron-expression form field: label + input + quick presets + a live human-readable readout. The translation is injected as `description` (compute with cronstrue in the host) so the design system stays dependency-free; validity is message-driven via `error` (no hand-set `invalid`), wired like CrField (aria-invalid + aria-describedby).",
       "spec": "references/components.md#cron-field",
       "variants": {
         "prop": [
+          "id",
+          "label",
           "value",
           "presets",
           "description",
-          "invalid"
+          "error"
         ]
       },
       "tokens": [
@@ -2503,7 +2505,7 @@
         },
         {
           "cssVar": "--sig-err",
-          "description": "invalid readout"
+          "description": "error message + border"
         }
       ],
       "keywords": [
