@@ -97,6 +97,7 @@
     "test:theme": "node --test tests/theme.test.mjs",
     "test:position": "node --test tests/position.test.mjs",
     "test:separation": "node --test tests/appearance-separation.test.mjs",
+    "test:rtl": "node --test tests/rtl.test.mjs",
     "pretest:pkg": "npm run build:pkg",
     "test:pkg": "node --test tests/pkg-react.test.mjs tests/pkg-qwik.test.mjs tests/pkg-vue.test.mjs",
     "pretest:frameworks": "npm run build:components",

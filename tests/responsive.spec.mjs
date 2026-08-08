@@ -22,4 +22,16 @@ for (const file of PAGES) {
       expect(scrollWidth, `overflow ${scrollWidth - clientWidth}px`).toBeLessThanOrEqual(clientWidth + 1);
     });
   }
+  // RTL: the layout mirrors via logical properties and must not overflow either.
+  test(`${file} — RTL: no horizontal overflow @ 1024px`, async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 800 });
+    await page.goto(pathToFileURL(join(process.cwd(), "public", file)).href);
+    await page.evaluate(() => document.documentElement.setAttribute("dir", "rtl"));
+    await page.waitForTimeout(300);
+    const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+    }));
+    expect(scrollWidth, `RTL overflow ${scrollWidth - clientWidth}px`).toBeLessThanOrEqual(clientWidth + 1);
+  });
 }

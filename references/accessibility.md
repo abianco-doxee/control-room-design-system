@@ -76,6 +76,27 @@ region). It runs on every push (`.github/workflows/deploy.yml`) and blocks the
 deploy. A companion visual-regression check (`npm run test:visual`) snapshots the
 gallery per theme; run `npm run test:visual:update` after intentional changes.
 
+## Direction (RTL)
+
+Layout is **direction-agnostic**: the component CSS uses logical properties
+(`margin-inline-*`, `padding-inline-*`, `border-inline-*`, `text-align: start/end`)
+rather than physical `left`/`right`, so the whole system mirrors under
+`dir="rtl"`. A guard (`npm run test:rtl`) fails the build if a physical flow
+property creeps back in, and the responsive gate checks there's no horizontal
+overflow under RTL. (Fixed/absolute overlay positioning and gradient/clip-path
+angles are direction-neutral and out of scope.)
+
+## Focus management & keyboard
+
+- **Dialog overlays** (Modal, Drawer, Command palette) render on the native
+  `<dialog>` element opened with `showModal()`, so the platform provides the focus
+  **trap** and **returns focus** to the invoker on close — no custom trap to drift.
+- **Popover** moves focus into the panel on open and returns it to the trigger on
+  `Esc` / close.
+- **Roving focus / active-descendant** is implemented for the composite widgets:
+  Tabs, Radio group, Segmented, Combobox, and the Command palette
+  (`aria-activedescendant` + arrow-key navigation), so each is a single tab stop.
+
 ## Component acceptance (a11y slice)
 
 Before shipping, confirm:
