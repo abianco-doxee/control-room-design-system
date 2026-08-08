@@ -9,7 +9,7 @@ export interface CrBarDatum {
 
 export interface CrBarChartProps {
   data: CrBarDatum[];
-  /** Force the top of the scale; otherwise auto from the data (and target). */
+  /** Force the top of the scale; otherwise a "nice" max is derived from the data (and target). */
   max?: number;
   /** viewBox height (aspect); the plot scales to its container width. */
   height?: number;
@@ -17,6 +17,10 @@ export interface CrBarChartProps {
   target?: number;
   /** Print each bar's value above it. */
   showValues?: boolean;
+  /** Show the numbered y-axis (nice ticks + gridlines). Default true. */
+  axis?: boolean;
+  /** Suffix appended to each y-tick label (e.g. "ms", "%"). */
+  unit?: string;
   /** Accessible name for the whole figure. */
   label?: string;
 }
@@ -38,27 +42,65 @@ export default function CrBarChart(props: CrBarChartProps) {
       const key = sig ? (sig === "accent2" ? "accent-2" : sig) : order[i % order.length];
       return "var(--sig-" + key + ")";
     },
+    /* A "nice" magnitude (1/2/5 x 10^k) for axis steps and extents. */
+    niceNum(range: number, round: boolean): number {
+      const exp = Math.floor(Math.log10(range));
+      const f = range / Math.pow(10, exp);
+      let nf: number;
+      if (round) {
+        if (f < 1.5) nf = 1; else if (f < 3) nf = 2; else if (f < 7) nf = 5; else nf = 10;
+      } else {
+        if (f <= 1) nf = 1; else if (f <= 2) nf = 2; else if (f <= 5) nf = 5; else nf = 10;
+      }
+      return nf * Math.pow(10, exp);
+    },
+    /* Round a data domain out to whole tick steps and list the ticks. */
+    niceScale(lo: number, hi: number, maxTicks: number) {
+      let a = lo;
+      let b = hi;
+      if (b <= a) b = a + 1;
+      const range = state.niceNum(b - a, false);
+      const step = state.niceNum(range / (maxTicks - 1), true);
+      const niceLo = Math.floor(a / step) * step;
+      const niceHi = Math.ceil(b / step) * step;
+      const ticks: number[] = [];
+      for (let v = niceLo; v <= niceHi + step * 0.5; v += step) ticks.push(Math.round(v / step) * step);
+      return { min: niceLo, max: niceHi, ticks };
+    },
+    /* Compact, human tick labels: 1500 -> "1.5k", 2000000 -> "2M". */
+    fmtTick(v: number): string {
+      const a = Math.abs(v);
+      if (a >= 1000000) return (Math.round(v / 100000) / 10) + "M";
+      if (a >= 1000) return (Math.round(v / 100) / 10) + "k";
+      return String(Math.round(v * 100) / 100);
+    },
     metrics() {
       const data = props.data || [];
+      const axis = props.axis !== false;
       const W = 320;
       const H = props.height || 140;
-      const L = 6;
+      const L = axis ? 30 : 6;
       const R = 6;
       const T = 14;
       const B = 18;
       const plotW = W - L - R;
       const plotH = H - T - B;
       const base = T + plotH;
-      let max = props.max;
-      if (max === undefined) {
-        let hi = props.target || 0;
-        for (const d of data) if (d.value > hi) hi = d.value;
-        max = hi || 1;
+      let hi = props.max;
+      if (hi === undefined) {
+        let dh = props.target || 0;
+        for (const d of data) if (d.value > dh) dh = d.value;
+        hi = dh || 1;
       }
+      const forced = props.max !== undefined;
+      const sc = state.niceScale(0, hi, 5);
+      const max = forced ? hi : sc.max;
+      const ticks: number[] = [];
+      for (const t of sc.ticks) if (t >= -max * 1e-6 && t <= max + max * 1e-6) ticks.push(t);
       const n = data.length || 1;
       const gap = 2;
       const bw = (plotW - gap * (n - 1)) / n;
-      return { W, H, L, R, T, B, plotW, plotH, base, max, n, gap, bw };
+      return { W, H, L, R, T, B, plotW, plotH, base, max, n, gap, bw, axis, ticks };
     },
     geo() {
       const m = state.metrics();
@@ -68,8 +110,10 @@ export default function CrBarChart(props: CrBarChartProps) {
         const x = m.L + i * (m.bw + m.gap);
         return { label: d.label, value: d.value, color: state.hue(d.signal, i), x, y: m.base - h, w: m.bw, h, cx: x + m.bw / 2 };
       });
-      const targetY = props.target !== undefined ? m.base - Math.max(0, Math.min(1, props.target / m.max)) * m.plotH : null;
-      return { W: m.W, H: m.H, L: m.L, R: m.R, base: m.base, bars, targetY };
+      const yAt = (v: number) => m.base - Math.max(0, Math.min(1, v / m.max)) * m.plotH;
+      const yticks = m.ticks.map((v: number) => ({ y: yAt(v), label: state.fmtTick(v) + (props.unit || "") }));
+      const targetY = props.target !== undefined ? yAt(props.target) : null;
+      return { W: m.W, H: m.H, L: m.L, R: m.R, base: m.base, axis: m.axis, bars, yticks, targetY };
     },
     summary(): string {
       const data = props.data || [];
@@ -113,7 +157,16 @@ export default function CrBarChart(props: CrBarChartProps) {
         onMouseMove={(event) => state.move(event)}
         onMouseLeave={() => state.leave()}
       >
-        <line class="cr-chart__grid" x1={state.geo().L} y1={state.geo().base} x2={state.geo().W - state.geo().R} y2={state.geo().base} vector-effect="non-scaling-stroke" />
+        <For each={state.geo().yticks}>
+          {(g: { y: number; label: string }) => (
+            <g>
+              <line class="cr-chart__grid" x1={state.geo().L} y1={g.y} x2={state.geo().W - state.geo().R} y2={g.y} vector-effect="non-scaling-stroke" />
+              <Show when={state.geo().axis}>
+                <text class="cr-chart__ytick" x={state.geo().L - 5} y={g.y + 3} text-anchor="end">{g.label}</text>
+              </Show>
+            </g>
+          )}
+        </For>
         <For each={state.geo().bars}>
           {(b: { label: string; value: number; color: string; x: number; y: number; w: number; h: number; cx: number }, i: number) => (
             <g>

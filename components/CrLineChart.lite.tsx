@@ -11,13 +11,17 @@ export interface CrLineChartProps {
   series: CrLineSeries[];
   /** X-axis tick labels, drawn left→right under the plot. */
   labels?: string[];
-  /** Force the y-scale; otherwise auto from the data. */
+  /** Force the y-scale; otherwise a "nice" scale is derived from the data. */
   min?: number;
   max?: number;
   /** viewBox height (aspect); the plot scales to its container width. */
   height?: number;
   /** Fill under each line with a faint tint. */
   area?: boolean;
+  /** Show the numbered y-axis (nice ticks + gridlines). Default true. */
+  axis?: boolean;
+  /** Suffix appended to each y-tick label (e.g. "ms", "%"). */
+  unit?: string;
   /** Accessible name for the whole figure. */
   label?: string;
 }
@@ -42,11 +46,44 @@ export default function CrLineChart(props: CrLineChartProps) {
       const key = sig ? (sig === "accent2" ? "accent-2" : sig) : order[i % order.length];
       return "var(--sig-" + key + ")";
     },
+    /* A "nice" magnitude (1/2/5 x 10^k) for axis steps and extents. */
+    niceNum(range: number, round: boolean): number {
+      const exp = Math.floor(Math.log10(range));
+      const f = range / Math.pow(10, exp);
+      let nf: number;
+      if (round) {
+        if (f < 1.5) nf = 1; else if (f < 3) nf = 2; else if (f < 7) nf = 5; else nf = 10;
+      } else {
+        if (f <= 1) nf = 1; else if (f <= 2) nf = 2; else if (f <= 5) nf = 5; else nf = 10;
+      }
+      return nf * Math.pow(10, exp);
+    },
+    /* Round a data domain out to whole tick steps and list the ticks. */
+    niceScale(lo: number, hi: number, maxTicks: number) {
+      let a = lo;
+      let b = hi;
+      if (b <= a) b = a + 1;
+      const range = state.niceNum(b - a, false);
+      const step = state.niceNum(range / (maxTicks - 1), true);
+      const niceLo = Math.floor(a / step) * step;
+      const niceHi = Math.ceil(b / step) * step;
+      const ticks: number[] = [];
+      for (let v = niceLo; v <= niceHi + step * 0.5; v += step) ticks.push(Math.round(v / step) * step);
+      return { min: niceLo, max: niceHi, ticks };
+    },
+    /* Compact, human tick labels: 1500 -> "1.5k", 2000000 -> "2M". */
+    fmtTick(v: number): string {
+      const a = Math.abs(v);
+      if (a >= 1000000) return (Math.round(v / 100000) / 10) + "M";
+      if (a >= 1000) return (Math.round(v / 100) / 10) + "k";
+      return String(Math.round(v * 100) / 100);
+    },
     metrics() {
       const series = props.series || [];
+      const axis = props.axis !== false;
       const W = 320;
       const H = props.height || 140;
-      const L = 8;
+      const L = axis ? 30 : 8;
       const R = 8;
       const T = 10;
       const B = 18;
@@ -54,21 +91,27 @@ export default function CrLineChart(props: CrLineChartProps) {
       const plotH = H - T - B;
       let n = 0;
       for (const s of series) if ((s.data || []).length > n) n = (s.data || []).length;
-      let min = props.min;
-      let max = props.max;
-      if (min === undefined || max === undefined) {
-        let lo = Infinity;
-        let hi = -Infinity;
+      let lo = props.min;
+      let hi = props.max;
+      if (lo === undefined || hi === undefined) {
+        let dlo = Infinity;
+        let dhi = -Infinity;
         for (const s of series) for (const v of s.data || []) {
-          if (v < lo) lo = v;
-          if (v > hi) hi = v;
+          if (v < dlo) dlo = v;
+          if (v > dhi) dhi = v;
         }
-        if (!isFinite(lo)) { lo = 0; hi = 1; }
-        if (min === undefined) min = lo;
-        if (max === undefined) max = hi;
+        if (!isFinite(dlo)) { dlo = 0; dhi = 1; }
+        if (lo === undefined) lo = dlo;
+        if (hi === undefined) hi = dhi;
       }
+      const forced = props.min !== undefined && props.max !== undefined;
+      const sc = state.niceScale(lo, hi, 5);
+      const min = forced ? lo : sc.min;
+      const max = forced ? hi : sc.max;
       const range = max - min || 1;
-      return { W, H, L, R, T, B, plotW, plotH, n, min, range };
+      const ticks: number[] = [];
+      for (const t of sc.ticks) if (t >= min - range * 1e-6 && t <= max + range * 1e-6) ticks.push(t);
+      return { W, H, L, R, T, B, plotW, plotH, n, min, max, range, axis, ticks };
     },
     geo() {
       const m = state.metrics();
@@ -89,9 +132,9 @@ export default function CrLineChart(props: CrLineChartProps) {
         const end = pts.length ? pts[pts.length - 1] : { x: m.L, y: m.T };
         return { name: s.name, color: state.hue(s.signal, si), line, area, ex: end.x, ey: end.y };
       });
-      const grid = [0, 0.5, 1].map((f: number) => m.T + f * m.plotH);
+      const yticks = m.ticks.map((v: number) => ({ y: yAt(v), label: state.fmtTick(v) + (props.unit || "") }));
       const ticks = (props.labels || []).map((t: string, i: number, a: string[]) => ({ t, x: xAt(i, a.length) }));
-      return { W: m.W, H: m.H, L: m.L, R: m.R, plotTop: m.T, plotBot: m.T + m.plotH, lines, grid, ticks };
+      return { W: m.W, H: m.H, L: m.L, R: m.R, axis: m.axis, plotTop: m.T, plotBot: m.T + m.plotH, lines, yticks, ticks };
     },
     summary(): string {
       const series = props.series || [];
@@ -147,8 +190,15 @@ export default function CrLineChart(props: CrLineChartProps) {
         onMouseMove={(event) => state.move(event)}
         onMouseLeave={() => state.leave()}
       >
-        <For each={state.geo().grid}>
-          {(gy: number) => <line class="cr-chart__grid" x1={state.geo().L} y1={gy} x2={state.geo().W - state.geo().R} y2={gy} vector-effect="non-scaling-stroke" />}
+        <For each={state.geo().yticks}>
+          {(g: { y: number; label: string }) => (
+            <g>
+              <line class="cr-chart__grid" x1={state.geo().L} y1={g.y} x2={state.geo().W - state.geo().R} y2={g.y} vector-effect="non-scaling-stroke" />
+              <Show when={state.geo().axis}>
+                <text class="cr-chart__ytick" x={state.geo().L - 5} y={g.y + 3} text-anchor="end">{g.label}</text>
+              </Show>
+            </g>
+          )}
         </For>
         <For each={state.geo().lines}>
           {(s: { name: string; color: string; line: string; area: string; ex: number; ey: number }) => (

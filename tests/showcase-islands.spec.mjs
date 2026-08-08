@@ -258,6 +258,24 @@ test.describe("component browser — live islands", () => {
     await expect(page.locator("#" + deep)).toBeVisible(); // scrolled into the rendered window
   });
 
+  test("line chart draws a numbered nice-scale y-axis (toggle-able)", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const island = page.locator('[data-island="line-chart"]');
+    const yticks = island.locator(".cr-chart__ytick");
+
+    // a numbered y-axis is present by default, with numeric labels
+    const n = await yticks.count();
+    expect(n, "y-axis has multiple nice ticks").toBeGreaterThan(1);
+    const labels = await yticks.allTextContents();
+    for (const t of labels) expect(t.trim(), `numeric tick "${t}"`).toMatch(/^-?[\d.]+[kM]?$/);
+
+    // the "axis" playground toggle removes the numbered axis entirely
+    await island.locator('.pg__controls input[type="checkbox"]').nth(1).uncheck();
+    await page.waitForTimeout(40);
+    expect(await yticks.count(), "axis toggled off").toBe(0);
+  });
+
   test("popover is collision-positioned and stays within the viewport", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
