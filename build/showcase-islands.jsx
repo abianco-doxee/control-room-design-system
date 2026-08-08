@@ -177,6 +177,15 @@ const calSet = (start, stepMs, count) => {
 const CAL_WK = calSet(Date.UTC(2026, 0, 5), DAY, 43);        // 6 weeks of daily → weekly ticks
 const CAL_MO = calSet(Date.UTC(2025, 0, 6), 7 * DAY, 22);    // 5 months of weekly → monthly ticks
 const CAL_YR = calSet(Date.UTC(2024, 3, 1), 30 * DAY, 13);   // ~1 year monthly → quarterly ticks
+// Session-only samples across Thu / Fri / Mon (hourly, 09:00–15:00) — the overnight
+// and weekend gaps collapse on the "market" (gap-collapse) axis.
+const MKT = (() => {
+  const days = [Date.UTC(2026, 0, 8), Date.UTC(2026, 0, 9), Date.UTC(2026, 0, 12)]; // Thu, Fri, Mon
+  const x = [], data = [];
+  let k = 0;
+  for (const d of days) for (let h = 9; h <= 15; h++) { x.push(d + h * 3600 * 1000); data.push(80 + Math.round(15 * Math.sin(k / 3)) + (k % 3)); k++; }
+  return { x, data };
+})();
 const BAR_DATA = [
   { label: "eu", value: 42 },
   { label: "us", value: 31 },
@@ -479,7 +488,7 @@ const DEMOS = {
       T("boolean", "area", true),
       T("boolean", "axis", true),
       T("enum", "yScale", "linear", { options: ["linear", "log"] }),
-      T("enum", "xScale", "categorical", { options: ["categorical", "clock", "calendar"] }),
+      T("enum", "xScale", "categorical", { options: ["categorical", "clock", "calendar", "market"] }),
       T("enum", "calSpan", "5 months", { options: ["6 weeks", "5 months", "1 year"] }),
       T("enum", "xLocale", "en", { options: ["en", "it"] }),
       T("enum", "xWeek", "date", { options: ["date", "iso"] }),
@@ -490,6 +499,13 @@ const DEMOS = {
     ],
     render: (s) => {
       const common = { area: s.area, axis: s.axis, yScale: s.yScale, unit: s.unit, height: s.height, label: s.label };
+      if (s.xScale === "market") {
+        return h(CrLineChart, {
+          series: [{ name: "price", data: MKT.data, signal: "work" }],
+          x: MKT.x, xTime: true, xBreak: true, xZone: "Europe/Rome", xLocale: s.xLocale,
+          ...common, label: s.label === "Throughput vs errors" ? "Session price (gaps collapsed)" : s.label,
+        });
+      }
       if (s.yScale === "log" && s.xScale !== "calendar") {
         return h(CrLineChart, { series: LOG_SERIES, labels: LINE_LABELS, ...common });
       }

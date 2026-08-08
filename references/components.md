@@ -1078,8 +1078,18 @@ optional, defaults reproduce a plain Gregorian axis):
   `xFiscalStart={4}` ticks quarters on Apr/Jul/Oct/Jan as `Q1 FY26 · Q2 · Q3 · Q4`
   and years on 1 April as `FY26` (named by the calendar year the fiscal year *ends*).
 
-It's a Gregorian calendar/clock scale. For a genuinely non-time axis — log, ordinal
-buckets, or a 4-4-5 retail calendar — pre-compute and pass `x` + `labels` yourself.
+It's a Gregorian calendar/clock scale. For a genuinely non-time axis — ordinal
+buckets or a 4-4-5 retail calendar — pre-compute and pass `x` + `labels` yourself.
+
+**Gap-collapse / market-hours axis (line chart).** Set `xBreak` on a continuous
+`x` (sorted ascending) to **collapse idle gaps** — nights, weekends, holidays — so
+session data reads without empty stretches, the way a trading chart does. Any gap
+larger than `xBreakGap` (default ~3× the typical sample gap) is compressed and marked
+with a dashed **break** line; the axis then shows one tick per session day. It works
+purely from the data's own gaps — if your series only carries session points, the
+closed periods vanish automatically, no exchange calendar needed. (This is an
+*ordinal* compression: spacing within a session stays proportional, but a collapsed
+gap is not to scale — that's the point.)
 
 **Interactive legend (line chart).** For ≥ 2 series the legend keys are **buttons**:
 click one to isolate/restore that series. Hidden series drop out of the plot, the

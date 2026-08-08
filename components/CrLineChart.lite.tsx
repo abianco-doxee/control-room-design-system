@@ -27,6 +27,12 @@ export interface CrLineChartProps {
   /** Fiscal year start month 1–12 (default 1 = calendar). Year/quarter ticks then
    *  anchor to it and label FY/Q (FY named by the ending calendar year). */
   xFiscalStart?: number;
+  /** Collapse idle gaps (nights / weekends / holidays) on the continuous x-axis so
+   *  session data reads without empty stretches — a trading-style "broken" axis.
+   *  Requires `x` sorted ascending; a dashed marker shows each collapsed gap. */
+  xBreak?: boolean;
+  /** Gap (ms) above which a span is collapsed. Default: ~3× the typical sample gap. */
+  xBreakGap?: number;
   /** Y-axis scale: "linear" (default) or "log" (base-10, for wide-range metrics
    *  like latency percentiles). Log needs positive data; ≤0 values are clamped to
    *  the axis floor. Domain snaps to powers of ten. */
@@ -354,7 +360,45 @@ export default function CrLineChart(props: CrLineChartProps) {
           for (const t of state.niceScale(xlo, xhi, 5).ticks) if (t >= xlo - xspan * 1e-6 && t <= xhi + xspan * 1e-6) xticks.push({ v: t, label: state.fmtTick(t) });
         }
       }
-      return { W, H, L, R, T, B, plotW, plotH, n, min, max, range, axis, ticks, xs, continuous, xmin, xmax, xticks, ylog, llo, lrange };
+      /* Gap-collapse ("broken") axis: compress idle gaps to a cap so session data
+       * reads without empty nights/weekends. cpos holds each sample's fractional
+       * position (0..1); cbreaks marks collapsed spans; dticks is one label per
+       * distinct day. */
+      let broken = false;
+      const cpos: number[] = [];
+      const cbreaks: number[] = [];
+      const dticks: { label: string; frac: number }[] = [];
+      if (xs && props.xBreak && xs.length > 1) {
+        broken = true;
+        const zone = props.xZone || "UTC";
+        const locale = props.xLocale || "en";
+        const gaps: number[] = [];
+        for (let i = 1; i < xs.length; i++) gaps.push(xs[i] - xs[i - 1]);
+        const sortedG = gaps.slice().sort((a: number, b: number) => a - b);
+        const med = sortedG.length ? (sortedG[Math.floor(sortedG.length / 2)] || sortedG[0]) : 1;
+        const cap = props.xBreakGap && props.xBreakGap > 0 ? props.xBreakGap : Math.max(med * 3, 1);
+        const pos: number[] = [0];
+        for (let i = 1; i < xs.length; i++) pos.push(pos[i - 1] + Math.min(xs[i] - xs[i - 1], cap));
+        const total = pos[pos.length - 1] || 1;
+        for (let i = 0; i < xs.length; i++) cpos.push(pos[i] / total);
+        for (let i = 1; i < xs.length; i++) {
+          const g = xs[i] - xs[i - 1];
+          if (g > cap * 1.5) cbreaks.push((pos[i - 1] + Math.min(g, cap) * 0.5) / total);
+        }
+        const dayIdx: number[] = [];
+        let lastKey = "";
+        for (let i = 0; i < xs.length; i++) {
+          const p = state.zoneParts(xs[i], zone);
+          const key = p.year + "-" + p.month + "-" + p.day;
+          if (key !== lastKey) { dayIdx.push(i); lastKey = key; }
+        }
+        const everyD = dayIdx.length > 8 ? Math.ceil(dayIdx.length / 8) : 1;
+        for (let j = 0; j < dayIdx.length; j += everyD) {
+          const p = state.zoneParts(xs[dayIdx[j]], zone);
+          dticks.push({ label: p.day + " " + state.monNames(locale)[p.month - 1], frac: cpos[dayIdx[j]] });
+        }
+      }
+      return { W, H, L, R, T, B, plotW, plotH, n, min, max, range, axis, ticks, xs, continuous, xmin, xmax, xticks, ylog, llo, lrange, broken, cpos, cbreaks, dticks };
     },
     geo() {
       const m = state.metrics();
@@ -363,12 +407,13 @@ export default function CrLineChart(props: CrLineChartProps) {
       const xspan = (m.xmax - m.xmin) || 1;
       const yAt = (v: number) => state.yPix(v, m);
       const xAtV = (v: number) => m.L + ((v - m.xmin) / xspan) * m.plotW;
+      const xAtF = (f: number) => m.L + f * m.plotW;
       const xAtI = (i: number, n: number) => m.L + (n <= 1 ? m.plotW / 2 : (i / (n - 1)) * m.plotW);
       const lines = series.map((s: CrLineSeries, si: number) => {
         const d = s.data || [];
         const lim = m.continuous ? Math.min(d.length, xs.length) : d.length;
         const pts: { x: number; y: number }[] = [];
-        for (let i = 0; i < lim; i++) pts.push({ x: m.continuous ? xAtV(xs[i]) : xAtI(i, lim), y: yAt(d[i]) });
+        for (let i = 0; i < lim; i++) pts.push({ x: m.broken ? xAtF(m.cpos[i]) : (m.continuous ? xAtV(xs[i]) : xAtI(i, lim)), y: yAt(d[i]) });
         const line = pts.map((p: { x: number; y: number }) => p.x.toFixed(2) + "," + p.y.toFixed(2)).join(" ");
         let area = "";
         if (pts.length) {
@@ -380,10 +425,13 @@ export default function CrLineChart(props: CrLineChartProps) {
         return { name: s.name, color: state.hue(s.signal, si), line, area, ex: end.x, ey: end.y, si, hidden: state.isHidden(si) };
       });
       const yticks = m.ticks.map((v: number) => ({ y: yAt(v), label: state.fmtTick(v) + (props.unit || "") }));
-      const ticks = m.continuous
-        ? m.xticks.map((tk: { v: number; label: string }) => ({ t: tk.label, x: xAtV(tk.v) }))
-        : (props.labels || []).map((t: string, i: number, a: string[]) => ({ t, x: xAtI(i, a.length) }));
-      return { W: m.W, H: m.H, L: m.L, R: m.R, axis: m.axis, continuous: m.continuous, plotTop: m.T, plotBot: m.T + m.plotH, lines, yticks, ticks };
+      const ticks = m.broken
+        ? m.dticks.map((tk: { label: string; frac: number }) => ({ t: tk.label, x: xAtF(tk.frac) }))
+        : m.continuous
+          ? m.xticks.map((tk: { v: number; label: string }) => ({ t: tk.label, x: xAtV(tk.v) }))
+          : (props.labels || []).map((t: string, i: number, a: string[]) => ({ t, x: xAtI(i, a.length) }));
+      const breaks = m.broken ? m.cbreaks.map((f: number) => xAtF(f)) : [];
+      return { W: m.W, H: m.H, L: m.L, R: m.R, axis: m.axis, continuous: m.continuous, plotTop: m.T, plotBot: m.T + m.plotH, lines, yticks, ticks, breaks };
     },
     summary(): string {
       const series = props.series || [];
@@ -400,6 +448,16 @@ export default function CrLineChart(props: CrLineChartProps) {
       if (!rect.width) return;
       const vbX = ((event.clientX - rect.left) / rect.width) * m.W;
       state.hovering = true;
+      if (m.broken) {
+        let best = 0;
+        let bd = Infinity;
+        for (let i = 0; i < m.cpos.length; i++) {
+          const dd = Math.abs(m.L + m.cpos[i] * m.plotW - vbX);
+          if (dd < bd) { bd = dd; best = i; }
+        }
+        state.at = best;
+        return;
+      }
       if (m.continuous && m.xs) {
         const xs = m.xs;
         const xspan = (m.xmax - m.xmin) || 1;
@@ -427,9 +485,11 @@ export default function CrLineChart(props: CrLineChartProps) {
       const series = props.series || [];
       const xs = m.xs || [];
       const xspan = (m.xmax - m.xmin) || 1;
-      const cx = m.continuous
-        ? (idx < xs.length ? m.L + ((xs[idx] - m.xmin) / xspan) * m.plotW : m.L)
-        : m.L + (m.n <= 1 ? m.plotW / 2 : (idx / (m.n - 1)) * m.plotW);
+      const cx = m.broken
+        ? (idx < m.cpos.length ? m.L + m.cpos[idx] * m.plotW : m.L)
+        : m.continuous
+          ? (idx < xs.length ? m.L + ((xs[idx] - m.xmin) / xspan) * m.plotW : m.L)
+          : m.L + (m.n <= 1 ? m.plotW / 2 : (idx / (m.n - 1)) * m.plotW);
       const rows = series
         .map((s: CrLineSeries, si: number) => {
           if (state.isHidden(si)) return null;
@@ -479,6 +539,9 @@ export default function CrLineChart(props: CrLineChartProps) {
               <text class="cr-chart__tick" x={tk.x} y={state.geo().H - 5} text-anchor="middle">{tk.t}</text>
             </g>
           )}
+        </For>
+        <For each={state.geo().breaks}>
+          {(bx: number) => <line class="cr-chart__break" x1={bx} y1={state.geo().plotTop} x2={bx} y2={state.geo().plotBot} vector-effect="non-scaling-stroke" />}
         </For>
         <For each={state.geo().lines}>
           {(s: { name: string; color: string; line: string; area: string; ex: number; ey: number; si: number; hidden: boolean }) => (
