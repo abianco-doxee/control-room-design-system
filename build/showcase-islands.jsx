@@ -493,16 +493,20 @@ const DEMOS = {
       T("enum", "xLocale", "en", { options: ["en", "it"] }),
       T("enum", "xWeek", "date", { options: ["date", "iso"] }),
       T("number", "xFiscalStart", 1, { min: 1, max: 12 }),
+      T("boolean", "customLabels", false),
       T("text", "unit", ""),
       T("number", "height", 140, { min: 90, max: 220 }),
       T("text", "label", "Throughput vs errors"),
     ],
     render: (s) => {
       const common = { area: s.area, axis: s.axis, yScale: s.yScale, unit: s.unit, height: s.height, label: s.label };
+      // Escape-hatch demo: format ticks as DD/MM in the display zone.
+      const dmy = (v) => new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Rome", day: "2-digit", month: "2-digit" }).format(new Date(v));
+      const xFormat = s.customLabels ? dmy : undefined;
       if (s.xScale === "market") {
         return h(CrLineChart, {
           series: [{ name: "price", data: MKT.data, signal: "work" }],
-          x: MKT.x, xTime: true, xBreak: true, xZone: "Europe/Rome", xLocale: s.xLocale,
+          x: MKT.x, xTime: true, xBreak: true, xZone: "Europe/Rome", xLocale: s.xLocale, xFormat,
           ...common, label: s.label === "Throughput vs errors" ? "Session price (gaps collapsed)" : s.label,
         });
       }
@@ -514,7 +518,7 @@ const DEMOS = {
         return h(CrLineChart, {
           series: [{ name: "budget", data: ds.data, signal: "work" }],
           x: ds.x, xTime: true, xZone: "Europe/Rome",
-          xLocale: s.xLocale, xWeek: s.xWeek, xFiscalStart: s.xFiscalStart,
+          xLocale: s.xLocale, xWeek: s.xWeek, xFiscalStart: s.xFiscalStart, xFormat,
           ...common, unit: s.unit || "%", label: s.label === "Throughput vs errors" ? "Error budget" : s.label,
         });
       }

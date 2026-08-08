@@ -1091,6 +1091,33 @@ closed periods vanish automatically, no exchange calendar needed. (This is an
 *ordinal* compression: spacing within a session stays proportional, but a collapsed
 gap is not to scale — that's the point.)
 
+**Custom labels — the `xFormat` escape hatch.** When none of the presets fit (ISO
+label variants, relative "T‑3d" stamps, a 4‑4‑5 retail label, a non-EN/IT locale),
+pass `xFormat={(value) => string}`. It relabels the chosen tick **positions** and the
+hover stamp; positions still come from the active scale. `xFormat` sits at the **top
+of label precedence** — it overrides `xLocale` / `xWeek` / `xFiscalStart` and the clock
+format. The same hook exists on the util: `timeTicks(lo, hi, { format })`.
+
+**Axis options don't collide — precedence and applicability.** The props read as a
+flat bag, but they resolve in a fixed order, and options outside their mode are inert
+(ignored), never conflicting:
+
+- **Which x-axis:** `x` present → continuous (and `labels` is ignored); otherwise
+  categorical from `labels`. `xBreak` layers gap-collapse on top of a continuous `x`.
+- **Tick text precedence (continuous):** `xFormat` → else `xTime` calendar labels
+  (themselves shaped by `xZone` · `xLocale` · `xWeek` · `xFiscalStart`) → else plain
+  numeric. Only one wins; the calendar sub-options apply *only* under `xTime` and are
+  no-ops otherwise.
+- **Granularity picks the sub-option:** at a given span exactly one calendar unit is
+  active, so `xWeek` (weeks) and `xFiscalStart` (months/years) never fight — each only
+  affects its own unit. Under `xBreak`, ticks are per-session-day, so `xWeek` /
+  `xFiscalStart` don't apply.
+- **`yScale` is orthogonal** to every x option (it's the other axis). Log needs
+  positive data and quietly falls back to linear otherwise.
+
+So mixing, say, `xWeek="iso"` with `xFiscalStart={4}` is safe: you get ISO weeks when
+the span is weeks and fiscal quarters when it's months — never a garbled blend.
+
 **Interactive legend (line chart).** For ≥ 2 series the legend keys are **buttons**:
 click one to isolate/restore that series. Hidden series drop out of the plot, the
 tooltip, and the auto y-domain — so isolating one **refits the y-scale** to what's
