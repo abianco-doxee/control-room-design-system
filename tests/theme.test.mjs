@@ -20,6 +20,7 @@ import {
 import { surfaceRamp } from "../build/ramp.mjs";
 import { toneSignals, fitSignals, SIGNAL_KEYS } from "../build/signals.mjs";
 import { chassisFrom } from "../build/chassis.mjs";
+import { typeFrom } from "../build/type.mjs";
 import { oklch } from "culori";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -267,6 +268,29 @@ test("boardroom brand: structural branding (soft corners + heavy chassis) applie
   assert.match(css, /--brd-heavy: 4px/, "$weight:heavy thickens borders");
   assert.match(css, /--shadow-off: 6px/, "$weight:heavy deepens shadows");
   assert.match(css, /--row-h: 40px/, "explicit chassis override wins over the preset");
+});
+
+test("typeFrom maps $fonts; type tokens are known to the contract", () => {
+  const t = typeFrom({ $fonts: { display: "'Inter', sans-serif", mono: "'IBM Plex Mono', monospace" } });
+  assert.equal(t["font-display"], "'Inter', sans-serif");
+  assert.equal(t["font-mono"], "'IBM Plex Mono', monospace");
+  assert.equal(t["font-sans"], undefined, "only provided families are set");
+
+  const full = {};
+  for (const r of THEME_ROLES) full[r.cssVar] = "#123456";
+  full["font-display"] = "'Inter', sans-serif";
+  full["type-display-transform"] = "none";
+  const v = validateTheme(full);
+  assert.equal(v.valid, true);
+  for (const k of ["font-display", "type-display-transform"]) {
+    assert.equal(v.unknown.includes(k), false, `${k} should be a known type token`);
+  }
+});
+
+test("boardroom brand: type branding (fonts + display character) applied", () => {
+  const css = readFileSync(join(ROOT, "dist/themes/boardroom.css"), "utf8");
+  assert.match(css, /--font-display: 'Helvetica Neue'/, "$fonts.display applied");
+  assert.match(css, /--type-display-transform: none/, "display character override applied");
 });
 
 test("the worked brand (brands/slate.json) is valid, complete, and legible", () => {
