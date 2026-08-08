@@ -164,12 +164,17 @@ const LINE_X = (() => {
   const base = Date.UTC(2026, 0, 1, 9, 0, 0), step = 15 * 60 * 1000;
   return LINE_LABELS.map((_, i) => base + i * step);
 })();
-// ~5 months of weekly samples for the calendar axis (monthly ticks in a real zone).
-const CAL = (() => {
-  const start = Date.UTC(2025, 0, 6), week = 7 * 24 * 3600 * 1000, x = [], data = [];
-  for (let i = 0; i < 22; i++) { x.push(start + i * week); data.push(80 + Math.round(18 * Math.sin(i / 2.5)) + (i % 4)); }
+// Calendar-axis datasets at three spans, so each granularity (week / month /
+// quarter) is demoable live. Deterministic (sine), values ~an error-budget %.
+const DAY = 24 * 3600 * 1000;
+const calSet = (start, stepMs, count) => {
+  const x = [], data = [];
+  for (let i = 0; i < count; i++) { x.push(start + i * stepMs); data.push(80 + Math.round(18 * Math.sin(i / 2.5)) + (i % 4)); }
   return { x, data };
-})();
+};
+const CAL_WK = calSet(Date.UTC(2026, 0, 5), DAY, 43);        // 6 weeks of daily → weekly ticks
+const CAL_MO = calSet(Date.UTC(2025, 0, 6), 7 * DAY, 22);    // 5 months of weekly → monthly ticks
+const CAL_YR = calSet(Date.UTC(2024, 3, 1), 30 * DAY, 13);   // ~1 year monthly → quarterly ticks
 const BAR_DATA = [
   { label: "eu", value: 42 },
   { label: "us", value: 31 },
@@ -472,6 +477,10 @@ const DEMOS = {
       T("boolean", "area", true),
       T("boolean", "axis", true),
       T("enum", "xScale", "categorical", { options: ["categorical", "clock", "calendar"] }),
+      T("enum", "calSpan", "5 months", { options: ["6 weeks", "5 months", "1 year"] }),
+      T("enum", "xLocale", "en", { options: ["en", "it"] }),
+      T("enum", "xWeek", "date", { options: ["date", "iso"] }),
+      T("number", "xFiscalStart", 1, { min: 1, max: 12 }),
       T("text", "unit", ""),
       T("number", "height", 140, { min: 90, max: 220 }),
       T("text", "label", "Throughput vs errors"),
@@ -479,10 +488,12 @@ const DEMOS = {
     render: (s) => {
       const common = { area: s.area, axis: s.axis, unit: s.unit, height: s.height, label: s.label };
       if (s.xScale === "calendar") {
+        const ds = s.calSpan === "6 weeks" ? CAL_WK : s.calSpan === "1 year" ? CAL_YR : CAL_MO;
         return h(CrLineChart, {
-          series: [{ name: "budget", data: CAL.data, signal: "work" }],
-          x: CAL.x, xTime: true, xZone: "Europe/Rome",
-          ...common, unit: s.unit || "%", label: s.label === "Throughput vs errors" ? "Error budget (5 months)" : s.label,
+          series: [{ name: "budget", data: ds.data, signal: "work" }],
+          x: ds.x, xTime: true, xZone: "Europe/Rome",
+          xLocale: s.xLocale, xWeek: s.xWeek, xFiscalStart: s.xFiscalStart,
+          ...common, unit: s.unit || "%", label: s.label === "Throughput vs errors" ? "Error budget" : s.label,
         });
       }
       if (s.xScale === "clock") {

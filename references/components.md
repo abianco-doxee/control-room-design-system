@@ -1055,10 +1055,23 @@ in local time, a multi-week chart on local Mondays, a multi-year chart on Jan 1.
 Labels format to the unit (`09:30`, `3 Mar`, `Mar`, `Jan '25`, `2025`); the hover
 tooltip shows a fuller stamp (`3 Mar 09:15`). This uses the built-in `Intl` zone
 database (no date library, no bundle cost) and is shared with the static gallery via
-`@control-room/design-system/time-scale` (`timeTicks(lo, hi, { zone, target })`), so
-hand-rendered and live charts agree. It's a Gregorian calendar/clock scale; for
-domains that aren't time — log, ordinal buckets, fiscal periods — pre-compute and
-pass `x` + `labels` yourself.
+`@control-room/design-system/time-scale` (`timeTicks(lo, hi, { zone, target, locale,
+week, fiscalStart })`), so hand-rendered and live charts agree.
+
+The calendar can be expressed the way a team reads it, via three more props (all
+optional, defaults reproduce a plain Gregorian axis):
+
+- **`xLocale`** — month-name language for the ticks: `"en"` (default) or `"it"`
+  (`gen · feb · mar …`). Day-first ordering either way.
+- **`xWeek`** — weekly ticks as dates (`3 Mar`, default) or **ISO week numbers**
+  (`W10`, weeks still starting Monday).
+- **`xFiscalStart`** — fiscal year start month `1–12` (default `1` = calendar). Year
+  and quarter ticks then anchor to that month and label **`FY`/`Q`** — e.g.
+  `xFiscalStart={4}` ticks quarters on Apr/Jul/Oct/Jan as `Q1 FY26 · Q2 · Q3 · Q4`
+  and years on 1 April as `FY26` (named by the calendar year the fiscal year *ends*).
+
+It's a Gregorian calendar/clock scale. For a genuinely non-time axis — log, ordinal
+buckets, or a 4-4-5 retail calendar — pre-compute and pass `x` + `labels` yourself.
 
 **Interactive legend (line chart).** For ≥ 2 series the legend keys are **buttons**:
 click one to isolate/restore that series. Hidden series drop out of the plot, the
