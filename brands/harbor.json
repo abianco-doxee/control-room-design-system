@@ -1,0 +1,15 @@
+{
+  "$schema": "../dist/theme-contract.json",
+  "$label": "Harbor · calm cool dark, muted signals",
+  "$description": "Shows the signal-voice knob. Surfaces come from `$ramp` (a cool base tone), the inherited neon state ramp is re-voiced to `muted` via `$signalTone` (hues preserved — err still red, done still green — just calmer), and only the accent + ink are set. On-colours auto-derived. Build with `npm run build:theme` → dist/themes/harbor.css.",
+  "$extends": "dark",
+  "$scheme": "dark",
+  "$ramp": "#0d1417",
+  "$signalTone": "muted",
+
+  "ink": "#e6eef0",
+  "muted": "#8aa0a6",
+  "rail-ink": "#dbe8ea",
+
+  "sig-accent": "#3aa0b0"
+}

@@ -1,0 +1,37 @@
+/* Control Room brand: harbor — Harbor · calm cool dark, muted signals (GENERATED
+ * from brands/harbor.json). Appearance layer only — pair with dist/structure.css.
+ * Regenerate: npm run build:theme. */
+:root[data-theme="harbor"] {
+  color-scheme: dark;
+  --ground: #0a1114;
+  --board: #121a1d;
+  --panel: #1c2326;
+  --panel-2: #282f33;
+  --ink: #e6eef0;
+  --muted: #8aa0a6;
+  --border: #000000;
+  --rail: #02080c;
+  --rail-ink: #dbe8ea;
+  --sig-work: #81cbe0;
+  --sig-accent: #3aa0b0;
+  --sig-accent-2: #aacb81;
+  --sig-done: #82d0b3;
+  --sig-wait: #dfb679;
+  --sig-err: #cd7674;
+  --sig-idle: #85858f;
+  --on-sig: #06050c;
+  --on-err: #06050c;
+  --on-accent: #06050c;
+  --on-accent-2: #06050c;
+  --on-idle: #06050c;
+  --shadow-col: #000000;
+  --mass: #000000;
+  --stage: #49de78;
+  --stage-ink: #04140a;
+  --drip: #4affc8;
+  --halftone: radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);
+  --dither: repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
+  --scanline: repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);
+  --crosshatch: repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);
+  --field: repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
+}

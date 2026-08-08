@@ -22,6 +22,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join, basename } from "node:path";
 import { themeCss, mergeTheme, validateTheme, checkThemeContrast, deriveOnColors } from "../lib/theme/index.js";
 import { surfaceRamp } from "./ramp.mjs";
+import { toneSignals } from "./signals.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BRANDS = join(ROOT, "brands");
@@ -70,9 +71,18 @@ function resolveBrand(brand, seen = new Set()) {
     const baseTone = typeof brand.$ramp === "string" ? brand.$ramp : brand.$ramp.base;
     surfaces = surfaceRamp(baseTone, brand.$scheme || "dark");
   }
-  /* auto-pick on-* for anything the brand didn't hand-set, re-deriving where it
-   * recoloured the underlying fill (so inherited on-colours can't go stale). */
-  const vars = deriveOnColors(mergeTheme(mergeTheme(base, surfaces), overrides), { changed: Object.keys(overrides) });
+  /* $signalTone: re-voice the inherited/derived signal ramp (neon → muted/pastel)
+   * in OKLCH, hue preserved. Explicit signal overrides are left untouched. */
+  let signals = {};
+  if (brand.$signalTone && brand.$signalTone !== "neon") {
+    const skip = new Set(Object.keys(overrides).map((k) => k.replace(/^--/, "")));
+    signals = toneSignals(mergeTheme(base, surfaces), brand.$signalTone, skip);
+  }
+  /* precedence: $extends base < ramp surfaces < toned signals < explicit roles.
+   * on-* re-derive for anything whose fill changed (explicit OR toned signals). */
+  const changed = [...Object.keys(overrides), ...Object.keys(signals)];
+  const merged = mergeTheme(mergeTheme(mergeTheme(base, surfaces), signals), overrides);
+  const vars = deriveOnColors(merged, { changed });
   return { vars, meta: brand };
 }
 

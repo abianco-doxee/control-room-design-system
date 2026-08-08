@@ -143,6 +143,31 @@ plus an accent. Precedence is `$extends` base < `$ramp` surfaces < explicit role
 `$ramp` is a **build-time** authoring feature (it uses OKLCH conversion); the
 generator lives in `build/ramp.mjs`.
 
+### Signal voice (`$signalTone`)
+
+The signal roles are a **state channel** — `--sig-err` *means* failing — so a brand
+must keep their hue families. `$signalTone` re-voices the inherited/derived ramp in
+OKLCH by scaling **chroma** (and, for pastel, lifting lightness) while holding hue,
+so the same states read louder or quieter:
+
+- `"neon"` (default) — the loud Control Room ramp.
+- `"muted"` — desaturated but still distinct (calm ops voice).
+- `"pastel"` — soft and light.
+
+```jsonc
+{
+  "$extends": "dark",
+  "$ramp": "#0d1417",
+  "$signalTone": "muted",     // work stays cyan, err stays red — just calmer
+  "sig-accent": "#3aa0b0"      // explicit signals are left untouched
+}
+```
+
+That's `brands/harbor.json`. Toning runs after `$extends`/`$ramp` and before
+on-colour derivation (so on-colours match the re-voiced fills); a signal you set by
+hand is never toned. Precedence: `$extends` < `$ramp` surfaces < toned signals <
+explicit roles. Build-time; generator in `build/signals.mjs`.
+
 ### Programmatic authoring (`@control-room/design-system/theme`)
 
 The build path is thin wrapping over a framework-agnostic core you can call
