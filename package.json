@@ -58,7 +58,8 @@
       "types": "./utils/cn.d.ts",
       "default": "./utils/cn.js"
     },
-    "./position": "./utils/position.js"
+    "./position": "./utils/position.js",
+    "./time-scale": "./utils/time-scale.js"
   },
   "scripts": {
     "build:tokens": "node build/build-tokens.mjs",
@@ -96,6 +97,7 @@
     "test:forms": "node --test tests/forms.test.mjs",
     "test:theme": "node --test tests/theme.test.mjs",
     "test:position": "node --test tests/position.test.mjs",
+    "test:timescale": "node --test tests/time-scale.test.mjs",
     "test:separation": "node --test tests/appearance-separation.test.mjs",
     "test:rtl": "node --test tests/rtl.test.mjs",
     "pretest:pkg": "npm run build:pkg",

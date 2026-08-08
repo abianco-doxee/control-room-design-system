@@ -1040,16 +1040,25 @@ labelled at the left gutter in monospace tick ink, formatted compactly (`1.5k`,
 `target`). The same nice-scale math backs the static gallery SVGs, so the
 hand-rendered and live charts share one y-axis.
 
-**Continuous / time x-axis (line chart).** By default the line chart's x-axis is
-**categorical** — samples are evenly spaced and labelled from `labels`. Pass an `x`
-array of numbers (parallel to each sample index) to switch to a **real continuous
-x-scale**: points then sit at their value, faint vertical gridlines mark nice x
-ticks, and the crosshair snaps to the nearest sample by x-distance. Add `xTime` to
-treat `x` as **epoch-ms** — ticks are then aligned to **round clock intervals**
-(…30s · 1m · 5m · 1h · 1d…, chosen to keep the count sane) and labelled `HH:MM`
-(UTC, so the build and the browser agree). This is a linear time scale, not a
-calendar (no month/DST bucketing); for spans beyond a few days, pre-bucket and
-label via `x`.
+**Continuous / calendar x-axis (line chart).** By default the line chart's x-axis
+is **categorical** — samples are evenly spaced and labelled from `labels`. Pass an
+`x` array of numbers (parallel to each sample index) to switch to a **real
+continuous x-scale**: points then sit at their value, faint vertical gridlines mark
+nice x ticks, and the crosshair snaps to the nearest sample by x-distance.
+
+Add `xTime` to treat `x` as **epoch-ms** and get a **timezone-aware calendar axis**.
+The tick granularity auto-scales to the span — clock intervals (…30s · 1m · 1h) for
+sub-day ranges, then **day → week (Mondays) → month → year** boundaries for longer
+ones — and every calendar tick lands on a **real boundary in `xZone`** (an IANA zone,
+default `"UTC"`), DST included. So a five-month chart ticks on the 1st of each month
+in local time, a multi-week chart on local Mondays, a multi-year chart on Jan 1.
+Labels format to the unit (`09:30`, `3 Mar`, `Mar`, `Jan '25`, `2025`); the hover
+tooltip shows a fuller stamp (`3 Mar 09:15`). This uses the built-in `Intl` zone
+database (no date library, no bundle cost) and is shared with the static gallery via
+`@control-room/design-system/time-scale` (`timeTicks(lo, hi, { zone, target })`), so
+hand-rendered and live charts agree. It's a Gregorian calendar/clock scale; for
+domains that aren't time — log, ordinal buckets, fiscal periods — pre-compute and
+pass `x` + `labels` yourself.
 
 **Interactive legend (line chart).** For ≥ 2 series the legend keys are **buttons**:
 click one to isolate/restore that series. Hidden series drop out of the plot, the
@@ -1112,12 +1121,12 @@ continuous/time x-axis, recessive grid, a 2px line + data-end dot per series, an
   labels={["09","10","11","12","13","14","15","16"]}
   area label="Throughput vs errors" />
 
-{/* Continuous time x-axis: samples sit at their timestamp, ticks snap to
-    round clock intervals */}
+{/* Calendar x-axis: samples sit at their timestamp, ticks snap to real
+    calendar boundaries in the given zone (here, monthly over five months) */}
 <CrLineChart
-  series={[{ name: "p95", data: [120,180,150,220,190,260,240,310], signal: "work" }]}
-  x={times /* epoch-ms, parallel to each sample */}
-  xTime unit="ms" label="p95 latency over time" />
+  series={[{ name: "budget", data: weekly /* 22 weekly points */, signal: "work" }]}
+  x={weekTimestamps /* epoch-ms, parallel to each sample */}
+  xTime xZone="Europe/Rome" unit="%" label="Error budget (5 months)" />
 ```
 
 - One shared y-scale. If two measures differ wildly in magnitude (e.g. throughput

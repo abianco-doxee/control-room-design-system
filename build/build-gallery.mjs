@@ -13,6 +13,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { browserScript } from "./gallery-scripts.mjs";
+import { timeTicks } from "../utils/time-scale.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const tokensCss = readFileSync(join(ROOT, "dist", "control-room.css"), "utf8");
@@ -86,22 +87,6 @@ const fmtTick = (v) => {
   if (a >= 1000) return (Math.round(v / 100) / 10) + "k";
   return String(Math.round(v * 100) / 100);
 };
-const niceTime = (lo, hi, maxTicks) => {
-  const S = 1000, M = 60 * S, H = 60 * M, D = 24 * H;
-  const steps = [S, 2 * S, 5 * S, 10 * S, 15 * S, 30 * S, M, 2 * M, 5 * M, 10 * M, 15 * M, 30 * M, H, 2 * H, 3 * H, 6 * H, 12 * H, D, 2 * D, 7 * D];
-  const span = (hi - lo) || 1;
-  let step = steps[steps.length - 1];
-  for (const s of steps) { if (span / s <= maxTicks - 1) { step = s; break; } }
-  const first = Math.ceil(lo / step) * step, ticks = [];
-  for (let v = first; v <= hi + step * 0.5; v += step) ticks.push(v);
-  return ticks;
-};
-const fmtX = (v, time) => {
-  if (!time) return fmtTick(v);
-  const d = new Date(v), p = (x) => (x < 10 ? "0" + x : "" + x);
-  const hm = p(d.getUTCHours()) + ":" + p(d.getUTCMinutes());
-  return d.getUTCSeconds() ? hm + ":" + p(d.getUTCSeconds()) : hm;
-};
 function sparkSvg(data, { signal = "work", area = true, height = 32, label = "trend" } = {}) {
   const W = 120, pad = 3, H = height, n = data.length;
   const min = Math.min(...data), max = Math.max(...data), range = (max - min) || 1, innerH = H - pad * 2;
@@ -117,7 +102,7 @@ function sparkSvg(data, { signal = "work", area = true, height = 32, label = "tr
     + `<polyline class="cr-spark__line" points="${line}" vector-effect="non-scaling-stroke"/>`
     + `<circle class="cr-spark__dot" cx="${last.x.toFixed(2)}" cy="${last.y.toFixed(2)}" r="2.4" vector-effect="non-scaling-stroke"/></svg></span>`;
 }
-function lineChartSvg(series, labels, { area = true, height = 140, label = "line chart", axis = true, unit = "", x = null, xTime = false } = {}) {
+function lineChartSvg(series, labels, { area = true, height = 140, label = "line chart", axis = true, unit = "", x = null, xTime = false, xZone = "UTC" } = {}) {
   const W = 320, H = height, L = axis ? 30 : 8, R = 8, T = 10, B = 18, plotW = W - L - R, plotH = H - T - B;
   const xs = x && x.length ? x : null, continuous = !!xs;
   let dlo = Infinity, dhi = -Infinity;
@@ -128,7 +113,9 @@ function lineChartSvg(series, labels, { area = true, height = 140, label = "line
   let xmin = 0, xmax = 1, xticks = [];
   if (continuous) {
     xmin = Math.min(...xs); xmax = Math.max(...xs);
-    xticks = xTime ? niceTime(xmin, xmax, 5) : niceScale(xmin, xmax, 5).ticks.filter((t) => t >= xmin && t <= xmax);
+    xticks = xTime
+      ? timeTicks(xmin, xmax, { zone: xZone, target: 6 }).filter((t) => t.value >= xmin && t.value <= xmax)
+      : niceScale(xmin, xmax, 5).ticks.filter((t) => t >= xmin && t <= xmax).map((v) => ({ value: v, label: fmtTick(v) }));
   }
   const xspan = (xmax - xmin) || 1;
   const xAtV = (v) => L + ((v - xmin) / xspan) * plotW;
@@ -152,7 +139,7 @@ function lineChartSvg(series, labels, { area = true, height = 140, label = "line
       + `<circle class="cr-linechart__end" cx="${e.x.toFixed(2)}" cy="${e.y.toFixed(2)}" r="2.6" style="fill:${color}" vector-effect="non-scaling-stroke"/>`;
   }).join("");
   const ticks = continuous
-    ? xticks.map((v) => `<line class="cr-chart__grid cr-chart__grid--v" x1="${xAtV(v).toFixed(2)}" y1="${T}" x2="${xAtV(v).toFixed(2)}" y2="${(T + plotH).toFixed(2)}" vector-effect="non-scaling-stroke"/><text class="cr-chart__tick" x="${xAtV(v).toFixed(2)}" y="${H - 5}" text-anchor="middle">${fmtX(v, xTime)}</text>`).join("")
+    ? xticks.map((tk) => `<line class="cr-chart__grid cr-chart__grid--v" x1="${xAtV(tk.value).toFixed(2)}" y1="${T}" x2="${xAtV(tk.value).toFixed(2)}" y2="${(T + plotH).toFixed(2)}" vector-effect="non-scaling-stroke"/><text class="cr-chart__tick" x="${xAtV(tk.value).toFixed(2)}" y="${H - 5}" text-anchor="middle">${tk.label}</text>`).join("")
     : (labels || []).map((t, i) => `<text class="cr-chart__tick" x="${xAtI(i, labels.length).toFixed(2)}" y="${H - 5}" text-anchor="middle">${t}</text>`).join("");
   const legend = series.length > 1
     ? `<figcaption class="cr-chart__legend">${series.map((s, si) => `<button type="button" class="cr-chart__key" aria-pressed="true"><span class="cr-chart__sw" style="background:${hue(s.signal, si)}" aria-hidden="true"></span>${s.name}</button>`).join("")}</figcaption>`
@@ -211,14 +198,16 @@ const chartsSection = `
           ], ["09", "10", "11", "12", "13", "14", "15", "16"], { label: "Throughput vs errors" })}
         </div>
         <div>
-          <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:6px">latency p95 · continuous time axis</div>
-          ${lineChartSvg([
-            { name: "p95", data: [120, 180, 150, 220, 190, 260, 240, 310], signal: "work" },
-          ], null, {
-            label: "p95 latency over time", unit: "ms",
-            x: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => Date.UTC(2026, 0, 1, 9, 0, 0) + i * 15 * 60 * 1000),
-            xTime: true,
-          })}
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:6px">error budget · calendar axis (5 months)</div>
+          ${(() => {
+            // ~5 months of weekly samples → monthly calendar ticks (UTC, deterministic).
+            const start = Date.UTC(2025, 0, 6), week = 7 * 24 * 3600 * 1000;
+            const xs = [], data = [];
+            for (let i = 0; i < 22; i++) { xs.push(start + i * week); data.push(80 + Math.round(18 * Math.sin(i / 2.5)) + (i % 4)); }
+            return lineChartSvg([{ name: "budget", data, signal: "work" }], null, {
+              label: "error budget over five months", unit: "%", x: xs, xTime: true, xZone: "UTC",
+            });
+          })()}
         </div>
         <div>
           <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:6px">sessions by region · target 35</div>

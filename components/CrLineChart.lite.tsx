@@ -14,8 +14,12 @@ export interface CrLineChartProps {
   /** Continuous x-values, parallel to each sample index. Switches the x-axis to a
    *  real linear/time scale: points sit at their value and nice ticks are derived. */
   x?: number[];
-  /** Treat `x` as epoch-ms and label the x-ticks as clock times (round intervals). */
+  /** Treat `x` as epoch-ms: ticks snap to calendar boundaries (clock → day → week
+   *  → month → year by span) computed in `xZone`, so multi-week/month charts get
+   *  real date ticks, not fixed-millisecond marks. */
   xTime?: boolean;
+  /** IANA time zone for the calendar x-axis (e.g. "Europe/Rome"). Default "UTC". */
+  xZone?: string;
   /** Force the y-scale; otherwise a "nice" scale is derived from the data. */
   min?: number;
   max?: number;
@@ -81,19 +85,6 @@ export default function CrLineChart(props: CrLineChartProps) {
       for (let v = niceLo; v <= niceHi + step * 0.5; v += step) ticks.push(Math.round(v / step) * step);
       return { min: niceLo, max: niceHi, ticks };
     },
-    /* Round clock ticks for a time domain: pick the smallest calendar step
-     * (…s, m, h, d) that keeps the tick count sane, then align to it. */
-    niceTime(lo: number, hi: number, maxTicks: number): number[] {
-      const S = 1000, M = 60 * S, H = 60 * M, D = 24 * H;
-      const steps = [S, 2 * S, 5 * S, 10 * S, 15 * S, 30 * S, M, 2 * M, 5 * M, 10 * M, 15 * M, 30 * M, H, 2 * H, 3 * H, 6 * H, 12 * H, D, 2 * D, 7 * D];
-      const span = (hi - lo) || 1;
-      let step = steps[steps.length - 1];
-      for (const s of steps) { if (span / s <= maxTicks - 1) { step = s; break; } }
-      const first = Math.ceil(lo / step) * step;
-      const ticks: number[] = [];
-      for (let v = first; v <= hi + step * 0.5; v += step) ticks.push(v);
-      return ticks;
-    },
     /* Compact, human tick labels: 1500 -> "1.5k", 2000000 -> "2M". */
     fmtTick(v: number): string {
       const a = Math.abs(v);
@@ -101,13 +92,108 @@ export default function CrLineChart(props: CrLineChartProps) {
       if (a >= 1000) return (Math.round(v / 100) / 10) + "k";
       return String(Math.round(v * 100) / 100);
     },
-    /* An x-tick label: a clock time (UTC, deterministic) under xTime, else numeric. */
-    fmtX(v: number): string {
-      if (!props.xTime) return state.fmtTick(v);
-      const d = new Date(v);
-      const p = (x: number) => (x < 10 ? "0" + x : "" + x);
-      const hm = p(d.getUTCHours()) + ":" + p(d.getUTCMinutes());
-      return d.getUTCSeconds() ? hm + ":" + p(d.getUTCSeconds()) : hm;
+    /* ── Timezone-aware time axis. Same algorithm as utils/time-scale.js (mirrored
+     * inline because Mitosis doesn't import runtime helpers into each target).
+     * Day/week/month/year ticks land on real calendar boundaries in `zone`
+     * (DST included) via the built-in Intl zone database; small spans fall back
+     * to clock ticks. ─────────────────────────────────────────────────────── */
+    z2(n: number): string { return n < 10 ? "0" + n : "" + n; },
+    zoneParts(ms: number, zone: string): any {
+      const dtf = new Intl.DateTimeFormat("en-US", {
+        timeZone: zone, hourCycle: "h23",
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit",
+      });
+      const out = { year: 0, month: 1, day: 1, hour: 0, minute: 0, second: 0 };
+      for (const p of dtf.formatToParts(new Date(ms))) {
+        if (p.type === "year") out.year = +p.value;
+        else if (p.type === "month") out.month = +p.value;
+        else if (p.type === "day") out.day = +p.value;
+        else if (p.type === "hour") out.hour = +p.value % 24;
+        else if (p.type === "minute") out.minute = +p.value;
+        else if (p.type === "second") out.second = +p.value;
+      }
+      return out;
+    },
+    zWeekday(ms: number, zone: string): number {
+      const s = new Intl.DateTimeFormat("en-US", { timeZone: zone, weekday: "short" }).format(new Date(ms));
+      const wd: any = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+      return wd[s] || 0;
+    },
+    zOffset(ms: number, zone: string): number {
+      const p = state.zoneParts(ms, zone);
+      return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - ms;
+    },
+    zEpoch(y: number, mo: number, d: number, h: number, mi: number, s: number, zone: string): number {
+      const guess = Date.UTC(y, mo, d, h, mi, s);
+      const ep = guess - state.zOffset(guess, zone);
+      return guess - state.zOffset(ep, zone);
+    },
+    fmtClock(ms: number, zone: string, withSec: boolean): string {
+      const p = state.zoneParts(ms, zone);
+      return state.z2(p.hour) + ":" + state.z2(p.minute) + (withSec ? ":" + state.z2(p.second) : "");
+    },
+    fmtCal(ms: number, unit: string, zone: string): string {
+      const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const p = state.zoneParts(ms, zone);
+      const mon = MON[p.month - 1];
+      if (unit === "year") return "" + p.year;
+      if (unit === "month") return p.month === 1 ? mon + " '" + state.z2(p.year % 100) : mon;
+      return p.day + " " + mon;
+    },
+    /* A fuller stamp for the hover tooltip's x-label. */
+    fmtStamp(ms: number, zone: string): string {
+      const p = state.zoneParts(ms, zone);
+      const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return p.day + " " + MON[p.month - 1] + " " + state.z2(p.hour) + ":" + state.z2(p.minute);
+    },
+    timeTicks(lo: number, hi: number, zone: string, target: number): { value: number; label: string }[] {
+      const S = 1000, MIN = 60 * S, HR = 60 * MIN, DAY = 24 * HR;
+      const FIXED = [S, 2 * S, 5 * S, 10 * S, 15 * S, 30 * S, MIN, 2 * MIN, 5 * MIN, 10 * MIN, 15 * MIN, 30 * MIN, HR, 2 * HR, 3 * HR, 6 * HR, 12 * HR];
+      let a = lo, b = hi;
+      if (b <= a) b = a + S;
+      const span = b - a;
+      const out: { value: number; label: string }[] = [];
+      for (const st of FIXED) {
+        if (span / st <= target) {
+          const withSec = st < MIN;
+          for (let v = Math.ceil(a / st) * st; v <= b && out.length < 1000; v += st) out.push({ value: v, label: state.fmtClock(v, zone, withSec) });
+          return out;
+        }
+      }
+      let unit = "year";
+      let step = 500;
+      if (span / DAY <= target) { unit = "day"; step = 1; }
+      else if (span / (2 * DAY) <= target) { unit = "day"; step = 2; }
+      else if (span / (7 * DAY) <= target) { unit = "week"; step = 1; }
+      else if (span / (30.4 * DAY) <= target) { unit = "month"; step = 1; }
+      else if (span / (3 * 30.4 * DAY) <= target) { unit = "month"; step = 3; }
+      else {
+        const years = [1, 2, 5, 10, 25, 50, 100];
+        step = years[years.length - 1];
+        for (const ny of years) { if (span / (ny * 365 * DAY) <= target) { step = ny; break; } }
+        unit = "year";
+      }
+      const p0 = state.zoneParts(a, zone);
+      let cy = p0.year, cmo = p0.month - 1, cd = p0.day;
+      if (unit === "year") { cy = Math.floor(cy / step) * step; cmo = 0; cd = 1; }
+      else if (unit === "month") { cmo = Math.floor(cmo / step) * step; cd = 1; }
+      let cur = state.zEpoch(cy, cmo, cd, 0, 0, 0, zone);
+      if (unit === "week") {
+        const back = (state.zWeekday(cur, zone) + 6) % 7;
+        cur = state.zEpoch(cy, cmo, cd - back, 0, 0, 0, zone);
+      }
+      let guard = 0;
+      while (cur <= b && guard < 5000) {
+        if (cur >= a) out.push({ value: cur, label: state.fmtCal(cur, unit, zone) });
+        const q = state.zoneParts(cur, zone);
+        if (unit === "year") cur = state.zEpoch(q.year + step, 0, 1, 0, 0, 0, zone);
+        else if (unit === "month") cur = state.zEpoch(q.year, q.month - 1 + step, 1, 0, 0, 0, zone);
+        else if (unit === "week") cur = state.zEpoch(q.year, q.month - 1, q.day + 7, 0, 0, 0, zone);
+        else cur = state.zEpoch(q.year, q.month - 1, q.day + step, 0, 0, 0, zone);
+        guard++;
+      }
+      return out;
     },
     isHidden(i: number): boolean {
       return !!state.hidden["" + i];
@@ -158,7 +244,7 @@ export default function CrLineChart(props: CrLineChartProps) {
       for (const t of sc.ticks) if (t >= min - range * 1e-6 && t <= max + range * 1e-6) ticks.push(t);
       let xmin = 0;
       let xmax = 1;
-      const xticks: number[] = [];
+      const xticks: { v: number; label: string }[] = [];
       if (xs) {
         let xlo = Infinity;
         let xhi = -Infinity;
@@ -167,8 +253,12 @@ export default function CrLineChart(props: CrLineChartProps) {
         xmin = xlo;
         xmax = xhi;
         const xspan = (xhi - xlo) || 1;
-        const raw = props.xTime ? state.niceTime(xlo, xhi, 5) : state.niceScale(xlo, xhi, 5).ticks;
-        for (const t of raw) if (t >= xlo - xspan * 1e-6 && t <= xhi + xspan * 1e-6) xticks.push(t);
+        if (props.xTime) {
+          const tt = state.timeTicks(xlo, xhi, props.xZone || "UTC", 6);
+          for (const t of tt) if (t.value >= xlo - xspan * 1e-6 && t.value <= xhi + xspan * 1e-6) xticks.push({ v: t.value, label: t.label });
+        } else {
+          for (const t of state.niceScale(xlo, xhi, 5).ticks) if (t >= xlo - xspan * 1e-6 && t <= xhi + xspan * 1e-6) xticks.push({ v: t, label: state.fmtTick(t) });
+        }
       }
       return { W, H, L, R, T, B, plotW, plotH, n, min, max, range, axis, ticks, xs, continuous, xmin, xmax, xticks };
     },
@@ -197,7 +287,7 @@ export default function CrLineChart(props: CrLineChartProps) {
       });
       const yticks = m.ticks.map((v: number) => ({ y: yAt(v), label: state.fmtTick(v) + (props.unit || "") }));
       const ticks = m.continuous
-        ? m.xticks.map((v: number) => ({ t: state.fmtX(v), x: xAtV(v) }))
+        ? m.xticks.map((tk: { v: number; label: string }) => ({ t: tk.label, x: xAtV(tk.v) }))
         : (props.labels || []).map((t: string, i: number, a: string[]) => ({ t, x: xAtI(i, a.length) }));
       return { W: m.W, H: m.H, L: m.L, R: m.R, axis: m.axis, continuous: m.continuous, plotTop: m.T, plotBot: m.T + m.plotH, lines, yticks, ticks };
     },
@@ -258,7 +348,9 @@ export default function CrLineChart(props: CrLineChartProps) {
       let leftPct = (cx / m.W) * 100;
       if (leftPct < 12) leftPct = 12;
       if (leftPct > 88) leftPct = 88;
-      const label = m.continuous ? (idx < xs.length ? state.fmtX(xs[idx]) : "") : ((props.labels || [])[idx] || "");
+      const label = m.continuous
+        ? (idx < xs.length ? (props.xTime ? state.fmtStamp(xs[idx], props.xZone || "UTC") : state.fmtTick(xs[idx])) : "")
+        : ((props.labels || [])[idx] || "");
       return { cx, top: m.T, bot: m.T + m.plotH, leftPct, label, rows };
     },
   });
