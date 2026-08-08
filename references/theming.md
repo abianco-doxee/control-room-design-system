@@ -143,6 +143,37 @@ plus an accent. Precedence is `$extends` base < `$ramp` surfaces < explicit role
 `$ramp` is a **build-time** authoring feature (it uses OKLCH conversion); the
 generator lives in `build/ramp.mjs`.
 
+### Structure — rounding, borders, shadows (`$shape`, `$weight`)
+
+Branding isn't only colour. The **chassis** tokens shape the system, and a brand can
+set them — either with two convenience knobs or by naming any chassis token directly:
+
+- **`$shape`** — corner rounding: `"sharp"` (0px, the house default) · `"soft"` (6px)
+  · `"round"` (12px). Rounds the rectangular surfaces (buttons, inputs, panels,
+  menus, …) via `--radius`; circular indicators, decorative shapes and the breach
+  keep their own radius.
+- **`$weight`** — border + hard-shadow scale: `"hairline"` · `"regular"` (default) ·
+  `"heavy"`. Scales `--brd-*` line weight and the `--shadow-off-*` offset depth.
+
+Any chassis token can also be set explicitly (it wins over a preset): `--radius`,
+`--brd-hair`/`--brd`/`--brd-heavy`/`--brd-brush`, `--shadow-off-sm`/`--shadow-off`/
+`--shadow-off-lg`, `--focus-w`, `--focus-offset`, `--row-h` (density).
+
+```jsonc
+{
+  "$extends": "light", "$ramp": "#f5f6f9",
+  "$shape": "soft",       // --radius: 6px
+  "$weight": "heavy",     // thicker borders + deeper hard shadows
+  "row-h": "40px"          // explicit chassis override (roomier rows)
+}
+```
+
+That's `brands/boardroom.json`. **House-style note:** the Control Room identity is
+square corners and hard, blur-free shadows; `$shape`/`$weight` deliberately relax
+that, so they change a brand's *character*, not just its palette. Chassis tokens are
+optional — omit them and the brand inherits the structure layer unchanged.
+Build-time; presets in `build/chassis.mjs`.
+
 ### Signal voice (`$signalTone`)
 
 The signal roles are a **state channel** — `--sig-err` *means* failing — so a brand
