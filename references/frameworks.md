@@ -5,7 +5,35 @@ Interactive components are authored **once** as [Mitosis](https://github.com/Bui
 each framework — so the library stays one source and apps ship coherent,
 framework-native components (not a foreign runtime).
 
-Targets: **React, Vue, Svelte, Angular, Solid** (`mitosis.config.cjs`).
+Targets: **React, Vue, Svelte, Angular, Solid, Qwik** (`mitosis.config.cjs`).
+
+## Consuming the packages
+
+Each framework has a subpath export with named components (and, where the target
+is typed, prop-type exports):
+
+```ts
+import { CrButton, type CrButtonProps } from "@control-room/design-system/react";
+import { CrButton } from "@control-room/design-system/qwik";
+import { CrButton } from "@control-room/design-system/vue";
+```
+
+How each entry is distributed reflects what that framework needs — the package is
+private, but every entry is a genuine, consumable package:
+
+| entry | shape | why |
+| --- | --- | --- |
+| `./react` | **compiled** ESM JS + `.d.ts` (`dist/pkg/react`) | React needs no special compiler, so we prebuild it. `react`/`react-dom` are peer deps. |
+| `./qwik` | **compiled** ESM JS + `.d.ts` (`dist/pkg/qwik`) | Same tsc build; JSX via Qwik's automatic runtime. `@builder.io/qwik` is a peer dep. The consumer's Qwik **optimizer** still adds QRL lazy-loading when it processes the package. |
+| `./vue` | **SFC source** (`dist/frameworks/vue`) | Vue libraries ship `.vue` — the consumer's bundler compiles them and Volar types them from the SFC. `vue` is a peer dep. |
+| `./svelte` · `./angular` · `./solid` | source | shipped as compiled framework source; consumed by that framework's toolchain. |
+
+The build compiles the typed packages with `npm run build:pkg` (relative import
+extensions rewritten `.tsx → .js` so the emit resolves in Node ESM and bundlers);
+`prepack` runs it so `npm pack` ships usable packages. The `test:pkg` gate imports
+each entry as a consumer would — React renders through `react-dom/server`, Qwik
+loads its named exports, Vue's SFCs are structurally verified — and asserts the
+typed declarations ship.
 
 ## Coverage
 
