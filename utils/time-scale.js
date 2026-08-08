@@ -11,7 +11,9 @@
 //   • fiscalStart  1..12            — fiscal year/quarter anchor (1 = calendar).
 //                                     Years/quarters then align to that month and
 //                                     label FY/Q, FY named by the ending year.
-// Defaults ("en" / "date" / 1) reproduce a plain Gregorian axis.
+//   • format       (value)=>string  — escape hatch: relabel the chosen tick
+//                                     positions; wins over locale/week/fiscal.
+// Defaults ("en" / "date" / 1, no format) reproduce a plain Gregorian axis.
 //
 // The SAME algorithm is mirrored inline in components/CrLineChart.lite.tsx
 // (Mitosis compiles to six targets and doesn't import runtime helpers into each),
@@ -170,13 +172,17 @@ export function timeTicks(lo, hi, opts = {}) {
     fiscalStart: clampInt(opts.fiscalStart, 1, 12, 1),
   };
   const target = opts.target || 6;
+  // `format` is the escape hatch: it relabels the chosen tick *positions*, taking
+  // precedence over locale/week/fiscal (which only shape the built-in text).
+  const fmt = typeof opts.format === "function" ? opts.format : null;
+  const fin = (arr) => (fmt ? arr.map((t) => ({ value: t.value, label: fmt(t.value) })) : arr);
   let a = lo, b = hi;
   if (b <= a) b = a + S;
   const span = b - a;
-  for (const st of FIXED) if (span / st <= target) return fixedTicks(a, b, st, o.zone);
-  for (const nd of [1, 2]) if (span / (nd * DAY) <= target) return calTicks(a, b, "day", nd, o);
-  if (span / (7 * DAY) <= target) return calTicks(a, b, "week", 1, o);
-  for (const nm of [1, 3]) if (span / (nm * 30.4 * DAY) <= target) return calTicks(a, b, "month", nm, o);
-  for (const ny of [1, 2, 5, 10, 25, 50, 100]) if (span / (ny * 365 * DAY) <= target) return calTicks(a, b, "year", ny, o);
-  return calTicks(a, b, "year", 500, o);
+  for (const st of FIXED) if (span / st <= target) return fin(fixedTicks(a, b, st, o.zone));
+  for (const nd of [1, 2]) if (span / (nd * DAY) <= target) return fin(calTicks(a, b, "day", nd, o));
+  if (span / (7 * DAY) <= target) return fin(calTicks(a, b, "week", 1, o));
+  for (const nm of [1, 3]) if (span / (nm * 30.4 * DAY) <= target) return fin(calTicks(a, b, "month", nm, o));
+  for (const ny of [1, 2, 5, 10, 25, 50, 100]) if (span / (ny * 365 * DAY) <= target) return fin(calTicks(a, b, "year", ny, o));
+  return fin(calTicks(a, b, "year", 500, o));
 }

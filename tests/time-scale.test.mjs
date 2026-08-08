@@ -117,6 +117,16 @@ test("fiscalStart anchors year + quarter ticks and labels FY/Q (April start)", (
   }
 });
 
+test("format escape hatch relabels the chosen tick positions", () => {
+  const lo = Date.UTC(2025, 0, 15), hi = Date.UTC(2025, 4, 20);
+  const base = timeTicks(lo, hi, { zone: "UTC" });
+  const custom = timeTicks(lo, hi, { zone: "UTC", locale: "it", format: (v) => new Date(v).getUTCMonth() + 1 + "" });
+  // same positions as the default run…
+  assert.deepEqual(custom.map((t) => t.value), base.map((t) => t.value));
+  // …but labels come from format, overriding locale
+  assert.deepEqual(custom.map((t) => t.label), ["2", "3", "4", "5"]);
+});
+
 test("defaults are unchanged (backward compatible)", () => {
   const lo = Date.UTC(2025, 0, 15), hi = Date.UTC(2025, 4, 20);
   const a = timeTicks(lo, hi, { zone: "UTC" });

@@ -33,6 +33,10 @@ export interface CrLineChartProps {
   xBreak?: boolean;
   /** Gap (ms) above which a span is collapsed. Default: ~3× the typical sample gap. */
   xBreakGap?: number;
+  /** Escape hatch: format each x-tick (and the hover stamp) yourself, given the
+   *  raw x value. Overrides the built-in labels (locale / week / fiscal / clock).
+   *  Positions still come from the active scale. */
+  xFormat?: (value: number) => string;
   /** Y-axis scale: "linear" (default) or "log" (base-10, for wide-range metrics
    *  like latency percentiles). Log needs positive data; ≤0 values are clamped to
    *  the axis floor. Domain snaps to powers of ten. */
@@ -353,11 +357,12 @@ export default function CrLineChart(props: CrLineChartProps) {
         xmin = xlo;
         xmax = xhi;
         const xspan = (xhi - xlo) || 1;
+        const xf = props.xFormat;
         if (props.xTime) {
           const tt = state.timeTicks(xlo, xhi, props.xZone || "UTC", 6, props.xLocale || "en", props.xWeek || "date", props.xFiscalStart || 1);
-          for (const t of tt) if (t.value >= xlo - xspan * 1e-6 && t.value <= xhi + xspan * 1e-6) xticks.push({ v: t.value, label: t.label });
+          for (const t of tt) if (t.value >= xlo - xspan * 1e-6 && t.value <= xhi + xspan * 1e-6) xticks.push({ v: t.value, label: xf ? xf(t.value) : t.label });
         } else {
-          for (const t of state.niceScale(xlo, xhi, 5).ticks) if (t >= xlo - xspan * 1e-6 && t <= xhi + xspan * 1e-6) xticks.push({ v: t, label: state.fmtTick(t) });
+          for (const t of state.niceScale(xlo, xhi, 5).ticks) if (t >= xlo - xspan * 1e-6 && t <= xhi + xspan * 1e-6) xticks.push({ v: t, label: xf ? xf(t) : state.fmtTick(t) });
         }
       }
       /* Gap-collapse ("broken") axis: compress idle gaps to a cap so session data
@@ -385,17 +390,27 @@ export default function CrLineChart(props: CrLineChartProps) {
           const g = xs[i] - xs[i - 1];
           if (g > cap * 1.5) cbreaks.push((pos[i - 1] + Math.min(g, cap) * 0.5) / total);
         }
-        const dayIdx: number[] = [];
-        let lastKey = "";
-        for (let i = 0; i < xs.length; i++) {
-          const p = state.zoneParts(xs[i], zone);
-          const key = p.year + "-" + p.month + "-" + p.day;
-          if (key !== lastKey) { dayIdx.push(i); lastKey = key; }
-        }
-        const everyD = dayIdx.length > 8 ? Math.ceil(dayIdx.length / 8) : 1;
-        for (let j = 0; j < dayIdx.length; j += everyD) {
-          const p = state.zoneParts(xs[dayIdx[j]], zone);
-          dticks.push({ label: p.day + " " + state.monNames(locale)[p.month - 1], frac: cpos[dayIdx[j]] });
+        const xf = props.xFormat;
+        if (props.xTime) {
+          /* Time values → one tick per distinct calendar day (in zone). */
+          const dayIdx: number[] = [];
+          let lastKey = "";
+          for (let i = 0; i < xs.length; i++) {
+            const p = state.zoneParts(xs[i], zone);
+            const key = p.year + "-" + p.month + "-" + p.day;
+            if (key !== lastKey) { dayIdx.push(i); lastKey = key; }
+          }
+          const everyD = dayIdx.length > 8 ? Math.ceil(dayIdx.length / 8) : 1;
+          for (let j = 0; j < dayIdx.length; j += everyD) {
+            const i = dayIdx[j];
+            const p = state.zoneParts(xs[i], zone);
+            dticks.push({ label: xf ? xf(xs[i]) : p.day + " " + state.monNames(locale)[p.month - 1], frac: cpos[i] });
+          }
+        } else {
+          /* Non-time numeric x with xBreak: label a few sample points by value
+           * (no calendar interpretation — that would be nonsense). */
+          const everyN = xs.length > 6 ? Math.ceil(xs.length / 6) : 1;
+          for (let i = 0; i < xs.length; i += everyN) dticks.push({ label: xf ? xf(xs[i]) : state.fmtTick(xs[i]), frac: cpos[i] });
         }
       }
       return { W, H, L, R, T, B, plotW, plotH, n, min, max, range, axis, ticks, xs, continuous, xmin, xmax, xticks, ylog, llo, lrange, broken, cpos, cbreaks, dticks };
@@ -503,7 +518,9 @@ export default function CrLineChart(props: CrLineChartProps) {
       if (leftPct < 12) leftPct = 12;
       if (leftPct > 88) leftPct = 88;
       const label = m.continuous
-        ? (idx < xs.length ? (props.xTime ? state.fmtStamp(xs[idx], props.xZone || "UTC", props.xLocale || "en") : state.fmtTick(xs[idx])) : "")
+        ? (idx < xs.length
+            ? (props.xFormat ? props.xFormat(xs[idx]) : (props.xTime ? state.fmtStamp(xs[idx], props.xZone || "UTC", props.xLocale || "en") : state.fmtTick(xs[idx])))
+            : "")
         : ((props.labels || [])[idx] || "");
       return { cx, top: m.T, bot: m.T + m.plotH, leftPct, label, rows };
     },
