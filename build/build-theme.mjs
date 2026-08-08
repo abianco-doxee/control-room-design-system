@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join, basename } from "node:path";
 import { themeCss, mergeTheme, validateTheme, checkThemeContrast, deriveOnColors } from "../lib/theme/index.js";
 import { surfaceRamp } from "./ramp.mjs";
-import { toneSignals } from "./signals.mjs";
+import { toneSignals, fitSignals } from "./signals.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BRANDS = join(ROOT, "brands");
@@ -71,15 +71,22 @@ function resolveBrand(brand, seen = new Set()) {
     const baseTone = typeof brand.$ramp === "string" ? brand.$ramp : brand.$ramp.base;
     surfaces = surfaceRamp(baseTone, brand.$scheme || "dark");
   }
+  const skip = new Set(Object.keys(overrides).map((k) => k.replace(/^--/, "")));
   /* $signalTone: re-voice the inherited/derived signal ramp (neon → muted/pastel)
    * in OKLCH, hue preserved. Explicit signal overrides are left untouched. */
   let signals = {};
   if (brand.$signalTone && brand.$signalTone !== "neon") {
-    const skip = new Set(Object.keys(overrides).map((k) => k.replace(/^--/, "")));
     signals = toneSignals(mergeTheme(base, surfaces), brand.$signalTone, skip);
   }
-  /* precedence: $extends base < ramp surfaces < toned signals < explicit roles.
-   * on-* re-derive for anything whose fill changed (explicit OR toned signals). */
+  /* $fitSignals: nudge signal lightness for contrast against the surfaces (e.g.
+   * a dark neon ramp reused on light surfaces). Runs after toning; skips explicit. */
+  if (brand.$fitSignals) {
+    const min = typeof brand.$fitSignals === "number" ? brand.$fitSignals : 3;
+    const afterTone = mergeTheme(mergeTheme(base, surfaces), signals);
+    signals = { ...signals, ...fitSignals(afterTone, { against: "panel", min, skip }) };
+  }
+  /* precedence: $extends base < ramp surfaces < toned/fitted signals < explicit
+   * roles. on-* re-derive for anything whose fill changed (explicit OR signals). */
   const changed = [...Object.keys(overrides), ...Object.keys(signals)];
   const merged = mergeTheme(mergeTheme(mergeTheme(base, surfaces), signals), overrides);
   const vars = deriveOnColors(merged, { changed });
@@ -93,22 +100,35 @@ function brandFiles() {
   return only.length ? all.filter((n) => only.includes(n)) : all;
 }
 
+/* A brand may carry `$modes` — one definition emitting several themes (e.g. a
+ * dark + light pair). Each mode's directives/roles override the shared top-level;
+ * the FIRST mode is primary (theme name = <name>), the rest are <name>-<mode>. */
+function variantsFor(name, brand) {
+  if (!brand.$modes || typeof brand.$modes !== "object") return [{ themeName: name, brand }];
+  const { $modes, ...shared } = brand;
+  return Object.keys($modes).map((mode, i) => ({
+    themeName: i === 0 ? name : `${name}-${mode}`,
+    brand: { ...shared, ...$modes[mode] },
+  }));
+}
+
 function render(name) {
-  const brand = JSON.parse(readFileSync(join(BRANDS, `${name}.json`), "utf8"));
-  const { vars } = resolveBrand(brand);
-  const v = validateTheme(vars);
-  if (!v.valid) {
-    throw new Error(`Brand "${name}" is missing required roles: ${v.missing.join(", ")}`);
-  }
-  const banner = `/* Control Room brand: ${name}${brand.$label ? ` — ${brand.$label}` : ""} (GENERATED
+  const file = JSON.parse(readFileSync(join(BRANDS, `${name}.json`), "utf8"));
+  return variantsFor(name, file).map(({ themeName, brand }) => {
+    const { vars } = resolveBrand(brand);
+    const v = validateTheme(vars);
+    if (!v.valid) {
+      throw new Error(`Brand "${themeName}" is missing required roles: ${v.missing.join(", ")}`);
+    }
+    const banner = `/* Control Room brand: ${themeName}${brand.$label ? ` — ${brand.$label}` : ""} (GENERATED
  * from brands/${name}.json). Appearance layer only — pair with dist/structure.css.
  * Regenerate: npm run build:theme. */\n`;
-  const css = banner + themeCss(name, vars, {
-    selector: brand.$selector || `:root[data-theme="${name}"]`,
-    scheme: brand.$scheme || "dark",
+    const css = banner + themeCss(themeName, vars, {
+      selector: brand.$selector || `:root[data-theme="${themeName}"]`,
+      scheme: brand.$scheme || "dark",
+    });
+    return { themeName, css, contrast: checkThemeContrast(vars), unknown: v.unknown };
   });
-  const contrast = checkThemeContrast(vars);
-  return { css, contrast, unknown: v.unknown };
 }
 
 const names = brandFiles();
@@ -119,22 +139,23 @@ if (!names.length) {
 
 let stale = false;
 for (const name of names) {
-  const { css, contrast, unknown } = render(name);
-  const rel = `dist/themes/${name}.css`;
-  const p = join(DIST, `${name}.css`);
-  if (CHECK) {
-    const cur = existsSync(p) ? readFileSync(p, "utf8") : "";
-    if (cur !== css) { stale = true; console.error(`✗ ${rel} is out of date`); }
-    continue;
+  for (const { themeName, css, contrast, unknown } of render(name)) {
+    const rel = `dist/themes/${themeName}.css`;
+    const p = join(DIST, `${themeName}.css`);
+    if (CHECK) {
+      const cur = existsSync(p) ? readFileSync(p, "utf8") : "";
+      if (cur !== css) { stale = true; console.error(`✗ ${rel} is out of date`); }
+      continue;
+    }
+    mkdirSync(DIST, { recursive: true });
+    writeFileSync(p, css);
+    let msg = `wrote ${rel}  (${css.length} bytes)`;
+    if (contrast.failures.length) {
+      msg += `  ⚠ contrast: ${contrast.failures.map((f) => `${f.label} ${f.ratio}<${f.min}`).join("; ")}`;
+    }
+    if (unknown.length) msg += `  · extra vars: ${unknown.join(", ")}`;
+    console.log(msg);
   }
-  mkdirSync(DIST, { recursive: true });
-  writeFileSync(p, css);
-  let msg = `wrote ${rel}  (${css.length} bytes)`;
-  if (contrast.failures.length) {
-    msg += `  ⚠ contrast: ${contrast.failures.map((f) => `${f.label} ${f.ratio}<${f.min}`).join("; ")}`;
-  }
-  if (unknown.length) msg += `  · extra vars: ${unknown.join(", ")}`;
-  console.log(msg);
 }
 
 if (CHECK) {
