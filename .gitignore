@@ -11,6 +11,8 @@ dist/utilities.css
 dist/frameworks/
 # Compiled, publishable framework packages (derived from dist/frameworks via build:pkg)
 dist/pkg/
+# Temp modules from the cross-framework render harness (build/render-fw.mjs)
+.fwtmp-*/
 
 # Astro / Starlight build output & cache (site output goes to site-dist/)
 site-dist/

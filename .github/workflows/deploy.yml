@@ -38,6 +38,8 @@ jobs:
         run: npm run verify:types
       - name: Package consumability gate (react/qwik/vue named exports build + import)
         run: npm run test:pkg
+      - name: Cross-framework runtime gate (Vue/Svelte/Solid SSR-render the output)
+        run: npm run test:frameworks
       - name: Forms core gate (ArkType ⇄ JSON Schema + validation)
         run: npm run test:forms
       - name: Theme core gate (contract + brand validation + contrast)
