@@ -19,6 +19,7 @@ import {
 } from "../lib/theme/index.js";
 import { surfaceRamp } from "../build/ramp.mjs";
 import { toneSignals, fitSignals, SIGNAL_KEYS } from "../build/signals.mjs";
+import { chassisFrom } from "../build/chassis.mjs";
 import { oklch } from "culori";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -229,6 +230,43 @@ test("$modes emits a dark + light pair (aurora); the light mode fits its signals
   assert.ok(contrastRatio(lWork, lPanel) >= 3, "fitted signal clears 3:1 on the light panel");
   // shared brand identity carries across modes (explicit accent untouched)
   assert.equal(pick(light, "sig-accent"), pick(dark, "sig-accent"), "brand accent shared across modes");
+});
+
+test("chassisFrom expands $shape / $weight; regular is identity", () => {
+  assert.equal(chassisFrom({ $shape: "soft" }).radius, "6px");
+  assert.equal(chassisFrom({ $shape: "sharp" }).radius, "0px");
+  assert.equal(chassisFrom({ $weight: "heavy" })["brd-heavy"], "4px");
+  assert.deepEqual(chassisFrom({ $weight: "regular" }), {}, "regular weight is the default (no output)");
+  const both = chassisFrom({ $shape: "round", $weight: "heavy" });
+  assert.equal(both.radius, "12px");
+  assert.equal(both["shadow-off"], "6px");
+});
+
+test("chassis tokens (incl --radius) are known to the contract, not 'unknown'", () => {
+  const full = {};
+  for (const r of THEME_ROLES) full[r.cssVar] = "#123456";
+  full["radius"] = "6px";
+  full["brd-heavy"] = "4px";
+  full["row-h"] = "40px";
+  const v = validateTheme(full);
+  assert.equal(v.valid, true);
+  for (const k of ["radius", "brd-heavy", "row-h"]) assert.equal(v.unknown.includes(k), false, `${k} should be a known chassis token`);
+});
+
+test("rectangular surfaces are wired to the brandable --radius (rounding works)", () => {
+  const css = readFileSync(join(ROOT, "styles/components.css"), "utf8");
+  assert.ok(css.includes("border-radius: var(--radius)"), "components reference the brandable --radius");
+  assert.match(css, /\.cr-drip \{ border-radius: var\(--radius-none\)/, "decorative drip stays square");
+  // the core form controls round with the brand
+  assert.match(css, /\.cr-input, \.cr-textarea, \.cr-select \{[^}]*border-radius: var\(--radius\)/s);
+});
+
+test("boardroom brand: structural branding (soft corners + heavy chassis) applied", () => {
+  const css = readFileSync(join(ROOT, "dist/themes/boardroom.css"), "utf8");
+  assert.match(css, /--radius: 6px/, "$shape:soft rounds surfaces");
+  assert.match(css, /--brd-heavy: 4px/, "$weight:heavy thickens borders");
+  assert.match(css, /--shadow-off: 6px/, "$weight:heavy deepens shadows");
+  assert.match(css, /--row-h: 40px/, "explicit chassis override wins over the preset");
 });
 
 test("the worked brand (brands/slate.json) is valid, complete, and legible", () => {

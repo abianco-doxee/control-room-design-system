@@ -194,12 +194,16 @@
     }
   ],
   "chassisOverridable": [
+    "--radius",
     "--brd-hair",
     "--brd",
     "--brd-heavy",
     "--brd-brush",
     "--shadow-off-sm",
     "--shadow-off",
-    "--shadow-off-lg"
+    "--shadow-off-lg",
+    "--focus-w",
+    "--focus-offset",
+    "--row-h"
   ]
 }

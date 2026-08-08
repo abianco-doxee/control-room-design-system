@@ -1,0 +1,46 @@
+/* Control Room brand: boardroom — Boardroom · light, soft corners, heavy chassis (GENERATED
+ * from brands/boardroom.json). Appearance layer only — pair with dist/structure.css.
+ * Regenerate: npm run build:theme. */
+:root[data-theme="boardroom"] {
+  color-scheme: light;
+  --ground: #edeef1;
+  --board: #e5e6e9;
+  --panel: #fdfdff;
+  --panel-2: #f2f3f6;
+  --ink: #181b22;
+  --muted: #5c6472;
+  --border: #000000;
+  --rail: #181b22;
+  --rail-ink: #eef1f6;
+  --sig-work: #0891b2;
+  --sig-accent: #2f5fe0;
+  --sig-accent-2: #0f9d8c;
+  --sig-done: #0d9488;
+  --sig-wait: #d97706;
+  --sig-err: #e11d48;
+  --sig-idle: #7e7e94;
+  --on-sig: #0b0b12;
+  --on-err: #ffffff;
+  --on-accent: #ffffff;
+  --on-accent-2: #06050c;
+  --on-idle: #0b0b12;
+  --shadow-col: #000000;
+  --mass: #0b0b12;
+  --stage: #00a344;
+  --stage-ink: #04140a;
+  --drip: #0a7f5c;
+  --halftone: radial-gradient(circle at center, rgba(0,0,0,0.13) 1.7px, transparent 2.2px);
+  --dither: repeating-conic-gradient(rgba(0,0,0,0.11) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;
+  --scanline: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0 1px, transparent 1px 3px);
+  --crosshatch: repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px);
+  --field: repeating-conic-gradient(rgba(0,0,0,0.045) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
+  --radius: 6px;
+  --brd-hair: 2px;
+  --brd: 3px;
+  --brd-heavy: 4px;
+  --brd-brush: 6px;
+  --shadow-off-sm: 3px;
+  --shadow-off: 6px;
+  --shadow-off-lg: 9px;
+  --row-h: 40px;
+}

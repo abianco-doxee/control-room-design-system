@@ -146,8 +146,14 @@ body {
 .cr-panel,
 .cr-btn,
 .cr-hero,
-.cr-bezel,
+.cr-bezel { border-radius: var(--radius); }
 .cr-drip { border-radius: var(--radius-none); }
+/* Roundable surfaces — a brand's --radius (default 0px) rounds these; circular
+ * indicators, decorative shapes and the sanctioned breach keep their own radius.
+ * Declared early so a component's own border-radius still wins where it sets one. */
+.cr-btn, .cr-chip, .cr-tag, .cr-panel, .cr-menu, .cr-popover, .cr-toast, .cr-alert,
+.cr-well, .cr-card, .cr-badge, .cr-kbd, .cr-combobox__input, .cr-combobox__list,
+.cr-cron__input, .cr-cron__preset { border-radius: var(--radius); }
 
 /* ── Panel ─────────────────────────────────────────────────────────────── */
 .cr-panel {
@@ -334,7 +340,7 @@ body {
 .cr-masthead {
   border: var(--brd-heavy) solid var(--border);
   box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
-  background: var(--panel); padding: var(--space-5) var(--space-6); border-radius: var(--radius-none);
+  background: var(--panel); padding: var(--space-5) var(--space-6); border-radius: var(--radius);
 }
 .cr-masthead__eyebrow {
   font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
@@ -524,7 +530,7 @@ body {
 /* ── Text input / textarea / select ────────────────────────────────────── */
 .cr-input, .cr-textarea, .cr-select {
   width: 100%; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink);
-  background: var(--board); border: var(--brd) solid var(--border); border-radius: var(--radius-none);
+  background: var(--board); border: var(--brd) solid var(--border); border-radius: var(--radius);
   padding: var(--space-2) var(--space-3);
 }
 .cr-input::placeholder, .cr-textarea::placeholder { color: var(--muted); }
@@ -574,13 +580,13 @@ body {
 .cr-modal {
   border: var(--brd-brush) solid var(--border); background: var(--panel); color: var(--ink);
   box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
-  padding: 0; max-width: min(92vw, 34rem); border-radius: var(--radius-none);
+  padding: 0; max-width: min(92vw, 34rem); border-radius: var(--radius);
 }
 .cr-modal::backdrop { background: color-mix(in srgb, var(--mass) 72%, transparent); }
 
 /* ── Command palette (⌘K) ───────────────────────────────────────────────── */
 .cr-palette {
-  padding: 0; width: min(92vw, 34rem); margin: 12vh auto auto; border-radius: var(--radius-none);
+  padding: 0; width: min(92vw, 34rem); margin: 12vh auto auto; border-radius: var(--radius);
   border: var(--brd-heavy) solid var(--border); background: var(--panel); color: var(--ink);
   box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
 }
@@ -784,7 +790,7 @@ body {
 
 /* ── Drawer / sheet (edge panel on native dialog) ───────────────────────── */
 .cr-drawer {
-  position: fixed; inset: 0 0 0 auto; margin: 0; padding: 0; border-radius: var(--radius-none);
+  position: fixed; inset: 0 0 0 auto; margin: 0; padding: 0; border-radius: var(--radius);
   height: 100vh; max-height: 100vh; width: min(92vw, 26rem);
   border: 0; border-left: var(--brd-brush) solid var(--border); background: var(--panel); color: var(--ink);
   box-shadow: calc(var(--shadow-off-lg) * -1) 0 0 var(--shadow-col);
@@ -949,6 +955,8 @@ body {
 .cr-cron__out { display: flex; align-items: center; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); }
 .cr-cron__out::before { content: "\2192"; color: var(--muted); }   /* → */
 .cr-cron__out--err { color: var(--sig-err); }
+.cr-cron--error .cr-cron__input { border-color: var(--sig-err); border-width: var(--brd-heavy); }
+.cr-cron__input:disabled { opacity: var(--state-disabled-op); cursor: not-allowed; }
 .cr-cron__presets { display: flex; gap: var(--space-1); flex-wrap: wrap; }
 .cr-cron__preset { font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 700; background: var(--panel-2); color: var(--muted); border: var(--brd-hair) solid var(--border); padding: var(--space-0-5) var(--space-2); cursor: pointer; }
 .cr-cron__preset:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
@@ -1399,6 +1407,7 @@ body {
 .brand-phosphor{color-scheme:dark;--ground:#020a04;--board:#041207;--panel:#06180a;--panel-2:#0a2210;--ink:#43ff7a;--muted:#2fac55;--border:#031a08;--rail:#020a04;--rail-ink:#43ff7a;--sig-work:#43ff7a;--sig-accent:#b6ff00;--sig-accent-2:#00e6a8;--sig-done:#00e05a;--sig-wait:#a8ff3e;--sig-err:#eaff40;--sig-idle:#12602c;--on-sig:#020a04;--on-err:#020a04;--on-accent:#020a04;--on-accent-2:#06050c;--on-idle:#ffffff;--shadow-col:#031a08;--mass:#010603;--stage:#0d7a34;--stage-ink:#d9ffe6;--drip:#43ff7a;--halftone:radial-gradient(circle at center, rgba(67,255,122,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(67,255,122,0.14) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(67,255,122,0.13) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(67,255,122,0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(67,255,122,0.16) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(67,255,122,0.05) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
 .brand-aurora{color-scheme:dark;--ground:#0b0f18;--board:#141822;--panel:#1d212b;--panel-2:#292e38;--ink:#e9ecf6;--muted:#9aa0b8;--border:#000000;--rail:#040712;--rail-ink:#e3e6f2;--sig-work:#00d3fb;--sig-accent:#7c5cff;--sig-accent-2:#22d3ee;--sig-done:#00deaa;--sig-wait:#f9ad00;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
 .brand-aurora-light{color-scheme:light;--ground:#ebeef5;--board:#e3e6ed;--panel:#fdfdff;--panel-2:#f0f3fa;--ink:#161a26;--muted:#5a6076;--border:#000000;--rail:#0d0f15;--rail-ink:#eef1f8;--sig-work:#009cba;--sig-accent:#7c5cff;--sig-accent-2:#22d3ee;--sig-done:#00a57d;--sig-wait:#c18500;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
+.brand-boardroom{color-scheme:light;--ground:#edeef1;--board:#e5e6e9;--panel:#fdfdff;--panel-2:#f2f3f6;--ink:#181b22;--muted:#5c6472;--border:#000000;--rail:#181b22;--rail-ink:#eef1f6;--sig-work:#0891b2;--sig-accent:#2f5fe0;--sig-accent-2:#0f9d8c;--sig-done:#0d9488;--sig-wait:#d97706;--sig-err:#e11d48;--sig-idle:#7e7e94;--on-sig:#0b0b12;--on-err:#ffffff;--on-accent:#ffffff;--on-accent-2:#06050c;--on-idle:#0b0b12;--shadow-col:#000000;--mass:#0b0b12;--stage:#00a344;--stage-ink:#04140a;--drip:#0a7f5c;--halftone:radial-gradient(circle at center, rgba(0,0,0,0.13) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(0,0,0,0.11) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(0,0,0,0.045) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--radius:6px;--brd-hair:2px;--brd:3px;--brd-heavy:4px;--brd-brush:6px;--shadow-off-sm:3px;--shadow-off:6px;--shadow-off-lg:9px;--row-h:40px}
 .brand-ember{color-scheme:dark;--ground:#120e11;--board:#1b171a;--panel:#242023;--panel-2:#312c30;--ink:#f4ece9;--muted:#a3908a;--border:#000000;--rail:#0a0609;--rail-ink:#f0e2dc;--sig-work:#00d3fb;--sig-accent:#ff6a3d;--sig-accent-2:#ffb020;--sig-done:#00deaa;--sig-wait:#f9ad00;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
 .brand-harbor{color-scheme:dark;--ground:#0a1114;--board:#121a1d;--panel:#1c2326;--panel-2:#282f33;--ink:#e6eef0;--muted:#8aa0a6;--border:#000000;--rail:#02080c;--rail-ink:#dbe8ea;--sig-work:#81cbe0;--sig-accent:#3aa0b0;--sig-accent-2:#aacb81;--sig-done:#82d0b3;--sig-wait:#dfb679;--sig-err:#cd7674;--sig-idle:#85858f;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
 .brand-porcelain{color-scheme:light;--ground:#f4f5f7;--board:#eceef2;--panel:#ffffff;--panel-2:#f2f4f8;--ink:#14161c;--muted:#5b6270;--border:#000000;--rail:#14161c;--rail-ink:#eef1f6;--sig-work:#1d74d6;--sig-accent:#4338ca;--sig-accent-2:#0e7490;--sig-done:#0f8a5f;--sig-wait:#b8730a;--sig-err:#cc2b3d;--sig-idle:#6b7280;--on-sig:#06050c;--on-err:#ffffff;--on-accent:#ffffff;--on-accent-2:#ffffff;--on-idle:#ffffff;--shadow-col:#000000;--mass:#0b0b12;--stage:#128a52;--stage-ink:#ffffff;--drip:#0e7490;--halftone:radial-gradient(circle at center, rgba(0,0,0,0.13) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(0,0,0,0.11) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(0,0,0,0.045) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
@@ -1571,6 +1580,32 @@ body {
     <span>idle</span><b class="ratio ok">5.5</b></div><div class="sw" style="background:var(--sig-accent);color:var(--on-accent)">
     <span>accent</span><b class="ratio ok">4.7</b></div><div class="sw" style="background:var(--sig-accent-2);color:var(--on-accent-2)">
     <span>accent2</span><b class="ratio ok">11.2</b></div></div></div>
+    <div class="samples">
+    <button class="cr-btn">Primary</button>
+    <button class="cr-btn cr-btn--outline cr-btn--sig-accent">Accent</button>
+    <button class="cr-btn cr-btn--ghost">Ghost</button>
+    <span class="cr-chip">chip</span>
+    <span class="cr-chip cr-chip--sig-err">error</span>
+    <div class="cr-panel" style="min-width:150px"><div class="cr-panel__body">Panel surface with <a href="#" style="color:var(--sig-work)">a link</a>.</div></div>
+  </div>
+  </section>
+<section class="brand-boardroom">
+    <header><h2>Boardroom · light, soft corners, heavy chassis</h2><code>data-theme="boardroom"</code>
+      <span class="scheme">light · brand</span></header>
+    <div class="row"><div class="lbl">surfaces</div><div class="swatches"><div class="sw" style="background:var(--ground);color:var(--ink)">
+    <span>ground</span><b class="ratio ok">14.9</b></div><div class="sw" style="background:var(--board);color:var(--ink)">
+    <span>board</span><b class="ratio ok">13.8</b></div><div class="sw" style="background:var(--panel);color:var(--ink)">
+    <span>panel</span><b class="ratio ok">17.0</b></div><div class="sw" style="background:var(--panel-2);color:var(--ink)">
+    <span>panel-2</span><b class="ratio ok">15.5</b></div><div class="sw" style="background:var(--rail);color:var(--rail-ink)">
+    <span>rail</span><b class="ratio ok">15.2</b></div></div></div>
+    <div class="row"><div class="lbl">signals</div><div class="swatches"><div class="sw" style="background:var(--sig-work);color:var(--on-sig)">
+    <span>work</span><b class="ratio ok">5.3</b></div><div class="sw" style="background:var(--sig-wait);color:var(--on-sig)">
+    <span>wait</span><b class="ratio ok">6.2</b></div><div class="sw" style="background:var(--sig-done);color:var(--on-sig)">
+    <span>done</span><b class="ratio ok">5.2</b></div><div class="sw" style="background:var(--sig-err);color:var(--on-err)">
+    <span>err</span><b class="ratio ok">4.7</b></div><div class="sw" style="background:var(--sig-idle);color:var(--on-idle)">
+    <span>idle</span><b class="ratio ok">4.9</b></div><div class="sw" style="background:var(--sig-accent);color:var(--on-accent)">
+    <span>accent</span><b class="ratio ok">5.5</b></div><div class="sw" style="background:var(--sig-accent-2);color:var(--on-accent-2)">
+    <span>accent2</span><b class="ratio ok">6.0</b></div></div></div>
     <div class="samples">
     <button class="cr-btn">Primary</button>
     <button class="cr-btn cr-btn--outline cr-btn--sig-accent">Accent</button>

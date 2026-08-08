@@ -1,0 +1,20 @@
+{
+  "$schema": "../dist/theme-contract.json",
+  "$label": "Boardroom · light, soft corners, heavy chassis",
+  "$description": "Shows STRUCTURAL branding, not just colour. `$shape: \"soft\"` rounds the rectangular surfaces (--radius 6px) and `$weight: \"heavy\"` thickens borders and deepens the hard shadows. Surfaces come from `$ramp`; on-colours are auto-derived. Any chassis token can also be set explicitly (e.g. \"row-h\") — those win over the presets. Build → dist/themes/boardroom.css.",
+  "$extends": "light",
+  "$scheme": "light",
+  "$ramp": "#f5f6f9",
+  "$shape": "soft",
+  "$weight": "heavy",
+
+  "ink": "#181b22",
+  "muted": "#5c6472",
+  "rail": "#181b22",
+  "rail-ink": "#eef1f6",
+
+  "sig-accent": "#2f5fe0",
+  "sig-accent-2": "#0f9d8c",
+
+  "row-h": "40px"
+}

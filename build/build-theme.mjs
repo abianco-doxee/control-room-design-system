@@ -23,6 +23,7 @@ import { dirname, join, basename } from "node:path";
 import { themeCss, mergeTheme, validateTheme, checkThemeContrast, deriveOnColors } from "../lib/theme/index.js";
 import { surfaceRamp } from "./ramp.mjs";
 import { toneSignals, fitSignals } from "./signals.mjs";
+import { chassisFrom } from "./chassis.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BRANDS = join(ROOT, "brands");
@@ -85,10 +86,13 @@ function resolveBrand(brand, seen = new Set()) {
     const afterTone = mergeTheme(mergeTheme(base, surfaces), signals);
     signals = { ...signals, ...fitSignals(afterTone, { against: "panel", min, skip }) };
   }
-  /* precedence: $extends base < ramp surfaces < toned/fitted signals < explicit
-   * roles. on-* re-derive for anything whose fill changed (explicit OR signals). */
+  /* $shape / $weight: structural chassis (rounding, border + shadow scale). */
+  const chassis = chassisFrom(brand);
+  /* precedence: $extends base < ramp surfaces < chassis presets < toned/fitted
+   * signals < explicit roles (incl. any explicit chassis token). on-* re-derive
+   * for anything whose fill changed (explicit OR signals). */
   const changed = [...Object.keys(overrides), ...Object.keys(signals)];
-  const merged = mergeTheme(mergeTheme(mergeTheme(base, surfaces), signals), overrides);
+  const merged = mergeTheme(mergeTheme(mergeTheme(mergeTheme(base, surfaces), chassis), signals), overrides);
   const vars = deriveOnColors(merged, { changed });
   return { vars, meta: brand };
 }
