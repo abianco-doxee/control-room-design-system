@@ -557,12 +557,21 @@
 
 /* Shared plot furniture — grid, axis ticks, value + target */
 .cr-chart__grid { stroke: color-mix(in srgb, var(--ink) 16%, transparent); stroke-width: 1; }
+.cr-chart__grid--v { stroke: color-mix(in srgb, var(--ink) 9%, transparent); }
 .cr-chart__target { stroke: var(--sig-err); stroke-width: 1.5; stroke-dasharray: 4 3; }
 .cr-chart__tick { fill: var(--muted); font-family: var(--font-mono); font-size: 9px; letter-spacing: -0.02em; }
 .cr-chart__ytick { fill: var(--muted); font-family: var(--font-mono); font-size: 8.5px; letter-spacing: -0.03em; opacity: 0.85; }
 .cr-chart__val { fill: var(--ink); font-family: var(--font-mono); font-size: 9px; font-weight: 700; }
 .cr-chart__legend { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-3); margin: var(--space-1) 0 0; padding: 0; }
 .cr-chart__key { display: inline-flex; align-items: center; gap: var(--space-1); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--ink); }
+/* Interactive legend keys: click to isolate/restore a series. Reset the button
+ * chrome so they read as legend text, keep a visible focus ring, and mute the
+ * key (label + swatch) when its series is toggled off. */
+button.cr-chart__key { border: 0; background: none; padding: 2px 3px; margin: 0; cursor: pointer; border-radius: calc(var(--radius) * 0.5); transition: opacity var(--dur-1) var(--ease-out); }
+button.cr-chart__key:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
+.cr-chart__key--off { opacity: 0.4; text-decoration: line-through; }
+.cr-chart__key--off .cr-chart__sw { filter: grayscale(1); }
 .cr-chart__sw { width: 10px; height: 10px; border: var(--brd-hair) solid var(--border); flex: none; }
 
 /* Hover layer — crosshair + cursor dots (SVG) and a top-docked tooltip (HTML).
@@ -587,6 +596,9 @@
 
 /* Line chart */
 .cr-linechart { margin: 0; }
+/* The graphic (svg + hover tooltip) carries role="img"; the interactive legend
+ * lives outside it so its buttons aren't nested inside an image subtree. */
+.cr-linechart__graphic { position: relative; display: block; }
 .cr-linechart__plot { display: block; width: 100%; height: auto; background: var(--panel-2); border: var(--brd-hair) solid var(--border); }
 .cr-linechart__line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 .cr-linechart__area { opacity: 0.12; stroke: none; }

@@ -159,6 +159,11 @@ const LINE_SERIES = [
   { name: "errors", data: [2, 3, 2, 5, 4, 3, 6, 4], signal: "err" },
 ];
 const LINE_LABELS = ["09", "10", "11", "12", "13", "14", "15", "16"];
+// Epoch-ms x-values (15-min cadence from a fixed base) for the continuous/time axis.
+const LINE_X = (() => {
+  const base = Date.UTC(2026, 0, 1, 9, 0, 0), step = 15 * 60 * 1000;
+  return LINE_LABELS.map((_, i) => base + i * step);
+})();
 const BAR_DATA = [
   { label: "eu", value: 42 },
   { label: "us", value: 31 },
@@ -460,11 +465,18 @@ const DEMOS = {
     defs: [
       T("boolean", "area", true),
       T("boolean", "axis", true),
+      T("boolean", "timeAxis", false),
       T("text", "unit", ""),
       T("number", "height", 140, { min: 90, max: 220 }),
       T("text", "label", "Throughput vs errors"),
     ],
-    render: (s) => h(CrLineChart, { series: LINE_SERIES, labels: LINE_LABELS, area: s.area, axis: s.axis, unit: s.unit, height: s.height, label: s.label }),
+    render: (s) => h(CrLineChart, {
+      series: LINE_SERIES,
+      labels: s.timeAxis ? undefined : LINE_LABELS,
+      x: s.timeAxis ? LINE_X : undefined,
+      xTime: s.timeAxis,
+      area: s.area, axis: s.axis, unit: s.unit, height: s.height, label: s.label,
+    }),
   },
   "bar-chart": {
     tag: "CrBarChart",
