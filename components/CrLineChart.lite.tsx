@@ -20,6 +20,13 @@ export interface CrLineChartProps {
   xTime?: boolean;
   /** IANA time zone for the calendar x-axis (e.g. "Europe/Rome"). Default "UTC". */
   xZone?: string;
+  /** Month-name language for calendar ticks: "en" (default) or "it". */
+  xLocale?: string;
+  /** Weekly ticks as dates ("3 Mar", default) or ISO week numbers ("W10"). */
+  xWeek?: string;
+  /** Fiscal year start month 1–12 (default 1 = calendar). Year/quarter ticks then
+   *  anchor to it and label FY/Q (FY named by the ending calendar year). */
+  xFiscalStart?: number;
   /** Force the y-scale; otherwise a "nice" scale is derived from the data. */
   min?: number;
   max?: number;
@@ -133,21 +140,45 @@ export default function CrLineChart(props: CrLineChartProps) {
       const p = state.zoneParts(ms, zone);
       return state.z2(p.hour) + ":" + state.z2(p.minute) + (withSec ? ":" + state.z2(p.second) : "");
     },
-    fmtCal(ms: number, unit: string, zone: string): string {
-      const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    monNames(locale: string): string[] {
+      if (locale === "it") return ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
+      return ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    },
+    fyEnd(year: number, month: number, start: number): number { return month >= start ? year + 1 : year; },
+    quarterOf(month: number, start: number): number { return Math.floor(((month - 1 - (start - 1) + 12) % 12) / 3) + 1; },
+    isoWeek(y: number, mo: number, d: number): { week: number; year: number } {
+      const date = new Date(Date.UTC(y, mo, d));
+      const dayNr = (date.getUTCDay() + 6) % 7;
+      date.setUTCDate(date.getUTCDate() - dayNr + 3);
+      const isoYear = date.getUTCFullYear();
+      const firstThu = new Date(Date.UTC(isoYear, 0, 4));
+      firstThu.setUTCDate(firstThu.getUTCDate() - ((firstThu.getUTCDay() + 6) % 7) + 3);
+      const week = 1 + Math.round((date.getTime() - firstThu.getTime()) / (7 * 24 * 3600 * 1000));
+      return { week, year: isoYear };
+    },
+    calLabel(ms: number, unit: string, step: number, zone: string, locale: string, week: string, fs: number): string {
       const p = state.zoneParts(ms, zone);
-      const mon = MON[p.month - 1];
-      if (unit === "year") return "" + p.year;
-      if (unit === "month") return p.month === 1 ? mon + " '" + state.z2(p.year % 100) : mon;
+      const mon = state.monNames(locale)[p.month - 1];
+      if (unit === "year") return fs > 1 ? "FY" + state.z2(state.fyEnd(p.year, p.month, fs) % 100) : "" + p.year;
+      if (unit === "month") {
+        if (step === 3 && fs > 1) {
+          const q = state.quarterOf(p.month, fs);
+          return "Q" + q + (q === 1 ? " FY" + state.z2(state.fyEnd(p.year, p.month, fs) % 100) : "");
+        }
+        return fs === 1 && p.month === 1 ? mon + " '" + state.z2(p.year % 100) : mon;
+      }
+      if (unit === "week" && week === "iso") {
+        const w = state.isoWeek(p.year, p.month - 1, p.day);
+        return "W" + w.week + (w.week === 1 ? " '" + state.z2(w.year % 100) : "");
+      }
       return p.day + " " + mon;
     },
     /* A fuller stamp for the hover tooltip's x-label. */
-    fmtStamp(ms: number, zone: string): string {
+    fmtStamp(ms: number, zone: string, locale: string): string {
       const p = state.zoneParts(ms, zone);
-      const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      return p.day + " " + MON[p.month - 1] + " " + state.z2(p.hour) + ":" + state.z2(p.minute);
+      return p.day + " " + state.monNames(locale)[p.month - 1] + " " + state.z2(p.hour) + ":" + state.z2(p.minute);
     },
-    timeTicks(lo: number, hi: number, zone: string, target: number): { value: number; label: string }[] {
+    timeTicks(lo: number, hi: number, zone: string, target: number, locale: string, week: string, fs: number): { value: number; label: string }[] {
       const S = 1000, MIN = 60 * S, HR = 60 * MIN, DAY = 24 * HR;
       const FIXED = [S, 2 * S, 5 * S, 10 * S, 15 * S, 30 * S, MIN, 2 * MIN, 5 * MIN, 10 * MIN, 15 * MIN, 30 * MIN, HR, 2 * HR, 3 * HR, 6 * HR, 12 * HR];
       let a = lo, b = hi;
@@ -176,8 +207,15 @@ export default function CrLineChart(props: CrLineChartProps) {
       }
       const p0 = state.zoneParts(a, zone);
       let cy = p0.year, cmo = p0.month - 1, cd = p0.day;
-      if (unit === "year") { cy = Math.floor(cy / step) * step; cmo = 0; cd = 1; }
-      else if (unit === "month") { cmo = Math.floor(cmo / step) * step; cd = 1; }
+      if (unit === "year") {
+        cmo = fs - 1; cd = 1;
+        if (fs > 1 && p0.month - 1 < fs - 1) cy = cy - 1;
+        cy = Math.floor(cy / step) * step;
+      } else if (unit === "month") {
+        const off = (fs - 1) % step;
+        cmo = Math.floor((p0.month - 1 - off) / step) * step + off;
+        cd = 1;
+      }
       let cur = state.zEpoch(cy, cmo, cd, 0, 0, 0, zone);
       if (unit === "week") {
         const back = (state.zWeekday(cur, zone) + 6) % 7;
@@ -185,9 +223,9 @@ export default function CrLineChart(props: CrLineChartProps) {
       }
       let guard = 0;
       while (cur <= b && guard < 5000) {
-        if (cur >= a) out.push({ value: cur, label: state.fmtCal(cur, unit, zone) });
+        if (cur >= a) out.push({ value: cur, label: state.calLabel(cur, unit, step, zone, locale, week, fs) });
         const q = state.zoneParts(cur, zone);
-        if (unit === "year") cur = state.zEpoch(q.year + step, 0, 1, 0, 0, 0, zone);
+        if (unit === "year") cur = state.zEpoch(q.year + step, fs - 1, 1, 0, 0, 0, zone);
         else if (unit === "month") cur = state.zEpoch(q.year, q.month - 1 + step, 1, 0, 0, 0, zone);
         else if (unit === "week") cur = state.zEpoch(q.year, q.month - 1, q.day + 7, 0, 0, 0, zone);
         else cur = state.zEpoch(q.year, q.month - 1, q.day + step, 0, 0, 0, zone);
@@ -254,7 +292,7 @@ export default function CrLineChart(props: CrLineChartProps) {
         xmax = xhi;
         const xspan = (xhi - xlo) || 1;
         if (props.xTime) {
-          const tt = state.timeTicks(xlo, xhi, props.xZone || "UTC", 6);
+          const tt = state.timeTicks(xlo, xhi, props.xZone || "UTC", 6, props.xLocale || "en", props.xWeek || "date", props.xFiscalStart || 1);
           for (const t of tt) if (t.value >= xlo - xspan * 1e-6 && t.value <= xhi + xspan * 1e-6) xticks.push({ v: t.value, label: t.label });
         } else {
           for (const t of state.niceScale(xlo, xhi, 5).ticks) if (t >= xlo - xspan * 1e-6 && t <= xhi + xspan * 1e-6) xticks.push({ v: t, label: state.fmtTick(t) });
@@ -349,7 +387,7 @@ export default function CrLineChart(props: CrLineChartProps) {
       if (leftPct < 12) leftPct = 12;
       if (leftPct > 88) leftPct = 88;
       const label = m.continuous
-        ? (idx < xs.length ? (props.xTime ? state.fmtStamp(xs[idx], props.xZone || "UTC") : state.fmtTick(xs[idx])) : "")
+        ? (idx < xs.length ? (props.xTime ? state.fmtStamp(xs[idx], props.xZone || "UTC", props.xLocale || "en") : state.fmtTick(xs[idx])) : "")
         : ((props.labels || [])[idx] || "");
       return { cx, top: m.T, bot: m.T + m.plotH, leftPct, label, rows };
     },

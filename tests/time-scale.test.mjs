@@ -78,6 +78,53 @@ test("calendar boundaries are computed in the target zone, not UTC", () => {
   }
 });
 
+test("locale: Italian month labels", () => {
+  const lo = Date.UTC(2025, 0, 15);
+  const hi = Date.UTC(2025, 4, 20);
+  const ticks = timeTicks(lo, hi, { zone: "UTC", locale: "it" });
+  assert.deepEqual(ticks.map((t) => t.label), ["feb", "mar", "apr", "mag"]);
+});
+
+test("week labels can be ISO week numbers (on Mondays)", () => {
+  const lo = Date.UTC(2026, 0, 1);
+  const hi = lo + 28 * DAY;
+  const ticks = timeTicks(lo, hi, { zone: "UTC", week: "iso" });
+  for (const t of ticks) {
+    const wd = new Intl.DateTimeFormat("en-US", { timeZone: "UTC", weekday: "short" }).format(new Date(t.value));
+    assert.equal(wd, "Mon", "still on Mondays");
+    assert.match(t.label, /^W\d+( '\d\d)?$/, `ISO week label ${t.label}`);
+  }
+  // 2026-01-01 is a Thursday → its Mondays are in ISO weeks 2, 3, …
+  assert.equal(ticks[0].label.replace(/ '\d\d/, ""), "W2");
+});
+
+test("fiscalStart anchors year + quarter ticks and labels FY/Q (April start)", () => {
+  // Fiscal year starting April; quarters Apr / Jul / Oct / Jan.
+  const lo = Date.UTC(2024, 3, 1);  // 1 Apr 2024
+  const hi = Date.UTC(2025, 2, 31); // 31 Mar 2025 — one fiscal year
+  const q = timeTicks(lo, hi, { zone: "UTC", fiscalStart: 4 });
+  // ~12 months → quarterly ticks
+  const months = q.map((t) => new Intl.DateTimeFormat("en-US", { timeZone: "UTC", month: "short" }).format(new Date(t.value)));
+  assert.deepEqual(months, ["Apr", "Jul", "Oct", "Jan"]);
+  assert.deepEqual(q.map((t) => t.label), ["Q1 FY25", "Q2", "Q3", "Q4"]);
+
+  // Multi-year → yearly ticks on 1 April, labelled by the ending FY.
+  const y = timeTicks(Date.UTC(2022, 5, 1), Date.UTC(2025, 5, 1), { zone: "UTC", fiscalStart: 4 });
+  for (const t of y) {
+    const p = new Intl.DateTimeFormat("en-US", { timeZone: "UTC", month: "2-digit", day: "2-digit" }).format(new Date(t.value));
+    assert.equal(p, "04/01", "1 April");
+    assert.match(t.label, /^FY\d\d$/, `FY label ${t.label}`);
+  }
+});
+
+test("defaults are unchanged (backward compatible)", () => {
+  const lo = Date.UTC(2025, 0, 15), hi = Date.UTC(2025, 4, 20);
+  const a = timeTicks(lo, hi, { zone: "UTC" });
+  const b = timeTicks(lo, hi, { zone: "UTC", locale: "en", week: "date", fiscalStart: 1 });
+  assert.deepEqual(a, b);
+  assert.deepEqual(a.map((t) => t.label), ["Feb", "Mar", "Apr", "May"]);
+});
+
 test("DST transition: day ticks stay on local midnight across the spring shift", () => {
   // Europe/Rome springs forward on 2025-03-30 (02:00 → 03:00).
   const lo = Date.UTC(2025, 2, 28);
