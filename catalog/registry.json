@@ -2517,6 +2517,43 @@
         "recurring",
         "form"
       ]
+    },
+    {
+      "id": "datagrid",
+      "name": "Data grid",
+      "category": "layout",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "A dense, VIRTUALIZED data grid for large datasets: only the rows in (or near) the viewport are in the DOM, so thousands of rows scroll smoothly. Fixed row height; sortable headers (asc → desc → none, stable); optional row selection (checkbox column + select-all + aria-selected); sticky header; grid a11y (role=grid/row/columnheader/gridcell, aria-sort, aria-rowcount). Div-grid (not a <table>) so virtualization offsets cleanly across all targets.",
+      "spec": "references/components.md#data-grid",
+      "variants": {
+        "prop": [
+          "columns",
+          "rows",
+          "selectable",
+          "height",
+          "rowHeight",
+          "rowKey"
+        ]
+      },
+      "tokens": [
+        { "cssVar": "--board", "description": "grid + row fill" },
+        { "cssVar": "--panel", "description": "sticky header" },
+        { "cssVar": "--sig-work", "description": "selected row + sort glyph" }
+      ],
+      "keywords": [
+        "data grid",
+        "datagrid",
+        "table",
+        "virtualized",
+        "virtualization",
+        "windowing",
+        "sortable",
+        "selection",
+        "rows",
+        "dataset",
+        "sticky header"
+      ]
     }
   ]
 }

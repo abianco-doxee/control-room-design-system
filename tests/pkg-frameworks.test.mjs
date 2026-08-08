@@ -20,6 +20,7 @@ const BREADTH = [
   ["CrStatusDot", { label: "online" }],
   ["CrSwitch", {}],
   ["CrField", { id: "f1", label: "Name" }],
+  ["CrDataGrid", { columns: [{ key: "a", label: "A" }, { key: "b", label: "B", sortable: true }], rows: [{ a: 1, b: 2 }, { a: 3, b: 4 }] }],
 ];
 
 for (const [fw, render] of Object.entries(RENDERERS)) {
