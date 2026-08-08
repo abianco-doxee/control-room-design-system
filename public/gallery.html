@@ -838,6 +838,8 @@ body {
 /* Shared plot furniture — grid, axis ticks, value + target */
 .cr-chart__grid { stroke: color-mix(in srgb, var(--ink) 16%, transparent); stroke-width: 1; }
 .cr-chart__grid--v { stroke: color-mix(in srgb, var(--ink) 9%, transparent); }
+/* Collapsed-gap marker on a "broken" (gap-collapse) time axis. */
+.cr-chart__break { stroke: color-mix(in srgb, var(--ink) 34%, transparent); stroke-width: 1; stroke-dasharray: 1 3; }
 .cr-chart__target { stroke: var(--sig-err); stroke-width: 1.5; stroke-dasharray: 4 3; }
 .cr-chart__tick { fill: var(--muted); font-family: var(--font-mono); font-size: 9px; letter-spacing: -0.02em; }
 .cr-chart__ytick { fill: var(--muted); font-family: var(--font-mono); font-size: 8.5px; letter-spacing: -0.03em; opacity: 0.85; }

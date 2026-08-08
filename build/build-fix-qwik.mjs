@@ -45,12 +45,18 @@ let unpatched = 0;
 for (const file of readdirSync(QWIK).filter((f) => f.endsWith(".tsx"))) {
   const p = join(QWIK, file);
   const src = readFileSync(p, "utf8");
-  const out = src.replace(IIFE, (match, body) => {
-    if (/\breturn\b/.test(body)) return match; // already correct
-    // prefix the first non-whitespace of the body with `return `
-    const fixed = body.replace(/^(\s*)(\S)/, (_m, ws, ch) => `${ws}return ${ch}`);
-    return `{(() => {${fixed}})()}`;
-  });
+  const out = src
+    .replace(IIFE, (match, body) => {
+      if (/\breturn\b/.test(body)) return match; // already correct
+      // prefix the first non-whitespace of the body with `return `
+      const fixed = body.replace(/^(\s*)(\S)/, (_m, ws, ch) => `${ws}return ${ch}`);
+      return `{(() => {${fixed}})()}`;
+    })
+    // Normalise a sibling-component import to the `.tsx` source extension the
+    // barrel uses: Mitosis's Qwik target emits `from "./CrFormRow.jsx"`, but the
+    // file is `.tsx` and build-pkg only rewrites .tsx/.ts → .js. Left as .jsx the
+    // emitted package can't resolve the cross-component import.
+    .replace(/from (["'])(\.\/Cr[A-Za-z0-9]+)\.jsx\1/g, "from $1$2.tsx$1");
   if (out !== src) {
     if (CHECK) { unpatched++; console.error(`✗ ${file} has an unpatched Qwik class IIFE`); continue; }
     writeFileSync(p, out);

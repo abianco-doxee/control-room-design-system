@@ -288,23 +288,49 @@ visible `*`; an error sets `aria-invalid` and is linked with `aria-describedby` 
 announced (`role="alert"`); hint text is linked the same way. The submit path uses
 `noValidate` so the schema's messages show instead of the browser's.
 
+## Per-field re-render isolation
+
+`CrForm` stays a **controlled** form (the value store is the source of truth, so
+Reset, autocomplete, coercion and `when` all just work) *and* re-renders only the
+field you're editing — not the whole form — on every keystroke. React-Hook-Form
+gets there by going *uncontrolled* with React-specific refs/context; `CrForm`
+compiles to **six** frameworks from one source, so it uses a portable shape
+instead:
+
+- **Each row is its own component** (`CrFormRow`) that takes **only plain data
+  props** — no function props. On React the compiled `CrFormRow` is wrapped in
+  `React.memo` (by `build/build-fix-react.mjs`), so when the form re-renders, every
+  row whose data didn't change bails out on a shallow compare. Only the edited
+  row re-renders.
+- **Input is delegated.** Instead of per-input handlers (which would be new
+  closures each render and defeat the memo), `CrForm` attaches one set of listeners
+  to the `<form>`; each control carries `data-path` / `data-kind` / `data-action`.
+  The handlers live in the component body, recreated each render, so they always
+  read the latest state — no stale closures.
+- **The fine-grained targets get it for free.** Solid/Vue/Svelte/Qwik already
+  update per-binding; the delegation is inert there. (blur/focus don't bubble on
+  those five, so the `<form>` also carries `onFocusOut`/`onFocusIn` alongside
+  `onBlur`/`onFocus` — React uses the bubbling `onBlur`/`onFocus`, the rest use
+  `focusout`/`focusin`.)
+
+The isolation is enforced by a test: `tests/showcase-islands.spec.mjs` types into
+one field and asserts only that field's render counter ticked; `tests/pkg-react.test.mjs`
+guards that `CrFormRow` still ships `memo`-wrapped. Even so, for an unusually large
+form (hundreds of live fields) prefer splitting it into steps/sections.
+
 ## Limitations (honest notes)
 
 - **ArkType alphabetises enum export.** `Type.toJsonSchema()` sorts enum members,
   so an ArkType-sourced `select` lists options alphabetically. Pass
   `overrides[name].options` (or author via JSON Schema, which preserves order) to
   control it.
-- **Controlled re-render (by design).** `CrForm` is a *controlled* form: a
-  keystroke updates the value store and the field subtree re-renders, so per-render
-  work is O(visible fields). Libraries like React-Hook-Form dodge this with
-  *uncontrolled* inputs and per-field subscriptions — but that leans on
-  React-specific refs/context, and this component compiles to **six** frameworks
-  from one source, where that machinery has no portable equivalent. The trade is
-  deliberate: universal targets over micro-tuned re-renders. In practice it's a
-  non-issue for typical forms (dozens of fields); the error-summary walk is gated
-  so it never runs on the typing path, and hidden `when` fields drop out of the
-  render entirely. For an unusually large form (hundreds of live fields) prefer
-  splitting it into steps/sections rather than rendering it all at once.
+- **A React dev-only warning for `onFocusOut`.** React doesn't know the
+  `onFocusOut`/`onFocusIn` props `CrForm` attaches for the other five targets, so a
+  React consumer's **dev** build logs one "Unknown event handler property" warning
+  per form. It's stripped from production builds and is harmless (React uses the
+  bubbling `onBlur`/`onFocus` we also attach). A React-only build could drop the two
+  props, but Mitosis's `useTarget` mis-compiles target-split event handlers today,
+  so both are emitted for every target.
 - **Predicate constraints degrade on export.** Some ArkType constraints are
   predicates (e.g. `string.url` validates via `new URL()`) with no exact JSON
   Schema form. Export keeps a known `format` where ArkType has one (`url` →

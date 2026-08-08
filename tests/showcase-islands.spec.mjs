@@ -145,6 +145,33 @@ test.describe("component browser — live islands", () => {
     await expect(reset).toHaveCount(0); // pristine again
   });
 
+  test("per-field re-render isolation: typing one field doesn't re-render its siblings", async ({ page }) => {
+    // CrForm delegates input to listeners on the <form> and renders each row as a
+    // React.memo'd CrFormRow taking only data props — so a keystroke re-renders
+    // only the edited field, not the whole form. CrFormRow ticks a per-path counter
+    // on every React commit (a memoized bail-out doesn't commit → doesn't tick),
+    // which is exactly what this asserts. See references/forms.md + CrFormRow.lite.tsx.
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const form = page.locator('[data-island="form"]');
+    await expect(form.locator("#cr-form-name")).toBeVisible();
+
+    // arm the probe AFTER mount (initial mounts, with the global unset, don't count)
+    await page.evaluate(() => { window.__CR_ROW_RENDERS__ = {}; });
+
+    // type into `name` only
+    await form.locator("#cr-form-name").pressSequentially("nova", { delay: 15 });
+    await page.waitForTimeout(50); // let effects flush
+
+    const renders = await page.evaluate(() => window.__CR_ROW_RENDERS__);
+    // the edited field re-rendered…
+    expect(renders["name"] || 0).toBeGreaterThanOrEqual(1);
+    // …and NO other field did. A non-isolated form (single component, no memo)
+    // would tick every visible row on each of the four keystrokes.
+    const ticked = Object.keys(renders).filter((k) => renders[k] > 0).sort();
+    expect(ticked, `only "name" should have re-rendered; got: ${JSON.stringify(renders)}`).toEqual(["name"]);
+  });
+
   test("editing a control prop re-renders the live component", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));

@@ -58,3 +58,17 @@ test("typed declarations ship alongside the JS", () => {
   assert.match(btn, /export interface CrButtonProps/);
   assert.match(btn, /emphasis\?:/);
 });
+
+test("CrFormRow ships wrapped in React.memo (per-field render isolation guard)", () => {
+  // CrForm's per-field re-render isolation depends on CrFormRow being memoized so a
+  // form re-render only re-renders the row whose data changed. build-fix-react.mjs
+  // applies the wrap; this guards it against a codegen/pipeline regression.
+  const REACT_MEMO = Symbol.for("react.memo");
+  assert.equal(CR.CrFormRow?.$$typeof, REACT_MEMO, "CrFormRow default export must be memo(...)");
+  assert.equal(typeof CR.CrFormRow.type, "function", "memo wraps the component function");
+
+  // and CrForm actually drives it by delegation (form-level listeners + data-path)
+  const formJs = readFileSync(join(PKG, "components", "CrForm.js"), "utf8");
+  assert.match(formJs, /from "\.\/CrFormRow\.js"/, "CrForm imports the compiled CrFormRow");
+  assert.match(formJs, /onFormInput|onInput/, "CrForm attaches a delegated input listener");
+});

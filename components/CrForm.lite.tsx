@@ -1,4 +1,5 @@
 import { useStore, Show, For } from "@builder.io/mitosis";
+import CrFormRow from "./CrFormRow.lite";
 
 export interface CrFormField {
   name: string;
@@ -433,6 +434,85 @@ export default function CrForm(props: CrFormProps) {
       if (props.onChange) props.onChange(next);
       if (state.submitted) state.revalidate(next);
     },
+    /* ── event delegation ──
+     * All field input is handled by a small set of listeners on the <form> (see
+     * the JSX) rather than per-input handlers. That keeps CrFormRow free of
+     * function props, so React.memo can skip the rows whose data didn't change —
+     * only the edited field re-renders. Each control carries `data-path` /
+     * `data-kind` / `data-action`; these helpers translate that back into the
+     * store operations. Handlers live here (recreated each render), so they always
+     * read the latest state — no stale-closure risk. */
+    pathOf(key: string): any[] {
+      /* dotted key → path array, coercing pure-integer segments back to numeric
+       * array indices (so setDeep rebuilds arrays, not objects). */
+      return key.split(".").map((seg: string) => (/^\d+$/.test(seg) ? Number(seg) : seg));
+    },
+    fieldAtKey(wantKey: string): any {
+      /* resolve the field descriptor for a leaf path (needed by autocomplete).
+       * `wantKey`, not `key` — the latter is a store method (a param named `key`
+       * would shadow it and break `state.key(...)` in the compiled output). */
+      const list = state.rows();
+      for (const r of list) if (r.t === "field" && state.key(r.path) === wantKey) return r.field;
+      return undefined;
+    },
+    addItemByKind(path: any[], kind: string) {
+      const empty = kind === "group" ? {} : kind === "checkbox" ? false : "";
+      const arr = state.getDeep(state.vals, path) || [];
+      const next = state.setDeep(state.vals, path, arr.concat([empty]));
+      state.vals = next;
+      if (props.onChange) props.onChange(next);
+    },
+    onFormInput(event: any) {
+      const el = event.target;
+      if (!el || !el.dataset || el.dataset.path == null) return;
+      const kind = el.dataset.kind;
+      const key = el.dataset.path;
+      if (kind === "autocomplete") {
+        state.acInput(state.fieldAtKey(key), state.pathOf(key), el.value);
+      } else if (kind === "text" || kind === "email" || kind === "url" || kind === "number" || kind === "textarea" || kind === "json") {
+        state.setField(state.pathOf(key), el.value);
+      }
+    },
+    onFormChange(event: any) {
+      const el = event.target;
+      if (!el || !el.dataset || el.dataset.path == null) return;
+      const kind = el.dataset.kind;
+      const path = state.pathOf(el.dataset.path);
+      if (kind === "checkbox") state.setField(path, el.checked);
+      else if (kind === "select") state.setField(path, el.value);
+    },
+    onFormLeave(event: any) {
+      const el = event.target;
+      if (!el || !el.dataset || el.dataset.path == null) return;
+      const path = state.pathOf(el.dataset.path);
+      if (el.dataset.kind === "autocomplete") state.acClose(path);
+      else state.blur(path);
+    },
+    onFormEnter(event: any) {
+      const el = event.target;
+      if (!el || !el.dataset || el.dataset.path == null || el.dataset.kind !== "autocomplete") return;
+      state.acOpenList(state.fieldAtKey(el.dataset.path), state.pathOf(el.dataset.path));
+    },
+    onFormKeyDown(event: any) {
+      const el = event.target;
+      if (!el || !el.dataset || el.dataset.kind !== "autocomplete" || el.dataset.path == null) return;
+      state.acKeydown(state.fieldAtKey(el.dataset.path), state.pathOf(el.dataset.path), event);
+    },
+    onFormMouseDown(event: any) {
+      const li = event.target && event.target.closest ? event.target.closest("li[data-idx]") : null;
+      if (!li || li.dataset.path == null) return;
+      const key = li.dataset.path;
+      const idx = Number(li.dataset.idx);
+      const items = state.acItems(state.pathOf(key));
+      if (items[idx]) state.acPick(state.fieldAtKey(key), state.pathOf(key), items[idx]);
+    },
+    onFormClick(event: any) {
+      const btn = event.target && event.target.closest ? event.target.closest("[data-action]") : null;
+      if (!btn || btn.dataset.path == null) return;
+      const path = state.pathOf(btn.dataset.path);
+      if (btn.dataset.action === "add") state.addItemByKind(path, btn.dataset.itemkind);
+      else if (btn.dataset.action === "remove") state.removeItem(path.slice(0, -1), Number(path[path.length - 1]));
+    },
     submit(event: any) {
       event.preventDefault();
       const values = state.vals;
@@ -460,7 +540,20 @@ export default function CrForm(props: CrFormProps) {
   });
 
   return (
-    <form class="cr-form" noValidate onSubmit={(event) => state.submit(event)}>
+    <form
+      class="cr-form"
+      noValidate
+      onSubmit={(event) => state.submit(event)}
+      onInput={(event) => state.onFormInput(event)}
+      onChange={(event) => state.onFormChange(event)}
+      onKeyDown={(event) => state.onFormKeyDown(event)}
+      onMouseDown={(event) => state.onFormMouseDown(event)}
+      onClick={(event) => state.onFormClick(event)}
+      onBlur={(event) => state.onFormLeave(event)}
+      onFocusOut={(event) => state.onFormLeave(event)}
+      onFocus={(event) => state.onFormEnter(event)}
+      onFocusIn={(event) => state.onFormEnter(event)}
+    >
       <Show when={props.title}>
         <h3 class="cr-form__title">{props.title}</h3>
       </Show>
@@ -478,200 +571,25 @@ export default function CrForm(props: CrFormProps) {
       </Show>
       <For each={state.rows()}>
         {(row: any) => (
-          <div
-            class={"cr-form__row cr-form__row--" + row.t + (row.t === "field" && state.showErr(row.path) ? " cr-field--error" : "")}
-            style={{ paddingLeft: state.pad(row.depth) }}
-          >
-            {/* group header */}
-            <Show when={row.t === "group"}>
-              <div class="cr-form__grouphead">{row.field.label}</div>
-            </Show>
-
-            {/* array header + add */}
-            <Show when={row.t === "array"}>
-              <div class="cr-form__arrayhead">
-                <span class="cr-form__grouphead">{row.field.label}</span>
-                <button type="button" class="cr-btn cr-btn--sm cr-btn--ghost" disabled={props.disabled} onClick={() => state.addItem(row.path, row.field.item)}>
-                  + add
-                </button>
-              </div>
-            </Show>
-
-            {/* array item header (object items) + remove */}
-            <Show when={row.t === "item"}>
-              <div class="cr-form__itemhead">
-                <span class="cr-form__itemidx">{(row.field.itemLabel || "#") + " " + (row.index + 1)}</span>
-                <button type="button" class="cr-btn cr-btn--sm cr-btn--ghost cr-btn--sig-err" disabled={props.disabled} onClick={() => state.removeItem(row.path.slice(0, -1), row.index)}>
-                  remove
-                </button>
-              </div>
-            </Show>
-
-            {/* leaf field */}
-            <Show when={row.t === "field"}>
-              <Show when={row.field.kind === "checkbox"}>
-                <label class="cr-check">
-                  <input
-                    type="checkbox"
-                    checked={state.at(row.path) === true}
-                    disabled={props.disabled}
-                    aria-describedby={state.descId(row.path)}
-                    onChange={(event) => state.setField(row.path, (event.target as HTMLInputElement).checked)}
-                    onBlur={() => state.blur(row.path)}
-                  />
-                  {row.field.label}
-                </label>
-              </Show>
-
-              <Show when={row.field.kind !== "checkbox"}>
-                <Show when={!row.scalarItem}>
-                  <label class="cr-field__label" for={state.cid(row.path)}>
-                    {row.field.label}
-                    <Show when={row.field.required}>
-                      <span class="cr-field__req" aria-hidden="true"> *</span>
-                    </Show>
-                  </label>
-                </Show>
-
-                <div class="cr-form__control">
-                  <Show when={state.isText(row.field.kind)}>
-                    <input
-                      id={state.cid(row.path)}
-                      class="cr-input"
-                      type={state.inputType(row.field.kind)}
-                      value={state.at(row.path)}
-                      placeholder={row.field.placeholder}
-                      disabled={props.disabled}
-                      required={row.field.required}
-                      aria-required={row.field.required ? "true" : undefined}
-                      aria-invalid={state.showErr(row.path) ? "true" : "false"}
-                      aria-describedby={state.descId(row.path)}
-                      onInput={(event) => state.setField(row.path, (event.target as HTMLInputElement).value)}
-                      onBlur={() => state.blur(row.path)}
-                    />
-                  </Show>
-
-                  <Show when={row.field.kind === "number"}>
-                    <input
-                      id={state.cid(row.path)}
-                      class="cr-input"
-                      type="number"
-                      value={state.at(row.path)}
-                      placeholder={row.field.placeholder}
-                      disabled={props.disabled}
-                      required={row.field.required}
-                      min={row.field.min}
-                      max={row.field.max}
-                      step={row.field.step}
-                      aria-required={row.field.required ? "true" : undefined}
-                      aria-invalid={state.showErr(row.path) ? "true" : "false"}
-                      aria-describedby={state.descId(row.path)}
-                      onInput={(event) => state.setField(row.path, (event.target as HTMLInputElement).value)}
-                      onBlur={() => state.blur(row.path)}
-                    />
-                  </Show>
-
-                  <Show when={row.field.kind === "select"}>
-                    <select
-                      id={state.cid(row.path)}
-                      class="cr-select"
-                      value={state.at(row.path)}
-                      disabled={props.disabled}
-                      required={row.field.required}
-                      aria-required={row.field.required ? "true" : undefined}
-                      aria-invalid={state.showErr(row.path) ? "true" : "false"}
-                      aria-describedby={state.descId(row.path)}
-                      onChange={(event) => state.setField(row.path, (event.target as HTMLSelectElement).value)}
-                      onBlur={() => state.blur(row.path)}
-                    >
-                      <option value="">{row.field.placeholder || "Select…"}</option>
-                      <For each={state.opts(row.field)}>
-                        {(o: { value: string; label: string }) => <option value={o.value}>{o.label}</option>}
-                      </For>
-                    </select>
-                  </Show>
-
-                  <Show when={row.field.kind === "textarea" || row.field.kind === "json"}>
-                    <textarea
-                      id={state.cid(row.path)}
-                      class="cr-textarea"
-                      value={state.at(row.path)}
-                      placeholder={row.field.placeholder}
-                      disabled={props.disabled}
-                      required={row.field.required}
-                      aria-required={row.field.required ? "true" : undefined}
-                      aria-invalid={state.showErr(row.path) ? "true" : "false"}
-                      aria-describedby={state.descId(row.path)}
-                      onInput={(event) => state.setField(row.path, (event.target as HTMLTextAreaElement).value)}
-                      onBlur={() => state.blur(row.path)}
-                    ></textarea>
-                  </Show>
-
-                  <Show when={row.field.kind === "autocomplete"}>
-                    <div class="cr-combobox">
-                      <input
-                        id={state.cid(row.path)}
-                        class="cr-combobox__input"
-                        type="text"
-                        role="combobox"
-                        autocomplete="off"
-                        value={state.acDisplay(row.field, row.path)}
-                        placeholder={row.field.placeholder}
-                        disabled={props.disabled}
-                        required={row.field.required}
-                        aria-required={row.field.required ? "true" : undefined}
-                        aria-expanded={state.acIsOpen(row.path) ? "true" : "false"}
-                        aria-autocomplete="list"
-                        aria-controls={state.cid(row.path) + "-list"}
-                        aria-invalid={state.showErr(row.path) ? "true" : "false"}
-                        aria-describedby={state.descId(row.path)}
-                        onInput={(event) => state.acInput(row.field, row.path, (event.target as HTMLInputElement).value)}
-                        onFocus={() => state.acOpenList(row.field, row.path)}
-                        onKeyDown={(event) => state.acKeydown(row.field, row.path, event)}
-                        onBlur={() => state.acClose(row.path)}
-                      />
-                      <Show when={state.acIsOpen(row.path)}>
-                        <ul class="cr-combobox__list" role="listbox" id={state.cid(row.path) + "-list"}>
-                          <Show when={state.acIsLoading(row.path)}>
-                            <li class="cr-combobox__empty">searching…</li>
-                          </Show>
-                          <For each={state.acItems(row.path)}>
-                            {(o: { value: string; label: string }, i: number) => (
-                              <li
-                                class={"cr-combobox__opt" + (state.acActiveIdx(row.path) === i ? " cr-combobox__opt--active" : "")}
-                                role="option"
-                                aria-selected={state.acActiveIdx(row.path) === i ? "true" : "false"}
-                                onMouseDown={() => state.acPick(row.field, row.path, o)}
-                              >
-                                {o.label}
-                              </li>
-                            )}
-                          </For>
-                          <Show when={!state.acIsLoading(row.path) && state.acItems(row.path).length === 0}>
-                            <li class="cr-combobox__empty">no matches</li>
-                          </Show>
-                        </ul>
-                      </Show>
-                    </div>
-                  </Show>
-
-                  {/* scalar array item: an inline remove */}
-                  <Show when={row.scalarItem}>
-                    <button type="button" class="cr-btn cr-btn--sm cr-btn--ghost cr-btn--sig-err" disabled={props.disabled} onClick={() => state.removeItem(row.path.slice(0, -1), row.path[row.path.length - 1])}>
-                      ✕
-                    </button>
-                  </Show>
-                </div>
-              </Show>
-
-              <Show when={row.field.hint && !state.showErr(row.path)}>
-                <span class="cr-field__hint">{row.field.hint}</span>
-              </Show>
-              <Show when={state.showErr(row.path)}>
-                <span class="cr-field__error" id={state.cid(row.path) + "-err"} role="alert">{state.showErr(row.path)}</span>
-              </Show>
-            </Show>
-          </div>
+          <CrFormRow
+            rowType={row.t}
+            field={row.field}
+            pathKey={state.key(row.path)}
+            cid={state.cid(row.path)}
+            descId={state.descId(row.path)}
+            padLeft={state.pad(row.depth)}
+            index={row.index}
+            scalarItem={row.scalarItem}
+            value={row.t === "field" ? state.at(row.path) : undefined}
+            error={row.t === "field" ? state.showErr(row.path) : ""}
+            disabled={props.disabled}
+            itemKind={row.t === "array" && row.field.item ? row.field.item.kind : undefined}
+            acDisplay={row.t === "field" && row.field.kind === "autocomplete" ? state.acDisplay(row.field, row.path) : undefined}
+            acOpen={row.t === "field" && row.field.kind === "autocomplete" ? state.acIsOpen(row.path) : false}
+            acLoading={row.t === "field" && row.field.kind === "autocomplete" ? state.acIsLoading(row.path) : false}
+            acItems={row.t === "field" && row.field.kind === "autocomplete" && state.acIsOpen(row.path) ? state.acItems(row.path) : undefined}
+            acActiveIdx={row.t === "field" && row.field.kind === "autocomplete" ? state.acActiveIdx(row.path) : 0}
+          />
         )}
       </For>
       <div class="cr-form__actions">
