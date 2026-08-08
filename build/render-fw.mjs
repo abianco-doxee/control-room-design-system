@@ -63,3 +63,42 @@ export async function renderVue(name, props = {}) {
 }
 
 export const RENDERERS = { vue: renderVue, svelte: renderSvelte, solid: renderSolid };
+
+/**
+ * Angular can't be SSR-rendered in plain Node (its distributed packages are
+ * partially-compiled and need the Angular build linker), so instead we execute the
+ * component's LOGIC on the real @angular/core: transpile it (esbuild, legacy
+ * decorators), stub the metadata-only @angular/common import, `new` it, apply
+ * @Input props, and return the instance + source so tests can assert the
+ * @Input-driven getters, the @Output EventEmitter, and the @Component template.
+ * A genuine runtime step beyond a build-only check.
+ */
+export async function instantiateAngular(name, props = {}) {
+  const esbuild = await import("esbuild");
+  const dir = mkdtempSync(join(ROOT, ".fwtmp-"));
+  try {
+    const stub = join(dir, "ng-common-stub.js");
+    writeFileSync(stub, "export class CommonModule {}\n");
+    const entry = join(ROOT, "dist", "frameworks", "angular", "components", `${name}.js`);
+    const source = readFileSync(entry, "utf8");
+    const out = join(dir, `${name}.mjs`);
+    await esbuild.build({
+      entryPoints: [entry],
+      bundle: true,
+      platform: "node",
+      format: "esm",
+      outfile: out,
+      external: ["@angular/core", "rxjs", "rxjs/*", "tslib"],
+      alias: { "@angular/common": stub },
+      loader: { ".js": "ts" },
+      tsconfigRaw: '{"compilerOptions":{"experimentalDecorators":true}}',
+      logLevel: "silent",
+    });
+    const mod = await import(pathToFileURL(out).href);
+    const instance = new mod.default();
+    for (const [k, v] of Object.entries(props)) instance[k] = v;
+    return { instance, source, module: mod };
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
