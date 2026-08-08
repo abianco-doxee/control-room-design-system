@@ -27,6 +27,10 @@ export interface CrLineChartProps {
   /** Fiscal year start month 1–12 (default 1 = calendar). Year/quarter ticks then
    *  anchor to it and label FY/Q (FY named by the ending calendar year). */
   xFiscalStart?: number;
+  /** Y-axis scale: "linear" (default) or "log" (base-10, for wide-range metrics
+   *  like latency percentiles). Log needs positive data; ≤0 values are clamped to
+   *  the axis floor. Domain snaps to powers of ten. */
+  yScale?: string;
   /** Force the y-scale; otherwise a "nice" scale is derived from the data. */
   min?: number;
   max?: number;
@@ -98,6 +102,31 @@ export default function CrLineChart(props: CrLineChartProps) {
       if (a >= 1000000) return (Math.round(v / 100000) / 10) + "M";
       if (a >= 1000) return (Math.round(v / 100) / 10) + "k";
       return String(Math.round(v * 100) / 100);
+    },
+    /* Base-10 log ticks in [lo,hi] (both > 0): 1·2·5×10^k when few decades,
+     * else powers of ten, thinned so the count stays readable. */
+    logTicks(lo: number, hi: number): number[] {
+      const lo10 = Math.floor(Math.log10(lo));
+      const hi10 = Math.ceil(Math.log10(hi));
+      const mant = hi10 - lo10 <= 3 ? [1, 2, 5] : [1];
+      const raw: number[] = [];
+      for (let k = lo10; k <= hi10; k++) for (const mm of mant) {
+        const v = mm * Math.pow(10, k);
+        if (v >= lo * 0.999 && v <= hi * 1.001) raw.push(v);
+      }
+      if (raw.length <= 9) return raw;
+      const stepEvery = Math.ceil(raw.length / 8);
+      const out: number[] = [];
+      for (let i = 0; i < raw.length; i++) if (i % stepEvery === 0) out.push(raw[i]);
+      return out;
+    },
+    /* Pixel y for a value, honouring linear or log scale (log clamps ≤0 to floor). */
+    yPix(v: number, m: any): number {
+      if (m.ylog) {
+        const val = v > 0 ? v : m.min;
+        return m.T + (1 - (Math.log(val) - m.llo) / m.lrange) * m.plotH;
+      }
+      return m.T + (1 - (v - m.min) / m.range) * m.plotH;
     },
     /* ── Timezone-aware time axis. Same algorithm as utils/time-scale.js (mirrored
      * inline because Mitosis doesn't import runtime helpers into each target).
@@ -275,11 +304,38 @@ export default function CrLineChart(props: CrLineChartProps) {
       }
       const forced = props.min !== undefined && props.max !== undefined;
       const sc = state.niceScale(lo, hi, 5);
-      const min = forced ? lo : sc.min;
-      const max = forced ? hi : sc.max;
-      const range = max - min || 1;
-      const ticks: number[] = [];
+      let min = forced ? lo : sc.min;
+      let max = forced ? hi : sc.max;
+      let range = max - min || 1;
+      let ticks: number[] = [];
       for (const t of sc.ticks) if (t >= min - range * 1e-6 && t <= max + range * 1e-6) ticks.push(t);
+      /* Log y-scale: derive a positive, power-of-ten-snapped domain from the
+       * visible data (or explicit >0 min/max) and swap in log ticks. Falls back
+       * to the linear scale above if there's no positive data. */
+      let ylog = false;
+      let llo = 0;
+      let lrange = 1;
+      if (props.yScale === "log") {
+        let plo = Infinity;
+        let phi = -Infinity;
+        for (let si = 0; si < series.length; si++) {
+          if (state.isHidden(si)) continue;
+          for (const v of series[si].data || []) { if (v > 0) { if (v < plo) plo = v; if (v > phi) phi = v; } }
+        }
+        if (props.min !== undefined && props.min > 0) plo = props.min;
+        if (props.max !== undefined && props.max > 0) phi = props.max;
+        if (isFinite(plo) && phi > 0) {
+          const dlo = Math.pow(10, Math.floor(Math.log10(plo)));
+          const dhi = Math.pow(10, Math.ceil(Math.log10(phi)));
+          min = dlo;
+          max = dhi;
+          range = dhi - dlo || 1;
+          llo = Math.log(dlo);
+          lrange = Math.log(dhi) - Math.log(dlo) || 1;
+          ticks = state.logTicks(dlo, dhi);
+          ylog = true;
+        }
+      }
       let xmin = 0;
       let xmax = 1;
       const xticks: { v: number; label: string }[] = [];
@@ -298,14 +354,14 @@ export default function CrLineChart(props: CrLineChartProps) {
           for (const t of state.niceScale(xlo, xhi, 5).ticks) if (t >= xlo - xspan * 1e-6 && t <= xhi + xspan * 1e-6) xticks.push({ v: t, label: state.fmtTick(t) });
         }
       }
-      return { W, H, L, R, T, B, plotW, plotH, n, min, max, range, axis, ticks, xs, continuous, xmin, xmax, xticks };
+      return { W, H, L, R, T, B, plotW, plotH, n, min, max, range, axis, ticks, xs, continuous, xmin, xmax, xticks, ylog, llo, lrange };
     },
     geo() {
       const m = state.metrics();
       const series = props.series || [];
       const xs = m.xs || [];
       const xspan = (m.xmax - m.xmin) || 1;
-      const yAt = (v: number) => m.T + (1 - (v - m.min) / m.range) * m.plotH;
+      const yAt = (v: number) => state.yPix(v, m);
       const xAtV = (v: number) => m.L + ((v - m.xmin) / xspan) * m.plotW;
       const xAtI = (i: number, n: number) => m.L + (n <= 1 ? m.plotW / 2 : (i / (n - 1)) * m.plotW);
       const lines = series.map((s: CrLineSeries, si: number) => {
@@ -380,7 +436,7 @@ export default function CrLineChart(props: CrLineChartProps) {
           const d = s.data || [];
           if (idx >= d.length) return null;
           const v = d[idx];
-          return { name: s.name, color: state.hue(s.signal, si), value: v, cy: m.T + (1 - (v - m.min) / m.range) * m.plotH };
+          return { name: s.name, color: state.hue(s.signal, si), value: v, cy: state.yPix(v, m) };
         })
         .filter((r: any) => r);
       let leftPct = (cx / m.W) * 100;
