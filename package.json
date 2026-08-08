@@ -57,7 +57,8 @@
     "./cn": {
       "types": "./utils/cn.d.ts",
       "default": "./utils/cn.js"
-    }
+    },
+    "./position": "./utils/position.js"
   },
   "scripts": {
     "build:tokens": "node build/build-tokens.mjs",
@@ -94,6 +95,7 @@
     "test:visual:update": "playwright test tests/visual.spec.mjs --update-snapshots",
     "test:forms": "node --test tests/forms.test.mjs",
     "test:theme": "node --test tests/theme.test.mjs",
+    "test:position": "node --test tests/position.test.mjs",
     "test:separation": "node --test tests/appearance-separation.test.mjs",
     "pretest:pkg": "npm run build:pkg",
     "test:pkg": "node --test tests/pkg-react.test.mjs tests/pkg-qwik.test.mjs tests/pkg-vue.test.mjs",
