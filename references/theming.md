@@ -168,6 +168,40 @@ on-colour derivation (so on-colours match the re-voiced fills); a signal you set
 hand is never toned. Precedence: `$extends` < `$ramp` surfaces < toned signals <
 explicit roles. Build-time; generator in `build/signals.mjs`.
 
+### Fit signals to the surfaces (`$fitSignals`)
+
+Reuse a dark-tuned neon ramp on light surfaces and a bright signal can vanish
+against a near-white panel. `$fitSignals: true` (or a target ratio number) nudges
+each signal's **lightness** (hue + chroma held) until it clears a minimum contrast
+(default `3` — the non-text UI floor) against `--panel`. It only touches signals
+that fall short, and never a hand-set one. Runs after toning, before on-colour
+derivation.
+
+### One brand, many modes (`$modes`)
+
+A brand can emit **several themes from one file** — most usefully a dark + light
+pair. Shared identity lives at the top level; each mode adds only what differs. The
+first mode is primary (`<name>`), the rest are `<name>-<mode>`:
+
+```jsonc
+{
+  "$extends": "dark", "$ramp": "#0f1420",
+  "sig-accent": "#7c5cff",              // shared brand identity
+  "$modes": {
+    "dark":  {},                         // → dist/themes/aurora.css
+    "light": {                           // → dist/themes/aurora-light.css
+      "$scheme": "light", "$ramp": "#eef1f8",
+      "$fitSignals": true,               // keep the shared neon signals legible on light
+      "ink": "#161a26", "muted": "#5a6076", "rail-ink": "#eef1f8"
+    }
+  }
+}
+```
+
+That's `brands/aurora.json`: the same indigo/cyan brand in both modes, the light
+mode auto-darkening the inherited neon signals to stay readable on its near-white
+surfaces. Select the light variant with `data-theme="aurora-light"`.
+
 ### Programmatic authoring (`@control-room/design-system/theme`)
 
 The build path is thin wrapping over a framework-agnostic core you can call
