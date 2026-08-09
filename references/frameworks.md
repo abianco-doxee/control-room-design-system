@@ -71,8 +71,15 @@ canvas ones imperative
 `<canvas>`, painted in `onMount` — Mitosis resolves the ref correctly per target:
 `canvasRef.current` in React, `bind:this` in Svelte, etc.).
 
-Components apply the `cr-` classes and contain **no styling**, so all six
-targets are identical and the token/CSS layer stays the single source.
+Components apply the `cr-` classes and hold **no hardcoded appearance** — the
+look lives in the token/CSS layer, so all six targets are identical from one
+source. On top of that, every functional component exposes the **pt / dt /
+unstyled styling contract** (`references/styling-contract.md`): a `data-part` on
+each part, an `unstyled` opt-out, a `pt` pass-through, and per-instance `dt`
+design tokens. Those are routed through the shared `lib/pt.ts` helpers rather
+than authored as literal inline styles — the one place appearance reaches the
+markup is a `dt` token map applied to the root, which is a set of CSS custom
+properties, not brand values.
 
 **You can still skip the components entirely.** The static pieces are just `cr-`
 classes, so in a server-rendered page or a framework you don't compile for, apply
@@ -164,9 +171,11 @@ and de-conflicting.
 
 ## Rules & limits
 
-- **MUST** keep styling in CSS — Mitosis components apply `cr-` classes, never
-  inline styles, so all five targets look identical and the token layer stays the
-  single source.
+- **MUST** keep appearance in the token/CSS layer — components apply `cr-`
+  classes and never hardcode brand values in the markup, so all six targets look
+  identical and the token layer stays the single source. The only styling a
+  component writes to the DOM is via the pt/dt contract's `lib/pt.ts` helpers
+  (a `dt` token map + `pt` pass-through), never a literal inline style.
 - **MUST** author within Mitosis's supported JSX subset (props, `useStore`,
   `Show`, `For`, events). Complex logic may need per-target checks — CI compiles
   all targets to catch breakage.
