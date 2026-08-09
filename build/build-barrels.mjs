@@ -11,11 +11,16 @@ import {
   readFileSync,
   writeFileSync,
 } from "node:fs";
+import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+const require = createRequire(import.meta.url);
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const FRAMEWORKS = join(ROOT, "dist", "frameworks");
+// The pixel pack is owned by @control-room/icons; vendor its data into each
+// target so CrIcon's `../lib/icons/pixel` relative import resolves (bake-in).
+const PIXEL_SRC = require.resolve("@control-room/icons/pixel");
 
 // target → { ext: component-file extension, index: barrel filename }
 const TARGETS = {
@@ -50,11 +55,11 @@ for (const [target, { ext, index }] of Object.entries(TARGETS)) {
     const libDir = join(dir, "lib");
     mkdirSync(libDir, { recursive: true });
     copyFileSync(join(ROOT, "lib", "pt.ts"), join(libDir, "pt.ts"));
-    // CrIcon imports the generated pixel pack as `../lib/icons/pixel.js` — copy it
-    // alongside so the relative import resolves in every target's output tree.
+    // CrIcon imports the pixel pack as `../lib/icons/pixel.ts` — vendor it from
+    // @control-room/icons so the relative import resolves in every target's output tree.
     const iconsDir = join(libDir, "icons");
     mkdirSync(iconsDir, { recursive: true });
-    copyFileSync(join(ROOT, "lib", "icons", "pixel.ts"), join(iconsDir, "pixel.ts"));
+    copyFileSync(PIXEL_SRC, join(iconsDir, "pixel.ts"));
   }
 
   const names = readdirSync(compDir)

@@ -80,7 +80,8 @@
       "default": "./packages/utils/duration.js"
     },
     "./position": "./packages/utils/position.js",
-    "./time-scale": "./packages/utils/time-scale.js"
+    "./time-scale": "./packages/utils/time-scale.js",
+    "./icons/pixel": "./packages/icons/pixel.ts"
   },
   "scripts": {
     "build:tokens": "node packages/tokens/build/build-tokens.mjs",
@@ -88,7 +89,7 @@
     "build:palette": "node packages/tokens/build/build-palette.mjs",
     "build:tw": "tailwindcss -i build/tailwind-input.css -o dist/utilities.css",
     "build:styles": "node packages/styles/build/build-styles.mjs",
-    "build:icons": "node build/build-icons.mjs",
+    "build:icons": "node packages/icons/build/build-icons.mjs",
     "build:components": "node build/compile-mitosis.mjs && node build/build-fix-qwik.mjs && node build/build-fix-react.mjs && node build/build-fix-angular.mjs && node build/build-barrels.mjs && node build/build-pkg-types.mjs",
     "build:components:cli": "mitosis build && node build/build-fix-qwik.mjs && node build/build-fix-react.mjs && node build/build-fix-angular.mjs && node build/build-barrels.mjs && node build/build-pkg-types.mjs",
     "build:pkg": "node build/build-pkg.mjs",
@@ -111,7 +112,7 @@
     "verify:pkg-types": "node build/build-pkg-types.mjs --check",
     "verify:palette": "node packages/tokens/build/build-palette.mjs --check",
     "verify:styles": "node packages/styles/build/build-styles.mjs --check",
-    "verify:icons": "node build/build-icons.mjs --check",
+    "verify:icons": "node packages/icons/build/build-icons.mjs --check",
     "skills:sync": "node scripts/skills-sync.mjs",
     "skills:check": "node scripts/skills-sync.mjs --check",
     "lint": "biome check",
@@ -210,6 +211,7 @@
     }
   },
   "dependencies": {
+    "@control-room/icons": "1.0.0",
     "@fontsource/archivo": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
     "arktype": "^2.2.3",
