@@ -147,12 +147,28 @@ regenerated at deploy. The docs site (Astro + Starlight, `packages/docs`, output
 
 ## Install as an agent skill
 
-```bash
-npm run skills:sync    # → .claude/skills, .cursor/skills, .opencode/skills
-npm run skills:check   # validity + drift gate (runs in CI)
+Control Room ships as a skill you can install in one command — via
+[`@control-room/skill`](packages/skill).
+
+**Claude Code — plugin (recommended):** installs the skill *and* the MCP server.
+
+```
+/plugin marketplace add alebianco/control-room-design-system
+/plugin install control-room-design-system@control-room
 ```
 
-Providers and the bundled file set are declared in `skills/manifest.json`.
+**Any project — npx installer** (Claude / Cursor / opencode):
+
+```bash
+npx @control-room/skill            # → ./.claude/skills (this project)
+npx @control-room/skill --global   # → ~/.claude/skills (all projects)
+npx @control-room/skill --provider=cursor   # or opencode
+```
+
+**Repo contributors:** `npm run skills:sync` installs into the repo's own provider
+dirs for local development; `npm run skills:check` is the drift gate. The skill's
+file set is declared once in `skills/manifest.json` and drives the bundle, the
+plugin, and the npx installer alike.
 
 ## Interop with the Doxee Design-System-Hub
 

@@ -1,0 +1,1581 @@
+/* ============================================================================
+ * CONTROL ROOM — Component layer
+ *
+ * Consumable component classes, built on the 3-tier token pipeline:
+ *   primitive scales (--space-*, --text-*, --leading-*)  →
+ *   semantic (--panel, --sig-*, --on-*)                   →
+ *   component tokens (--cr-btn-*, --cr-panel-* …)         →  these classes.
+ *
+ * Import token layer first:
+ *   <link rel="stylesheet" href="dist/control-room.css">   <!-- tokens -->
+ *   <link rel="stylesheet" href="styles/components.css">    <!-- this file -->
+ *
+ * No raw px — every size/space is a scale token. Override a component's look by
+ * setting its --cr-<component>-* tokens; radius 0, hard offset shadow only.
+ * ==========================================================================*/
+
+.cr-panel,
+.cr-btn,
+.cr-hero,
+.cr-bezel { border-radius: var(--radius); }
+.cr-drip { border-radius: var(--radius-none); }
+/* Roundable surfaces — a brand's --radius (default 0px) rounds these; circular
+ * indicators, decorative shapes and the sanctioned breach keep their own radius.
+ * Declared early so a component's own border-radius still wins where it sets one. */
+.cr-btn, .cr-chip, .cr-tag, .cr-panel, .cr-menu, .cr-popover, .cr-toast, .cr-alert,
+.cr-well, .cr-card, .cr-badge, .cr-kbd, .cr-combobox__input, .cr-combobox__list,
+.cr-cron__input, .cr-cron__preset { border-radius: var(--radius); }
+
+/* ── Panel ─────────────────────────────────────────────────────────────── */
+.cr-panel {
+  background: var(--cr-panel-bg);
+  border: var(--brd) solid var(--border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  padding: var(--cr-panel-pad);
+}
+.cr-panel--major { border-width: var(--brd-heavy); }
+.cr-panel--inset { background: var(--panel-2); box-shadow: none; }
+.cr-panel__title {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink); margin: 0 0 var(--space-2);
+}
+
+/* ── Button (snap-press) ───────────────────────────────────────────────── */
+.cr-btn {
+  --cr-btn-tint: var(--ink);   /* colour for outline/ghost/link (a signal overrides it) */
+  display: inline-flex; align-items: center; gap: var(--cr-btn-gap);
+  font-family: var(--font-mono); font-size: var(--cr-btn-size); font-weight: 800; letter-spacing: 0.03em;
+  padding: var(--cr-btn-pad-y) var(--cr-btn-pad-x); cursor: pointer;
+  background: var(--cr-btn-bg); color: var(--cr-btn-fg);
+  border: var(--brd-heavy) solid var(--border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  transition: transform 0.05s, box-shadow 0.05s, background 0.1s;
+}
+.cr-btn:active { transform: translate(var(--shadow-off), var(--shadow-off)); box-shadow: 0 0 0 var(--shadow-col); }
+/* disabled: flatten off the surface (drop the hard shadow), dim, block the press */
+.cr-btn:disabled, .cr-btn[disabled] {
+  opacity: var(--state-disabled-op); cursor: not-allowed;
+  box-shadow: none; transform: none; filter: saturate(0.5);
+}
+.cr-btn--sm { --cr-btn-pad-x: var(--space-3); --cr-btn-pad-y: var(--space-1); --cr-btn-size: var(--text-xs); }
+
+/* ── EMPHASIS (gravity) — form, not colour ─────────────────────────────────
+ * solid (default, primary) is the filled+shadowed base above. */
+/* text is the tint shifted toward the theme ink so a signal colour stays AA on any
+ * surface; the pure signal still reads on the BORDER (outline) and hover wash. */
+.cr-btn { --cr-btn-ink: color-mix(in srgb, var(--cr-btn-tint) 66%, var(--ink)); }
+.cr-btn--outline { background: transparent; color: var(--cr-btn-ink); border: var(--brd) solid var(--cr-btn-tint); box-shadow: none; }
+.cr-btn--outline:hover:not(:disabled) { background: color-mix(in srgb, var(--cr-btn-tint) 14%, transparent); }
+.cr-btn--ghost { background: transparent; color: var(--cr-btn-ink); border-color: transparent; box-shadow: none; }
+.cr-btn--ghost:hover:not(:disabled) { background: color-mix(in srgb, var(--cr-btn-tint) 12%, transparent); }
+.cr-btn--link { background: transparent; color: var(--cr-btn-ink); border: 0; box-shadow: none;
+  padding-inline-start: 0; padding-inline-end: 0; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 2px; }
+.cr-btn--link:hover:not(:disabled) { filter: brightness(1.18); }
+/* outline/ghost/link don't snap-press off a shadow they don't have */
+.cr-btn--outline:active, .cr-btn--ghost:active, .cr-btn--link:active { transform: none; box-shadow: none; }
+
+/* ── SIGNAL (colour key) — sets the solid fill AND the outline/ghost/link tint ─ */
+.cr-btn--sig-work    { --cr-btn-bg: var(--sig-work);     --cr-btn-fg: var(--on-sig);      --cr-btn-tint: var(--sig-work); }
+.cr-btn--sig-wait    { --cr-btn-bg: var(--sig-wait);     --cr-btn-fg: var(--on-sig);      --cr-btn-tint: var(--sig-wait); }
+.cr-btn--sig-done    { --cr-btn-bg: var(--sig-done);     --cr-btn-fg: var(--on-sig);      --cr-btn-tint: var(--sig-done); }
+.cr-btn--sig-err     { --cr-btn-bg: var(--sig-err);      --cr-btn-fg: var(--on-err);      --cr-btn-tint: var(--sig-err); }
+.cr-btn--sig-accent  { --cr-btn-bg: var(--sig-accent);   --cr-btn-fg: var(--on-accent);   --cr-btn-tint: var(--sig-accent); }
+.cr-btn--sig-accent2 { --cr-btn-bg: var(--sig-accent-2); --cr-btn-fg: var(--on-accent-2); --cr-btn-tint: var(--sig-accent-2); }
+
+/* ── Chip ──────────────────────────────────────────────────────────────── */
+.cr-chip {
+  display: inline-block; font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700;
+  padding: var(--cr-chip-pad-y) var(--cr-chip-pad-x);
+  background: var(--cr-chip-bg); color: var(--cr-chip-fg); border: var(--brd) solid var(--border);
+}
+.cr-chip--alt { --cr-chip-bg: var(--sig-work); }
+
+/* ── Tag (inline status) ───────────────────────────────────────────────── */
+.cr-tag {
+  display: inline-block; font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 800;
+  padding: var(--space-0-5) var(--space-2); border: 1.5px solid var(--border);
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+/* Canonical tone vocabulary — matches the signal ramp (Law 2), the same words a
+ * StatusDot / Toast / Chip asserts: done · work · wait · err · idle · accent. */
+.cr-tag--done   { background: var(--sig-done); color: var(--on-sig); }
+.cr-tag--work   { background: var(--sig-work); color: var(--on-sig); }
+.cr-tag--wait   { background: var(--sig-wait); color: var(--on-sig); }
+.cr-tag--err    { background: var(--sig-err);  color: var(--on-err); }
+.cr-tag--idle   { background: var(--sig-idle); color: var(--on-idle); }
+.cr-tag--accent { background: var(--sig-accent); color: var(--on-accent); }
+
+/* ── StatusDot (a square — radius 0) ───────────────────────────────────── */
+.cr-dot { display: inline-block; width: var(--space-2); height: var(--space-2); border: 1.5px solid var(--border); }
+
+/* ── SessionRow ────────────────────────────────────────────────────────── */
+.cr-row {
+  display: flex; align-items: center; gap: var(--cr-row-gap); padding: var(--cr-row-pad-y) 0;
+  border-bottom: 1.5px solid color-mix(in srgb, var(--border) 18%, transparent);
+}
+.cr-row:last-child { border-bottom: none; }
+.cr-row__name { flex: 1; font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 600; color: var(--ink); }
+.cr-row__status { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--muted); }
+
+/* ── Hero (keyed focal region) ─────────────────────────────────────────── */
+.cr-hero {
+  display: flex; align-items: center; gap: var(--cr-hero-gap);
+  background: var(--cr-hero-bg); color: var(--cr-hero-fg);
+  border: var(--brd) solid var(--border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col); padding: var(--cr-hero-pad);
+}
+.cr-hero--wait { --cr-hero-bg: var(--sig-wait); --cr-hero-fg: var(--on-sig); }
+.cr-hero--err  { --cr-hero-bg: var(--sig-err); --cr-hero-fg: var(--on-err); }
+.cr-hero--calm { --cr-hero-bg: var(--stage); --cr-hero-fg: var(--stage-ink); }
+.cr-hero__big  { font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); line-height: var(--leading-tight); letter-spacing: var(--type-display-tracking); }
+.cr-hero__sub  { font-family: var(--font-mono); font-size: var(--text-sm); margin-top: var(--space-0-5); }
+
+/* ── Bezel + screen (the only texture host) ────────────────────────────── */
+.cr-bezel {
+  border: var(--brd-brush) solid var(--border); background: var(--panel-2); padding: var(--space-3);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+}
+.cr-bezel__rivets { display: flex; justify-content: space-between; margin-bottom: var(--space-2); }
+.cr-bezel__rivets i { width: var(--space-2); height: var(--space-2); background: var(--border); display: block; }
+.cr-bezel__screen {
+  position: relative; isolation: isolate;
+  background: var(--board); border: var(--brd) solid var(--border); padding: var(--space-4);
+  font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink);
+}
+/* CRT halftone rides BEHIND the text (own layer, toned + dialable) so the readout
+ * stays crisp — texture under body text is a readability tax, not a feature. */
+.cr-bezel__screen::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background-image: var(--halftone); background-size: var(--halftone-size) var(--halftone-size);
+  opacity: calc(0.55 * var(--decoration-intensity, 1));
+}
+
+/* ── Diagonal primitives (Law 4 — shape carries meaning, never decoration) ──
+ * Four shapes, four fixed meanings, max 15° off-axis. The arrow-rail below is
+ * the fourth (sequence). See references/components.md#diagonal-primitives. */
+.cr-chev { position: relative; padding-inline-start: var(--space-6); }
+.cr-chev::before {
+  content: ""; position: absolute; left: var(--space-2); top: 50%; transform: translateY(-50%);
+  width: 0; height: 0; border-inline-start: 9px solid var(--cr-chev-c, var(--sig-work));
+  border-top: 6px solid transparent; border-bottom: 6px solid transparent; pointer-events: none;
+}
+.cr-notch {
+  background: var(--sig-wait); color: var(--on-sig);
+  padding: var(--space-2) var(--space-3); border: var(--brd) solid var(--border);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 11px), calc(100% - 11px) 100%, 0 100%);
+}
+.cr-wedge { position: relative; }
+.cr-wedge::after {
+  content: ""; position: absolute; top: 0; right: 0; width: var(--space-3); height: 100%;
+  background: var(--cr-wedge-c, var(--sig-work)); pointer-events: none;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+/* ── Arrow-rail (sequence, Law 4) ──────────────────────────────────────── */
+.cr-rail { display: flex; }
+.cr-rail__step {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700;
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-5);
+  background: var(--panel); color: var(--ink); border: var(--brd) solid var(--border); margin-inline-start: -10px;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%, 10px 50%);
+}
+.cr-rail__step:first-child { margin-inline-start: 0; }
+.cr-rail__step--on { background: var(--sig-work); color: var(--on-sig); }
+
+/* ── Drip / error surface (Law 3) ──────────────────────────────────────── */
+.cr-drip { position: relative; border: var(--brd) solid var(--border); background: var(--sig-err); color: var(--on-err); padding: var(--space-4); }
+/* the surface actually DRIPS — uneven columns of the fill bleed past the bottom
+ * edge, hard-outlined to stay neobrutalist. Follows the loudness dial. */
+.cr-drip::after {
+  content: ""; position: absolute; left: calc(var(--brd) * -1); right: calc(var(--brd) * -1);
+  top: 100%; height: 22px; pointer-events: none;
+  opacity: var(--decoration-intensity, 1);
+  background:
+    radial-gradient(7px 20px at 10% 0, var(--sig-err) 62%, transparent 64%),
+    radial-gradient(5px 11px at 26% 0, var(--sig-err) 62%, transparent 64%),
+    radial-gradient(8px 15px at 45% 0, var(--sig-err) 62%, transparent 64%),
+    radial-gradient(5px 22px at 63% 0, var(--sig-err) 62%, transparent 64%),
+    radial-gradient(6px 9px at 80% 0, var(--sig-err) 62%, transparent 64%),
+    radial-gradient(7px 17px at 93% 0, var(--sig-err) 62%, transparent 64%);
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 1.5px 0 var(--border));
+}
+.cr-drip__title { font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
+.cr-drip__sub { font-family: var(--font-mono); font-size: var(--text-xs); margin-top: var(--space-0-5); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cr-btn { transition: none; }
+}
+
+/* ── Masthead (stark title card) ────────────────────────────────────────── */
+.cr-masthead {
+  border: var(--brd-heavy) solid var(--cr-masthead-border);
+  box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
+  background: var(--cr-masthead-bg); padding: var(--space-5) var(--space-6); border-radius: var(--radius);
+}
+.cr-masthead__eyebrow {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.14em; color: var(--cr-masthead-accent); margin: 0 0 var(--space-2);
+}
+.cr-masthead__title {
+  font-family: var(--font-display);
+  font-weight: 900; font-size: var(--text-xl); line-height: var(--leading-display);
+  letter-spacing: -0.038em; text-transform: uppercase; margin: 0; color: var(--ink);
+}
+
+/* Registration marks: .cr-mark is the ink-weight corner-tick preset of .cr-trim
+ * (structure, never a signal — Law 2). The shared implementation lives with
+ * .cr-trim in the decoration section. See design-language.md#signatures. */
+
+/* ── Nav rail ───────────────────────────────────────────────────────────── */
+.cr-nav {
+  width: var(--cr-nav-w); flex-shrink: 0; background: var(--cr-nav-bg);
+  border-inline-end: var(--brd-heavy) solid var(--cr-nav-border); padding: var(--space-3) 0;
+}
+.cr-nav__brand {
+  font-family: var(--font-mono); font-weight: 900; font-size: var(--text-sm); line-height: 1.15;
+  padding: 0 var(--space-4) var(--space-4); color: var(--cr-nav-fg);
+}
+.cr-nav__list { list-style: none; margin: 0; padding: 0; }
+.cr-nav__item {
+  display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4);
+  color: var(--cr-nav-fg); text-decoration: none; font-family: var(--font-mono);
+  font-size: var(--text-sm); font-weight: 700; border-inline-start: 3px solid transparent; cursor: pointer;
+}
+.cr-nav__item:hover { background: color-mix(in srgb, var(--cr-nav-fg) 10%, transparent); }
+.cr-nav__item[aria-current="page"], .cr-nav__item--active {
+  background: var(--cr-nav-active-bg); color: var(--cr-nav-active-fg); border-inline-start-color: var(--cr-nav-border);
+}
+.cr-nav__badge {
+  margin-inline-start: auto; font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 800;
+  background: var(--sig-err); color: var(--on-err); padding: 0 var(--space-1); border: 1.5px solid var(--border);
+}
+
+/* ── Table ──────────────────────────────────────────────────────────────── */
+.cr-table {
+  width: 100%; border-collapse: collapse; font-size: var(--text-base);
+  border: var(--brd) solid var(--cr-table-border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col); background: var(--cr-table-bg);
+}
+.cr-table th, .cr-table td {
+  text-align: start; padding: var(--space-2) var(--space-3);
+  border-bottom: var(--brd-hair) solid color-mix(in srgb, var(--cr-table-border) 15%, transparent);
+}
+.cr-table tbody tr:last-child td, .cr-table tr:last-child td { border-bottom: none; }
+.cr-table th {
+  font-family: var(--font-mono); font-size: var(--text-xs); text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--cr-table-head-fg); font-weight: 800;
+}
+.cr-table td { color: var(--ink); }
+/* sticky header (opt-in) — wrap the table in a scroll box for it to bite */
+.cr-table--sticky thead th { position: sticky; top: 0; z-index: 1; background: var(--cr-table-bg); }
+/* sortable header — a real <button> inside the <th> (keyboard-operable) */
+.cr-table__sortable {
+  display: inline-flex; align-items: center; gap: var(--space-1); width: 100%;
+  background: transparent; border: 0; padding: 0; cursor: pointer; user-select: none;
+  white-space: nowrap; font: inherit; color: inherit; text-transform: inherit;
+  letter-spacing: inherit; text-align: start;
+}
+.cr-table__sortable:hover { color: var(--ink); }
+.cr-table__ind { color: var(--cr-table-accent); font-weight: 900; margin-inline-start: var(--space-1); }
+/* row hover + selection */
+.cr-table tbody tr:hover td { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-table tbody tr[aria-selected="true"] td { background: color-mix(in srgb, var(--cr-table-accent) 18%, transparent); }
+.cr-table__sel { width: var(--space-8); text-align: center; }
+
+/* ── Tabs ──────────────────────────────────────────────────────────────── */
+.cr-tabs { display: flex; gap: 0; border-bottom: var(--brd) solid var(--cr-tabs-border); }
+.cr-tab {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: var(--cr-tabs-tab-pad-y) var(--cr-tabs-tab-pad-x); background: transparent; color: var(--cr-tabs-tab-fg);
+  border: 0; border-bottom: var(--brd-heavy) solid transparent; margin-bottom: calc(var(--brd) * -1);
+  cursor: pointer;
+}
+.cr-tab:hover { color: var(--cr-tabs-tab-hover-fg); }
+.cr-tab--on { color: var(--cr-tabs-tab-active-fg); border-bottom-color: var(--cr-tabs-indicator); }
+
+/* ── Meter (capacity / utilisation bar) ─────────────────────────────────── */
+.cr-meter { --cr-meter-c: var(--sig-work); display: flex; align-items: center; gap: var(--space-2); }
+.cr-meter__label {
+  font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); min-width: 6ch;
+}
+.cr-meter__track {
+  flex: 1; display: block; height: var(--space-2); background: var(--panel-2);
+  border: var(--brd-hair) solid var(--border);
+}
+.cr-meter__fill { display: block; height: 100%; background: var(--cr-meter-c); }
+.cr-meter--work { --cr-meter-c: var(--sig-work); }
+.cr-meter--wait { --cr-meter-c: var(--sig-wait); }
+.cr-meter--done { --cr-meter-c: var(--sig-done); }
+.cr-meter--err  { --cr-meter-c: var(--sig-err); }
+.cr-meter--idle { --cr-meter-c: var(--sig-idle); }
+
+/* ── Keyed contact sheet (Law 2) ───────────────────────────────────────── */
+.cr-tiles {
+  display: grid; gap: 0; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  border: var(--brd-brush) solid var(--border);
+}
+.cr-tile {
+  aspect-ratio: 1; position: relative; display: flex; align-items: flex-end; padding: var(--space-2);
+  overflow: hidden; border-inline-end: var(--brd) solid var(--border); border-bottom: var(--brd) solid var(--border);
+  font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 700; text-transform: uppercase;
+}
+.cr-tile--work { background: var(--sig-work); color: var(--on-sig); }
+.cr-tile--wait { background: var(--sig-wait); color: var(--on-sig); }
+.cr-tile--done { background: var(--sig-done); color: var(--on-sig); }
+.cr-tile--err  { background: var(--sig-err);  color: var(--on-err); }
+.cr-tile--idle { background: var(--sig-idle); color: var(--on-idle); }
+.cr-tile--stage{ background: var(--stage);    color: var(--stage-ink); }
+
+/* ── Interaction states (Law 7 — event-driven, settles) ────────────────── */
+.cr-row--event { animation: cr-rowglitch 0.4s steps(3) 1; }
+@keyframes cr-rowglitch {
+  0%, 100% { transform: translateX(0); filter: none; }
+  33% { transform: translateX(-2px); filter: hue-rotate(20deg); }
+  66% { transform: translateX(2px); }
+}
+.cr-chip--stamp { animation: cr-stamp 0.18s ease-out 1; }
+@keyframes cr-stamp { 0% { transform: scale(1.18); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
+.cr-btn--kick { position: relative; }
+.cr-btn--kick::after {
+  content: ""; position: absolute; inset: -3px; border: 3px solid var(--sig-work);
+  opacity: 0; animation: cr-kick 0.2s ease-out 1;
+}
+@keyframes cr-kick { 0% { opacity: 0.9; transform: translate(-2px, 0); } 100% { opacity: 0; transform: translate(2px, 0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .cr-row--event, .cr-chip--stamp, .cr-btn--kick::after { animation: none; }
+}
+
+/* ── Instrument shell (composes rail + board) ──────────────────────────── */
+.cr-instrument {
+  display: flex; border: var(--brd-brush) solid var(--border);
+  box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
+  background: var(--board); overflow: hidden;
+}
+.cr-instrument__board {
+  flex: 1; min-width: 0; padding: var(--space-4);
+  display: flex; flex-direction: column; gap: var(--space-4);
+}
+
+/* ── Form field wrapper ────────────────────────────────────────────────── */
+.cr-field { display: flex; flex-direction: column; gap: var(--space-1); }
+.cr-field__label {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
+  text-transform: uppercase; letter-spacing: var(--type-label-tracking); color: var(--ink);
+}
+.cr-field__hint { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); }
+.cr-field__error { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--ink); }
+.cr-field__error::before { content: "\2717 "; color: var(--sig-err); font-weight: 800; }
+.cr-field__req { color: var(--sig-err); }
+
+/* ── Form (schema-driven; renders a stack of fields + a submit action) ───── */
+.cr-form { display: flex; flex-direction: column; gap: var(--space-4); }
+.cr-form__title {
+  margin: 0; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg);
+  text-transform: uppercase; letter-spacing: -0.01em; color: var(--ink);
+}
+.cr-form__actions { display: flex; gap: var(--space-2); margin-top: var(--space-1); }
+/* form-level error summary — appears after a failed submit; links jump to fields */
+.cr-form__summary { border: var(--brd) solid var(--sig-err); background: color-mix(in srgb, var(--sig-err) 12%, var(--panel)); padding: var(--space-2) var(--space-3); display: flex; flex-direction: column; gap: var(--space-1); }
+.cr-form__summary-title { font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--sig-err); }
+.cr-form__summary-list { margin: 0; padding-inline-start: var(--space-4); font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--ink); display: flex; flex-direction: column; gap: 2px; }
+.cr-form__summary-link { color: var(--ink); text-underline-offset: 2px; }
+/* nesting: rows carry a depth pad; groups/array-items get a left rule so nested
+ * structure reads at a glance without real DOM nesting */
+.cr-form__row { display: flex; flex-direction: column; gap: var(--space-1); }
+.cr-form__row--group, .cr-form__row--array { margin-top: var(--space-1); }
+.cr-form__row--item { border-inline-start: var(--brd) solid var(--border); }
+.cr-form__grouphead {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
+  border-bottom: var(--brd-hair) solid var(--border); padding-bottom: 2px;
+}
+.cr-form__arrayhead, .cr-form__itemhead { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.cr-form__itemidx { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.cr-form__control { display: flex; align-items: center; gap: var(--space-2); }
+.cr-form__control .cr-input, .cr-form__control .cr-select, .cr-form__control .cr-textarea { flex: 1; }
+
+/* ── Text input / textarea / select ────────────────────────────────────── */
+.cr-input, .cr-textarea, .cr-select {
+  width: 100%; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--cr-field-fg);
+  background: var(--cr-field-bg); border: var(--brd) solid var(--cr-field-border); border-radius: var(--radius);
+  padding: var(--space-2) var(--space-3);
+}
+.cr-input::placeholder, .cr-textarea::placeholder { color: var(--cr-field-placeholder); }
+.cr-textarea { min-height: var(--space-16); resize: vertical; }
+.cr-input:disabled, .cr-textarea:disabled, .cr-select:disabled { opacity: 0.5; cursor: not-allowed; }
+.cr-field--error .cr-input,
+.cr-field--error .cr-textarea,
+.cr-field--error .cr-select { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
+
+/* ── Checkbox / radio (square — Law 1) ─────────────────────────────────── */
+.cr-check {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); cursor: pointer;
+}
+.cr-check input {
+  appearance: none; -webkit-appearance: none; margin: 0;
+  width: var(--space-4); height: var(--space-4); flex-shrink: 0;
+  border: var(--brd) solid var(--cr-field-border); background: var(--cr-check-bg);
+  display: inline-grid; place-content: center; cursor: pointer;
+}
+.cr-check input:checked { background: var(--cr-check-checked); }
+.cr-check input:checked::after {
+  content: ""; width: var(--space-2); height: var(--space-2); background: var(--cr-check-mark);
+}
+.cr-check input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Switch (button[role=switch]) ──────────────────────────────────────── */
+.cr-switch {
+  display: inline-flex; align-items: center; gap: var(--space-2); cursor: pointer;
+  font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 700; color: var(--ink);
+  background: none; border: none; padding: 0;
+}
+.cr-switch__track {
+  position: relative; display: inline-block; width: var(--space-8); height: var(--space-4);
+  background: var(--cr-switch-track); border: var(--brd) solid var(--cr-field-border);
+}
+.cr-switch__track::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: var(--space-4);
+  background: var(--cr-switch-thumb); transition: left var(--dur-press), background var(--dur-press);
+}
+.cr-switch[aria-checked="true"] .cr-switch__track { background: var(--cr-switch-track-on); }
+.cr-switch[aria-checked="true"] .cr-switch__track::after { left: calc(100% - var(--space-4)); background: var(--cr-switch-thumb-on); }
+
+@media (prefers-reduced-motion: reduce) { .cr-switch__track::after { transition: none; } }
+
+/* ── Modal (native <dialog> — free focus-trap + Esc + backdrop) ────────── */
+.cr-modal {
+  border: var(--brd-brush) solid var(--cr-modal-border); background: var(--cr-modal-bg); color: var(--ink);
+  box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
+  padding: 0; max-width: min(92vw, 34rem); border-radius: var(--radius);
+}
+.cr-modal::backdrop { background: var(--cr-modal-backdrop); }
+
+/* ── Command palette (⌘K) ───────────────────────────────────────────────── */
+.cr-palette {
+  padding: 0; width: min(92vw, 34rem); margin: 12vh auto auto; border-radius: var(--radius);
+  border: var(--brd-heavy) solid var(--border); background: var(--panel); color: var(--ink);
+  box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
+}
+.cr-palette::backdrop { background: color-mix(in srgb, var(--mass) 72%, transparent); }
+.cr-palette__box { display: flex; flex-direction: column; }
+.cr-palette__input {
+  font-family: var(--font-mono); font-size: var(--text-md); padding: var(--space-3) var(--space-4);
+  background: var(--board); color: var(--ink); border: 0; border-bottom: var(--brd) solid var(--border);
+  outline: none;
+}
+.cr-palette__input::placeholder { color: var(--muted); }
+.cr-palette__list { list-style: none; margin: 0; padding: var(--space-1); max-height: 52vh; overflow: auto; }
+.cr-palette__item {
+  display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-3);
+  font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); cursor: pointer;
+}
+.cr-palette__item--active { background: var(--sig-work); color: var(--on-sig); }
+.cr-palette__item--active .cr-kbd { border-color: currentColor; color: inherit; background: color-mix(in srgb, currentColor 16%, transparent); box-shadow: none; }
+.cr-palette__label { flex: 1; }
+.cr-palette__group { font-size: var(--text-2xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.cr-palette__item--active .cr-palette__group { color: inherit; }
+.cr-palette__empty { padding: var(--space-3) var(--space-4); font-family: var(--font-mono); color: var(--muted); }
+
+/* ── Alert / callout (inline message, keyed to a signal) ────────────────── */
+.cr-alert {
+  --cr-alert-key: var(--sig-work);
+  display: flex; gap: var(--space-3); align-items: flex-start;
+  border: var(--brd) solid var(--cr-alert-border); border-inline-start: var(--brd-brush) solid var(--cr-alert-key);
+  background: var(--cr-alert-bg); padding: var(--space-3) var(--space-4);
+  box-shadow: var(--shadow-off-sm) var(--shadow-off-sm) 0 var(--shadow-col);
+}
+.cr-alert--info { --cr-alert-key: var(--sig-work); }
+.cr-alert--wait { --cr-alert-key: var(--sig-wait); }
+.cr-alert--done { --cr-alert-key: var(--sig-done); }
+.cr-alert--err  { --cr-alert-key: var(--sig-err); }
+.cr-alert__icon { width: var(--space-3); height: var(--space-3); background: var(--cr-alert-key); border: var(--brd-hair) solid var(--cr-alert-border); margin-top: var(--space-0-5); flex-shrink: 0; }
+.cr-alert__body { flex: 1; min-width: 0; }
+.cr-alert__title { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; letter-spacing: -0.01em; font-size: var(--text-md); margin: 0 0 var(--space-0-5); color: var(--ink); }
+.cr-alert__msg { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); margin: 0; }
+.cr-alert__close {
+  font-family: var(--font-mono); cursor: pointer; background: transparent; color: inherit;
+  border: var(--brd-hair) solid currentColor; padding: 0 var(--space-1); line-height: 1.4;
+}
+
+/* ── Radio group (a square — radius 0; filled when checked) ──────────────── */
+.cr-radiogroup { display: flex; flex-direction: column; gap: var(--space-2); }
+.cr-radiogroup--row { flex-direction: row; flex-wrap: wrap; gap: var(--space-4); }
+.cr-radio {
+  display: inline-flex; align-items: center; gap: var(--space-2); cursor: pointer;
+  font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink);
+  background: transparent; border: 0; padding: 0; text-align: start;
+}
+.cr-radio__box { position: relative; width: var(--space-3); height: var(--space-3); flex-shrink: 0; background: var(--cr-radio-bg); border: var(--brd) solid var(--cr-field-border); }
+.cr-radio[aria-checked="true"] .cr-radio__box::after { content: ""; position: absolute; inset: 3px; background: var(--cr-radio-dot); }
+.cr-radio[disabled] { opacity: var(--state-disabled-op); cursor: not-allowed; }
+
+/* ── Slider (styled native range — keyboard for free) ───────────────────── */
+.cr-slider { -webkit-appearance: none; appearance: none; width: 100%; height: var(--space-2); background: var(--cr-slider-track); border: var(--brd-hair) solid var(--cr-field-border); cursor: pointer; }
+.cr-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: var(--space-3); height: var(--space-4); background: var(--cr-slider-thumb); border: var(--brd) solid var(--cr-field-border); box-shadow: var(--space-px) var(--brd-hair) 0 var(--shadow-col); }
+.cr-slider::-moz-range-thumb { width: var(--space-3); height: var(--space-4); border-radius: 0; background: var(--cr-slider-thumb); border: var(--brd) solid var(--cr-field-border); }
+.cr-slider:focus-visible { outline: var(--focus-w) solid var(--cr-field-focus); outline-offset: var(--focus-offset); }
+
+/* ── Progress (task progress; determinate + indeterminate) ──────────────── */
+.cr-progress { --cr-prog-c: var(--sig-work); height: var(--space-2); background: var(--panel-2); border: var(--brd-hair) solid var(--border); overflow: hidden; }
+.cr-progress--wait { --cr-prog-c: var(--sig-wait); }
+.cr-progress--done { --cr-prog-c: var(--sig-done); }
+.cr-progress--err  { --cr-prog-c: var(--sig-err); }
+.cr-progress__fill { display: block; height: 100%; width: 0; background: var(--cr-prog-c); }
+.cr-progress--indeterminate .cr-progress__fill {
+  width: 38%;
+  background-image: repeating-linear-gradient(45deg, var(--cr-prog-c) 0 8px, color-mix(in srgb, var(--cr-prog-c) 60%, var(--border)) 8px 16px);
+  animation: cr-prog-slide 1.1s linear infinite;
+}
+@keyframes cr-prog-slide { from { transform: translateX(-110%); } to { transform: translateX(320%); } }
+@media (prefers-reduced-motion: reduce) { .cr-progress--indeterminate .cr-progress__fill { animation: none; width: 100%; } }
+
+/* ── Charts — sparkline · line · bar · stacked (SVG plots + token hues) ─────
+ * House rules from the dataviz method, tuned to the signal palette: thin marks,
+ * a crisp non-scaling 2px stroke, baseline-anchored bars with rounded data-ends,
+ * a recessive grid, a 2px surface gap between fills, legends/labels in text ink
+ * (never the series colour), and one y-axis only. Series colour is set inline
+ * from a signal token; text/grid/axis colours live here. */
+
+/* Sparkline — inline micro line/area (no axes) */
+.cr-spark { --cr-spark-c: var(--sig-work); display: inline-block; width: 120px; height: 32px; vertical-align: middle; color: var(--cr-spark-c); }
+.cr-spark__svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.cr-spark__line { fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: miter; stroke-linecap: square; }
+.cr-spark__area { fill: currentColor; opacity: 0.14; }
+.cr-spark__dot { fill: currentColor; stroke: var(--panel); stroke-width: 1; }
+.cr-spark--work { --cr-spark-c: var(--sig-work); }
+.cr-spark--wait { --cr-spark-c: var(--sig-wait); }
+.cr-spark--done { --cr-spark-c: var(--sig-done); }
+.cr-spark--err  { --cr-spark-c: var(--sig-err); }
+.cr-spark--idle { --cr-spark-c: var(--sig-idle); }
+.cr-spark--accent  { --cr-spark-c: var(--sig-accent); }
+.cr-spark--accent2 { --cr-spark-c: var(--sig-accent-2); }
+
+/* Shared plot furniture — grid, axis ticks, value + target */
+.cr-chart__grid { stroke: color-mix(in srgb, var(--ink) 16%, transparent); stroke-width: 1; }
+.cr-chart__grid--v { stroke: color-mix(in srgb, var(--ink) 9%, transparent); }
+/* Collapsed-gap marker on a "broken" (gap-collapse) time axis. */
+.cr-chart__break { stroke: color-mix(in srgb, var(--ink) 34%, transparent); stroke-width: 1; stroke-dasharray: 1 3; }
+.cr-chart__target { stroke: var(--sig-err); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.cr-chart__tick { fill: var(--muted); font-family: var(--font-mono); font-size: 9px; letter-spacing: -0.02em; }
+.cr-chart__ytick { fill: var(--muted); font-family: var(--font-mono); font-size: 8.5px; letter-spacing: -0.03em; opacity: 0.85; }
+.cr-chart__val { fill: var(--ink); font-family: var(--font-mono); font-size: 9px; font-weight: 700; }
+.cr-chart__legend { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-3); margin: var(--space-1) 0 0; padding: 0; }
+.cr-chart__key { display: inline-flex; align-items: center; gap: var(--space-1); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--ink); }
+/* Interactive legend keys: click to isolate/restore a series. Reset the button
+ * chrome so they read as legend text, keep a visible focus ring, and mute the
+ * key (label + swatch) when its series is toggled off. */
+button.cr-chart__key { border: 0; background: none; padding: 2px 3px; margin: 0; cursor: pointer; border-radius: calc(var(--radius) * 0.5); transition: opacity var(--dur-1) var(--ease-out); }
+button.cr-chart__key:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
+.cr-chart__key--off { opacity: 0.4; text-decoration: line-through; }
+.cr-chart__key--off .cr-chart__sw { filter: grayscale(1); }
+.cr-chart__sw { width: 10px; height: 10px; border: var(--brd-hair) solid var(--border); flex: none; }
+
+/* Hover layer — crosshair + cursor dots (SVG) and a top-docked tooltip (HTML).
+ * Progressive enhancement: nothing renders until pointer-over, so the static
+ * page and visual baselines are unaffected. Interaction feedback, so it stays
+ * on under the calm profile. */
+.cr-chart { position: relative; }
+.cr-chart__cross { stroke: color-mix(in srgb, var(--ink) 55%, transparent); stroke-width: 1; stroke-dasharray: 2 2; }
+.cr-chart__cursor { stroke: var(--panel-2); stroke-width: 1.5; }
+.cr-chart__tip {
+  position: absolute; top: var(--space-1); transform: translateX(-50%); z-index: 2; pointer-events: none;
+  display: flex; flex-direction: column; gap: 2px; padding: var(--space-1) var(--space-2);
+  background: var(--panel); border: var(--brd) solid var(--border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  font-family: var(--font-mono); font-size: var(--text-xs); white-space: nowrap;
+}
+.cr-chart__tip-x { color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.cr-chart__tip-row { display: inline-flex; align-items: center; gap: var(--space-1); color: var(--ink); }
+.cr-chart__tip-sw { width: 9px; height: 9px; border: var(--brd-hair) solid var(--border); flex: none; }
+.cr-chart__tip-n { color: var(--ink); }
+.cr-chart__tip-v { color: var(--ink); font-weight: 700; margin-inline-start: auto; padding-inline-start: var(--space-2); }
+
+/* Line chart */
+.cr-linechart { margin: 0; }
+/* The graphic (svg + hover tooltip) carries role="img"; the interactive legend
+ * lives outside it so its buttons aren't nested inside an image subtree. */
+.cr-linechart__graphic { position: relative; display: block; }
+.cr-linechart__plot { display: block; width: 100%; height: auto; background: var(--panel-2); border: var(--brd-hair) solid var(--border); }
+.cr-linechart__line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.cr-linechart__area { opacity: 0.12; stroke: none; }
+.cr-linechart__end { stroke: var(--panel-2); stroke-width: 1; }
+
+/* Bar chart */
+.cr-barchart { margin: 0; }
+.cr-barchart__plot { display: block; width: 100%; height: auto; background: var(--panel-2); border: var(--brd-hair) solid var(--border); }
+.cr-barchart__bar { stroke: var(--panel-2); stroke-width: 1; }
+
+/* Stacked bar — "stacked progress" */
+.cr-stack { display: flex; flex-direction: column; gap: var(--space-1); }
+.cr-stack__label { font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.cr-stack__bar { display: flex; gap: 2px; height: var(--space-3); background: var(--panel-2); border: var(--brd-hair) solid var(--border); overflow: hidden; }
+.cr-stack__seg { display: block; min-width: 3px; background: var(--sig-idle); }
+.cr-stack__seg--work { background: var(--sig-work); }
+.cr-stack__seg--wait { background: var(--sig-wait); }
+.cr-stack__seg--done { background: var(--sig-done); }
+.cr-stack__seg--err  { background: var(--sig-err); }
+.cr-stack__seg--idle { background: var(--sig-idle); }
+.cr-stack__seg--accent  { background: var(--sig-accent); }
+.cr-stack__seg--accent2 { background: var(--sig-accent-2); }
+.cr-stack__legend { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); }
+.cr-stack__key { display: inline-flex; align-items: center; gap: var(--space-1); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--ink); }
+.cr-stack__sw { width: 10px; height: 10px; border: var(--brd-hair) solid var(--border); flex: none; }
+.cr-stack__kl { color: var(--ink); }
+.cr-stack__kv { color: var(--ink); font-weight: 700; }
+.cr-stack__kp { color: var(--muted); }
+
+/* ── Skeleton (loading placeholder — blocky pulse, never rounded) ────────── */
+.cr-skeleton { background: var(--cr-skeleton-bg); border: var(--brd-hair) solid color-mix(in srgb, var(--border) 30%, transparent); animation: cr-skel-pulse 1.4s ease-in-out infinite; }
+.cr-skeleton--line { height: var(--space-2); }
+.cr-skeleton--text { height: var(--space-3); }
+.cr-skeleton--block { height: var(--space-10); }
+@keyframes cr-skel-pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.9; } }
+@media (prefers-reduced-motion: reduce) { .cr-skeleton { animation: none; } }
+
+/* ── Data / description list (key → value readout) ──────────────────────── */
+.cr-dl { display: grid; grid-template-columns: max-content 1fr; gap: var(--space-1) var(--space-4); margin: 0; }
+.cr-dl__k { font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.cr-dl__v { margin: 0; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); }
+
+/* ── Accordion (collapsible sections) ───────────────────────────────────── */
+.cr-accordion { border: var(--brd) solid var(--cr-accordion-border); background: var(--cr-accordion-bg); }
+.cr-accordion__item + .cr-accordion__item { border-top: var(--brd) solid var(--cr-accordion-border); }
+.cr-accordion__header {
+  width: 100%; display: flex; align-items: center; gap: var(--space-2); justify-content: space-between;
+  background: transparent; border: 0; cursor: pointer; padding: var(--space-3) var(--space-4);
+  font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 700; color: var(--ink);
+  text-transform: uppercase; letter-spacing: 0.04em; text-align: start;
+}
+.cr-accordion__header:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-accordion__chevron {
+  display: inline-block; width: 0; height: 0; flex-shrink: 0;
+  border-inline-start: 7px solid var(--muted); border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+  transition: transform var(--dur-press);
+}
+.cr-accordion__header[aria-expanded="true"] .cr-accordion__chevron { transform: rotate(90deg); border-inline-start-color: var(--cr-accordion-accent); }
+.cr-accordion__panel { padding: 0 var(--space-4) var(--space-4); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .cr-accordion__chevron { transition: none; } }
+
+/* ── Popover (generic anchored overlay) ─────────────────────────────────── */
+.cr-popover { position: relative; display: inline-block; }
+.cr-popover__scrim { position: fixed; inset: 0; z-index: var(--z-overlay); background: transparent; border: 0; cursor: default; }
+.cr-popover__panel {
+  position: absolute; top: calc(100% + var(--space-1)); left: 0; z-index: calc(var(--z-overlay) + 1);
+  min-width: 15rem; max-width: min(92vw, 22rem); background: var(--cr-popover-bg); color: var(--cr-popover-fg);
+  border: var(--brd) solid var(--cr-popover-border); box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  padding: var(--space-3) var(--space-4);
+}
+.cr-popover__panel--right { left: auto; right: 0; }
+.cr-popover__panel:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
+
+/* ── Drawer / sheet (edge panel on native dialog) ───────────────────────── */
+.cr-drawer {
+  position: fixed; inset: 0 0 0 auto; margin: 0; padding: 0; border-radius: var(--radius);
+  height: 100vh; max-height: 100vh; width: min(92vw, 26rem);
+  border: 0; border-inline-start: var(--brd-brush) solid var(--cr-drawer-border); background: var(--cr-drawer-bg); color: var(--ink);
+  box-shadow: calc(var(--shadow-off-lg) * -1) 0 0 var(--shadow-col);
+}
+.cr-drawer--left { inset: 0 auto 0 0; border-inline-start: 0; border-inline-end: var(--brd-brush) solid var(--cr-drawer-border); box-shadow: var(--shadow-off-lg) 0 0 var(--shadow-col); }
+.cr-drawer::backdrop { background: var(--cr-drawer-backdrop); }
+.cr-drawer[open] { animation: cr-drawer-in var(--dur-press) ease-out; }
+.cr-drawer--left[open] { animation-name: cr-drawer-in-l; }
+@keyframes cr-drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes cr-drawer-in-l { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) { .cr-drawer[open] { animation: none; } }
+.cr-drawer__box { display: flex; flex-direction: column; height: 100%; }
+.cr-drawer__head { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: var(--brd) solid var(--border); }
+.cr-drawer__title { flex: 1; margin: 0; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
+.cr-drawer__close { font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1; cursor: pointer; background: var(--panel); color: var(--ink); border: var(--brd) solid var(--border); padding: var(--space-1) var(--space-2); }
+.cr-drawer__body { flex: 1; overflow: auto; padding: var(--space-4); }
+
+/* ── Breadcrumb (ascii "/" separators) ──────────────────────────────────── */
+.cr-breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--text-xs); margin: 0; padding: 0; list-style: none; }
+.cr-breadcrumb__item { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--cr-breadcrumb-fg); }
+.cr-breadcrumb__item + .cr-breadcrumb__item::before { content: "/"; color: color-mix(in srgb, var(--cr-breadcrumb-fg) 55%, transparent); }
+.cr-breadcrumb__link { color: var(--cr-breadcrumb-fg); text-decoration: none; }
+.cr-breadcrumb__link:hover { color: var(--cr-breadcrumb-current-fg); text-decoration: underline; }
+.cr-breadcrumb__item[aria-current="page"] { color: var(--cr-breadcrumb-current-fg); font-weight: 700; }
+
+/* ── Segmented control (single-select toggle group) ─────────────────────── */
+.cr-segmented { display: inline-flex; border: var(--brd) solid var(--cr-segmented-border); }
+.cr-segmented__opt {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.04em; padding: var(--space-1) var(--space-3); background: var(--cr-segmented-bg); color: var(--muted);
+  border: 0; border-inline-start: var(--brd-hair) solid var(--cr-segmented-border); cursor: pointer;
+}
+.cr-segmented__opt:first-child { border-inline-start: 0; }
+.cr-segmented__opt:hover { color: var(--ink); }
+.cr-segmented__opt[aria-checked="true"] { background: var(--cr-segmented-accent-bg); color: var(--cr-segmented-accent-fg); }
+
+/* ── Combobox (autocomplete input + listbox) ────────────────────────────── */
+.cr-combobox { position: relative; display: inline-block; width: 100%; max-width: 20rem; }
+.cr-combobox__scrim { position: fixed; inset: 0; z-index: var(--z-overlay); background: transparent; border: 0; }
+.cr-combobox__input {
+  width: 100%; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--cr-field-fg);
+  background: var(--cr-field-bg); border: var(--brd) solid var(--cr-field-border); padding: var(--space-2) var(--space-3);
+}
+.cr-combobox__list {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: calc(var(--z-overlay) + 1);
+  list-style: none; margin: 0; padding: var(--space-1); max-height: 40vh; overflow: auto;
+  background: var(--cr-combobox-panel-bg); border: var(--brd) solid var(--cr-field-border); border-top: 0;
+  box-shadow: var(--shadow-off-sm) var(--shadow-off-sm) 0 var(--shadow-col);
+}
+.cr-combobox__opt { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-2); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--cr-field-fg); cursor: pointer; }
+.cr-combobox__opt::before { content: "\25B8"; color: var(--cr-combobox-opt-active-bg); opacity: 0; }
+.cr-combobox__opt--active { background: var(--cr-combobox-opt-active-bg); color: var(--cr-combobox-opt-active-fg); }
+.cr-combobox__opt--active::before { color: currentColor; opacity: 1; }
+.cr-combobox__empty { padding: var(--space-2); font-family: var(--font-mono); color: var(--muted); }
+
+/* ── Number field (input + −/+ steppers) ────────────────────────────────── */
+.cr-numberfield { display: inline-flex; border: var(--brd) solid var(--cr-field-border); background: var(--cr-field-bg); }
+.cr-numberfield__input {
+  width: 4rem; text-align: center; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--cr-field-fg);
+  background: transparent; border: 0; outline: none; padding: var(--space-1); -moz-appearance: textfield;
+}
+.cr-numberfield__input::-webkit-outer-spin-button, .cr-numberfield__input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.cr-numberfield__btn {
+  width: var(--space-6); font-family: var(--font-mono); font-size: var(--text-md); font-weight: 800; line-height: 1;
+  background: var(--panel); color: var(--ink); border: 0; cursor: pointer;
+}
+.cr-numberfield__btn:first-child { border-inline-end: var(--brd-hair) solid var(--cr-field-border); }
+.cr-numberfield__btn:last-child { border-inline-start: var(--brd-hair) solid var(--cr-field-border); }
+.cr-numberfield__btn:hover:not([disabled]) { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-numberfield__btn[disabled] { opacity: var(--state-disabled-op); cursor: not-allowed; }
+
+/* ── ASCII separators & lists ───────────────────────────────────────────── */
+.cr-sep { border: 0; height: 0; border-top: var(--brd-hair) dashed color-mix(in srgb, var(--border) 60%, transparent); margin: var(--space-3) 0; }
+.cr-sep--dot { border-top-style: dotted; border-top-width: var(--brd); }
+.cr-sep--double { height: var(--space-0-5); border-top: var(--brd-hair) solid var(--border); border-bottom: var(--brd-hair) solid var(--border); }
+/* labeled rule — ── LABEL ── */
+.cr-sep-label { display: flex; align-items: center; gap: var(--space-3); margin: var(--space-4) 0; font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+.cr-sep-label::before, .cr-sep-label::after { content: ""; flex: 1; border-top: var(--brd-hair) dashed color-mix(in srgb, var(--border) 60%, transparent); }
+/* ascii-marker list */
+.cr-list { list-style: none; margin: 0; padding: 0; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); }
+.cr-list__item { display: flex; gap: var(--space-2); padding: var(--space-0-5) 0; }
+.cr-list__item::before { content: "\25B8"; color: var(--sig-work); flex-shrink: 0; }   /* ▸ */
+.cr-list--dot .cr-list__item::before { content: "\00B7"; color: var(--muted); }          /* · */
+.cr-list--tick .cr-list__item::before { content: "\00BB"; color: var(--sig-work); }       /* » */
+.cr-list--plus .cr-list__item::before { content: "+"; color: var(--muted); }
+/* dot-leader row — label ······· value */
+.cr-leader { display: flex; align-items: baseline; font-family: var(--font-mono); font-size: var(--text-sm); gap: var(--space-2); }
+.cr-leader__k { color: var(--muted); }
+.cr-leader__fill { flex: 1; align-self: center; border-bottom: var(--brd) dotted color-mix(in srgb, var(--muted) 55%, transparent); }
+.cr-leader__v { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* ── ASCII rules · meters · spinner (first-class ASCII vocabulary) ───────────
+ * Real characters, not borders — the house ASCII voice, monospace + tabular. */
+.cr-rule { font-family: var(--font-mono); color: color-mix(in srgb, var(--muted) 70%, transparent);
+  line-height: 1; overflow: hidden; white-space: nowrap; user-select: none; }
+.cr-rule::before { content: "\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500\2500"; }         /* ──── */
+.cr-rule--hatch::before { content: "\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591\2593\2592\2591"; }  /* ▓▒░ */
+.cr-rule--dot::before   { content: "\00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7 \00B7"; letter-spacing: 2px; }
+
+/* ASCII progress/meter — a real block-glyph bar driven by --v (0..1). */
+.cr-ascii-bar { position: relative; display: inline-block; font-family: var(--font-mono); font-size: var(--text-sm);
+  color: color-mix(in srgb, var(--muted) 55%, transparent); letter-spacing: 1px; line-height: 1; user-select: none; }
+.cr-ascii-bar::before { content: "\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1\25B1"; }  /* ▱×20 track */
+.cr-ascii-bar__fill { position: absolute; top: 0; left: 0; overflow: hidden; white-space: nowrap;
+  width: calc(var(--v, 0) * 100%); color: var(--sig-work); }
+.cr-ascii-bar__fill::before { content: "\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0\25B0"; letter-spacing: 1px; }  /* ▰×20 fill */
+
+/* ASCII spinner — cycles braille frames (honors reduced motion + the motion dial). */
+.cr-ascii-spin { font-family: var(--font-mono); color: var(--sig-work); }
+.cr-ascii-spin::before { content: "\28CB"; animation: cr-braille 0.8s steps(1, jump-none) infinite; }
+@keyframes cr-braille {
+  0%   { content: "\280B"; } 12.5% { content: "\2819"; } 25%  { content: "\2839"; } 37.5% { content: "\2838"; }
+  50%  { content: "\283C"; } 62.5% { content: "\2834"; } 75%  { content: "\2826"; } 87.5% { content: "\2827"; }
+}
+@media (prefers-reduced-motion: reduce) { .cr-ascii-spin::before { animation: none; content: "\28FF"; } }
+
+/* ASCII/braille density backdrop — the default texture for empty & loading states.
+ * A masked braille tile so it themes to --muted and follows the loudness dial. */
+.cr-empty { position: relative; isolation: isolate; overflow: hidden;
+  --cr-braille: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2272%22%20height=%2254%22%20viewBox=%220%200%2072%2054%22%3E%3Ctext%20x=%226%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠁%3C/text%3E%3Ctext%20x=%2218%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠒%3C/text%3E%3Ctext%20x=%2230%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠹%3C/text%3E%3Ctext%20x=%2242%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠶%3C/text%3E%3Ctext%20x=%2254%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠇%3C/text%3E%3Ctext%20x=%2266%22%20y=%2216%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠘%3C/text%3E%3Ctext%20x=%226%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠠%3C/text%3E%3Ctext%20x=%2218%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠉%3C/text%3E%3Ctext%20x=%2230%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠛%3C/text%3E%3Ctext%20x=%2242%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠿%3C/text%3E%3Ctext%20x=%2254%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠄%3C/text%3E%3Ctext%20x=%2266%22%20y=%2234%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠧%3C/text%3E%3Ctext%20x=%226%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠁%3C/text%3E%3Ctext%20x=%2218%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠒%3C/text%3E%3Ctext%20x=%2230%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠹%3C/text%3E%3Ctext%20x=%2242%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠶%3C/text%3E%3Ctext%20x=%2254%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠇%3C/text%3E%3Ctext%20x=%2266%22%20y=%2252%22%20font-family=%22monospace%22%20font-size=%2214%22%20fill=%22%23000%22%3E⠘%3C/text%3E%3C/svg%3E"); }
+.cr-empty::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: color-mix(in srgb, var(--muted) 45%, transparent);
+  -webkit-mask: var(--cr-braille) 0 0 / 72px 54px repeat; mask: var(--cr-braille) 0 0 / 72px 54px repeat;
+  opacity: calc(0.5 * var(--decoration-intensity, 1)); }
+
+/* ── Hover card (rich hover/focus reveal) ───────────────────────────────── */
+.cr-hovercard { position: relative; display: inline-flex; }
+.cr-hovercard__trigger { cursor: default; border-bottom: var(--brd-hair) dashed var(--muted); }
+.cr-hovercard__panel {
+  position: absolute; top: calc(100% + var(--space-2)); left: 0; z-index: var(--z-overlay);
+  min-width: 16rem; max-width: min(92vw, 22rem);
+  background: var(--cr-hovercard-bg); color: var(--cr-hovercard-fg); border: var(--brd) solid var(--cr-hovercard-border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col); padding: var(--space-3) var(--space-4);
+  opacity: 0; visibility: hidden; transition: opacity var(--dur-press); transition-delay: 0.12s;
+}
+.cr-hovercard__panel--right { left: auto; right: 0; }
+.cr-hovercard:hover .cr-hovercard__panel, .cr-hovercard:focus-within .cr-hovercard__panel { opacity: 1; visibility: visible; }
+/* Escape latch (WCAG 1.4.13 dismissable): outranks the hover/focus reveal above. */
+.cr-hovercard[data-dismissed="true"]:hover .cr-hovercard__panel,
+.cr-hovercard[data-dismissed="true"]:focus-within .cr-hovercard__panel { opacity: 0; visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .cr-hovercard__panel { transition: none; } }
+
+/* ── Tree (hierarchical, flattened visible rows) ────────────────────────── */
+.cr-tree { list-style: none; margin: 0; padding: 0; font-family: var(--font-mono); font-size: var(--text-sm); }
+.cr-tree__item { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-0-5) var(--space-2); cursor: pointer; color: var(--ink); }
+.cr-tree__item:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-tree__item[aria-selected="true"] { background: color-mix(in srgb, var(--cr-tree-accent) 20%, transparent); }
+.cr-tree__item:focus-visible { outline: var(--focus-w) solid var(--cr-tree-accent); outline-offset: -3px; }
+.cr-tree__twist { width: 0; height: 0; flex-shrink: 0; border-inline-start: 6px solid var(--muted); border-top: 5px solid transparent; border-bottom: 5px solid transparent; transition: transform var(--dur-press); }
+.cr-tree__item[aria-expanded="true"] .cr-tree__twist { transform: rotate(90deg); border-inline-start-color: var(--cr-tree-accent); }
+.cr-tree__lead { width: 6px; flex-shrink: 0; color: color-mix(in srgb, var(--muted) 60%, transparent); text-align: center; }
+@media (prefers-reduced-motion: reduce) { .cr-tree__twist { transition: none; } }
+
+/* ── DateTime (styled native datetime-local) ────────────────────────────── */
+.cr-datetime {
+  font-family: var(--font-mono); font-size: var(--text-sm); color: var(--cr-field-fg); background: var(--cr-field-bg);
+  border: var(--brd) solid var(--cr-field-border); padding: var(--space-2) var(--space-3);
+}
+.cr-datetime:focus-visible { outline: var(--focus-w) solid var(--cr-field-focus); outline-offset: var(--focus-offset); }
+.cr-datetime::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.7; }
+
+/* ── Cron field (expression input + human-readable readout) ─────────────── */
+.cr-cron { display: flex; flex-direction: column; gap: var(--space-2); }
+.cr-cron__input { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--cr-field-fg); background: var(--cr-field-bg); border: var(--brd) solid var(--cr-field-border); padding: var(--space-2) var(--space-3); }
+.cr-cron__out { display: flex; align-items: center; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); }
+.cr-cron__out::before { content: "\2192"; color: var(--muted); }   /* → */
+.cr-cron__out--err { color: var(--cr-field-error); }
+.cr-cron--error .cr-cron__input { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
+.cr-cron__input:disabled { opacity: var(--state-disabled-op); cursor: not-allowed; }
+.cr-cron__presets { display: flex; gap: var(--space-1); flex-wrap: wrap; }
+.cr-cron__preset { font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 700; background: var(--panel-2); color: var(--muted); border: var(--brd-hair) solid var(--border); padding: var(--space-0-5) var(--space-2); cursor: pointer; }
+.cr-cron__preset:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-modal__head {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--cr-modal-head-pad-y) var(--cr-modal-head-pad-x); border-bottom: var(--brd) solid var(--cr-modal-border);
+}
+.cr-modal__title { flex: 1; margin: 0; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
+.cr-modal__close {
+  font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1; cursor: pointer;
+  background: var(--panel); color: var(--ink); border: var(--brd) solid var(--border);
+  padding: var(--space-0-5) var(--space-2);
+}
+.cr-modal__body { padding: var(--cr-modal-body-pad); font-size: var(--text-base); }
+
+/* ── Toast (keyed to a signal; role=status/alert) ──────────────────────── */
+.cr-toast {
+  display: flex; align-items: center; gap: var(--space-3);
+  border: var(--brd) solid var(--border); box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  padding: var(--space-2) var(--space-3); font-family: var(--font-mono); font-size: var(--text-sm);
+  background: var(--sig-work); color: var(--on-sig);
+}
+.cr-toast--done { background: var(--sig-done); color: var(--on-sig); }
+.cr-toast--wait { background: var(--sig-wait); color: var(--on-sig); }
+.cr-toast--err  { background: var(--sig-err);  color: var(--on-err); }
+.cr-toast__msg { flex: 1; }
+.cr-toast__close {
+  font-family: var(--font-mono); cursor: pointer; background: transparent; color: inherit;
+  border: var(--brd-hair) solid currentColor; padding: 0 var(--space-1); line-height: 1.4;
+}
+
+/* ── Toast region (stacks toasts in a screen corner) ────────────────────── */
+.cr-toast-region {
+  position: fixed; z-index: var(--z-overlay); display: flex; flex-direction: column;
+  gap: var(--space-2); max-width: min(92vw, 30rem); pointer-events: none;
+}
+.cr-toast-region > * { pointer-events: auto; }
+.cr-toast-region--tr { top: var(--space-4); right: var(--space-4); }
+.cr-toast-region--br { bottom: var(--space-4); right: var(--space-4); }
+.cr-toast-region--tl { top: var(--space-4); left: var(--space-4); }
+.cr-toast-region--bl { bottom: var(--space-4); left: var(--space-4); }
+/* bottom-anchored regions stack newest nearest the corner */
+.cr-toast-region--br, .cr-toast-region--bl { flex-direction: column-reverse; }
+
+/* ── Menu (dropdown) ────────────────────────────────────────────────────── */
+.cr-menu { position: relative; display: inline-block; }
+.cr-menu__scrim { position: fixed; inset: 0; z-index: var(--z-overlay); background: transparent; border: 0; cursor: default; }
+.cr-menu__panel {
+  position: absolute; top: calc(100% + var(--space-1)); left: 0; z-index: calc(var(--z-overlay) + 1);
+  min-width: 12rem; background: var(--cr-menu-panel-bg); border: var(--brd) solid var(--cr-menu-panel-border);
+  box-shadow: var(--shadow-off-sm) var(--shadow-off-sm) 0 var(--shadow-col);
+  display: flex; flex-direction: column; padding: var(--space-1);
+}
+.cr-menu__panel--right { left: auto; right: 0; }
+.cr-menu__item {
+  font-family: var(--font-mono); font-size: var(--text-sm); text-align: start;
+  background: transparent; border: 0; color: var(--cr-menu-item-fg); cursor: pointer;
+  padding: var(--cr-menu-item-pad-y) var(--cr-menu-item-pad-x);
+}
+.cr-menu__item:hover { background: var(--cr-menu-item-hover-bg); }
+.cr-menu__item--danger { color: var(--cr-menu-item-danger-fg); }
+.cr-menu__sep { height: var(--brd-hair); background: color-mix(in srgb, var(--border) 30%, transparent); margin: var(--space-1) 0; }
+
+/* ── Pagination ─────────────────────────────────────────────────────────── */
+.cr-pager { display: flex; align-items: center; gap: var(--space-1); font-family: var(--font-mono); }
+.cr-pager__btn {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700;
+  min-width: var(--space-6); padding: var(--space-1) var(--space-2);
+  background: var(--cr-pager-bg); color: var(--ink); border: var(--brd-hair) solid var(--cr-pager-border); cursor: pointer;
+}
+.cr-pager__btn:hover:not([disabled]):not(.cr-pager__btn--on) {
+  background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent);
+}
+.cr-pager__btn--on { background: var(--cr-pager-accent-bg); color: var(--cr-pager-accent-fg); border-color: var(--cr-pager-border); }
+.cr-pager__btn[disabled] { opacity: var(--state-disabled-op); cursor: not-allowed; }
+.cr-pager__ellipsis { color: var(--muted); padding: 0 var(--space-1); }
+
+/* ── Key-hint badges (keycaps) ──────────────────────────────────────────────
+ * A tiny hard-edged keycap for a keyboard shortcut. Decorative (aria-hidden) —
+ * the actual binding is announced via aria-keyshortcuts on the action. Main
+ * actions show a keycap always; secondary ones use --hint, revealed on hover /
+ * focus of a `.cr-keys-host`, or globally when the root is "peeking"
+ * (`:root[data-cr-keys="on"]` — see the CrKeyHints hold-to-reveal behavior). */
+.cr-kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: var(--space-4); height: var(--space-4); padding: 0 var(--space-1);
+  margin-inline-start: var(--space-1); font-family: var(--font-mono); font-size: var(--text-2xs);
+  font-weight: 800; text-transform: uppercase; line-height: 1; white-space: nowrap;
+  background: var(--cr-kbd-bg); color: var(--cr-kbd-fg); border: var(--brd-hair) solid var(--cr-kbd-border);
+  box-shadow: var(--space-px) var(--brd-hair) 0 var(--shadow-col);
+}
+/* on a signal-filled surface (inside a filled button) — key off currentColor */
+.cr-kbd--on {
+  background: color-mix(in srgb, currentColor 16%, transparent); color: inherit;
+  border-color: currentColor; box-shadow: none;
+}
+/* secondary — hidden until revealed (no layout shift: opacity, not display) */
+.cr-kbd--hint { opacity: 0; transition: opacity var(--dur-press); }
+.cr-keys-host:hover .cr-kbd--hint,
+.cr-keys-host:focus-within .cr-kbd--hint,
+:root[data-cr-keys="on"] .cr-kbd--hint { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .cr-kbd--hint { transition: none; } }
+
+/* ── Tooltip (CSS reveal on hover/focus; role=tooltip + aria-describedby) ─ */
+.cr-tooltip { position: relative; display: inline-flex; }
+.cr-tooltip__trigger { cursor: help; border-bottom: 1.5px dotted var(--muted); }
+.cr-tooltip__bubble {
+  position: absolute; bottom: calc(100% + var(--space-2)); left: 50%; transform: translateX(-50%);
+  min-width: max-content; max-width: 16rem; z-index: var(--z-overlay);
+  background: var(--cr-tooltip-bg); color: var(--cr-tooltip-fg); border: var(--brd) solid var(--cr-tooltip-border);
+  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  padding: var(--space-1) var(--space-2); font-family: var(--font-mono); font-size: var(--text-xs);
+  opacity: 0; visibility: hidden; transition: opacity var(--dur-press);
+}
+.cr-tooltip:hover .cr-tooltip__bubble,
+.cr-tooltip:focus-within .cr-tooltip__bubble { opacity: 1; visibility: visible; }
+/* Escape latch (WCAG 1.4.13 dismissable): outranks the hover/focus reveal above. */
+.cr-tooltip[data-dismissed="true"]:hover .cr-tooltip__bubble,
+.cr-tooltip[data-dismissed="true"]:focus-within .cr-tooltip__bubble { opacity: 0; visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .cr-tooltip__bubble { transition: none; } }
+
+/* ── Texture utilities (hardware only — Law 6) ─────────────────────────────
+ * Apply to a bezel/screen/hardware surface, NEVER a flat content field. All
+ * three read as the neo-print / CRT grain; theme-keyed via the texture tokens. */
+/* All fill edge-to-edge (repeat, from the origin). Pair with a background-color. */
+.cr-tex--halftone, .cr-tex--dither, .cr-tex--scan, .cr-tex--cross, .cr-tex--glass {
+  background-repeat: repeat; background-position: 0 0; background-attachment: local;
+  /* Follows the loudness dial — 1 (default/showcase) is a no-op; the `calm` ops
+     profile tones the texture down. These are decorative texture layers by design. */
+  opacity: var(--decoration-intensity, 1);
+}
+.cr-tex--halftone { background-image: var(--halftone); background-size: var(--halftone-size) var(--halftone-size); }
+.cr-tex--dither   { background-image: var(--dither); }
+.cr-tex--scan     { background-image: var(--scanline); }
+/* a stacked "aged glass" — halftone + scanlines together, the house hardware wash */
+.cr-tex--glass    { background-image: var(--scanline), var(--halftone); background-size: auto, var(--halftone-size) var(--halftone-size); }
+
+/* ── Icon (CrIcon) — house operational glyph set ───────────────────────────
+ * 24×24, currentColor, single 2px stroke, square caps. Inherits text colour and
+ * aligns to the text baseline; never shrinks in a flex row. */
+.cr-icon { display: inline-block; vertical-align: -0.15em; flex-shrink: 0; }
+/* pixel pack (set="pixel"): filled glyphs, rendered crisp for the pixel-art look */
+.cr-icon[data-set="pixel"] { shape-rendering: crispedges; }
+
+/* ── Ambient loops (Law 7 — alive at rest; low-fps, hardware-bound) ─────────
+ * Opt-in classes. All are OFF under prefers-reduced-motion (global rule in
+ * control-room.css already kills animations; these add the keyframes). */
+@keyframes cr-scan  { from { top: -18px; } to { top: 100%; } }
+@keyframes cr-pulse { 0% { box-shadow: 0 0 0 0 var(--_pulse, var(--sig-work)); } 100% { box-shadow: 0 0 0 12px transparent; } }
+@keyframes cr-drift { to { background-position: var(--halftone-size, 6px 6px); } }
+@keyframes cr-flick { 50% { opacity: 0.45; } }
+
+/* a thin CRT sweep bar; host must be position:relative + overflow:hidden */
+.cr-anim-scan { position: relative; overflow: hidden; }
+/* travels the FULL height: `top` is a %-of-container, so from -18px to 100% sweeps
+ * the whole element (translateY(100%) only moved the 18px stripe by its own height).
+ * Subtler by default and follows the loudness dial. */
+.cr-anim-scan::after {
+  content: ""; position: absolute; left: 0; right: 0; top: -18px; height: 18px;
+  background: linear-gradient(var(--sig-work), transparent);
+  opacity: calc(0.16 * var(--decoration-intensity, 1));
+  animation: cr-scan 3.6s linear infinite; pointer-events: none;
+}
+/* a slow expanding ring on a signal dot; set --_pulse to a signal to re-key */
+.cr-anim-pulse { animation: cr-pulse 2.4s ease-out infinite; }
+/* halftone/dither surface that slowly drifts one cell */
+.cr-anim-drift { animation: cr-drift 6s linear infinite; }
+/* a ticker/cursor flicker for a live readout */
+.cr-anim-flick { animation: cr-flick 1.1s steps(2, jump-none) infinite; }
+
+/* ── Governed motion: glitch · attention · interaction · 3D break ───────────
+ * All transform/opacity/shadow only (60fps), all opt-in, all silenced by the
+ * global reduced-motion rule and the `calm` intensity profile. See motion.md. */
+
+/* GLITCH — datamosh RGB-split + slice. Set data-text to the element's text.
+ * Hover-triggered by default; `--on` runs continuously (use only for alerts). */
+.cr-glitch { position: relative; }
+.cr-glitch::before, .cr-glitch::after {
+  content: attr(data-text); position: absolute; left: 0; top: 0; pointer-events: none;
+  clip-path: inset(0 0 100% 0); opacity: 0.9;
+}
+.cr-glitch:hover::before, .cr-glitch--on::before { color: var(--sig-work); animation: cr-glitch-a 0.5s var(--ease-step, steps(3)) infinite; }
+.cr-glitch:hover::after,  .cr-glitch--on::after  { color: var(--sig-accent); animation: cr-glitch-b 0.55s var(--ease-step, steps(3)) infinite; }
+@keyframes cr-glitch-a {
+  0%,100% { clip-path: inset(0 0 100% 0); transform: translate(0,0); }
+  20% { clip-path: inset(10% 0 60% 0); transform: translate(-2px,0); }
+  45% { clip-path: inset(50% 0 20% 0); transform: translate(2px,0); }
+  70% { clip-path: inset(80% 0 5% 0);  transform: translate(-1px,0); }
+}
+@keyframes cr-glitch-b {
+  0%,100% { clip-path: inset(100% 0 0 0); transform: translate(0,0); }
+  30% { clip-path: inset(60% 0 15% 0); transform: translate(2px,0); }
+  55% { clip-path: inset(20% 0 55% 0); transform: translate(-2px,0); }
+  80% { clip-path: inset(5% 0 80% 0);  transform: translate(1px,0); }
+}
+/* Chroma variant — a faint always-on RGB fringe so an element reads as "signal"
+ * even at rest; the slice animation still fires on hover / --on. The fringe is
+ * decoration-only (aria owns the real text) and fades with --decoration-intensity. */
+.cr-glitch--chroma::before, .cr-glitch--chroma::after {
+  clip-path: none; opacity: calc(0.32 * var(--decoration-intensity, 1)); mix-blend-mode: screen;
+}
+.cr-glitch--chroma::before { color: var(--sig-err); transform: translate(-0.6px, 0); }
+.cr-glitch--chroma::after  { color: var(--sig-work); transform: translate(0.6px, 0); }
+.cr-glitch--chroma:hover::before, .cr-glitch--chroma.cr-glitch--on::before { opacity: 0.9; }
+.cr-glitch--chroma:hover::after,  .cr-glitch--chroma.cr-glitch--on::after  { opacity: 0.9; }
+
+/* CURSED — zalgo decay (Law 3, T3). The clean text lives on the element as an
+ * aria-label; the JS painter replaces the visible glyphs with an aria-hidden,
+ * combining-mark-corrupted span (MAX 2 marks/glyph). We only style the corrupted
+ * layer here — tinted toward danger, with room for the marks to overshoot the box. */
+.cr-cursed { color: var(--sig-err); line-height: 1.9; overflow: visible; }
+.cr-cursed > [aria-hidden] { display: inline-block; }
+
+/* ATTENTION — a slow breathing glow that pulls the eye to a primary/active item.
+ * Keys to the element's signal via --cr-attn (default accent). Deliberately calm. */
+.cr-attention { animation: cr-attention var(--dur-ambient, 3.2s) ease-in-out infinite; }
+@keyframes cr-attention {
+  0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--cr-attn, var(--sig-accent)) 55%, transparent); }
+  50%     { box-shadow: 0 0 10px 2px color-mix(in srgb, var(--cr-attn, var(--sig-accent)) 65%, transparent); }
+}
+
+/* INTERACTION — a keyed edge sweep for a focusable surface (row/card/nav item). */
+.cr-keyed { position: relative; overflow: hidden; }
+.cr-keyed::after {
+  content: ""; position: absolute; left: 0; bottom: 0; height: 2px; width: 100%;
+  background: var(--sig-work); transform: scaleX(0); transform-origin: left;
+  transition: transform var(--dur-fast, 160ms) var(--ease-snap, ease);
+}
+.cr-keyed:hover::after, .cr-keyed:focus-visible::after { transform: scaleX(1); }
+
+/* 3D — a sanctioned break of the flat plane (like the Law-9 breach: use sparingly).
+ * A hover tilt in perspective; `--live` adds a slow idle float to draw attention. */
+.cr-tilt { transition: transform var(--dur-fast, 160ms) var(--ease-snap, ease); transform-style: preserve-3d; will-change: transform; }
+.cr-tilt:hover { transform: perspective(600px) rotateX(5deg) rotateY(-7deg) translateZ(6px); }
+.cr-tilt--live { animation: cr-float3d 6s ease-in-out infinite; }
+@keyframes cr-float3d {
+  0%,100% { transform: perspective(600px) rotateX(3deg) rotateY(-4deg); }
+  50%     { transform: perspective(600px) rotateX(-3deg) rotateY(4deg); }
+}
+
+/* ── Severity shapes (Law 4 — shape carries meaning; sides ∝ 1/danger) ──────
+ * A second channel next to colour: the polygon's side-count encodes focus.
+ * Fewer sides = more danger (triangle = act now); more sides = calmer; the
+ * circle is fully at rest. Works in monochrome (phosphor) and for colour-blind
+ * readers where the hue alone can't. Colour defaults to the matching signal but
+ * is orthogonal — set --cr-sev-fill to decouple. */
+.cr-sev {
+  display: inline-block; width: var(--space-4); height: var(--space-4);
+  background: var(--cr-sev-fill, var(--sig-idle)); flex-shrink: 0;
+}
+.cr-sev--crit { --cr-sev-fill: var(--sig-err);  clip-path: polygon(50% 0, 100% 100%, 0 100%); }              /* 3 · act now */
+.cr-sev--warn { --cr-sev-fill: var(--sig-wait); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }      /* 4 · attend  */
+.cr-sev--work { --cr-sev-fill: var(--sig-work); clip-path: polygon(50% 0,98% 35%,79% 100%,21% 100%,2% 35%); } /* 5 · working */
+.cr-sev--ok   { --cr-sev-fill: var(--sig-done); clip-path: polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%); } /* 6 · nominal */
+.cr-sev--idle { --cr-sev-fill: var(--sig-idle); border-radius: 50%; }                                        /* ∞ · at rest */
+
+/* ── Hardware chrome vocabulary (Law 6 — detail that proves real hardware) ──
+ * Decorative; apply on a bezel / rail / masthead, never on a flat data field.
+ * All are aria-hidden by intent — they carry no information a label doesn't. */
+.cr-rivet {
+  width: var(--space-3); height: var(--space-3); background: var(--rail-ink);
+  border: 1.5px solid var(--border); border-radius: 50%;
+  box-shadow: inset 1px 1px 0 color-mix(in srgb, #fff 22%, transparent), inset -1px -1px 0 color-mix(in srgb, #000 55%, transparent);
+}
+.cr-rivet--hex  { border-radius: 0; clip-path: polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%); }
+.cr-rivet--slot { position: relative; }
+.cr-rivet--slot::after { content: ""; position: absolute; inset: 42% 20%; background: var(--border); }
+.cr-vent   { width: var(--space-10); height: var(--space-5); border: 1.5px solid var(--border);
+             background: repeating-linear-gradient(var(--rail-ink) 0 2px, var(--mass) 2px 4px); }
+.cr-port   { width: var(--space-6); height: var(--space-4); background: var(--mass); border: var(--brd) solid var(--rail-ink); position: relative; }
+.cr-port::after { content: ""; position: absolute; inset: 3px 5px; background: var(--rail-ink); }
+.cr-stripe { height: var(--space-4); border: 1.5px solid var(--border);
+             background: repeating-linear-gradient(45deg, var(--sig-wait) 0 8px, var(--mass) 8px 16px); }
+.cr-seam   { height: 4px; border-top: 1px solid var(--rail-ink); border-bottom: 1px solid var(--mass); background: var(--panel-2); }
+.cr-plate  { display: inline-block; font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: 0.14em;
+             text-transform: uppercase; color: var(--muted); border: 1px solid var(--rail-ink); padding: 1px var(--space-2); }
+.cr-tally  { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: 0.24em; color: var(--ink); }
+/* more fasteners + indicators (variance for hand-composed chrome) */
+.cr-screw  { width: var(--space-3); height: var(--space-3); border-radius: 50%; background: var(--rail-ink);
+             border: 1.5px solid var(--border); position: relative; }
+.cr-screw::after { content: ""; position: absolute; inset: 44% 18%; background: var(--border); }   /* single slot */
+.cr-screw--x::before { content: ""; position: absolute; inset: 18% 44%; background: var(--border); }/* + cross slot */
+.cr-bolt   { width: var(--space-3); height: var(--space-3); background: var(--rail-ink); border: 1.5px solid var(--border); }
+.cr-led    { width: var(--space-2); height: var(--space-2); border-radius: 50%; border: 1px solid var(--border);
+             background: var(--cr-led, var(--sig-work));
+             box-shadow: inset 0 0 0 1px color-mix(in srgb, #fff 35%, transparent); }  /* solid indicator, no glow */
+.cr-led--wait { --cr-led: var(--sig-wait); } .cr-led--done { --cr-led: var(--sig-done); }
+.cr-led--err { --cr-led: var(--sig-err); }   .cr-led--idle { --cr-led: var(--sig-idle); }
+.cr-grille { width: var(--space-6); height: var(--space-5); border: 1.5px solid var(--border);
+             background: repeating-linear-gradient(90deg, var(--rail-ink) 0 1.5px, var(--mass) 1.5px 3px); }  /* vertical grille */
+
+/* ── Richer texture — crosshatch (× diagonals) + duotone (cross-colours) ────
+ * Answers "not just dots": cross-hatching from ±45° diagonals (Law 4 energy),
+ * and a two-colour ordered dither that mixes two signals. Hardware only. */
+.cr-tex--cross { background-image: var(--crosshatch); }
+.cr-tex--duo {
+  background-image:
+    repeating-conic-gradient(var(--cr-duo-a, var(--sig-accent)) 0% 25%, transparent 0% 50%),
+    repeating-conic-gradient(from 90deg, var(--cr-duo-b, var(--sig-accent-2)) 0% 25%, transparent 0% 50%);
+  background-size: 5px 5px, 5px 5px; background-position: 0 0, 2.5px 2.5px;
+}
+
+/* ── The Breach (Law 9 — the one sanctioned rule-break per screen) ──────────
+ * Everything else obeys the laws; the breach is the single element licensed to
+ * use the forbidden vocabulary — a soft corner, a blurred blob, a colour glow,
+ * a gradient — to mark the ONE most exceptional thing. It only reads because
+ * everything around it is hard-edged. Rare by contract: one breach per screen.
+ * Colour keys to a signal (default accent); set --cr-breach to re-key. */
+/* the rim angle is a registered property so the conic gradient can interpolate */
+@property --cr-breach-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
+.cr-breach {
+  --cr-breach: var(--sig-accent);         /* primary neon hue  */
+  --cr-breach-2: var(--sig-accent-2);     /* the paired hue (acid) — the neon pairing */
+  --cr-breach-fill: var(--panel);         /* interior; --wash swaps this for a tint */
+  position: relative;
+  border-radius: var(--breach-radius);
+  /* the corner is a SQUIRCLE (superellipse), not a plain arc — the one place the
+   * system softens (the Law-9 breach). corner-shape keeps the glow + rim following
+   * the shape automatically and falls back to the plain radius where unsupported.
+   * Radius-0 holds everywhere else in the system. */
+  corner-shape: superellipse(4);
+  border: 3px solid transparent;
+  /* Layered backgrounds (top → bottom): opaque interior clipped to padding-box;
+   * bright SPOTS riding the border (counter-rotating); the rotating neon RIM.
+   * Both conic layers show only in the 3px border ring — the fill covers the
+   * interior, so text stays legible. */
+  background:
+    linear-gradient(var(--cr-breach-fill), var(--cr-breach-fill)) padding-box,
+    conic-gradient(from calc(var(--cr-breach-angle) * -1.7),
+      transparent 0 3%, #fff 3% 5%, transparent 5% 36%, #fff 36% 38%,
+      transparent 38% 69%, #fff 69% 71%, transparent 71%) border-box,
+    conic-gradient(from var(--cr-breach-angle),
+      var(--cr-breach), var(--cr-breach-2), var(--cr-breach)) border-box;
+  background-color: var(--cr-breach-fill);  /* explicit opaque interior for contrast tooling */
+  /* dual-hue neon glow halo — magenta near, acid far (box-shadow stays outside) */
+  box-shadow:
+    0 0 calc(var(--breach-glow-size) * 0.9) color-mix(in srgb, var(--cr-breach) 70%, transparent),
+    0 0 calc(var(--breach-glow-size) * 2.4) color-mix(in srgb, var(--cr-breach-2) 42%, transparent);
+  animation: cr-breach-spin var(--breach-spin, 9s) linear infinite;     /* the rim rotates   */
+}
+@keyframes cr-breach-spin { to { --cr-breach-angle: 360deg; } }
+/* re-key the primary hue to a signal (the pair stays acid unless overridden) */
+.cr-breach--work   { --cr-breach: var(--sig-work);  --cr-breach-2: var(--sig-accent); }
+.cr-breach--wait   { --cr-breach: var(--sig-wait);  --cr-breach-2: var(--sig-accent); }
+.cr-breach--done   { --cr-breach: var(--sig-done);  --cr-breach-2: var(--sig-accent-2); }
+.cr-breach--err    { --cr-breach: var(--sig-err);   --cr-breach-2: var(--sig-accent); }
+.cr-breach--accent2{ --cr-breach: var(--sig-accent-2); --cr-breach-2: var(--sig-accent); }
+/* subtle interior tint — the strike is the rim + glow, so text stays legible */
+.cr-breach--wash {
+  --cr-breach-fill: color-mix(in srgb, var(--cr-breach) 16%, var(--panel));
+}
+/* a living dual-hue glow on top of the rotating rim — opt-in */
+.cr-breach--alive { animation: cr-breach-spin var(--breach-spin, 9s) linear infinite, cr-breath 3.6s ease-in-out infinite; }
+@keyframes cr-breath {
+  0%, 100% { box-shadow:
+    0 0 calc(var(--breach-glow-size) * 0.7) color-mix(in srgb, var(--cr-breach) 55%, transparent),
+    0 0 calc(var(--breach-glow-size) * 1.6) color-mix(in srgb, var(--cr-breach-2) 35%, transparent); }
+  50%      { box-shadow:
+    0 0 calc(var(--breach-glow-size) * 1.3) color-mix(in srgb, var(--cr-breach) 85%, transparent),
+    0 0 calc(var(--breach-glow-size) * 3) color-mix(in srgb, var(--cr-breach-2) 60%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) { .cr-breach, .cr-breach--alive { animation: none; } }
+
+/* a standalone soft luminous accent — the antithesis of the hard pixel.
+ * Purely decorative (aria-hidden); use to underline a single distinctive item. */
+.cr-blob {
+  width: var(--space-10); height: var(--space-10); border-radius: 50%;
+  background: radial-gradient(closest-side, var(--cr-breach, var(--sig-accent)), transparent 70%);
+  filter: blur(calc(var(--breach-blur) * 0.5)); pointer-events: none;
+}
+
+/* ── Scroll-bound progress rail (pure-CSS scroll-driven animation) ──────────
+ * Width is bound to scroll position via `animation-timeline: scroll()` — no JS,
+ * no scroll listener. Default binds to the document; add .cr-scrollbar--local on
+ * an element inside a scroll container to bind to the NEAREST scroller instead. */
+.cr-scrollbar {
+  position: fixed; inset: 0 0 auto 0; height: 3px; z-index: var(--z-overlay);
+  transform: scaleX(0); transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--sig-accent), var(--sig-accent-2));
+  animation: cr-scrollfill linear both;
+  animation-timeline: scroll(root block);
+}
+.cr-scrollbar--local { position: sticky; animation-timeline: scroll(nearest block); }
+@keyframes cr-scrollfill { to { transform: scaleX(1); } }
+/* the global reduced-motion rule sets `animation: none`, which would freeze the
+ * rail at empty — so hide it rather than leave a stuck bar. */
+@media (prefers-reduced-motion: reduce) { .cr-scrollbar { display: none; } }
+
+/* ── ASCII / pixel decoration for DEAD SPACE (never touches content) ─────────
+ * Everything here is decoration: aria-hidden, non-interactive, whisper contrast,
+ * mask-faded away from text. Give the host `position: relative` and put real
+ * content above with `position: relative; z-index: 1`. See references/decoration.md. */
+
+/* seeded density field (the CrAscii canvas) — sits behind, faded off the text */
+.cr-ascii {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; user-select: none;
+  opacity: 0.5; overflow: hidden;
+}
+.cr-ascii > canvas { display: block; width: 100%; height: 100%; }
+.cr-ascii--mask-l    { -webkit-mask-image: linear-gradient(90deg, transparent, #000 62%); mask-image: linear-gradient(90deg, transparent, #000 62%); }
+.cr-ascii--mask-r    { -webkit-mask-image: linear-gradient(90deg, #000 38%, transparent); mask-image: linear-gradient(90deg, #000 38%, transparent); }
+.cr-ascii--mask-edge { -webkit-mask-image: radial-gradient(120% 120% at 50% 50%, #000 38%, transparent 86%); mask-image: radial-gradient(120% 120% at 50% 50%, #000 38%, transparent 86%); }
+
+/* telemetry frame trim — corner brackets on any surface (structure, not signal).
+ * .cr-mark is the ink-weight preset used for registration ticks on a primary
+ * readout (structure, never a signal — Law 2); it is the same primitive with a
+ * heavier border and a wider offset, so the two share one implementation. */
+.cr-trim { --cr-trim-c: var(--muted); --cr-trim-sz: 12px; --cr-trim-w: 2px; --cr-trim-off: calc(var(--cr-trim-w) * -1); position: relative; }
+.cr-mark { --cr-trim-c: var(--border); --cr-trim-sz: var(--space-3); --cr-trim-w: var(--brd); --cr-trim-off: calc(var(--space-2) * -1); position: relative; }
+.cr-trim::before, .cr-trim::after,
+.cr-mark::before, .cr-mark::after {
+  content: ""; position: absolute; width: var(--cr-trim-sz); height: var(--cr-trim-sz);
+  border: var(--cr-trim-w) solid var(--cr-trim-c); pointer-events: none;
+}
+.cr-trim::before, .cr-mark::before { top: var(--cr-trim-off); left: var(--cr-trim-off); border-inline-end: 0; border-bottom: 0; }
+.cr-trim::after,  .cr-mark::after  { bottom: var(--cr-trim-off); right: var(--cr-trim-off); border-inline-start: 0; border-top: 0; }
+/* opt into all four corners (adds TR + BL via a background of L-marks) */
+.cr-trim--4 {
+  background-image:
+    linear-gradient(var(--cr-trim-c), var(--cr-trim-c)), linear-gradient(var(--cr-trim-c), var(--cr-trim-c)),
+    linear-gradient(var(--cr-trim-c), var(--cr-trim-c)), linear-gradient(var(--cr-trim-c), var(--cr-trim-c));
+  background-repeat: no-repeat;
+  background-size:
+    var(--cr-trim-sz) var(--cr-trim-w), var(--cr-trim-w) var(--cr-trim-sz),
+    var(--cr-trim-sz) var(--cr-trim-w), var(--cr-trim-w) var(--cr-trim-sz);
+  background-position: top right, top right, bottom left, bottom left;
+}
+
+/* a fine tick-ruler edge (FUI) — short ticks every 8px, tall every 40px */
+.cr-ruler {
+  height: var(--space-2); pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, var(--muted) 0 1px, transparent 1px 40px) bottom / 100% 100% no-repeat,
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--muted) 55%, transparent) 0 1px, transparent 1px 8px) bottom / 100% 55% no-repeat;
+  opacity: 0.7;
+}
+
+/* seeded decorative telemetry string (CrTelemetry) */
+.cr-telemetry {
+  font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: 0.12em;
+  color: var(--muted); user-select: none; white-space: nowrap;
+}
+
+/* whisper drafting field for large dead background regions */
+.cr-bg--field { background-image: var(--field); background-repeat: repeat; }
+
+@media (prefers-reduced-motion: reduce) { .cr-breach--alive { animation: none; } }
+
+/* ── Data grid (virtualized) — dense table for large datasets ─────────────── */
+.cr-grid { border: var(--brd) solid var(--cr-datagrid-border); background: var(--cr-datagrid-bg); font-family: var(--font-mono); display: flex; flex-direction: column; overflow: hidden; }
+.cr-grid__head { display: grid; align-items: center; position: sticky; top: 0; z-index: var(--z-raised); background: var(--panel); border-bottom: var(--brd-heavy) solid var(--cr-datagrid-border); }
+.cr-grid__viewport { overflow-y: auto; overflow-x: hidden; position: relative; }
+.cr-grid__sizer { position: relative; width: 100%; }
+.cr-grid__rows { position: absolute; inset-inline: 0; top: 0; }
+.cr-grid__row { display: grid; align-items: center; border-bottom: var(--brd-hair) solid color-mix(in srgb, var(--cr-datagrid-border) 55%, transparent); background: var(--cr-datagrid-bg); }
+.cr-grid__row:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), var(--cr-datagrid-bg)); }
+.cr-grid__row[aria-selected="true"] { background: color-mix(in srgb, var(--sig-work) 16%, var(--cr-datagrid-bg)); }
+.cr-grid__cell { display: flex; align-items: center; min-width: 0; padding: 0 var(--space-3); font-size: var(--text-sm); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cr-grid__cell > * { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.cr-grid__cell--start { justify-content: flex-start; text-align: start; }
+.cr-grid__cell--end { justify-content: flex-end; text-align: end; font-variant-numeric: tabular-nums; }
+.cr-grid__cell--center { justify-content: center; text-align: center; }
+.cr-grid__cell--check { justify-content: center; padding: 0; }
+.cr-grid__head .cr-grid__cell { font-size: var(--text-2xs); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); height: var(--row-h); }
+.cr-grid__sort { font: inherit; font-size: var(--text-2xs); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; align-items: center; gap: var(--space-1); }
+.cr-grid__sort:hover { color: var(--ink); }
+.cr-grid__glyph { color: var(--sig-work); font-size: var(--text-2xs); }
+.cr-grid__empty { padding: var(--space-4); color: var(--muted); text-align: center; font-size: var(--text-sm); }
+.cr-grid:focus { outline: none; }
+.cr-grid:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -1px; }
+.cr-grid__cell--active { outline: var(--focus-w) solid var(--sig-work); outline-offset: calc(-1 * var(--focus-w)); position: relative; z-index: 1; }
+
+/* ── Stepper ─────────────────────────────────────────────────────────────── */
+.cr-stepper { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); list-style: none; margin: 0; padding: 0; }
+.cr-stepper__item { display: flex; align-items: center; gap: var(--space-2); flex: 1 1 auto; min-width: 0; }
+.cr-stepper__item:not(:last-child)::after { content: ""; flex: 1; min-width: var(--space-4); height: 0; border-top: var(--brd) solid var(--cr-stepper-line); opacity: .55; }
+.cr-stepper__btn { display: flex; align-items: center; gap: var(--space-2); background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; text-align: start; }
+.cr-stepper__dot { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; flex: none; font-family: var(--font-mono); font-weight: 700; border: var(--brd) solid var(--cr-stepper-line); background: var(--cr-stepper-pending-bg); color: var(--muted); }
+.cr-stepper__item--active .cr-stepper__dot { background: var(--cr-stepper-accent-bg); color: var(--cr-stepper-accent-fg); border-color: var(--cr-stepper-accent-bg); }
+.cr-stepper__item--done .cr-stepper__dot { background: var(--cr-stepper-done-bg); color: var(--cr-stepper-accent-fg); border-color: var(--cr-stepper-done-bg); }
+.cr-stepper__text { display: flex; flex-direction: column; }
+.cr-stepper__label { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: var(--text-xs); }
+.cr-stepper__item--upcoming .cr-stepper__label { color: var(--muted); }
+.cr-stepper__hint { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); }
+.cr-stepper__btn:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+
+/* ── Spinner ─────────────────────────────────────────────────────────────── */
+.cr-spinner { display: inline-flex; }
+.cr-spinner__ring { width: 1.25rem; height: 1.25rem; border: var(--brd-heavy) solid var(--cr-spinner-track); border-top-color: var(--cr-spinner-accent); border-radius: 50%; animation: cr-spin .7s linear infinite; }
+.cr-spinner--sm .cr-spinner__ring { width: .9rem; height: .9rem; }
+.cr-spinner--lg .cr-spinner__ring { width: 2rem; height: 2rem; }
+@keyframes cr-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .cr-spinner__ring { animation-duration: 2.4s; } }
+
+/* ── Avatar ──────────────────────────────────────────────────────────────── */
+.cr-avatar { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; flex: none; border: var(--brd) solid var(--cr-avatar-border); background: var(--cr-avatar-bg); }
+.cr-avatar--sm { width: 1.5rem; height: 1.5rem; }
+.cr-avatar--lg { width: 3rem; height: 3rem; }
+.cr-avatar__img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cr-avatar__initials { font-family: var(--font-mono); font-weight: 700; font-size: var(--text-xs); text-transform: uppercase; color: var(--cr-avatar-fg); }
+.cr-avatar__status { position: absolute; bottom: -3px; right: -3px; width: .6rem; height: .6rem; border: 1.5px solid var(--panel); background: var(--muted); }
+.cr-avatar__status--online { background: var(--sig-done); }
+.cr-avatar__status--idle { background: var(--sig-wait); }
+.cr-avatar__status--busy { background: var(--sig-err); }
+.cr-avatar__status--offline { background: var(--muted); }
+
+/* ── InputGroup ──────────────────────────────────────────────────────────── */
+.cr-input-group { display: inline-flex; align-items: stretch; }
+.cr-input-group__addon { display: inline-flex; align-items: center; padding: 0 var(--space-3); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--muted); background: var(--panel-2); border: var(--brd) solid var(--cr-field-border); white-space: nowrap; }
+.cr-input-group__addon--prefix { border-inline-end: 0; }
+.cr-input-group__addon--suffix { border-inline-start: 0; }
+.cr-input-group__input { min-width: 0; }
+
+/* ── PinInput ────────────────────────────────────────────────────────────── */
+.cr-pin { display: inline-flex; gap: var(--space-2); }
+.cr-pin__cell { width: 2.5rem; height: 2.75rem; text-align: center; font-family: var(--font-mono); font-size: var(--text-lg); font-weight: 700; color: var(--cr-field-fg); background: var(--panel-2); border: var(--brd) solid var(--cr-field-border); }
+.cr-pin__cell:focus { outline: none; border-color: var(--cr-field-focus); box-shadow: inset 0 -3px 0 var(--cr-field-focus); }
+
+/* ── TagsInput ───────────────────────────────────────────────────────────── */
+.cr-tags { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); padding: var(--space-2); border: var(--brd) solid var(--cr-field-border); background: var(--panel-2); }
+.cr-tags:focus-within { border-color: var(--cr-field-focus); }
+.cr-tags__list { display: contents; list-style: none; margin: 0; padding: 0; }
+.cr-tags__tag { display: inline-flex; align-items: center; gap: var(--space-1); padding: 2px var(--space-2); background: var(--panel); border: var(--brd-hair) solid var(--cr-field-border); font-family: var(--font-mono); font-size: var(--text-xs); }
+.cr-tags__remove { display: inline-flex; background: none; border: 0; padding: 0 2px; color: var(--muted); cursor: pointer; font: inherit; line-height: 1; }
+.cr-tags__remove:hover { color: var(--cr-field-error); }
+.cr-tags__input { flex: 1; min-width: 6rem; border: 0; background: none; color: var(--cr-field-fg); font: inherit; padding: 2px; }
+.cr-tags__input:focus { outline: none; }
+
+/* ── ScrollArea ──────────────────────────────────────────────────────────── */
+.cr-scroll { overflow-y: auto; overflow-x: hidden; max-height: 16rem; scrollbar-width: thin; scrollbar-color: var(--sig-work) var(--panel-2); }
+.cr-scroll--x { overflow-x: auto; overflow-y: hidden; }
+.cr-scroll--both { overflow: auto; }
+.cr-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
+.cr-scroll::-webkit-scrollbar-track { background: var(--panel-2); }
+.cr-scroll::-webkit-scrollbar-thumb { background: var(--sig-work); border: 2px solid var(--panel-2); }
+.cr-scroll:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -2px; }
+
+/* ── Resizable ───────────────────────────────────────────────────────────── */
+.cr-resizable { position: relative; display: grid; grid-template-columns: 50% 1fr; width: 100%; border: var(--brd) solid var(--border); overflow: hidden; }
+.cr-resizable--vertical { grid-template-columns: none; grid-template-rows: 50% 1fr; }
+.cr-resizable > * { min-width: 0; min-height: 0; overflow: auto; }
+.cr-resizable__handle { position: absolute; z-index: 2; background: var(--border); touch-action: none; }
+.cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle { top: 0; bottom: 0; width: var(--brd-heavy); transform: translateX(-50%); cursor: col-resize; }
+.cr-resizable--vertical .cr-resizable__handle { left: 0; right: 0; height: var(--brd-heavy); transform: translateY(-50%); cursor: row-resize; }
+.cr-resizable__handle::before { content: ""; position: absolute; inset: -5px; } /* generous hit area */
+.cr-resizable__handle:hover, .cr-resizable[data-dragging="true"] .cr-resizable__handle { background: var(--sig-work); }
+.cr-resizable__handle:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+
+/* ── ToggleChip (interactive multi-select filter pill; role=checkbox) ─────── */
+.cr-togglechip {
+  display: inline-flex; align-items: center; gap: var(--space-1);
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; padding: var(--space-1) var(--space-2);
+  background: var(--cr-togglechip-bg); color: var(--cr-togglechip-fg);
+  border: var(--brd) solid var(--cr-togglechip-border); cursor: pointer;
+}
+.cr-togglechip:hover { color: var(--ink); }
+.cr-togglechip--on { background: var(--cr-togglechip-on-bg); color: var(--cr-togglechip-on-fg); border-color: var(--cr-togglechip-on-bg); }
+.cr-togglechip[disabled] { opacity: var(--state-disabled-op); cursor: not-allowed; }
+.cr-togglechip__count { font-variant-numeric: tabular-nums; background: color-mix(in srgb, currentColor 16%, transparent); padding: 0 var(--space-1); }
+
+/* ── Overflow ("+N more" disclosure) ─────────────────────────────────────── */
+.cr-overflow {
+  font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted);
+  background: transparent; border: 0; cursor: pointer; padding: var(--space-0-5) var(--space-1);
+}
+.cr-overflow:hover { color: var(--sig-work); }
+.cr-overflow--static { cursor: default; }
+.cr-overflow:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
+
+/* ── RelativeTime (semantic <time> display) ──────────────────────────────── */
+.cr-reltime { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* ── Responsive type architecture (see references/responsive.md) ─────────────
+ * The --text-* scale is now container-relative (cqi clamps, floored at the
+ * legacy px so it never shrinks below legible). Panel surfaces declare a query
+ * container so their dense text sizes to the *panel*, not the viewport. Only
+ * surfaces with no escaping fixed/absolute descendants are safe containers
+ * (container-type establishes a containing block — menus/popovers/grids opt out).
+ * Scoped to .cr-panel: it is the surface with real @container consumers (the
+ * stacking .cr-dl). Hero/masthead are keyed signal banners with dark-text-on-bright
+ * fills; container-type there defeats axe's getBackgroundColor (it can't resolve a
+ * descendant's background through a container, yielding a false low-contrast
+ * reading) for no responsive gain, so they stay plain surfaces. */
+.cr-panel { container-type: inline-size; }
+
+/* Explicit type-role utilities (opt-in), within the two registers (Law 5). */
+.cr-type-display { font-family: var(--font-display); font-size: var(--type-display-size); font-weight: var(--type-display-weight); line-height: var(--type-display-leading); letter-spacing: var(--type-display-tracking); text-transform: uppercase; }
+.cr-type-h1     { font-family: var(--font-display); font-size: var(--type-h1-size); font-weight: var(--type-h1-weight); line-height: var(--type-h1-leading); letter-spacing: var(--type-h1-tracking); }
+.cr-type-h2     { font-family: var(--font-display); font-size: var(--type-h2-size); font-weight: var(--type-h2-weight); line-height: var(--type-h2-leading); letter-spacing: var(--type-h2-tracking); }
+.cr-type-body   { font-family: var(--font-mono); font-size: var(--type-body-size); font-weight: var(--type-body-weight); line-height: var(--type-body-leading); }
+.cr-type-data   { font-family: var(--font-mono); font-size: var(--type-data-size-fluid); font-weight: var(--type-data-weight); line-height: var(--type-data-leading); }
+.cr-type-label  { font-family: var(--font-mono); font-size: var(--type-label-size); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); text-transform: uppercase; }
+.cr-type-meta   { font-family: var(--font-mono); font-size: var(--type-meta-size); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); }
+.cr-type-chrome { font-family: var(--font-mono); font-size: var(--type-chrome-size); font-weight: var(--type-chrome-weight); line-height: var(--type-chrome-leading); letter-spacing: var(--type-chrome-tracking); text-transform: uppercase; }
+
+/* ── Density (per-container) ──────────────────────────────────────────────
+ * Comfortable is the default (:root, from the token layer). Set
+ * data-density="compact" on ANY container and its subtree tightens — the
+ * component pad/gap tokens resolve through these aliases, so no component
+ * branches on density. Cascades, so it nests per-region. */
+[data-density="compact"] {
+  --pad: var(--space-2);
+  --pad-tight: var(--space-1);
+  --pad-loose: var(--space-3);
+  --gap: var(--space-2);
+  --gap-tight: var(--space-1);
+}
+
+/* ── Sizing & touch targets (see references/responsive.md) ───────────────────
+ * Shared control heights so inputs/buttons share a baseline, plus a pointer-
+ * aware tap floor: on COARSE pointers (touch) interactive controls meet the
+ * 44px WCAG 2.5.5 target — keyed to pointer type, not viewport width, so the
+ * dense desktop layout (fine pointer) is unchanged. */
+.cr-input, .cr-textarea, .cr-select, .cr-datetime, .cr-cron__input, .cr-numberfield, .cr-btn { min-height: var(--control-h-md); }
+.cr-btn--sm { min-height: var(--control-h-sm); }
+.cr-tap { display: inline-flex; align-items: center; justify-content: center; }
+@media (pointer: coarse) {
+  .cr-btn, .cr-input, .cr-select, .cr-textarea, .cr-datetime, .cr-tab, .cr-segmented__opt,
+  .cr-togglechip, .cr-menu__item, .cr-pager__btn, .cr-overflow, .cr-tap,
+  .cr-rating__star, .cr-carousel__nav, .cr-carousel__dot, .cr-calendar__nav { min-height: 44px; }
+  .cr-rating__star, .cr-carousel__nav, .cr-carousel__dot, .cr-calendar__nav { min-width: 44px; }
+  .cr-calendar__day { min-width: 40px; min-height: 40px; }
+}
+
+/* ── Container-query layout (see references/responsive.md) ───────────────────
+ * Panel surfaces are query containers (phase 2), so layout inside them responds
+ * to the PANEL width, not the viewport. Breakpoints (literal — @container can't
+ * read var()): --bp-panel-sm 22rem · -md 34rem · -lg 52rem. */
+.cr-grid-auto { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fill, minmax(var(--col-min, 16rem), 1fr)); }
+/* the data list keeps its two-column default everywhere; only inside a narrow
+   panel does term/definition stack — proof of the container-query model. */
+@container (max-width: 22rem) {
+  .cr-dl { grid-template-columns: 1fr; gap: var(--space-0-5) 0; }
+}
+
+/* ── Rating ──────────────────────────────────────────────────────────────────
+ * A radiogroup of geometric-glyph stars; fill (◆) vs outline (◇) is the state,
+ * colour asserts it (Law 2). No icon font. */
+.cr-rating { display: inline-flex; gap: var(--space-0-5); }
+.cr-rating__star { display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; margin: 0; padding: var(--space-0-5); cursor: pointer; color: var(--cr-rating-off); font-size: var(--text-lg); line-height: 1; }
+.cr-rating__star[data-state="on"] { color: var(--cr-rating-on); }
+.cr-rating__star:disabled { cursor: not-allowed; opacity: .5; }
+.cr-rating--readonly .cr-rating__star { cursor: default; }
+.cr-rating__star:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+
+/* ── Timeline ────────────────────────────────────────────────────────────────
+ * An <ol> on a vertical rail; each node is signal-coloured (Law 2), the rail is
+ * chrome. */
+.cr-timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.cr-timeline__item { position: relative; display: grid; grid-template-columns: auto 1fr; gap: var(--space-3); padding-block: var(--space-1) var(--space-4); }
+.cr-timeline__item::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: calc(0.375rem - (var(--brd) / 2)); width: var(--brd); background: var(--cr-timeline-rail); }
+.cr-timeline__item:first-child::before { inset-block-start: 0.5rem; }
+.cr-timeline__item:last-child::before { inset-block-end: auto; height: 0.5rem; }
+.cr-timeline__node { position: relative; z-index: 1; inline-size: 0.75rem; block-size: 0.75rem; margin-block-start: 0.35rem; flex: none; border: var(--brd) solid var(--panel); background: var(--cr-timeline-node); }
+.cr-timeline__node--work { background: var(--sig-work); }
+.cr-timeline__node--done { background: var(--sig-done); }
+.cr-timeline__node--wait { background: var(--sig-wait); }
+.cr-timeline__node--err { background: var(--sig-err); }
+.cr-timeline__body { display: flex; flex-direction: column; gap: var(--space-0-5); min-width: 0; }
+.cr-timeline__time { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.cr-timeline__title { font-weight: 700; font-size: var(--text-sm); color: var(--ink); }
+.cr-timeline__detail { margin: 0; font-size: var(--text-xs); color: var(--muted); }
+
+/* ── Toolbar ─────────────────────────────────────────────────────────────────
+ * A labelled row/column of the operator's own controls; a single tab stop with
+ * roving-tabindex arrows. */
+.cr-toolbar { display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-1); background: var(--cr-toolbar-bg); border: var(--brd) solid var(--cr-toolbar-border); max-width: 100%; }
+.cr-toolbar[aria-orientation="vertical"] { flex-direction: column; align-items: stretch; }
+/* Overflow (priority+) mode: the bar never wraps — items that don't fit are moved
+   to the "⋯ more" menu by the measure pass (hidden = display:none, out of layout). */
+/* .cr-btn sets display:inline-flex, which out-specifies the UA [hidden] rule —
+   re-assert display:none for collapsed items so the measure pass truly removes them. */
+/* Overflow mode fills its container (block flex, not shrink-to-content inline-flex)
+   so the measured width is STABLE — an inline-flex bar would shrink as items
+   collapse and spiral the measure down to zero. */
+.cr-toolbar--overflow { display: flex; width: 100%; }
+.cr-toolbar__item[hidden] { display: none; }
+.cr-toolbar__more-wrap { position: relative; display: inline-flex; margin-inline-start: auto; }
+.cr-toolbar__more { min-width: var(--control-h-sm); }
+.cr-toolbar[aria-orientation="vertical"] .cr-toolbar__more-wrap { margin-inline-start: 0; margin-block-start: auto; }
+
+/* ── FileUpload ──────────────────────────────────────────────────────────────
+ * A dropzone wrapping a real, visually-hidden native <input type=file>; the
+ * dragover border is the accent (a state, Law 2). */
+.cr-fileupload { position: relative; display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-5); background: var(--cr-fileupload-bg); border: var(--brd-heavy) dashed var(--cr-fileupload-border); color: var(--cr-fileupload-fg); cursor: pointer; text-align: center; }
+.cr-fileupload--over { border-color: var(--cr-fileupload-active-border); border-style: solid; }
+.cr-fileupload__input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.cr-fileupload__input:disabled { cursor: not-allowed; }
+.cr-fileupload__input:focus-visible + .cr-fileupload__prompt { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--space-2); }
+.cr-fileupload__prompt { display: flex; flex-direction: column; gap: var(--space-0-5); pointer-events: none; }
+.cr-fileupload__title { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: var(--text-sm); color: var(--ink); }
+.cr-fileupload__hint { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); }
+.cr-fileupload__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-0-5); font-family: var(--font-mono); font-size: var(--text-xs); text-align: start; }
+.cr-fileupload__file { color: var(--ink); border-block-start: var(--brd-hair) solid var(--border); padding-block-start: var(--space-1); }
+
+/* ── Carousel ────────────────────────────────────────────────────────────────
+ * A slide region with prev/next + dot tabs; the active dot is the accent. */
+.cr-carousel { display: flex; flex-direction: column; gap: var(--space-2); }
+.cr-carousel__frame { display: grid; grid-template-columns: auto 1fr auto; align-items: stretch; gap: var(--space-2); }
+.cr-carousel__viewport { display: flex; align-items: center; justify-content: center; min-height: 5rem; padding: var(--space-4); background: var(--cr-carousel-bg); border: var(--brd) solid var(--border); }
+.cr-carousel__slide { display: flex; flex-direction: column; gap: var(--space-1); text-align: center; }
+.cr-carousel__title { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--ink); }
+.cr-carousel__caption { font-size: var(--text-xs); color: var(--muted); }
+.cr-carousel__nav { display: inline-flex; align-items: center; justify-content: center; min-width: var(--control-h-md); background: var(--panel-2); border: var(--brd) solid var(--border); color: var(--ink); cursor: pointer; font-size: var(--text-md); }
+.cr-carousel__nav:hover { background: var(--panel); }
+.cr-carousel__nav:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-carousel__dots { display: inline-flex; justify-content: center; gap: var(--space-1); }
+.cr-carousel__dot { display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; padding: var(--space-0-5); margin: 0; cursor: pointer; color: var(--cr-carousel-dot); font-size: var(--text-xs); line-height: 1; }
+.cr-carousel__dot[data-state="active"] { color: var(--cr-carousel-dot-active); }
+.cr-carousel__dot:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+
+/* ── Calendar ────────────────────────────────────────────────────────────────
+ * A month grid; the selected day is the accent (a state), today is ringed. */
+.cr-calendar { display: inline-flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); background: var(--cr-calendar-bg); border: var(--brd) solid var(--border); }
+.cr-calendar__header { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--space-2); }
+.cr-calendar__month { text-align: center; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: var(--text-sm); color: var(--ink); }
+.cr-calendar__nav { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: var(--panel-2); border: var(--brd) solid var(--border); color: var(--ink); cursor: pointer; }
+.cr-calendar__nav:hover { background: var(--panel); }
+.cr-calendar__nav:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-calendar__row { display: grid; grid-template-columns: repeat(7, 1fr); }
+.cr-calendar__body { display: flex; flex-direction: column; gap: var(--space-px); }
+.cr-calendar__body .cr-calendar__row { gap: var(--space-px); }
+.cr-calendar__weekday { display: inline-flex; align-items: center; justify-content: center; padding: var(--space-1) 0; font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); text-transform: uppercase; }
+.cr-calendar__day { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; background: none; border: var(--brd-hair) solid transparent; color: var(--ink); font-family: var(--font-mono); font-size: var(--text-xs); cursor: pointer; }
+.cr-calendar__day:hover { background: var(--panel-2); }
+.cr-calendar__day--adjacent { color: var(--cr-calendar-muted); }
+.cr-calendar__day--today { border-color: var(--cr-calendar-today-ring); }
+.cr-calendar__day--selected { background: var(--cr-calendar-selected-bg); color: var(--cr-calendar-selected-fg); border-color: var(--cr-calendar-selected-bg); }
+.cr-calendar__day:disabled { color: var(--muted); opacity: .4; cursor: not-allowed; }
+.cr-calendar__day:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -2px; }
