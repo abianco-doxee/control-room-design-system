@@ -1,9 +1,10 @@
-# Responsive architecture — DRAFT PROPOSAL (for review, not yet implemented)
+# Responsive architecture
 
-> Status: **proposal**. Nothing here is wired into the build or the published docs
-> yet. It exists to agree the direction before writing tokens/CSS. Ported thinking
-> from dp-tooling `feature/DOXP-11` (container-relative type scale) generalised
-> into a coherent spacing / sizing / grid model.
+> Status: **shipped** (phases 1–5). A container-query-first responsive system —
+> fluid type, per-container density, control sizing + touch floor, and
+> `@container` layout — generalised from the dp-tooling `feature/DOXP-11`
+> container-relative type-scale idea. This page is the reference; the
+> `tests/responsive.test.mjs` guard keeps it honest.
 
 ## Why
 
@@ -111,19 +112,30 @@ Eight roles, each carrying size + weight + leading + tracking:
 
 Directive: **prefer the most modern responsive option at each choice.**
 
-## Phase status
+## What shipped (by phase)
 
-- **Phase 1 — token foundation** ✅ (this commit): all 8 type roles + `--pad`/`--gap`
-  density aliases + `--control-h-*` + `--bp-panel-*` added to `tokens.json`
-  (typography + chassis), emitted to `dist/control-room.css`. New names only —
-  nothing consumes them yet, so it's pixel-neutral.
-- Phase 2 — migrate type consumers (`--text-*`/`--type-*` → roles) + `.cr-typo`
-  container primitive.
-- Phase 3 — density-aware spacing (`--pad`/`--gap`) across components + per-
-  container `data-density`.
-- Phase 4 — `--control-h-*` sizing + `.cr-tap` pointer floor.
-- Phase 5 — `@container` grid/breakpoints + exemplar components; retire `--text-*`.
-- Phase 6 — re-baseline visual snapshots; container-query visual test; docs page.
+- **Phase 1 — token foundation** ✅: all 8 type roles + `--pad`/`--gap` density
+  aliases + `--control-h-*` + `--bp-panel-*` in `tokens.json` → `dist/control-room.css`.
+- **Phase 2 — fluid type** ✅: the `--text-*` rungs are now bounded `cqi` clamps
+  (floor = legacy px → never shrinks / no new overflow); panel surfaces
+  (`.cr-panel`/`.cr-hero`/`.cr-masthead`) are `container-type: inline-size` query
+  containers, so dense text sizes to the panel. Opt-in `.cr-type-*` role utilities.
+- **Phase 3 — per-container density** ✅: component pad/gap tokens route through
+  `--pad`/`--gap`; `[data-density="compact"]` on any container tightens its
+  subtree via the cascade. Comfortable = default = pixel-neutral.
+- **Phase 4 — sizing + touch** ✅: shared `--control-h-*` heights on the form
+  family; a `@media (pointer: coarse)` 44px tap floor (WCAG 2.5.5) that leaves
+  the fine-pointer desktop layout untouched; `.cr-tap` utility.
+- **Phase 5 — container-query layout** ✅: `.cr-grid-auto` reflows by container;
+  `@container (max-width: 22rem)` stacks the data-list inside a narrow panel.
+
+> Note on the "breaking" migration: rather than renaming `--text-*` away (which
+> would churn 100+ call sites), the rung *values* were changed to fluid clamps —
+> so every existing consumer became responsive at once. The names stay; the
+> behaviour broke (intended), which is why the visual baselines were regenerated.
+
+Guard: `tests/responsive.test.mjs`. Deeper per-component `data-density` adoption
+and more `@container` layouts can land incrementally on this foundation.
 
 ## Rollout (once direction is agreed)
 
