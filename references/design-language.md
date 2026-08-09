@@ -393,7 +393,7 @@ accent) — `references/components.md#breach`.
 
 ---
 
-## Signatures — the tells
+## Signatures — the tells {#signatures}
 
 The laws are the *why*. These are the **tells**: the concrete marks that, present
 together, make a screen unmistakably Control Room — and whose absence means it

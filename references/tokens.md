@@ -254,7 +254,7 @@ all themes — they resolve to nothing elsewhere.
 ## Full per-theme values
 
 The resolved value of every token in every theme lives in the **generated,
-authoritative** file **[`dist/tokens.flat.json`](../../dist/tokens.flat.json)**
+authoritative** file **[`dist/tokens.flat.json`](../dist/tokens.flat.json)**
 (`{ themes: { dark|light|extreme|phosphor: { "--token": value } } }`) — emitted
 from `tokens/tokens.json` by `build:tokens`. It is not reproduced as a hand-typed
 table here on purpose: a copied hex matrix silently rots the moment a value

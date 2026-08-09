@@ -50,6 +50,7 @@ Detail lives in `references/`. Load only what the task needs.
 | `references/tokens.md` | The full token reference — every variable, every theme, and how to consume them. |
 | `references/theming.md` | **Theming & branding** — the feature ⇄ appearance split, the theme contract, authoring a brand (`brands/*.json` + `@control-room/design-system/theme`), contrast, and the appearance-separation guard. |
 | `references/components.md` | The **component library** — formal spec + API for each component (Panel, Button, Chip, StatusDot, SessionRow, Rail, Hero, Bezel, Table, Tag, diagonal primitives, keyed tiles, drip, form controls, instrument shell, and the overlays — Modal / Toast / Tooltip). |
+| `references/forms.md` | **Forms — ArkType/JSON-Schema validation** — declarative form controls and their validation contract. |
 | `references/motion.md` | The four motion tiers, the glitch/CRT vocabulary, and the reduced-motion contract. |
 | `references/accessibility.md` | The accessibility contract — contrast, focus, ARIA, and how the aesthetic and a11y coexist. |
 | `references/seeded-cat.md` | The seeded pixel-cat: identity-from-seed, pose-is-state, the `paint()` contract. |
@@ -59,7 +60,8 @@ Detail lives in `references/`. Load only what the task needs.
 | `dist/control-room.css` | Ready-to-use CSS custom properties for all four themes. Import first. |
 | `styles/components.css` | The shipped component layer — `cr-`prefixed classes (`.cr-panel`, `.cr-btn`, …) built on the tokens. Import after the tokens. |
 | `references/tailwind.md` | Tailwind-first authoring — the token-driven Tailwind v4 `@theme`, utility→token map, and theme-reactive utilities. |
-| `references/frameworks.md` | Author-once interactive components (Mitosis) compiled to idiomatic React/Vue/Svelte/Angular/Solid; styling stays in the `cr-` classes. |
+| `references/frameworks.md` | Author-once interactive components (Mitosis) compiled to idiomatic React/Vue/Svelte/Angular/Solid/Qwik; styling stays in the `cr-` classes. |
+| `references/styling-contract.md` | **Styling contract — pt / dt / unstyled + finer tokens** — the PrimeVue-shaped API on the single-source model. |
 | `templates/component.md` | The authoring template every new component follows. |
 | `checklists/component-checklist.md` | The ship gate. A component is not done until it passes. |
 
