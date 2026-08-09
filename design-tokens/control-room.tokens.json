@@ -910,6 +910,192 @@
       "$extensions": {
         "com.doxee.cssVar": "--cr-hovercard-border"
       }
+    },
+    "cr-table-bg": {
+      "$value": "var(--panel)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-table-bg"
+      }
+    },
+    "cr-table-border": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-table-border"
+      }
+    },
+    "cr-table-head-fg": {
+      "$value": "var(--muted)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-table-head-fg"
+      }
+    },
+    "cr-table-accent": {
+      "$value": "var(--sig-work)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-table-accent"
+      }
+    },
+    "cr-accordion-bg": {
+      "$value": "var(--panel)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-accordion-bg"
+      }
+    },
+    "cr-accordion-border": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-accordion-border"
+      }
+    },
+    "cr-accordion-accent": {
+      "$value": "var(--sig-work)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-accordion-accent"
+      }
+    },
+    "cr-segmented-bg": {
+      "$value": "var(--panel)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-segmented-bg"
+      }
+    },
+    "cr-segmented-border": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-segmented-border"
+      }
+    },
+    "cr-segmented-accent-bg": {
+      "$value": "var(--sig-work)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-segmented-accent-bg"
+      }
+    },
+    "cr-segmented-accent-fg": {
+      "$value": "var(--on-sig)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-segmented-accent-fg"
+      }
+    },
+    "cr-tree-accent": {
+      "$value": "var(--sig-work)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-tree-accent"
+      }
+    },
+    "cr-pager-bg": {
+      "$value": "var(--panel)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-pager-bg"
+      }
+    },
+    "cr-pager-border": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-pager-border"
+      }
+    },
+    "cr-pager-accent-bg": {
+      "$value": "var(--sig-work)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-pager-accent-bg"
+      }
+    },
+    "cr-pager-accent-fg": {
+      "$value": "var(--on-sig)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-pager-accent-fg"
+      }
+    },
+    "cr-stepper-line": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-stepper-line"
+      }
+    },
+    "cr-stepper-pending-bg": {
+      "$value": "var(--panel-2)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-stepper-pending-bg"
+      }
+    },
+    "cr-stepper-accent-bg": {
+      "$value": "var(--sig-work)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-stepper-accent-bg"
+      }
+    },
+    "cr-stepper-done-bg": {
+      "$value": "var(--sig-done)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-stepper-done-bg"
+      }
+    },
+    "cr-stepper-accent-fg": {
+      "$value": "var(--on-sig)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-stepper-accent-fg"
+      }
+    },
+    "cr-avatar-bg": {
+      "$value": "var(--panel-2)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-avatar-bg"
+      }
+    },
+    "cr-avatar-border": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-avatar-border"
+      }
+    },
+    "cr-avatar-fg": {
+      "$value": "var(--ink)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-avatar-fg"
+      }
+    },
+    "cr-kbd-bg": {
+      "$value": "var(--panel-2)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-kbd-bg"
+      }
+    },
+    "cr-kbd-border": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-kbd-border"
+      }
+    },
+    "cr-kbd-fg": {
+      "$value": "var(--muted)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-kbd-fg"
+      }
+    },
+    "cr-breadcrumb-fg": {
+      "$value": "var(--muted)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-breadcrumb-fg"
+      }
+    },
+    "cr-breadcrumb-current-fg": {
+      "$value": "var(--ink)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-breadcrumb-current-fg"
+      }
+    },
+    "cr-datagrid-bg": {
+      "$value": "var(--board)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-datagrid-bg"
+      }
+    },
+    "cr-datagrid-border": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-datagrid-border"
+      }
     }
   },
   "theme": {
