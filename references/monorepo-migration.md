@@ -53,11 +53,40 @@ All six workspaces are extracted and independently publishable under `@control-r
 the packages, so existing `@control-room/design-system/*` consumers are unchanged. Cross-
 package references use `@control-room/<pkg>` specifiers throughout.
 
-Follow-ups (optional, not blocking): the shared build toolchain (Mitosis, framework
-compilers, astro/playwright) still lives in the root devDependencies and is hoisted to every
-workspace; moving each package's build-only devDeps into its own manifest would make each
-package independently installable outside the monorepo. And `build:tw` still emits
-`dist/utilities.css` at the repo root — a candidate to fold into `@control-room/styles`.
+### Release-readiness & scope decisions
+
+Blocking a real release (deferred by the team — see the release checklist):
+
+- **Publish story.** The install docs (`npm i @control-room/*`, `npx @control-room/mcp`,
+  `npx @control-room/skill`, `/plugin install`) all assume a registry, but the repo is
+  configured **private / no-publish** (`.changeset` `access: restricted`, `release.yml` has
+  no publish step, `license: UNLICENSED`). Decision needed: publish to public npm, a private
+  registry (GitHub Packages), or keep private and reframe the install docs.
+- **Pre-split changeset queue.** The ~85 changesets predating the split all name
+  `@control-room/design-system` (now the private workspace root Changesets no longer tracks),
+  so `changeset status` / the Version Packages PR error. Their content is preserved in this
+  CHANGELOG's `[Unreleased]` section and in git. Reconcile at release time — remove the
+  vestigial pre-1.0 queue (recommended) or re-point them — once the publish model is chosen.
+
+Deliberate scope (not defects):
+
+- **Per-package build devDeps.** The shared toolchain (Mitosis, framework compilers,
+  astro/playwright) lives in the root devDependencies and is hoisted to every workspace.
+  Splitting build-only devDeps into each manifest only pays off for standalone installs
+  outside the monorepo, and is best validated with `npm pack` + a clean install — a
+  publish-time task.
+- **Compiled packages: React + Qwik only.** Vue/Svelte/Angular/Solid ship as idiomatic
+  framework *source* (SFCs / `.ts` / `.jsx`) via `./frameworks/*` + typed barrels — the
+  normal delivery for those toolchains, which compile on consume. React and Qwik additionally
+  get a precompiled JS `dist/pkg`. All six are consumable; the asymmetry is intentional.
+- **One baked icon family.** `CrIcon`'s portable single-`<path>` model (no `innerHTML`, so
+  Vue/Solid-safe across six targets) rules out general multi-element families (Lucide/Tabler)
+  as *baked* sets. Multi-family is delivered two ways instead: `@control-room/icons` exposes
+  importable per-family path packs, and `CrIcon`'s `path` escape hatch renders any glyph
+  per-use. A second baked set would need another single-`<path>` (pixel-style) source.
+
+Done since the split: `build:tw` now emits `@control-room/styles/utilities.css` (was an
+orphan at the repo root).
 
 ## Why this is staged, not done in one commit
 
