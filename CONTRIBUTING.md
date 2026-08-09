@@ -7,9 +7,9 @@ proposing anything visual — most questions are already answered there.
 
 ## Ground rules
 
-- **The token layer is the single source of truth.** `tokens/tokens.json` is
-  authored by hand; everything in `dist/` is generated from it. Never hand-edit
-  `dist/`.
+- **The token layer is the single source of truth.** `packages/tokens/tokens/tokens.json` is
+  authored by hand; everything generated under `packages/*/dist/` is derived from it.
+  Never hand-edit a generated `dist/`.
 - **Nothing bypasses the laws.** If a change needs a rule that doesn't exist yet,
   add the rule (a law, a token, or a component spec) — don't freelance it in one
   component.
@@ -20,7 +20,7 @@ proposing anything visual — most questions are already answered there.
 
 ```bash
 npm install
-npm run build:tokens   # regenerate dist/ + design-tokens/ from tokens/tokens.json
+npm run build:tokens   # regenerate packages/tokens/dist/ + design-tokens/ from packages/tokens/tokens/tokens.json
 npm run build:catalog  # regenerate catalog/catalog.json from catalog/registry.json
 npm run dev            # Astro + Starlight docs + gallery at localhost
 npm run build          # full build: tokens + catalog + gallery + content + site
@@ -29,11 +29,11 @@ npm run verify         # token drift + catalog drift + skill validity (the CI ga
 
 ## Changing tokens
 
-1. Edit `tokens/tokens.json` — add/adjust the value for **all four themes**.
-2. `npm run build:tokens` to regenerate `dist/control-room.css`,
-   `dist/tw-theme.css`, `dist/tokens.flat.json`, and the DTCG export
-   `design-tokens/control-room.tokens.json`.
-3. Commit `tokens/tokens.json` **and** the regenerated `dist/` + `design-tokens/`.
+1. Edit `packages/tokens/tokens/tokens.json` — add/adjust the value for **all four themes**.
+2. `npm run build:tokens` to regenerate `packages/tokens/dist/control-room.css`,
+   `packages/tokens/dist/tw-theme.css`, `packages/tokens/dist/tokens.flat.json`, and the DTCG export
+   `packages/tokens/design-tokens/control-room.tokens.json`.
+3. Commit `packages/tokens/tokens/tokens.json` **and** the regenerated `packages/tokens/dist/` + `design-tokens/`.
 4. CI runs `npm run verify:tokens` and fails the PR if any generated file is stale.
 5. New signal hue? Verify `--on-sig` contrast against it in every theme
    (`references/accessibility.md`).
@@ -42,7 +42,7 @@ npm run verify         # token drift + catalog drift + skill validity (the CI ga
 
 1. Write a spec using `templates/component.md` — fill every section.
 2. Build it from tokens only (no raw hex, no `border-radius`, hard shadow only).
-3. Add a live demo to the gallery (`build/build-gallery.mjs`) so it is visible
+3. Add a live demo to the gallery (`packages/docs/build/build-gallery.mjs`) so it is visible
    across all four themes.
 4. Register it in `catalog/registry.json` (id, category, kind, lifecycle,
    tokens, variants, keywords) and run `npm run build:catalog`. Commit both.
@@ -87,14 +87,14 @@ npm run test:e2e             # both (builds the gallery first)
 
 - The **a11y gate is a hard CI gate** — a serious/critical WCAG violation blocks
   the deploy. New/changed components must pass in all four themes.
-- **Visual baselines** (`tests/*-snapshots/`) are committed and platform-suffixed.
+- **Visual baselines** (`packages/docs/tests/*-snapshots/`) are committed and platform-suffixed.
   They're environment-sensitive, so visual is **informational** in CI; regenerate
   with `test:visual:update` when you intend a visual change, and commit them.
 
 ## Interactive components (Mitosis)
 
 Static components ship as `cr-` CSS classes (framework-agnostic). Components with
-real state/logic/ARIA are authored once as Mitosis `.lite.tsx` in `components/`
+real state/logic/ARIA are authored once as Mitosis `.lite.tsx` in `packages/components/components/`
 and compiled to React/Vue/Svelte/Angular/Solid/Qwik (`npm run build:components`).
 They apply `cr-` classes and carry no styling. See `references/frameworks.md`. CI
 compiles all targets so sources can't silently break. A real Qwik app built on

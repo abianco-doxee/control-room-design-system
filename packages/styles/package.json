@@ -4,7 +4,15 @@
   "license": "UNLICENSED",
   "type": "module",
   "description": "Control Room component styles — the authored all-in-one bundle (components.css), the thin global/base layer (base.css) and the per-component partials (parts/*.css) for PrimeVue-style import-on-use, plus the Tailwind v4 entry. Pairs with @control-room/tokens.",
-  "files": ["styles", "build"],
+  "keywords": ["control-room", "design-system", "css", "styles", "tailwind"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abianco-doxee/control-room-design-system.git",
+    "directory": "packages/styles"
+  },
+  "homepage": "https://github.com/abianco-doxee/control-room-design-system#readme",
+  "sideEffects": ["*.css"],
+  "files": ["styles"],
   "exports": {
     "./components": "./styles/components.css",
     "./base": "./styles/base.css",

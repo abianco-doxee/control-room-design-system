@@ -4,6 +4,14 @@
   "license": "UNLICENSED",
   "type": "module",
   "description": "Control Room icon data — path-data packs, one importable map per Iconify family, keyed by the house icon names. Ships the pixel-art escape-hatch pack (pixelarticons) today; add a family = add one @iconify-json/<set> devDep + a name map, run build:icons. CrIcon (in @control-room/components) renders these; apps can import a map directly and feed any glyph to CrIcon's `path` escape hatch.",
+  "keywords": ["control-room", "design-system", "icons", "iconify", "pixelarticons"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abianco-doxee/control-room-design-system.git",
+    "directory": "packages/icons"
+  },
+  "homepage": "https://github.com/abianco-doxee/control-room-design-system#readme",
+  "sideEffects": false,
   "files": ["pixel.ts", "build"],
   "exports": {
     "./pixel": "./pixel.ts"
