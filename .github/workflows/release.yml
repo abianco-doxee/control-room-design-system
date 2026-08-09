@@ -1,8 +1,15 @@
 name: Release
 
 # When changesets land on main, open/update a "Version Packages" PR that bumps
-# the version and updates CHANGELOG.md. Merging that PR cuts the release.
-# This package is PRIVATE — there is no npm publish step.
+# each package's version and writes its CHANGELOG. Merging that PR publishes the
+# bumped packages to GitHub Packages (npm.pkg.github.com) via `changeset publish`.
+#
+# PREREQUISITE for the publish step: the `@control-room` npm scope must be owned
+# by the account that runs this workflow. GitHub Packages ties a scope to a
+# GitHub org/user of the same name, so `@control-room/*` publishes only under a
+# `control-room` org. Until that org owns the repo, the version PR is still
+# opened normally; only the publish-on-merge step needs the scope. See
+# references/monorepo-migration.md ("Publishing").
 on:
   push:
     branches: [main]
@@ -10,6 +17,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  packages: write
 
 concurrency:
   group: release
@@ -20,17 +28,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
-      - name: Create/update the Version Packages PR
+          cache: pnpm
+          registry-url: https://npm.pkg.github.com
+      - run: pnpm install --frozen-lockfile
+      - name: Version PR (changesets) / publish to GitHub Packages on merge
         uses: changesets/action@v1
         with:
-          version: npm run version
-          # no `publish:` — private package, versioning + changelog only
+          version: pnpm run version
+          publish: pnpm run release
           title: "Release: version packages"
           commit: "chore: version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

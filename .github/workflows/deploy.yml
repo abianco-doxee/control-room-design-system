@@ -20,52 +20,53 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - name: Lint + format check (Biome)
-        run: npm run lint
+        run: pnpm run lint
       - name: Verify generated artifacts match sources (tokens, catalog, skill)
-        run: npm run verify
+        run: pnpm run verify
       - name: Build tokens + catalog + gallery + docs site
-        run: npm run build
+        run: pnpm run build
         env:
           SITE_URL: https://abianco-doxee.github.io
           BASE_PATH: /control-room-design-system/
       - name: Compile framework components (Mitosis → react/vue/svelte/angular/solid)
-        run: npm run build:components
+        run: pnpm run build:components
       - name: Type-check compiled React output (codegen guard)
-        run: npm run verify:types
+        run: pnpm run verify:types
       - name: Package consumability gate (react/qwik/vue named exports build + import)
-        run: npm run test:pkg
+        run: pnpm run test:pkg
       - name: Cross-framework runtime gate (Vue/Svelte/Solid SSR-render the output)
-        run: npm run test:frameworks
+        run: pnpm run test:frameworks
       - name: Styling-contract gate (pt/dt/unstyled coverage + finer tokens + util ports + responsive tokens)
-        run: npm run test:contract
+        run: pnpm run test:contract
       - name: Forms core gate (ArkType ⇄ JSON Schema + validation)
-        run: npm run test:forms
+        run: pnpm run test:forms
       - name: Theme core gate (contract + brand validation + contrast)
-        run: npm run test:theme
+        run: pnpm run test:theme
       - name: Positioning gate (collision-aware overlay placement)
-        run: npm run test:position
+        run: pnpm run test:position
       - name: RTL-safe authoring guard (logical properties)
-        run: npm run test:rtl
+        run: pnpm run test:rtl
       - name: Appearance-separation guard (no brand colour in the feature layer)
-        run: npm run test:separation
+        run: pnpm run test:separation
       - name: Tooling gate (MCP server tools + skill installer)
-        run: npm run test:tooling
+        run: pnpm run test:tooling
       - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
       - name: Accessibility gate (axe, all four themes)
-        run: npm run test:a11y
+        run: pnpm run test:a11y
       - name: Live islands gate (real components mount + stay interactive)
-        run: npm run test:islands
+        run: pnpm run test:islands
       - name: Responsiveness gate (no horizontal overflow @ 375/768/1024)
-        run: npm run test:responsive
+        run: pnpm run test:responsive
       - name: Visual regression (informational — baselines are env-specific)
-        run: npm run test:visual
+        run: pnpm run test:visual
         continue-on-error: true
       - name: Upload Pages artifact
         if: github.ref == 'refs/heads/main'

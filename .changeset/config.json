@@ -4,9 +4,9 @@
   "commit": false,
   "fixed": [],
   "linked": [],
-  "access": "restricted",
+  "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [],
-  "___comment": "Private package — no npm publish. `changeset version` bumps the version + writes CHANGELOG from the changeset files; the release workflow opens a Version Packages PR. access:restricted keeps it from ever being published publicly."
+  "___comment": "Multi-package publish to GitHub Packages. `changeset version` bumps each package + writes its CHANGELOG; `changeset publish` (root `release` script) ships the non-private packages. release.yml runs both via changesets/action: pending changesets open a Version Packages PR, merging it publishes. The private root (@control-room/design-system) and docs are never published."
 }

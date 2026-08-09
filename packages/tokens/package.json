@@ -4,15 +4,30 @@
   "license": "UNLICENSED",
   "type": "module",
   "description": "Control Room design tokens — the single source of truth (tokens.json) for the CSS custom-property bundle, per-theme appearance layers, the structure layer, the Tailwind v4 @theme, the flat resolved map, the DTCG export, and the theme contract. Author brands without forking via brands/*.json.",
-  "keywords": ["control-room", "design-system", "design-tokens", "dtcg", "css-variables", "oklch", "theming"],
+  "keywords": [
+    "control-room",
+    "design-system",
+    "design-tokens",
+    "dtcg",
+    "css-variables",
+    "oklch",
+    "theming"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/abianco-doxee/control-room-design-system.git",
     "directory": "packages/tokens"
   },
   "homepage": "https://github.com/abianco-doxee/control-room-design-system#readme",
-  "sideEffects": ["*.css"],
-  "files": ["tokens", "brands", "dist", "design-tokens"],
+  "sideEffects": [
+    "*.css"
+  ],
+  "files": [
+    "tokens",
+    "brands",
+    "dist",
+    "design-tokens"
+  ],
   "exports": {
     "./tokens.json": "./tokens/tokens.json",
     "./css": "./dist/control-room.css",
@@ -32,9 +47,12 @@
     "test": "node --test tests/theme.test.mjs"
   },
   "dependencies": {
-    "@control-room/utils": "1.0.0"
+    "@control-room/utils": "workspace:*"
   },
   "devDependencies": {
     "culori": "^4.0.2"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   }
 }

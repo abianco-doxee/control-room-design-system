@@ -8,7 +8,7 @@
  *   data/references/*.md       the reference docs the server exposes
  *
  * The copies are committed and guarded by `--check` (verify:mcp), so drift from
- * the sources fails CI. Regenerate: npm run build -w @control-room/mcp.
+ * the sources fails CI. Regenerate: pnpm --filter @control-room/mcp run build.
  */
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -70,7 +70,7 @@ if (CHECK) {
     console.error("✗ data/docs.json is out of date");
   }
   if (stale) {
-    console.error("\nRun: npm run build -w @control-room/mcp");
+    console.error("\nRun: pnpm --filter @control-room/mcp run build");
     process.exit(1);
   }
   console.log("✓ MCP data is up to date");

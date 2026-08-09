@@ -10,7 +10,7 @@
  *
  * The bundle is committed and drift-gated by `--check` (verify:skill), so it can
  * never fall out of step with the source. Regenerate:
- *   npm run build -w @control-room/skill
+ *   pnpm --filter @control-room/skill run build
  */
 import {
   cpSync,
@@ -73,7 +73,7 @@ if (CHECK) {
       console.error(`✗ bundle has stray ${rel}`);
     }
   if (stale) {
-    console.error("\nRun: npm run build -w @control-room/skill");
+    console.error("\nRun: pnpm --filter @control-room/skill run build");
     process.exit(1);
   }
   console.log(`✓ skill bundle is in sync (${Object.keys(want).length} files)`);

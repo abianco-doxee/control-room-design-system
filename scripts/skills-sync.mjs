@@ -123,7 +123,7 @@ for (const skill of manifest.skills) {
 if (errors.length) {
   console.error("\n✗ skills check failed:");
   for (const e of errors) console.error("  - " + e);
-  if (CHECK) console.error("\nFix the source or run: npm run skills:sync");
+  if (CHECK) console.error("\nFix the source or run: pnpm run skills:sync");
   process.exit(1);
 }
 console.log(
