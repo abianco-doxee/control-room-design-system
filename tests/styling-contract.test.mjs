@@ -8,7 +8,11 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const fw = (t, f) => readFileSync(join(ROOT, "dist", "frameworks", t, "components", f), "utf8");
+const fw = (t, f) =>
+  readFileSync(
+    join(ROOT, "packages", "components", "dist", "frameworks", t, "components", f),
+    "utf8"
+  );
 
 test("Vue CrTabs is the hand-written per-target override (full native pt)", () => {
   const vue = fw("vue", "CrTabs.vue");
@@ -30,9 +34,9 @@ test("the other targets are generated from the single .lite source (portable pt)
 
 test("every target exposes the data-part styling hook on CrTabs", () => {
   for (const t of ["react", "vue", "svelte", "solid", "qwik", "angular"]) {
-    const file = readdirSync(join(ROOT, "dist", "frameworks", t, "components")).find((f) =>
-      /^CrTabs\./.test(f)
-    );
+    const file = readdirSync(
+      join(ROOT, "packages", "components", "dist", "frameworks", t, "components")
+    ).find((f) => /^CrTabs\./.test(f));
     assert.ok(file, `${t}: CrTabs output exists`);
     assert.match(fw(t, file), /data-part/, `${t}: exposes data-part`);
   }
@@ -45,7 +49,7 @@ test("every target exposes the data-part styling hook on CrTabs", () => {
 // directions: a new functional component that forgets the contract fails, and so
 // does a decorative one that unexpectedly grows it (update the set on purpose).
 test("pt/dt/unstyled contract covers every functional component", () => {
-  const COMPONENTS = join(ROOT, "components");
+  const COMPONENTS = join(ROOT, "packages", "components", "components");
   const DECORATIVE = new Set([
     "CrArrowRail",
     "CrAscii",

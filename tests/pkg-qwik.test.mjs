@@ -16,7 +16,7 @@ import { fileURLToPath } from "node:url";
 import * as CR from "../dist/pkg/qwik/index.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const PKG = join(ROOT, "dist", "pkg", "qwik");
+const PKG = join(ROOT, "packages", "components", "dist", "pkg", "qwik");
 
 test("the qwik package imports and exposes every component as a named export", () => {
   const expected = ["CrButton", "CrPanel", "CrChip", "CrForm", "CrTabs", "CrBarChart", "CrSigil"];

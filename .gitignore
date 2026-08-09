@@ -8,9 +8,10 @@ dist/.sd/
 dist/utilities.css
 
 # Mitosis framework output — build artifact (npm run build:components)
-dist/frameworks/
+# (lives under packages/components/dist since the workspace split)
+**/dist/frameworks/
 # Compiled, publishable framework packages (derived from dist/frameworks via build:pkg)
-dist/pkg/
+**/dist/pkg/
 # Temp modules from the cross-framework render harness (build/render-fw.mjs)
 .fwtmp-*/
 

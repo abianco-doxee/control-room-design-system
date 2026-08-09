@@ -18,8 +18,8 @@
       "!test-results",
       "!coverage",
       "!examples",
-      "!overrides",
-      "!components",
+      "!packages/components/overrides",
+      "!packages/components/components",
       "!packages/icons/pixel.ts"
     ]
   },
