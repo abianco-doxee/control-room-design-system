@@ -100,6 +100,26 @@
   --cr-hero-bg: var(--sig-accent);
   --cr-hero-fg: var(--on-accent);
   --cr-nav-w: 180px;
+  --cr-tabs-border: var(--border);
+  --cr-tabs-tab-fg: var(--muted);
+  --cr-tabs-tab-hover-fg: var(--ink);
+  --cr-tabs-tab-active-fg: var(--ink);
+  --cr-tabs-indicator: var(--sig-work);
+  --cr-tabs-tab-pad-x: var(--space-4);
+  --cr-tabs-tab-pad-y: var(--space-2);
+  --cr-menu-panel-bg: var(--panel);
+  --cr-menu-panel-border: var(--border);
+  --cr-menu-item-fg: var(--ink);
+  --cr-menu-item-hover-bg: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent);
+  --cr-menu-item-danger-fg: var(--sig-err);
+  --cr-menu-item-pad-x: var(--space-2);
+  --cr-menu-item-pad-y: var(--space-1);
+  --cr-modal-bg: var(--panel);
+  --cr-modal-border: var(--border);
+  --cr-modal-backdrop: color-mix(in srgb, var(--mass) 72%, transparent);
+  --cr-modal-head-pad-x: var(--space-4);
+  --cr-modal-head-pad-y: var(--space-3);
+  --cr-modal-body-pad: var(--space-4);
   --ground: #0f0327;
   --board: #15092f;
   --panel: #1d133a;
@@ -841,16 +861,16 @@ body {
 .cr-table__sel { width: var(--space-8); text-align: center; }
 
 /* ── Tabs ──────────────────────────────────────────────────────────────── */
-.cr-tabs { display: flex; gap: 0; border-bottom: var(--brd) solid var(--border); }
+.cr-tabs { display: flex; gap: 0; border-bottom: var(--brd) solid var(--cr-tabs-border); }
 .cr-tab {
   font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
   text-transform: uppercase; letter-spacing: 0.06em;
-  padding: var(--space-2) var(--space-4); background: transparent; color: var(--muted);
+  padding: var(--cr-tabs-tab-pad-y) var(--cr-tabs-tab-pad-x); background: transparent; color: var(--cr-tabs-tab-fg);
   border: 0; border-bottom: var(--brd-heavy) solid transparent; margin-bottom: calc(var(--brd) * -1);
   cursor: pointer;
 }
-.cr-tab:hover { color: var(--ink); }
-.cr-tab--on { color: var(--ink); border-bottom-color: var(--sig-work); }
+.cr-tab:hover { color: var(--cr-tabs-tab-hover-fg); }
+.cr-tab--on { color: var(--cr-tabs-tab-active-fg); border-bottom-color: var(--cr-tabs-indicator); }
 
 /* ── Meter (capacity / utilisation bar) ─────────────────────────────────── */
 .cr-meter { --cr-meter-c: var(--sig-work); display: flex; align-items: center; gap: var(--space-2); }
@@ -1006,11 +1026,11 @@ body {
 
 /* ── Modal (native <dialog> — free focus-trap + Esc + backdrop) ────────── */
 .cr-modal {
-  border: var(--brd-brush) solid var(--border); background: var(--panel); color: var(--ink);
+  border: var(--brd-brush) solid var(--cr-modal-border); background: var(--cr-modal-bg); color: var(--ink);
   box-shadow: var(--shadow-off-lg) var(--shadow-off-lg) 0 var(--shadow-col);
   padding: 0; max-width: min(92vw, 34rem); border-radius: var(--radius);
 }
-.cr-modal::backdrop { background: color-mix(in srgb, var(--mass) 72%, transparent); }
+.cr-modal::backdrop { background: var(--cr-modal-backdrop); }
 
 /* ── Command palette (⌘K) ───────────────────────────────────────────────── */
 .cr-palette {
@@ -1408,7 +1428,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-cron__preset:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
 .cr-modal__head {
   display: flex; align-items: center; gap: var(--space-3);
-  padding: var(--space-3) var(--space-4); border-bottom: var(--brd) solid var(--border);
+  padding: var(--cr-modal-head-pad-y) var(--cr-modal-head-pad-x); border-bottom: var(--brd) solid var(--cr-modal-border);
 }
 .cr-modal__title { flex: 1; margin: 0; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
 .cr-modal__close {
@@ -1416,7 +1436,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
   background: var(--panel); color: var(--ink); border: var(--brd) solid var(--border);
   padding: var(--space-0-5) var(--space-2);
 }
-.cr-modal__body { padding: var(--space-4); font-size: var(--text-base); }
+.cr-modal__body { padding: var(--cr-modal-body-pad); font-size: var(--text-base); }
 
 /* ── Toast (keyed to a signal; role=status/alert) ──────────────────────── */
 .cr-toast {
@@ -1452,18 +1472,18 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-menu__scrim { position: fixed; inset: 0; z-index: var(--z-overlay); background: transparent; border: 0; cursor: default; }
 .cr-menu__panel {
   position: absolute; top: calc(100% + var(--space-1)); left: 0; z-index: calc(var(--z-overlay) + 1);
-  min-width: 12rem; background: var(--panel); border: var(--brd) solid var(--border);
+  min-width: 12rem; background: var(--cr-menu-panel-bg); border: var(--brd) solid var(--cr-menu-panel-border);
   box-shadow: var(--shadow-off-sm) var(--shadow-off-sm) 0 var(--shadow-col);
   display: flex; flex-direction: column; padding: var(--space-1);
 }
 .cr-menu__panel--right { left: auto; right: 0; }
 .cr-menu__item {
   font-family: var(--font-mono); font-size: var(--text-sm); text-align: start;
-  background: transparent; border: 0; color: var(--ink); cursor: pointer;
-  padding: var(--space-1) var(--space-2);
+  background: transparent; border: 0; color: var(--cr-menu-item-fg); cursor: pointer;
+  padding: var(--cr-menu-item-pad-y) var(--cr-menu-item-pad-x);
 }
-.cr-menu__item:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
-.cr-menu__item--danger { color: var(--sig-err); }
+.cr-menu__item:hover { background: var(--cr-menu-item-hover-bg); }
+.cr-menu__item--danger { color: var(--cr-menu-item-danger-fg); }
 .cr-menu__sep { height: var(--brd-hair); background: color-mix(in srgb, var(--border) 30%, transparent); margin: var(--space-1) 0; }
 
 /* ── Pagination ─────────────────────────────────────────────────────────── */
