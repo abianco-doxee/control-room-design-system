@@ -24,6 +24,7 @@ import {
   CrTag, CrSessionRow, CrPanel, CrIcon,
   CrSparkline, CrLineChart, CrBarChart, CrStackedBar, CrForm, CrDataGrid,
   CrStepper, CrPinInput, CrTagsInput, CrInputGroup, CrAvatar, CrSpinner,
+  CrScrollArea, CrResizable,
 } from "../dist/frameworks/react/index.ts";
 import { defineForm, type as ark } from "../lib/forms/index.js";
 
@@ -713,6 +714,21 @@ const DEMOS = {
     tag: "CrSpinner",
     defs: [T("text", "label", "Provisioning"), T("enum", "size", "md", { options: ["sm", "md", "lg"] })],
     render: (s) => h(CrSpinner, { label: s.label, size: s.size }),
+  },
+  "scroll-area": {
+    tag: "CrScrollArea",
+    defs: [T("text", "label", "Log output")],
+    render: (s) => h(CrScrollArea, { label: s.label, maxHeight: "9rem" },
+      h("div", { style: { fontFamily: "var(--font-mono)", fontSize: "12px", lineHeight: 1.7 } },
+        Array.from({ length: 24 }, (_, i) => h("div", { key: i }, `[${String(i).padStart(2, "0")}:12] worker-${1000 + i} · session ${(i * 37).toString(16)} · ok`)))),
+  },
+  resizable: {
+    tag: "CrResizable",
+    defs: [T("enum", "orientation", "horizontal", { options: ["horizontal", "vertical"] })],
+    render: (s) => h("div", { style: { height: "180px" } },
+      h(CrResizable, { orientation: s.orientation, defaultSize: 45, label: "Resize panels" },
+        h("div", { style: { padding: "10px", fontFamily: "var(--font-mono)", fontSize: "12px" } }, "queue"),
+        h("div", { style: { padding: "10px", fontFamily: "var(--font-mono)", fontSize: "12px" } }, "detail"))),
   },
 };
 
