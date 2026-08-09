@@ -71,7 +71,27 @@ The publish model is **GitHub Packages** (`npm.pkg.github.com`), wired end-to-en
   `.github/workflows/release.yml` runs both through `changesets/action`: a push to `main`
   with pending changesets opens/updates the **Version Packages** PR; merging it publishes.
   CI injects the token via `setup-node` (`registry-url` + `NODE_AUTH_TOKEN`), and the job
-  holds `packages: write`.
+  holds `packages: write`. The job is **dormant** (gated on the `RELEASE_ENABLED` repo
+  variable) so CI stays green until the repo is deliberately configured for releasing.
+
+**Turning releasing on — three one-time repo/infra toggles (no code change):**
+
+1. **Own the `@control-room` scope.** GitHub Packages ties a scope to a GitHub org/user of
+   the same name, so `@control-room/*` publishes only under a `control-room` org. This repo's
+   owner is the user `alebianco`; create a free `control-room` GitHub org and move the
+   repo there, or rename the scope to match the owner. The scope was **not** renamed
+   unilaterally because it is the product's identity and pervades the docs, MCP data, and
+   skill bundle.
+2. **Allow Actions to open PRs.** Settings → Actions → General → Workflow permissions →
+   enable "Allow GitHub Actions to create and approve pull requests". The default
+   `GITHUB_TOKEN` cannot open the Version Packages PR without it (this is the documented
+   changesets prerequisite, not a defect).
+3. **Flip the gate.** Set the `RELEASE_ENABLED=true` repo variable (Settings → Secrets and
+   variables → Actions → Variables).
+
+Until then, everything is wired and verified locally (`changeset status` is green and
+`changeset version` produces correct per-package bumps + changelogs); only these external
+toggles gate the live release.
 - **Pre-split changeset queue — resolved.** The ~85 changesets predating the split named
   `@control-room/design-system` (the private workspace root, which is not a workspace
   member, so Changesets errored on it). Their content is preserved in this CHANGELOG's
