@@ -1911,23 +1911,45 @@ carries the meaning.
 
 ### Toolbar {#toolbar}
 
-A **WAI-ARIA toolbar** — a labelled group of *your own* controls (buttons, links,
-fields, passed as children) with a **single tab stop** and roving-tabindex arrow
-navigation (←/→ horizontal, ↑/↓ vertical, Home/End to the ends). Enter/Space still
-activate the focused control natively. The first control is made the tab stop on
-mount; the arrows move focus and the stop together. Props: `label` (required),
-`orientation?` (`horizontal` default · `vertical`), children.
+A **WAI-ARIA toolbar** — a labelled group of controls with a **single tab stop**
+and roving-tabindex arrow navigation (←/→ horizontal, ↑/↓ vertical, Home/End to the
+ends). Enter/Space activate the focused control natively. Two modes:
+
+**Children mode** — wrap *your own* controls (buttons, links, fields). The first is
+made the tab stop on mount; arrows move focus and the stop together. Props:
+`label` (required), `orientation?` (`horizontal` default · `vertical`), children.
 
 ```tsx
 <CrToolbar label="editor actions">
   <button class="cr-btn cr-btn--sm">bold</button>
   <button class="cr-btn cr-btn--sm">italic</button>
-  <button class="cr-btn cr-btn--sm">link</button>
 </CrToolbar>
 ```
 
-**Tokens** — `--cr-toolbar-bg` · `--cr-toolbar-border`. **A11y** — `role="toolbar"`
-with `aria-orientation`; roving tabindex keeps the whole bar one Tab stop.
+**Items + overflow mode** — pass `items` as data and set `overflow` to get the
+**priority+ pattern**: the buttons that don't fit collapse into a **"⋯ more" menu**
+instead of wrapping. A `ResizeObserver` measures the bar live and moves the tail
+into the menu as it narrows; the "⋯" trigger is a proper `aria-haspopup="menu"`
+(↓ opens, ↑/↓/Home/End move, Esc closes). Each item is `{ id, label, onSelect?,
+disabled?, danger? }`. SSR / no-JS renders every item in the bar (all actions stay
+reachable), then the measure pass runs on hydrate.
+
+```tsx
+<CrToolbar label="editor actions" overflow items={[
+  { id: "bold", label: "bold", onSelect: bold },
+  { id: "italic", label: "italic", onSelect: italic },
+  { id: "link", label: "link", onSelect: link },
+  { id: "code", label: "code", onSelect: code },
+  // …as many as you like — the tail folds into "⋯ more" when space runs out
+]} />
+```
+
+**Tokens** — `--cr-toolbar-bg` · `--cr-toolbar-border` (the overflow menu reuses the
+Menu surface). **A11y** — `role="toolbar"` with `aria-orientation`; roving tabindex
+keeps the whole bar (including the "⋯" trigger) one Tab stop; the menu is a labelled
+`role="menu"` of `role="menuitem"`s. **Note** — overflow mode measures widths via
+the DOM (a `data-w` stamp per button) and fills its container (`display:flex`), so
+the measurement is stable as items collapse.
 
 ### File upload {#file-upload}
 
