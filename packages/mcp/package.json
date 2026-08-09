@@ -1,0 +1,22 @@
+{
+  "name": "@control-room/mcp",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "type": "module",
+  "description": "Model Context Protocol server for the Control Room design system — exposes the component catalog, the token/theme contract, and the reference docs (the nine design laws, styling contract, forms, theming…) as tools and resources a coding agent can query while building UI. Run: npx @control-room/mcp.",
+  "keywords": ["mcp", "model-context-protocol", "design-system", "control-room", "ai", "agent"],
+  "bin": {
+    "control-room-mcp": "./server.mjs"
+  },
+  "files": ["server.mjs", "data", "build", "README.md"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "node build/build-mcp-data.mjs",
+    "verify": "node build/build-mcp-data.mjs --check",
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^3.25.76"
+  }
+}

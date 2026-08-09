@@ -1,0 +1,156 @@
+# Control Room Design System
+
+> A neon-noir, neobrutalist design system for dense operational dashboards — authored once as Mitosis components and compiled to React, Vue, Svelte, Angular, Solid and Qwik, on a four-theme OKLCH token layer with a documented accessibility contract.
+
+Control Room is both a published component library (`@control-room/*` on npm) and a
+Claude Code skill. Install one framework build plus the token + style layers:
+
+```
+npm i @control-room/components @control-room/tokens @control-room/styles
+```
+
+```
+import { CrButton } from "@control-room/components/react";  // or /vue /svelte /angular /solid /qwik
+import "@control-room/tokens/css";                          // token layer, all four themes
+import "@control-room/styles/components";                   // component styles (or per-part parts/*)
+```
+
+Set the theme on the root: `<html data-theme="dark|light|extreme|phosphor">`.
+
+## Foundations
+- [Design Language — the nine laws](https://alebianco.github.io/control-room-design-system/reference/design-language/): the why + do/don't behind every decision
+- [Tokens](https://alebianco.github.io/control-room-design-system/reference/tokens/): the token layer, OKLCH generation, and how to consume it
+- [Theming & Branding](https://alebianco.github.io/control-room-design-system/reference/theming/): author a brand without forking; the four built-in themes
+- [Responsive Architecture](https://alebianco.github.io/control-room-design-system/reference/responsive/): fluid type + per-container density
+- [Tailwind-first](https://alebianco.github.io/control-room-design-system/reference/tailwind/): token-driven utilities (Tailwind v4 @theme)
+- [Motion](https://alebianco.github.io/control-room-design-system/reference/motion/): motion tiers, glitch/CRT vocabulary, reduced-motion
+- [Accessibility](https://alebianco.github.io/control-room-design-system/reference/accessibility/): the WCAG 2.1 AA contract for the aesthetic
+
+## Building
+- [Component Library](https://alebianco.github.io/control-room-design-system/reference/components/): spec + copy-ready markup for every component
+- [Styling Contract](https://alebianco.github.io/control-room-design-system/reference/styling-contract/): the pt / dt / unstyled per-part styling hooks
+- [Forms](https://alebianco.github.io/control-room-design-system/reference/forms/): schema-driven validation (ArkType ⇄ JSON Schema)
+- [Framework Components](https://alebianco.github.io/control-room-design-system/reference/frameworks/): Mitosis compile-to-six + per-target packages
+
+## Components
+Every component is catalogued with its variants, design tokens, and keywords in
+[catalog.json](https://alebianco.github.io/control-room-design-system/catalog.json) (83 entries). Rendered and
+exercised in all four themes in the [Component Browser](https://alebianco.github.io/control-room-design-system/components.html); see them
+live in the [Gallery](https://alebianco.github.io/control-room-design-system/gallery.html).
+
+### Action
+- [Button](https://alebianco.github.io/control-room-design-system/components.html#c-button): Primary action with the signature mechanical snap-press; secondary 'controls' variant for utilities.
+- [Toolbar](https://alebianco.github.io/control-room-design-system/components.html#c-toolbar): WAI-ARIA toolbar — a labelled group of controls with a single tab stop and roving-tabindex arrows. Two modes: wrap your own controls as children, or pass items[] and (with overflow) collapse the buttons that don't fit into a “⋯ more” menu (priority+, measured via ResizeObserver).
+
+### Behavior
+- [Key hints (peek)](https://alebianco.github.io/control-room-design-system/components.html#c-key-hints): Headless behavior — while the reveal key (default Alt) is held, sets data-cr-keys on the root so every secondary key hint fades in at once (a peek-all-shortcuts gesture). Renders nothing visible.
+
+### Chart
+- [Bar chart](https://alebianco.github.io/control-room-design-system/components.html#c-bar-chart): Categorical bar chart — baseline-anchored bars with rounded data-ends, a 2px surface gap, optional dashed target line, monospace value/category labels.
+- [Line chart](https://alebianco.github.io/control-room-design-system/components.html#c-line-chart): Time-series line chart — recessive grid, non-scaling 2px lines, a data-end dot per series, tick labels and a legend for ≥2 series. One y-axis only.
+- [Sparkline](https://alebianco.github.io/control-room-design-system/components.html#c-sparkline): Inline micro line/area chart for a KPI or table cell — no axes, a crisp non-scaling 2px stroke, a data-end dot. Stretches to fill its box.
+- [Stacked bar](https://alebianco.github.io/control-room-design-system/components.html#c-stacked-bar): A single composition bar ("stacked progress") — signal-toned segments sized by share, with a 2px surface gap and a legend (label · value · %). Compose several for a comparison.
+
+### Forms
+- [Calendar](https://alebianco.github.io/control-room-design-system/components.html#c-calendar): Month calendar grid — role=grid with roving tabindex (arrows move day/week, PageUp/Down step months, Enter/Space select). Fully controlled, SSR-safe (month + today injected, never read from the clock).
+- [Checkbox / Radio](https://alebianco.github.io/control-room-design-system/components.html#c-checkbox): Square checkbox and radio (radius 0); checked fills to --sig-work with an --on-sig mark.
+- [Combobox](https://alebianco.github.io/control-room-design-system/components.html#c-combobox): Autocomplete — an input (role=combobox) filtering a listbox; ↑/↓ move the active option (aria-activedescendant), Enter selects, Esc closes. Active row shows an ascii ▸ marker.
+- [Cron field](https://alebianco.github.io/control-room-design-system/components.html#c-cron-field): A proper cron-expression form field: label + input + quick presets + a live human-readable readout. The translation is injected as `description` (compute with cronstrue in the host) so the design system stays dependency-free; validity is message-driven via `error` (no hand-set `invalid`), wired like CrField (aria-invalid + aria-describedby).
+- [Date-time](https://alebianco.github.io/control-room-design-system/components.html#c-datetime): A styled native date/time input (datetime-local / date / time) — the browser owns the picker, keyboard, and locale.
+- [FileUpload](https://alebianco.github.io/control-room-design-system/components.html#c-file-upload): File dropzone over a real native <input type=file> — click/keyboard opens the picker, drag-drop is accepted, dragover is announced via data-state. Selected files listed.
+- [Form](https://alebianco.github.io/control-room-design-system/components.html#c-form): Schema-driven form. Feed it a Form Model + a validate() function (built by the headless forms core from an ArkType type OR a JSON Schema) and it renders and validates the whole form — value/touched/error state, validate on blur + submit, re-check on change once touched.
+- [Form Field](https://alebianco.github.io/control-room-design-system/components.html#c-form-field): Label + control + hint/error wrapper; error state shows a non-color ✗ marker.
+- [InputGroup](https://alebianco.github.io/control-room-design-system/components.html#c-input-group): An input flanked by decorative prefix / suffix addons (protocol, currency, unit). Addons are aria-hidden; give the field a label. For a validated field use Field or Form.
+- [Number field](https://alebianco.github.io/control-room-design-system/components.html#c-number-field): Number input with −/+ steppers, clamped to min/max; the native input keeps its own keyboard.
+- [PinInput](https://alebianco.github.io/control-room-design-system/components.html#c-pin-input): One-time-code / PIN entry — N single-digit cells acting as one field; typing advances, Backspace steps back, arrows move, paste fills across. role=group with per-cell labels.
+- [Radio group](https://alebianco.github.io/control-room-design-system/components.html#c-radio-group): Single-choice group (role=radiogroup) with roving tabindex + arrow-key nav. Square radios (radius 0) — a filled inner square marks the choice.
+- [Rating](https://alebianco.github.io/control-room-design-system/components.html#c-rating): Star-rating control — a radiogroup with roving tabindex (interactive) or an inert score readout (readonly). Geometric-glyph marks (no icon font); fill encodes the value.
+- [Select](https://alebianco.github.io/control-room-design-system/components.html#c-select): Native select styled to the chassis.
+- [Slider](https://alebianco.github.io/control-room-design-system/components.html#c-slider): Styled native range input — square track + thumb, keyboard for free (arrows, Home/End, PageUp/Down).
+- [Switch](https://alebianco.github.io/control-room-design-system/components.html#c-switch): button[role=switch] toggle; on = --sig-done track.
+- [TagsInput](https://alebianco.github.io/control-room-design-system/components.html#c-tags-input): Token entry — Enter or comma adds a tag, Backspace on an empty field removes the last, each tag has a labelled remove button. role=group; duplicates ignored.
+- [Text Input](https://alebianco.github.io/control-room-design-system/components.html#c-input): Single-line text input on a recessed board surface; square, inked, focus-ringed.
+- [Textarea](https://alebianco.github.io/control-room-design-system/components.html#c-textarea): Multi-line text input; vertically resizable.
+- [ToggleChip](https://alebianco.github.io/control-room-design-system/components.html#c-toggle-chip): Interactive multi-select filter pill (role=checkbox). Distinct from the static Chip and single-select Segmented; several toggle independently. On/off announced via aria-checked + data-state.
+
+### Identity
+- [Avatar](https://alebianco.github.io/control-room-design-system/components.html#c-avatar): Image with an initials fallback and optional presence dot. With a src it's an img[alt=name]; without one the wrapper is role=img[aria-label=name] over the initials.
+- [Hero](https://alebianco.github.io/control-room-design-system/components.html#c-hero): The one region that keys to the state needing attention; keys to --stage when calm.
+- [Masthead](https://alebianco.github.io/control-room-design-system/components.html#c-masthead): The stark title card — page identity and headline state in the display register; optional drip host.
+
+### Layout
+- [Accordion](https://alebianco.github.io/control-room-design-system/components.html#c-accordion): Collapsible sections — header buttons (aria-expanded + aria-controls) reveal region panels. single = exclusive; ↑/↓/Home/End move between headers.
+- [Bezel + Screen](https://alebianco.github.io/control-room-design-system/components.html#c-bezel): The only legal host for texture (Law 6) — a physical instrument enclosing a recessed, halftoned screen.
+- [Breach](https://alebianco.github.io/control-room-design-system/components.html#c-breach): The one sanctioned rule-break per screen (Law 9) — soft corner, colour glow, blurred blob, optional gradient wash — to spotlight the single most exceptional item.
+- [Data grid](https://alebianco.github.io/control-room-design-system/components.html#c-datagrid): A dense, VIRTUALIZED data grid for large datasets: only the rows in (or near) the viewport are in the DOM, so thousands of rows scroll smoothly. Fixed row height; sortable headers (asc → desc → none, stable); optional row selection (checkbox column + select-all + aria-selected); sticky header; grid a11y (role=grid/row/columnheader/gridcell, aria-sort, aria-rowcount). Div-grid (not a <table>) so virtualization offsets cleanly across all targets.
+- [Data list](https://alebianco.github.io/control-room-design-system/components.html#c-data-list): Key → value readout (dl/dt/dd) on a two-column grid — mono/label keys, data-register values. For detail panels.
+- [Instrument shell](https://alebianco.github.io/control-room-design-system/components.html#c-instrument): The dashboard chassis — composes the nav rail and a board (masthead/hero + panels).
+- [Panel](https://alebianco.github.io/control-room-design-system/components.html#c-panel): The default container for a group of related data — the system's workhorse surface.
+- [Resizable](https://alebianco.github.io/control-room-design-system/components.html#c-resizable): Two panes with a draggable divider. Panes are children (CSS-grid sized); the handle is a WAI-ARIA window splitter (role=separator, focusable, aria-valuenow, arrow/Home/End keys). Pointer-capture drag.
+- [ScrollArea](https://alebianco.github.io/control-room-design-system/components.html#c-scroll-area): A container with cross-browser styled scrollbars (thin, inked, neon thumb) that keep the Control Room look. Keyboard-scrollable; with a label it's a named role=group.
+- [Table](https://alebianco.github.io/control-room-design-system/components.html#c-table): Dense operator table on the same chassis as a panel; mono/label headers, data-register cells. Optional column sort, row selection (checkbox + aria-selected), and a sticky header.
+
+### Media
+- [Ascii](https://alebianco.github.io/control-room-design-system/components.html#c-ascii): Seeded ASCII/Unicode density field (braille/block/ramp) for dead space — whisper contrast, aria-hidden, mask-faded off content.
+- [ASCII separators & lists](https://alebianco.github.io/control-room-design-system/components.html#c-ascii-detail): Character-flavored detail utilities: .cr-sep / .cr-sep-label box-rule separators (dashed/dotted, labeled), .cr-list ascii-marker lists (▸ · » +), and .cr-leader dot-leader rows (label ····· value).
+- [Carousel](https://alebianco.github.io/control-room-design-system/components.html#c-carousel): Slide carousel with the WAI-ARIA carousel pattern — labelled region, prev/next, dot indicators, aria-live viewport, ←/→ navigation. Controlled via index/onIndex.
+- [Chrome](https://alebianco.github.io/control-room-design-system/components.html#c-chrome): Seeded hardware chrome strip — a pixel-art metal bar with deterministically varied fasteners, panel seams, wear scratches, and an indicator LED.
+- [Decoration utilities](https://alebianco.github.io/control-room-design-system/components.html#c-decoration-utilities): The FUI/decoration utility layer for dead space and chassis edges: styled scrollbar, tick-ruler edge, whisper drafting field, hazard stripe, and the Breach blur-blob. All aria-hidden, non-interactive, whisper contrast — never on a content field.
+- [Icon](https://alebianco.github.io/control-room-design-system/components.html#c-icon): The house operational glyph set — 24×24, currentColor, single 2px stroke, square caps to match the neobrutalist geometry. Decorative by default; pass a label to name it.
+- [Seeded pixel-cat](https://alebianco.github.io/control-room-design-system/components.html#c-seeded-cat): Identity+state sprite: fur/markings from the session id, pose from state; deterministic paint() to canvas.
+- [Sigil](https://alebianco.github.io/control-room-design-system/components.html#c-sigil): Seeded cyber-sigil — a retro-futuristic pixel glyph generated from a seed; optional state keys the hue.
+- [Telemetry](https://alebianco.github.io/control-room-design-system/components.html#c-telemetry): Seeded NERV-style decorative telemetry string (hex id, byte, latency, mini bar) for a frame corner. Decoration, not data.
+
+### Navigation
+- [Breadcrumb](https://alebianco.github.io/control-room-design-system/components.html#c-breadcrumb): Navigation trail — ascii "/" separators from CSS; the last crumb is the current page (aria-current).
+- [Overflow](https://alebianco.github.io/control-room-design-system/components.html#c-overflow): An a11y-correct "+N more" disclosure for truncated lists; a button (aria-expanded) with onToggle, or an inert count. The accessible name always includes the noun.
+- [Pagination](https://alebianco.github.io/control-room-design-system/components.html#c-pagination): Controlled pager — prev/next plus a windowed run of page numbers with ellipses; current page keyed and aria-current.
+- [Rail + Nav](https://alebianco.github.io/control-room-design-system/components.html#c-rail): Primary navigation — persistent left chassis; active item keyed to accent, count badge to its state.
+- [Segmented control](https://alebianco.github.io/control-room-design-system/components.html#c-segmented): Single-select connected button bar (role=radiogroup, roving tabindex; ←/→/Home/End). Same semantics as a radio group, distinct connected visual.
+- [Stepper](https://alebianco.github.io/control-room-design-system/components.html#c-stepper): Numbered progress indicator for a multi-step flow — ordered list with done/active/upcoming states; current step carries aria-current, optional navigable step buttons.
+- [Tabs](https://alebianco.github.io/control-room-design-system/components.html#c-tabs): Tab strip (role=tablist) with a keyed underline on the active tab; scalar active-index state.
+- [Tree](https://alebianco.github.io/control-room-design-system/components.html#c-tree): Hierarchical tree (role=tree) for nested data like a worker→session fleet. Rendered as a flat list of visible rows; full keyboard nav (arrows expand/collapse/step, Home/End) and aria-level/aria-expanded.
+
+### Overlay
+- [Command palette](https://alebianco.github.io/control-room-design-system/components.html#c-palette): A ⌘K command palette on the native dialog (focus-trap + Esc + backdrop). The input is a combobox driving a listbox — focus stays in the field while ↑/↓ move the active option (aria-activedescendant), Enter runs it; live query filter with per-command keycap hints.
+- [Drawer](https://alebianco.github.io/control-room-design-system/components.html#c-drawer): An edge sheet on the native dialog (focus-trap + Esc + backdrop) — slides from the left or right, full height. For detail/inspector panels.
+- [Hover card](https://alebianco.github.io/control-room-design-system/components.html#c-hover-card): A rich hover/focus card for structured content (Tooltip is for plain text, Menu for actions). CSS-driven reveal with an open delay; the trigger is focusable so keyboard users get it too.
+- [Menu](https://alebianco.github.io/control-room-design-system/components.html#c-menu): Dropdown menu — a trigger toggles a role=menu panel; a transparent full-viewport scrim closes it on outside click (no global listeners). Optional danger items.
+- [Modal](https://alebianco.github.io/control-room-design-system/components.html#c-modal): Native <dialog> modal; browser owns focus-trap, Esc, and backdrop.
+- [Popover](https://alebianco.github.io/control-room-design-system/components.html#c-popover): Generic anchored overlay for arbitrary content — a trigger toggles a floating panel; scrim closes on outside click, Esc closes and returns focus. Use Menu for a list of actions.
+- [Toast](https://alebianco.github.io/control-room-design-system/components.html#c-toast): Transient status readout keyed to a machine signal; err announces assertively.
+- [Toast region](https://alebianco.github.io/control-room-design-system/components.html#c-toast-region): A fixed screen corner that stacks live toasts (parent owns the list). Each toast is its own live region — err announces assertively — so nothing double-announces. Bottom corners stack newest nearest the edge.
+- [Tooltip](https://alebianco.github.io/control-room-design-system/components.html#c-tooltip): Hint bubble revealed on hover/focus; role=tooltip wired via aria-describedby, pure-CSS reveal.
+
+### Primitives
+- [Diagonal primitives](https://alebianco.github.io/control-room-design-system/components.html#c-diagonal-primitives): Four shapes with four fixed meanings (Law 4): chevron=direction, notch=state, wedge=focus, arrow-rail=sequence. Max 15° off-axis.
+- [Key hint](https://alebianco.github.io/control-room-design-system/components.html#c-kbd): A keycap badge for a keyboard shortcut. Decorative (aria-hidden) — the real binding rides aria-keyshortcuts on the action. Main actions show it always; secondary use the hint variant, revealed on host hover/focus or a global peek.
+
+### State
+- [Alert](https://alebianco.github.io/control-room-design-system/components.html#c-alert): Inline callout keyed to a signal (info/wait/done/err) — a left brush-bar in the signal hue, optional dismiss. err announces assertively (role=alert).
+- [Chip](https://alebianco.github.io/control-room-design-system/components.html#c-chip): A compact standalone tag/label; default keys to done, alt to work; stamp-in when added.
+- [Drip / error surface](https://alebianco.github.io/control-room-design-system/components.html#c-drip): The house glitch for failure — vertical downward bleed in --drip over a --sig-err field. Errors only.
+- [EmptyState / ErrorState](https://alebianco.github.io/control-room-design-system/components.html#c-empty-error-state): Zero-data (calm) and failure (error keying + drip) fallbacks for any panel — must not look alike.
+- [Keyed contact sheet](https://alebianco.github.io/control-room-design-system/components.html#c-keyed-contact-sheet): A grid of uniform state-keyed tiles that reads as one instrument, not competing stages (Law 2).
+- [Meter](https://alebianco.github.io/control-room-design-system/components.html#c-meter): Token-driven capacity / utilisation bar (role=meter), square and hard-edged, keyed to a signal tone.
+- [Progress](https://alebianco.github.io/control-room-design-system/components.html#c-progress): Task progress (role=progressbar) — determinate fills to value/max; indeterminate runs an animated hazard sweep. Distinct from Meter (a static capacity reading).
+- [RelativeTime](https://alebianco.github.io/control-room-design-system/components.html#c-relative-time): Relative-time display ("5m ago") as a semantic <time>; the clock is injected as a prop so SSR and client agree (no hydration flicker).
+- [SessionRow](https://alebianco.github.io/control-room-design-system/components.html#c-session-row): One row of a live list — the densest unit; calm at rest, one-shot glitch on a real state change.
+- [Shape](https://alebianco.github.io/control-room-design-system/components.html#c-shape): Severity glyph — polygon side-count encodes danger/focus (fewer sides = more urgent); a shape channel beside colour (Law 4).
+- [Skeleton](https://alebianco.github.io/control-room-design-system/components.html#c-skeleton): Loading placeholder — a blocky pulse (never rounded). Sizes: --line, --text, --block; give it a width inline.
+- [Spinner](https://alebianco.github.io/control-room-design-system/components.html#c-spinner): Indeterminate loading indicator — role=status with an accessible label; the ring is aria-hidden and honours reduced-motion. For a known fraction use Progress or Meter.
+- [StatusDot](https://alebianco.github.io/control-room-design-system/components.html#c-status-dot): The smallest state readout — a square keyed to the signal ramp, with an aria-label naming the state.
+- [Tag](https://alebianco.github.io/control-room-design-system/components.html#c-tag): Inline status label inside dense content; variants map to the signal ramp.
+- [Timeline](https://alebianco.github.io/control-room-design-system/components.html#c-timeline): Vertical event timeline — an ordered list of moments on a rail, each with a signal-coloured node, machine time, title and optional detail. Presentational; node colour is the semantic signal.
+
+## Machine-readable
+- [catalog.json](https://alebianco.github.io/control-room-design-system/catalog.json): every component — id, category, lifecycle, variants, tokens, keywords, spec anchor
+- [theme-contract.json](https://alebianco.github.io/control-room-design-system/theme-contract.json): the required theme roles a valid theme/brand must define
+- [tokens.json](https://github.com/alebianco/control-room-design-system/blob/main/packages/tokens/tokens/tokens.json): the token source of truth (all themes)
+- [llms-full.txt](https://alebianco.github.io/control-room-design-system/llms-full.txt): this index followed by the full text of every reference doc
+- MCP server: `npx @control-room/mcp` — exposes the catalog, tokens, theme contract and design laws as tools an agent can query ([docs](https://github.com/alebianco/control-room-design-system/blob/main/packages/mcp/README.md))
+
+## Optional
+- [Seeded Pixel-Cat](https://alebianco.github.io/control-room-design-system/reference/seeded-cat/): the identity+state pixel-cat generator
+- [Seeded Pixel-Sigil](https://alebianco.github.io/control-room-design-system/reference/seeded-sigil/): the seeded cyber-sigil glyph
+- [Decoration — ASCII / Pixel](https://alebianco.github.io/control-room-design-system/reference/decoration/): the decorative-only contract for dead space

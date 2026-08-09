@@ -1,0 +1,3268 @@
+{
+  "$schema": "https://schemas.control-room.dev/catalog/v1",
+  "$description": "Control Room component catalog. GENERATED from catalog/registry.json — do not edit by hand. Deterministic (no timestamps) so it can be drift-checked.",
+  "meta": {
+    "name": "Control Room",
+    "version": "1.0.0",
+    "origin": "control-room",
+    "count": 83,
+    "categories": {
+      "action": 2,
+      "behavior": 1,
+      "chart": 4,
+      "forms": 20,
+      "identity": 3,
+      "layout": 10,
+      "media": 9,
+      "navigation": 8,
+      "overlay": 9,
+      "primitives": 2,
+      "state": 15
+    },
+    "lifecycles": {
+      "stable": 82,
+      "experimental": 1
+    }
+  },
+  "entries": [
+    {
+      "id": "button",
+      "name": "Button",
+      "kind": "component",
+      "category": "action",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Primary action with the signature mechanical snap-press; secondary 'controls' variant for utilities.",
+      "spec": "references/components.md#button",
+      "variants": {
+        "emphasis": [
+          "solid",
+          "outline",
+          "ghost",
+          "link"
+        ],
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "accent",
+          "accent2"
+        ],
+        "size": [
+          "md",
+          "sm"
+        ],
+        "state": [
+          "rest",
+          "active",
+          "kick"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-wait",
+          "description": "primary fill"
+        },
+        {
+          "cssVar": "--panel",
+          "description": "controls fill"
+        },
+        {
+          "cssVar": "--brd-heavy",
+          "description": "primary border"
+        },
+        {
+          "cssVar": "--shadow-off",
+          "description": "press offset"
+        },
+        {
+          "cssVar": "--on-sig",
+          "description": "text"
+        }
+      ],
+      "keywords": [
+        "button",
+        "action",
+        "cta",
+        "press",
+        "snap"
+      ]
+    },
+    {
+      "id": "toolbar",
+      "name": "Toolbar",
+      "kind": "component",
+      "category": "action",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "WAI-ARIA toolbar — a labelled group of controls with a single tab stop and roving-tabindex arrows. Two modes: wrap your own controls as children, or pass items[] and (with overflow) collapse the buttons that don't fit into a “⋯ more” menu (priority+, measured via ResizeObserver).",
+      "spec": "references/components.md#toolbar",
+      "variants": {
+        "mode": [
+          "children",
+          "items",
+          "items + overflow"
+        ],
+        "orientation": [
+          "horizontal",
+          "vertical"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-toolbar-bg",
+          "description": "bar surface"
+        },
+        {
+          "cssVar": "--cr-toolbar-border",
+          "description": "bar border"
+        }
+      ],
+      "keywords": []
+    },
+    {
+      "id": "key-hints",
+      "name": "Key hints (peek)",
+      "kind": "component",
+      "category": "behavior",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Headless behavior — while the reveal key (default Alt) is held, sets data-cr-keys on the root so every secondary key hint fades in at once (a peek-all-shortcuts gesture). Renders nothing visible.",
+      "spec": "references/components.md#key-hint",
+      "variants": {
+        "prop": [
+          "revealKey"
+        ]
+      },
+      "tokens": [],
+      "keywords": [
+        "keyboard",
+        "shortcuts",
+        "peek",
+        "reveal",
+        "headless",
+        "behavior"
+      ]
+    },
+    {
+      "id": "bar-chart",
+      "name": "Bar chart",
+      "kind": "component",
+      "category": "chart",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Categorical bar chart — baseline-anchored bars with rounded data-ends, a 2px surface gap, optional dashed target line, monospace value/category labels.",
+      "spec": "references/components.md#bar-chart",
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle",
+          "accent",
+          "accent2"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "plot surface"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "first categorical hue"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "target line"
+        }
+      ],
+      "keywords": [
+        "bar chart",
+        "chart",
+        "graph",
+        "column",
+        "categorical",
+        "magnitude",
+        "target",
+        "budget"
+      ]
+    },
+    {
+      "id": "line-chart",
+      "name": "Line chart",
+      "kind": "component",
+      "category": "chart",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Time-series line chart — recessive grid, non-scaling 2px lines, a data-end dot per series, tick labels and a legend for ≥2 series. One y-axis only.",
+      "spec": "references/components.md#line-chart",
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle",
+          "accent",
+          "accent2"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "plot surface"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "first categorical hue"
+        },
+        {
+          "cssVar": "--ink",
+          "description": "grid (mixed to ~16%)"
+        }
+      ],
+      "keywords": [
+        "line chart",
+        "chart",
+        "graph",
+        "time series",
+        "trend",
+        "series",
+        "plot",
+        "telemetry"
+      ]
+    },
+    {
+      "id": "sparkline",
+      "name": "Sparkline",
+      "kind": "component",
+      "category": "chart",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Inline micro line/area chart for a KPI or table cell — no axes, a crisp non-scaling 2px stroke, a data-end dot. Stretches to fill its box.",
+      "spec": "references/components.md#sparkline",
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle",
+          "accent",
+          "accent2"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "default line/area/dot"
+        },
+        {
+          "cssVar": "--panel",
+          "description": "dot halo"
+        }
+      ],
+      "keywords": [
+        "sparkline",
+        "trend",
+        "chart",
+        "line",
+        "area",
+        "micro",
+        "kpi",
+        "inline"
+      ]
+    },
+    {
+      "id": "stacked-bar",
+      "name": "Stacked bar",
+      "kind": "component",
+      "category": "chart",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A single composition bar (\"stacked progress\") — signal-toned segments sized by share, with a 2px surface gap and a legend (label · value · %). Compose several for a comparison.",
+      "spec": "references/components.md#stacked-bar",
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle",
+          "accent",
+          "accent2"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "a segment tone"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "track"
+        }
+      ],
+      "keywords": [
+        "stacked bar",
+        "stacked progress",
+        "composition",
+        "breakdown",
+        "share",
+        "chart",
+        "segments",
+        "mix"
+      ]
+    },
+    {
+      "id": "calendar",
+      "name": "Calendar",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Month calendar grid — role=grid with roving tabindex (arrows move day/week, PageUp/Down step months, Enter/Space select). Fully controlled, SSR-safe (month + today injected, never read from the clock).",
+      "spec": "references/components.md#calendar",
+      "variants": {
+        "weekStart": [
+          "0 (Sun)",
+          "1 (Mon)"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-calendar-selected-bg",
+          "description": "selected-day fill (a state — Law 2)"
+        },
+        {
+          "cssVar": "--cr-calendar-today-ring",
+          "description": "today ring"
+        }
+      ],
+      "keywords": []
+    },
+    {
+      "id": "checkbox",
+      "name": "Checkbox / Radio",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Square checkbox and radio (radius 0); checked fills to --sig-work with an --on-sig mark.",
+      "spec": "references/components.md#form-controls",
+      "variants": {
+        "kind": [
+          "checkbox",
+          "radio"
+        ],
+        "state": [
+          "unchecked",
+          "checked",
+          "disabled"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "fill"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "checked fill"
+        },
+        {
+          "cssVar": "--on-sig",
+          "description": "mark"
+        }
+      ],
+      "keywords": [
+        "checkbox",
+        "radio",
+        "choice",
+        "form"
+      ]
+    },
+    {
+      "id": "combobox",
+      "name": "Combobox",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Autocomplete — an input (role=combobox) filtering a listbox; ↑/↓ move the active option (aria-activedescendant), Enter selects, Esc closes. Active row shows an ascii ▸ marker.",
+      "spec": "references/components.md#combobox",
+      "variants": {
+        "prop": [
+          "value",
+          "options"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "input"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "active option + ▸ marker"
+        },
+        {
+          "cssVar": "--panel",
+          "description": "list"
+        }
+      ],
+      "keywords": [
+        "combobox",
+        "autocomplete",
+        "typeahead",
+        "select",
+        "search",
+        "dropdown",
+        "form"
+      ]
+    },
+    {
+      "id": "cron-field",
+      "name": "Cron field",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A proper cron-expression form field: label + input + quick presets + a live human-readable readout. The translation is injected as `description` (compute with cronstrue in the host) so the design system stays dependency-free; validity is message-driven via `error` (no hand-set `invalid`), wired like CrField (aria-invalid + aria-describedby).",
+      "spec": "references/components.md#cron-field",
+      "variants": {
+        "prop": [
+          "id",
+          "label",
+          "value",
+          "presets",
+          "description",
+          "error"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "input"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "readout"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error message + border"
+        }
+      ],
+      "keywords": [
+        "cron",
+        "schedule",
+        "crontab",
+        "cronstrue",
+        "expression",
+        "recurring",
+        "form"
+      ]
+    },
+    {
+      "id": "datetime",
+      "name": "Date-time",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A styled native date/time input (datetime-local / date / time) — the browser owns the picker, keyboard, and locale.",
+      "spec": "references/components.md#datetime",
+      "variants": {
+        "kind": [
+          "datetime-local",
+          "date",
+          "time"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "field"
+        },
+        {
+          "cssVar": "--border",
+          "description": "border"
+        }
+      ],
+      "keywords": [
+        "date",
+        "time",
+        "datetime",
+        "calendar",
+        "picker",
+        "schedule",
+        "form"
+      ]
+    },
+    {
+      "id": "file-upload",
+      "name": "FileUpload",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "File dropzone over a real native <input type=file> — click/keyboard opens the picker, drag-drop is accepted, dragover is announced via data-state. Selected files listed.",
+      "spec": "references/components.md#file-upload",
+      "variants": {
+        "state": [
+          "idle",
+          "dragover"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-fileupload-active-border",
+          "description": "dragover accent border (a state — Law 2)"
+        }
+      ],
+      "keywords": []
+    },
+    {
+      "id": "form",
+      "name": "Form",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Schema-driven form. Feed it a Form Model + a validate() function (built by the headless forms core from an ArkType type OR a JSON Schema) and it renders and validates the whole form — value/touched/error state, validate on blur + submit, re-check on change once touched.",
+      "spec": "references/forms.md",
+      "variants": {
+        "kind": [
+          "text",
+          "email",
+          "url",
+          "number",
+          "select",
+          "textarea",
+          "checkbox",
+          "autocomplete",
+          "group",
+          "array"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--ink",
+          "description": "labels"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error border/marker/required"
+        },
+        {
+          "cssVar": "--board",
+          "description": "control surface"
+        }
+      ],
+      "keywords": [
+        "form",
+        "form builder",
+        "validation",
+        "validator",
+        "arktype",
+        "json schema",
+        "schema",
+        "fields",
+        "nested",
+        "array",
+        "autocomplete",
+        "combobox"
+      ]
+    },
+    {
+      "id": "form-field",
+      "name": "Form Field",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Label + control + hint/error wrapper; error state shows a non-color ✗ marker.",
+      "spec": "references/components.md#form-controls",
+      "variants": {
+        "state": [
+          "default",
+          "error"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--ink",
+          "description": "label"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "hint"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error border/marker"
+        }
+      ],
+      "keywords": [
+        "field",
+        "form",
+        "label",
+        "hint",
+        "error"
+      ]
+    },
+    {
+      "id": "input",
+      "name": "Text Input",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Single-line text input on a recessed board surface; square, inked, focus-ringed.",
+      "spec": "references/components.md#form-controls",
+      "variants": {
+        "state": [
+          "rest",
+          "focus",
+          "disabled",
+          "error"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "border"
+        },
+        {
+          "cssVar": "--ink",
+          "description": "text"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "placeholder"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "focus ring"
+        }
+      ],
+      "keywords": [
+        "input",
+        "text",
+        "field",
+        "form"
+      ]
+    },
+    {
+      "id": "input-group",
+      "name": "InputGroup",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "An input flanked by decorative prefix / suffix addons (protocol, currency, unit). Addons are aria-hidden; give the field a label. For a validated field use Field or Form.",
+      "spec": "references/components.md#input-group",
+      "variants": {
+        "prop": [
+          "prefix",
+          "suffix"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "addon fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "contour"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "addon text"
+        }
+      ],
+      "keywords": [
+        "input group",
+        "addon",
+        "prefix",
+        "suffix",
+        "unit",
+        "affix"
+      ]
+    },
+    {
+      "id": "number-field",
+      "name": "Number field",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Number input with −/+ steppers, clamped to min/max; the native input keeps its own keyboard.",
+      "spec": "references/components.md#number-field",
+      "variants": {
+        "prop": [
+          "value",
+          "min",
+          "max",
+          "step"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "field"
+        },
+        {
+          "cssVar": "--panel",
+          "description": "stepper buttons"
+        },
+        {
+          "cssVar": "--state-disabled-op",
+          "description": "disabled at bounds"
+        }
+      ],
+      "keywords": [
+        "number",
+        "stepper",
+        "spinner",
+        "input",
+        "quantity",
+        "form"
+      ]
+    },
+    {
+      "id": "pin-input",
+      "name": "PinInput",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "One-time-code / PIN entry — N single-digit cells acting as one field; typing advances, Backspace steps back, arrows move, paste fills across. role=group with per-cell labels.",
+      "spec": "references/components.md#pin-input",
+      "variants": {
+        "prop": [
+          "length"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "cell fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "cell border"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "focused cell"
+        }
+      ],
+      "keywords": [
+        "pin",
+        "otp",
+        "one-time-code",
+        "code",
+        "verification",
+        "2fa"
+      ]
+    },
+    {
+      "id": "radio-group",
+      "name": "Radio group",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Single-choice group (role=radiogroup) with roving tabindex + arrow-key nav. Square radios (radius 0) — a filled inner square marks the choice.",
+      "spec": "references/components.md#radio-group",
+      "variants": {
+        "prop": [
+          "value",
+          "row"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "checked mark"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "box fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "box border"
+        }
+      ],
+      "keywords": [
+        "radio",
+        "radiogroup",
+        "choice",
+        "option",
+        "single-select",
+        "form"
+      ]
+    },
+    {
+      "id": "rating",
+      "name": "Rating",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Star-rating control — a radiogroup with roving tabindex (interactive) or an inert score readout (readonly). Geometric-glyph marks (no icon font); fill encodes the value.",
+      "spec": "references/components.md#rating",
+      "variants": {
+        "mode": [
+          "interactive",
+          "readonly"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-rating-on",
+          "description": "filled-star colour (a state, not a per-item hue — Law 2)"
+        },
+        {
+          "cssVar": "--cr-rating-off",
+          "description": "empty-star colour"
+        }
+      ],
+      "keywords": []
+    },
+    {
+      "id": "select",
+      "name": "Select",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Native select styled to the chassis.",
+      "spec": "references/components.md#form-controls",
+      "variants": {
+        "state": [
+          "rest",
+          "focus",
+          "disabled",
+          "error"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "fill"
+        },
+        {
+          "cssVar": "--ink",
+          "description": "text"
+        }
+      ],
+      "keywords": [
+        "select",
+        "dropdown",
+        "form"
+      ]
+    },
+    {
+      "id": "slider",
+      "name": "Slider",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Styled native range input — square track + thumb, keyboard for free (arrows, Home/End, PageUp/Down).",
+      "spec": "references/components.md#slider",
+      "variants": {
+        "prop": [
+          "value",
+          "min",
+          "max",
+          "step"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "thumb"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "track"
+        },
+        {
+          "cssVar": "--border",
+          "description": "track/thumb border"
+        }
+      ],
+      "keywords": [
+        "slider",
+        "range",
+        "threshold",
+        "input",
+        "numeric",
+        "form"
+      ]
+    },
+    {
+      "id": "switch",
+      "name": "Switch",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "button[role=switch] toggle; on = --sig-done track.",
+      "spec": "references/components.md#form-controls",
+      "variants": {
+        "state": [
+          "off",
+          "on",
+          "disabled"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "off track"
+        },
+        {
+          "cssVar": "--sig-done",
+          "description": "on track"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "off knob"
+        },
+        {
+          "cssVar": "--on-sig",
+          "description": "on knob"
+        }
+      ],
+      "keywords": [
+        "switch",
+        "toggle",
+        "form"
+      ]
+    },
+    {
+      "id": "tags-input",
+      "name": "TagsInput",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Token entry — Enter or comma adds a tag, Backspace on an empty field removes the last, each tag has a labelled remove button. role=group; duplicates ignored.",
+      "spec": "references/components.md#tags-input",
+      "variants": {
+        "prop": [
+          "value"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "tag fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "contour"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "remove affordance"
+        }
+      ],
+      "keywords": [
+        "tags",
+        "tags input",
+        "tokens",
+        "chips input",
+        "multi",
+        "keywords"
+      ]
+    },
+    {
+      "id": "textarea",
+      "name": "Textarea",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Multi-line text input; vertically resizable.",
+      "spec": "references/components.md#form-controls",
+      "variants": {
+        "state": [
+          "rest",
+          "focus",
+          "disabled",
+          "error"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "fill"
+        },
+        {
+          "cssVar": "--ink",
+          "description": "text"
+        }
+      ],
+      "keywords": [
+        "textarea",
+        "multiline",
+        "form"
+      ]
+    },
+    {
+      "id": "toggle-chip",
+      "name": "ToggleChip",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Interactive multi-select filter pill (role=checkbox). Distinct from the static Chip and single-select Segmented; several toggle independently. On/off announced via aria-checked + data-state.",
+      "spec": "references/components.md#togglechip",
+      "variants": {
+        "state": [
+          "off",
+          "on"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-togglechip-on-bg",
+          "description": "ON-state fill (a state, not a per-option identity hue — Law 2)"
+        }
+      ],
+      "keywords": []
+    },
+    {
+      "id": "avatar",
+      "name": "Avatar",
+      "kind": "component",
+      "category": "identity",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Image with an initials fallback and optional presence dot. With a src it's an img[alt=name]; without one the wrapper is role=img[aria-label=name] over the initials.",
+      "spec": "references/components.md#avatar",
+      "variants": {
+        "status": [
+          "online",
+          "idle",
+          "busy",
+          "offline"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "fallback fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "ring"
+        },
+        {
+          "cssVar": "--sig-done",
+          "description": "online dot"
+        }
+      ],
+      "keywords": [
+        "avatar",
+        "user",
+        "profile",
+        "initials",
+        "presence",
+        "identity"
+      ]
+    },
+    {
+      "id": "hero",
+      "name": "Hero",
+      "kind": "component",
+      "category": "identity",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The one region that keys to the state needing attention; keys to --stage when calm.",
+      "spec": "references/components.md#hero-keyed-focal-region",
+      "variants": {
+        "state": [
+          "accent",
+          "wait",
+          "err",
+          "calm"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-accent",
+          "description": "default keyed fill"
+        },
+        {
+          "cssVar": "--sig-wait",
+          "description": "wait state fill"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error state fill"
+        },
+        {
+          "cssVar": "--stage",
+          "description": "calm state fill"
+        },
+        {
+          "cssVar": "--on-sig",
+          "description": "text on fill"
+        }
+      ],
+      "keywords": [
+        "hero",
+        "keyed",
+        "focal",
+        "attention",
+        "state"
+      ]
+    },
+    {
+      "id": "masthead",
+      "name": "Masthead",
+      "kind": "component",
+      "category": "identity",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The stark title card — page identity and headline state in the display register; optional drip host.",
+      "spec": "references/components.md#masthead",
+      "variants": {
+        "glitch": [
+          "off",
+          "drip"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "fill"
+        },
+        {
+          "cssVar": "--brd-heavy",
+          "description": "border weight"
+        },
+        {
+          "cssVar": "--shadow-off-lg",
+          "description": "large offset shadow"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "eyebrow (or --stage when calm)"
+        }
+      ],
+      "keywords": [
+        "masthead",
+        "title",
+        "header",
+        "hero-title",
+        "display"
+      ]
+    },
+    {
+      "id": "accordion",
+      "name": "Accordion",
+      "kind": "component",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Collapsible sections — header buttons (aria-expanded + aria-controls) reveal region panels. single = exclusive; ↑/↓/Home/End move between headers.",
+      "spec": "references/components.md#accordion",
+      "variants": {
+        "prop": [
+          "single",
+          "defaultOpen"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--border",
+          "description": "dividers"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "open chevron"
+        },
+        {
+          "cssVar": "--state-hover-mix",
+          "description": "header hover"
+        }
+      ],
+      "keywords": [
+        "accordion",
+        "collapse",
+        "collapsible",
+        "disclosure",
+        "expander",
+        "sections"
+      ]
+    },
+    {
+      "id": "bezel",
+      "name": "Bezel + Screen",
+      "kind": "component",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The only legal host for texture (Law 6) — a physical instrument enclosing a recessed, halftoned screen.",
+      "spec": "references/components.md#bezel--screen",
+      "variants": {},
+      "tokens": [
+        {
+          "cssVar": "--brd-brush",
+          "description": "casing"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "casing fill"
+        },
+        {
+          "cssVar": "--board",
+          "description": "screen fill"
+        },
+        {
+          "cssVar": "--halftone",
+          "description": "screen texture"
+        },
+        {
+          "cssVar": "--halftone-size",
+          "description": "texture cell"
+        }
+      ],
+      "keywords": [
+        "bezel",
+        "screen",
+        "crt",
+        "texture",
+        "halftone",
+        "instrument"
+      ]
+    },
+    {
+      "id": "breach",
+      "name": "Breach",
+      "kind": "component",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The one sanctioned rule-break per screen (Law 9) — soft corner, colour glow, blurred blob, optional gradient wash — to spotlight the single most exceptional item.",
+      "spec": "references/components.md#breach",
+      "variants": {
+        "signal": [
+          "accent",
+          "work",
+          "wait",
+          "done",
+          "err",
+          "accent2"
+        ],
+        "flag": [
+          "wash",
+          "alive"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--breach-radius",
+          "description": "the soft corner"
+        },
+        {
+          "cssVar": "--breach-blur",
+          "description": "blurred-blob softness"
+        },
+        {
+          "cssVar": "--breach-glow-size",
+          "description": "glow radius"
+        },
+        {
+          "cssVar": "--sig-accent",
+          "description": "default glow hue"
+        }
+      ],
+      "keywords": [
+        "breach",
+        "glow",
+        "gradient",
+        "blob",
+        "soft",
+        "exception",
+        "spotlight",
+        "law-9",
+        "milestone"
+      ]
+    },
+    {
+      "id": "data-list",
+      "name": "Data list",
+      "kind": "utility",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Key → value readout (dl/dt/dd) on a two-column grid — mono/label keys, data-register values. For detail panels.",
+      "spec": "references/components.md#data-list",
+      "variants": {
+        "class": [
+          "cr-dl",
+          "cr-dl__k",
+          "cr-dl__v"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--muted",
+          "description": "keys"
+        },
+        {
+          "cssVar": "--ink",
+          "description": "values"
+        }
+      ],
+      "keywords": [
+        "data",
+        "list",
+        "description",
+        "definition",
+        "key-value",
+        "detail"
+      ]
+    },
+    {
+      "id": "datagrid",
+      "name": "Data grid",
+      "kind": "component",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A dense, VIRTUALIZED data grid for large datasets: only the rows in (or near) the viewport are in the DOM, so thousands of rows scroll smoothly. Fixed row height; sortable headers (asc → desc → none, stable); optional row selection (checkbox column + select-all + aria-selected); sticky header; grid a11y (role=grid/row/columnheader/gridcell, aria-sort, aria-rowcount). Div-grid (not a <table>) so virtualization offsets cleanly across all targets.",
+      "spec": "references/components.md#data-grid",
+      "variants": {
+        "prop": [
+          "columns",
+          "rows",
+          "selectable",
+          "height",
+          "rowHeight",
+          "rowKey"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "grid + row fill"
+        },
+        {
+          "cssVar": "--panel",
+          "description": "sticky header"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "selected row + sort glyph"
+        }
+      ],
+      "keywords": [
+        "data grid",
+        "datagrid",
+        "table",
+        "virtualized",
+        "virtualization",
+        "windowing",
+        "sortable",
+        "selection",
+        "rows",
+        "dataset",
+        "sticky header"
+      ]
+    },
+    {
+      "id": "instrument",
+      "name": "Instrument shell",
+      "kind": "block",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The dashboard chassis — composes the nav rail and a board (masthead/hero + panels).",
+      "spec": "references/components.md#instrument-shell",
+      "variants": {},
+      "tokens": [
+        {
+          "cssVar": "--brd-brush",
+          "description": "outer chassis"
+        },
+        {
+          "cssVar": "--board",
+          "description": "board fill"
+        },
+        {
+          "cssVar": "--shadow-off-lg",
+          "description": "chassis shadow"
+        }
+      ],
+      "keywords": [
+        "instrument",
+        "shell",
+        "layout",
+        "dashboard",
+        "app-frame"
+      ]
+    },
+    {
+      "id": "panel",
+      "name": "Panel",
+      "kind": "component",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The default container for a group of related data — the system's workhorse surface.",
+      "spec": "references/components.md#panel",
+      "variants": {
+        "weight": [
+          "default",
+          "major"
+        ],
+        "inset": [
+          "false",
+          "true"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "surface fill"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "inset variant fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "contour"
+        },
+        {
+          "cssVar": "--brd",
+          "description": "border weight (default)"
+        },
+        {
+          "cssVar": "--brd-heavy",
+          "description": "border weight (major)"
+        },
+        {
+          "cssVar": "--shadow-off",
+          "description": "hard offset shadow"
+        },
+        {
+          "cssVar": "--shadow-col",
+          "description": "shadow color"
+        }
+      ],
+      "keywords": [
+        "panel",
+        "card",
+        "container",
+        "surface",
+        "box"
+      ]
+    },
+    {
+      "id": "resizable",
+      "name": "Resizable",
+      "kind": "component",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Two panes with a draggable divider. Panes are children (CSS-grid sized); the handle is a WAI-ARIA window splitter (role=separator, focusable, aria-valuenow, arrow/Home/End keys). Pointer-capture drag.",
+      "spec": "references/components.md#resizable",
+      "variants": {
+        "orientation": [
+          "horizontal",
+          "vertical"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--border",
+          "description": "divider + frame"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "active divider"
+        }
+      ],
+      "keywords": [
+        "resizable",
+        "splitter",
+        "split pane",
+        "divider",
+        "resize",
+        "panels"
+      ]
+    },
+    {
+      "id": "scroll-area",
+      "name": "ScrollArea",
+      "kind": "component",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A container with cross-browser styled scrollbars (thin, inked, neon thumb) that keep the Control Room look. Keyboard-scrollable; with a label it's a named role=group.",
+      "spec": "references/components.md#scroll-area",
+      "variants": {
+        "axis": [
+          "y",
+          "x",
+          "both"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "scrollbar thumb"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "scrollbar track"
+        }
+      ],
+      "keywords": [
+        "scroll area",
+        "scrollbar",
+        "overflow",
+        "scroll",
+        "viewport"
+      ]
+    },
+    {
+      "id": "table",
+      "name": "Table",
+      "kind": "component",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Dense operator table on the same chassis as a panel; mono/label headers, data-register cells. Optional column sort, row selection (checkbox + aria-selected), and a sticky header.",
+      "spec": "references/components.md#table",
+      "variants": {
+        "prop": [
+          "sortable",
+          "selectable",
+          "sticky"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "outer border"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "header text"
+        },
+        {
+          "cssVar": "--brd-hair",
+          "description": "row separators"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "sort indicator + selected-row wash"
+        },
+        {
+          "cssVar": "--state-hover-mix",
+          "description": "row hover"
+        }
+      ],
+      "keywords": [
+        "table",
+        "grid",
+        "data",
+        "rows",
+        "columns",
+        "sort",
+        "select",
+        "sticky",
+        "operator"
+      ]
+    },
+    {
+      "id": "ascii",
+      "name": "Ascii",
+      "kind": "component",
+      "category": "media",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Seeded ASCII/Unicode density field (braille/block/ramp) for dead space — whisper contrast, aria-hidden, mask-faded off content.",
+      "spec": "references/decoration.md",
+      "variants": {
+        "variant": [
+          "braille",
+          "block",
+          "ramp"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--muted",
+          "description": "glyph ink"
+        },
+        {
+          "cssVar": "--field",
+          "description": "related background field"
+        }
+      ],
+      "keywords": [
+        "ascii",
+        "braille",
+        "block",
+        "density",
+        "decoration",
+        "background",
+        "seeded",
+        "dead-space"
+      ]
+    },
+    {
+      "id": "ascii-detail",
+      "name": "ASCII separators & lists",
+      "kind": "utility",
+      "category": "media",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Character-flavored detail utilities: .cr-sep / .cr-sep-label box-rule separators (dashed/dotted, labeled), .cr-list ascii-marker lists (▸ · » +), and .cr-leader dot-leader rows (label ····· value).",
+      "spec": "references/components.md#ascii-detail",
+      "variants": {
+        "class": [
+          "cr-sep",
+          "cr-sep--dot",
+          "cr-sep--double",
+          "cr-sep-label",
+          "cr-list",
+          "cr-list--dot",
+          "cr-list--tick",
+          "cr-list--plus",
+          "cr-leader"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--muted",
+          "description": "rule / marker ink"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "▸ / » markers"
+        }
+      ],
+      "keywords": [
+        "separator",
+        "divider",
+        "rule",
+        "list",
+        "leader",
+        "ascii",
+        "dot-leader",
+        "marker",
+        "bullet"
+      ]
+    },
+    {
+      "id": "carousel",
+      "name": "Carousel",
+      "kind": "component",
+      "category": "media",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Slide carousel with the WAI-ARIA carousel pattern — labelled region, prev/next, dot indicators, aria-live viewport, ←/→ navigation. Controlled via index/onIndex.",
+      "spec": "references/components.md#carousel",
+      "variants": {
+        "dots": [
+          "true",
+          "false"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-carousel-dot-active",
+          "description": "active-dot accent (a state — Law 2)"
+        }
+      ],
+      "keywords": []
+    },
+    {
+      "id": "chrome",
+      "name": "Chrome",
+      "kind": "component",
+      "category": "media",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Seeded hardware chrome strip — a pixel-art metal bar with deterministically varied fasteners, panel seams, wear scratches, and an indicator LED.",
+      "spec": "references/components.md#seeded-chrome",
+      "variants": {
+        "prop": [
+          "seed",
+          "width"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--rail-ink",
+          "description": "metal highlight (kit pieces)"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "LED default hue"
+        }
+      ],
+      "keywords": [
+        "chrome",
+        "hardware",
+        "seeded",
+        "rivet",
+        "bolt",
+        "screw",
+        "led",
+        "pixel",
+        "wear"
+      ]
+    },
+    {
+      "id": "decoration-utilities",
+      "name": "Decoration utilities",
+      "kind": "utility",
+      "category": "media",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The FUI/decoration utility layer for dead space and chassis edges: styled scrollbar, tick-ruler edge, whisper drafting field, hazard stripe, and the Breach blur-blob. All aria-hidden, non-interactive, whisper contrast — never on a content field.",
+      "spec": "references/decoration.md",
+      "variants": {
+        "class": [
+          "cr-scrollbar",
+          "cr-scrollbar--local",
+          "cr-ruler",
+          "cr-bg--field",
+          "cr-stripe",
+          "cr-blob",
+          "cr-trim",
+          "cr-trim--4",
+          "cr-mark"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--muted",
+          "description": "ruler ticks, trim brackets"
+        },
+        {
+          "cssVar": "--field",
+          "description": "drafting-field background"
+        },
+        {
+          "cssVar": "--sig-wait",
+          "description": "hazard stripe hue"
+        },
+        {
+          "cssVar": "--border",
+          "description": "registration-mark ink"
+        }
+      ],
+      "keywords": [
+        "scrollbar",
+        "ruler",
+        "field",
+        "stripe",
+        "blob",
+        "trim",
+        "mark",
+        "registration",
+        "fui",
+        "decoration",
+        "dead-space"
+      ]
+    },
+    {
+      "id": "icon",
+      "name": "Icon",
+      "kind": "component",
+      "category": "media",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The house operational glyph set — 24×24, currentColor, single 2px stroke, square caps to match the neobrutalist geometry. Decorative by default; pass a label to name it.",
+      "spec": "references/components.md#icon",
+      "variants": {
+        "name": [
+          "play",
+          "pause",
+          "stop",
+          "retry",
+          "deploy",
+          "scan",
+          "search",
+          "alert",
+          "error",
+          "done",
+          "clock",
+          "cpu",
+          "logs",
+          "filter",
+          "sliders",
+          "close",
+          "chevron",
+          "plus",
+          "minus",
+          "trash",
+          "external",
+          "copy",
+          "session",
+          "menu"
+        ],
+        "size": [
+          "16",
+          "20",
+          "24"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--ink",
+          "description": "inherited stroke colour (currentColor)"
+        }
+      ],
+      "keywords": [
+        "icon",
+        "glyph",
+        "svg",
+        "symbol",
+        "stroke",
+        "operational"
+      ]
+    },
+    {
+      "id": "seeded-cat",
+      "name": "Seeded pixel-cat",
+      "kind": "component",
+      "category": "media",
+      "lifecycle": "experimental",
+      "origin": "control-room",
+      "description": "Identity+state sprite: fur/markings from the session id, pose from state; deterministic paint() to canvas.",
+      "spec": "references/seeded-cat.md",
+      "variants": {
+        "state": [
+          "working",
+          "waiting",
+          "idle",
+          "error",
+          "done"
+        ],
+        "frame": [
+          "0",
+          "1",
+          "2",
+          "3"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "eye color by state (via stateHex)"
+        }
+      ],
+      "keywords": [
+        "cat",
+        "sprite",
+        "seeded",
+        "identity",
+        "pixel",
+        "canvas",
+        "avatar"
+      ]
+    },
+    {
+      "id": "sigil",
+      "name": "Sigil",
+      "kind": "component",
+      "category": "media",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Seeded cyber-sigil — a retro-futuristic pixel glyph generated from a seed; optional state keys the hue.",
+      "spec": "references/seeded-sigil.md",
+      "variants": {
+        "state": [
+          "working",
+          "waiting",
+          "idle",
+          "error",
+          "done"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "working hue"
+        },
+        {
+          "cssVar": "--sig-accent",
+          "description": "default glyph hue (seeded)"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error hue"
+        },
+        {
+          "cssVar": "--sig-accent-2",
+          "description": "done/acid hue"
+        }
+      ],
+      "keywords": [
+        "sigil",
+        "pixel",
+        "cyber-sigilism",
+        "pixel-art",
+        "seeded",
+        "identity",
+        "glyph"
+      ]
+    },
+    {
+      "id": "telemetry",
+      "name": "Telemetry",
+      "kind": "component",
+      "category": "media",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Seeded NERV-style decorative telemetry string (hex id, byte, latency, mini bar) for a frame corner. Decoration, not data.",
+      "spec": "references/decoration.md",
+      "variants": {
+        "prop": [
+          "seed"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--muted",
+          "description": "text"
+        }
+      ],
+      "keywords": [
+        "telemetry",
+        "fui",
+        "hud",
+        "string",
+        "seeded",
+        "decoration",
+        "nerv"
+      ]
+    },
+    {
+      "id": "breadcrumb",
+      "name": "Breadcrumb",
+      "kind": "component",
+      "category": "navigation",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Navigation trail — ascii \"/\" separators from CSS; the last crumb is the current page (aria-current).",
+      "spec": "references/components.md#breadcrumb",
+      "variants": {
+        "prop": [
+          "items"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--muted",
+          "description": "crumbs + separators"
+        },
+        {
+          "cssVar": "--ink",
+          "description": "current page"
+        }
+      ],
+      "keywords": [
+        "breadcrumb",
+        "trail",
+        "nav",
+        "path",
+        "hierarchy",
+        "ascii"
+      ]
+    },
+    {
+      "id": "overflow",
+      "name": "Overflow",
+      "kind": "component",
+      "category": "navigation",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "An a11y-correct \"+N more\" disclosure for truncated lists; a button (aria-expanded) with onToggle, or an inert count. The accessible name always includes the noun.",
+      "spec": "references/components.md#overflow",
+      "variants": {
+        "mode": [
+          "toggle",
+          "static"
+        ]
+      },
+      "tokens": [],
+      "keywords": []
+    },
+    {
+      "id": "pagination",
+      "name": "Pagination",
+      "kind": "component",
+      "category": "navigation",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Controlled pager — prev/next plus a windowed run of page numbers with ellipses; current page keyed and aria-current.",
+      "spec": "references/components.md#pagination",
+      "variants": {
+        "prop": [
+          "page",
+          "total"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "button fill"
+        },
+        {
+          "cssVar": "--brd-hair",
+          "description": "button border"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "current page"
+        },
+        {
+          "cssVar": "--state-disabled-op",
+          "description": "disabled prev/next"
+        }
+      ],
+      "keywords": [
+        "pagination",
+        "pager",
+        "pages",
+        "prev",
+        "next",
+        "paginate"
+      ]
+    },
+    {
+      "id": "rail",
+      "name": "Rail + Nav",
+      "kind": "component",
+      "category": "navigation",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Primary navigation — persistent left chassis; active item keyed to accent, count badge to its state.",
+      "spec": "references/components.md#rail--nav",
+      "variants": {
+        "item": [
+          "default",
+          "active"
+        ],
+        "badge": [
+          "off",
+          "on"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--rail",
+          "description": "rail background"
+        },
+        {
+          "cssVar": "--rail-ink",
+          "description": "rail text"
+        },
+        {
+          "cssVar": "--sig-accent",
+          "description": "active item"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "attention badge"
+        },
+        {
+          "cssVar": "--brd-heavy",
+          "description": "right border"
+        }
+      ],
+      "keywords": [
+        "rail",
+        "nav",
+        "navigation",
+        "sidebar",
+        "menu",
+        "badge"
+      ]
+    },
+    {
+      "id": "segmented",
+      "name": "Segmented control",
+      "kind": "component",
+      "category": "navigation",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Single-select connected button bar (role=radiogroup, roving tabindex; ←/→/Home/End). Same semantics as a radio group, distinct connected visual.",
+      "spec": "references/components.md#segmented",
+      "variants": {
+        "prop": [
+          "value"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "selected segment"
+        },
+        {
+          "cssVar": "--panel",
+          "description": "segment fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "dividers"
+        }
+      ],
+      "keywords": [
+        "segmented",
+        "toggle-group",
+        "selectbutton",
+        "switcher",
+        "filter",
+        "single-select"
+      ]
+    },
+    {
+      "id": "stepper",
+      "name": "Stepper",
+      "kind": "component",
+      "category": "navigation",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Numbered progress indicator for a multi-step flow — ordered list with done/active/upcoming states; current step carries aria-current, optional navigable step buttons.",
+      "spec": "references/components.md#stepper",
+      "variants": {
+        "state": [
+          "upcoming",
+          "active",
+          "done"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "active step"
+        },
+        {
+          "cssVar": "--sig-done",
+          "description": "completed step"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "upcoming step"
+        },
+        {
+          "cssVar": "--border",
+          "description": "connector line"
+        }
+      ],
+      "keywords": [
+        "stepper",
+        "wizard",
+        "steps",
+        "progress",
+        "multi-step",
+        "flow"
+      ]
+    },
+    {
+      "id": "tabs",
+      "name": "Tabs",
+      "kind": "component",
+      "category": "navigation",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Tab strip (role=tablist) with a keyed underline on the active tab; scalar active-index state.",
+      "spec": "references/components.md#tabs",
+      "variants": {
+        "prop": [
+          "active"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--border",
+          "description": "baseline"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "active underline"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "inactive label"
+        }
+      ],
+      "keywords": [
+        "tabs",
+        "tablist",
+        "nav",
+        "switcher",
+        "segment"
+      ]
+    },
+    {
+      "id": "tree",
+      "name": "Tree",
+      "kind": "component",
+      "category": "navigation",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Hierarchical tree (role=tree) for nested data like a worker→session fleet. Rendered as a flat list of visible rows; full keyboard nav (arrows expand/collapse/step, Home/End) and aria-level/aria-expanded.",
+      "spec": "references/components.md#tree",
+      "variants": {
+        "prop": [
+          "nodes",
+          "defaultExpanded"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "open twist + selection"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "twist / leaf marker"
+        },
+        {
+          "cssVar": "--state-hover-mix",
+          "description": "row hover"
+        }
+      ],
+      "keywords": [
+        "tree",
+        "treeview",
+        "hierarchy",
+        "nested",
+        "fleet",
+        "expand",
+        "collapse"
+      ]
+    },
+    {
+      "id": "drawer",
+      "name": "Drawer",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "An edge sheet on the native dialog (focus-trap + Esc + backdrop) — slides from the left or right, full height. For detail/inspector panels.",
+      "spec": "references/components.md#drawer",
+      "variants": {
+        "side": [
+          "left",
+          "right"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "sheet fill"
+        },
+        {
+          "cssVar": "--brd-brush",
+          "description": "edge border"
+        },
+        {
+          "cssVar": "--shadow-off-lg",
+          "description": "sheet shadow"
+        }
+      ],
+      "keywords": [
+        "drawer",
+        "sheet",
+        "sidebar",
+        "panel",
+        "off-canvas",
+        "inspector"
+      ]
+    },
+    {
+      "id": "hover-card",
+      "name": "Hover card",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A rich hover/focus card for structured content (Tooltip is for plain text, Menu for actions). CSS-driven reveal with an open delay; the trigger is focusable so keyboard users get it too.",
+      "spec": "references/components.md#hover-card",
+      "variants": {
+        "align": [
+          "left",
+          "right"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "card fill"
+        },
+        {
+          "cssVar": "--shadow-off",
+          "description": "card shadow"
+        },
+        {
+          "cssVar": "--z-overlay",
+          "description": "stacking layer"
+        }
+      ],
+      "keywords": [
+        "hover",
+        "card",
+        "hovercard",
+        "preview",
+        "richtooltip",
+        "popover"
+      ]
+    },
+    {
+      "id": "menu",
+      "name": "Menu",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Dropdown menu — a trigger toggles a role=menu panel; a transparent full-viewport scrim closes it on outside click (no global listeners). Optional danger items.",
+      "spec": "references/components.md#menu",
+      "variants": {
+        "align": [
+          "left",
+          "right"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "panel fill"
+        },
+        {
+          "cssVar": "--shadow-off-sm",
+          "description": "panel shadow"
+        },
+        {
+          "cssVar": "--state-hover-mix",
+          "description": "item hover"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "danger item"
+        }
+      ],
+      "keywords": [
+        "menu",
+        "dropdown",
+        "popover",
+        "actions",
+        "overflow",
+        "kebab"
+      ]
+    },
+    {
+      "id": "modal",
+      "name": "Modal",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Native <dialog> modal; browser owns focus-trap, Esc, and backdrop.",
+      "spec": "references/components.md#modal",
+      "variants": {
+        "state": [
+          "closed",
+          "open"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "surface"
+        },
+        {
+          "cssVar": "--border",
+          "description": "frame"
+        },
+        {
+          "cssVar": "--shadow-col",
+          "description": "hard offset shadow"
+        },
+        {
+          "cssVar": "--mass",
+          "description": "::backdrop scrim"
+        }
+      ],
+      "keywords": [
+        "modal",
+        "dialog",
+        "overlay",
+        "popup"
+      ]
+    },
+    {
+      "id": "palette",
+      "name": "Command palette",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A ⌘K command palette on the native dialog (focus-trap + Esc + backdrop). The input is a combobox driving a listbox — focus stays in the field while ↑/↓ move the active option (aria-activedescendant), Enter runs it; live query filter with per-command keycap hints.",
+      "spec": "references/components.md#command-palette",
+      "variants": {
+        "prop": [
+          "open",
+          "commands",
+          "placeholder"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "palette fill"
+        },
+        {
+          "cssVar": "--board",
+          "description": "search field"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "active option"
+        },
+        {
+          "cssVar": "--shadow-off-lg",
+          "description": "palette shadow"
+        }
+      ],
+      "keywords": [
+        "command",
+        "palette",
+        "cmdk",
+        "quick-open",
+        "spotlight",
+        "combobox",
+        "search",
+        "shortcuts"
+      ]
+    },
+    {
+      "id": "popover",
+      "name": "Popover",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Generic anchored overlay for arbitrary content — a trigger toggles a floating panel; scrim closes on outside click, Esc closes and returns focus. Use Menu for a list of actions.",
+      "spec": "references/components.md#popover",
+      "variants": {
+        "align": [
+          "left",
+          "right"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "panel fill"
+        },
+        {
+          "cssVar": "--shadow-off",
+          "description": "panel shadow"
+        },
+        {
+          "cssVar": "--z-overlay",
+          "description": "stacking layer"
+        }
+      ],
+      "keywords": [
+        "popover",
+        "overlay",
+        "anchored",
+        "floating",
+        "flyout",
+        "hovercard"
+      ]
+    },
+    {
+      "id": "toast",
+      "name": "Toast",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Transient status readout keyed to a machine signal; err announces assertively.",
+      "spec": "references/components.md#toast",
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "default / work fill"
+        },
+        {
+          "cssVar": "--sig-done",
+          "description": "done fill"
+        },
+        {
+          "cssVar": "--sig-wait",
+          "description": "wait fill"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "err fill"
+        },
+        {
+          "cssVar": "--on-sig",
+          "description": "text on work/wait/done"
+        },
+        {
+          "cssVar": "--on-err",
+          "description": "text on err"
+        }
+      ],
+      "keywords": [
+        "toast",
+        "notification",
+        "status",
+        "snackbar",
+        "alert"
+      ]
+    },
+    {
+      "id": "toast-region",
+      "name": "Toast region",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A fixed screen corner that stacks live toasts (parent owns the list). Each toast is its own live region — err announces assertively — so nothing double-announces. Bottom corners stack newest nearest the edge.",
+      "spec": "references/components.md#toast-region",
+      "variants": {
+        "position": [
+          "tr",
+          "br",
+          "tl",
+          "bl"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--z-overlay",
+          "description": "stacking layer"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error toast fill"
+        }
+      ],
+      "keywords": [
+        "toast",
+        "region",
+        "stack",
+        "notifications",
+        "snackbar",
+        "live"
+      ]
+    },
+    {
+      "id": "tooltip",
+      "name": "Tooltip",
+      "kind": "component",
+      "category": "overlay",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Hint bubble revealed on hover/focus; role=tooltip wired via aria-describedby, pure-CSS reveal.",
+      "spec": "references/components.md#tooltip",
+      "variants": {
+        "state": [
+          "hidden",
+          "shown"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "bubble surface"
+        },
+        {
+          "cssVar": "--border",
+          "description": "frame"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "dotted trigger underline"
+        },
+        {
+          "cssVar": "--z-overlay",
+          "description": "stacking"
+        }
+      ],
+      "keywords": [
+        "tooltip",
+        "hint",
+        "popover",
+        "describedby"
+      ]
+    },
+    {
+      "id": "diagonal-primitives",
+      "name": "Diagonal primitives",
+      "kind": "block",
+      "category": "primitives",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Four shapes with four fixed meanings (Law 4): chevron=direction, notch=state, wedge=focus, arrow-rail=sequence. Max 15° off-axis.",
+      "spec": "references/components.md#diagonal-primitives-law-4",
+      "variants": {
+        "shape": [
+          "chevron",
+          "notch",
+          "wedge",
+          "arrow-rail"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "chevron / active step"
+        },
+        {
+          "cssVar": "--sig-wait",
+          "description": "notch"
+        },
+        {
+          "cssVar": "--sig-accent",
+          "description": "wedge"
+        },
+        {
+          "cssVar": "--border",
+          "description": "edges"
+        }
+      ],
+      "keywords": [
+        "chevron",
+        "notch",
+        "wedge",
+        "arrow",
+        "rail",
+        "sequence",
+        "diagonal"
+      ]
+    },
+    {
+      "id": "kbd",
+      "name": "Key hint",
+      "kind": "component",
+      "category": "primitives",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A keycap badge for a keyboard shortcut. Decorative (aria-hidden) — the real binding rides aria-keyshortcuts on the action. Main actions show it always; secondary use the hint variant, revealed on host hover/focus or a global peek.",
+      "spec": "references/components.md#key-hint",
+      "variants": {
+        "flag": [
+          "hint",
+          "on"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "keycap fill"
+        },
+        {
+          "cssVar": "--brd-hair",
+          "description": "keycap border"
+        },
+        {
+          "cssVar": "--shadow-off-sm",
+          "description": "keycap depth"
+        }
+      ],
+      "keywords": [
+        "kbd",
+        "keycap",
+        "shortcut",
+        "hotkey",
+        "hint",
+        "accelerator"
+      ]
+    },
+    {
+      "id": "alert",
+      "name": "Alert",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Inline callout keyed to a signal (info/wait/done/err) — a left brush-bar in the signal hue, optional dismiss. err announces assertively (role=alert).",
+      "spec": "references/components.md#alert",
+      "variants": {
+        "signal": [
+          "info",
+          "wait",
+          "done",
+          "err"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "info key"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error key"
+        },
+        {
+          "cssVar": "--panel",
+          "description": "fill"
+        }
+      ],
+      "keywords": [
+        "alert",
+        "callout",
+        "banner",
+        "message",
+        "notice",
+        "inline"
+      ]
+    },
+    {
+      "id": "chip",
+      "name": "Chip",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A compact standalone tag/label; default keys to done, alt to work; stamp-in when added.",
+      "spec": "references/components.md#chip",
+      "variants": {
+        "tone": [
+          "done",
+          "alt"
+        ],
+        "stamp": [
+          "off",
+          "on"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-done",
+          "description": "default fill"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "alt fill"
+        },
+        {
+          "cssVar": "--on-sig",
+          "description": "text"
+        },
+        {
+          "cssVar": "--border",
+          "description": "outline"
+        }
+      ],
+      "keywords": [
+        "chip",
+        "tag",
+        "label",
+        "token",
+        "pill"
+      ]
+    },
+    {
+      "id": "drip",
+      "name": "Drip / error surface",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The house glitch for failure — vertical downward bleed in --drip over a --sig-err field. Errors only.",
+      "spec": "references/components.md#drip--error-surface-law-3",
+      "variants": {},
+      "tokens": [
+        {
+          "cssVar": "--sig-err",
+          "description": "field"
+        },
+        {
+          "cssVar": "--drip",
+          "description": "bleed hue"
+        },
+        {
+          "cssVar": "--border",
+          "description": "outline"
+        }
+      ],
+      "keywords": [
+        "drip",
+        "error",
+        "glitch",
+        "failure",
+        "decay"
+      ]
+    },
+    {
+      "id": "empty-error-state",
+      "name": "EmptyState / ErrorState",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Zero-data (calm) and failure (error keying + drip) fallbacks for any panel — must not look alike.",
+      "spec": "references/components.md#emptystate--errorstate",
+      "variants": {
+        "kind": [
+          "empty",
+          "error"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--muted",
+          "description": "empty text"
+        },
+        {
+          "cssVar": "--stage",
+          "description": "empty calm accent"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error keying"
+        }
+      ],
+      "keywords": [
+        "empty",
+        "error",
+        "state",
+        "fallback",
+        "zero-data"
+      ]
+    },
+    {
+      "id": "keyed-contact-sheet",
+      "name": "Keyed contact sheet",
+      "kind": "block",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A grid of uniform state-keyed tiles that reads as one instrument, not competing stages (Law 2).",
+      "spec": "references/components.md#keyed-contact-sheet-law-2",
+      "variants": {},
+      "tokens": [
+        {
+          "cssVar": "--brd-brush",
+          "description": "sheet border"
+        },
+        {
+          "cssVar": "--border",
+          "description": "tile dividers"
+        }
+      ],
+      "keywords": [
+        "tiles",
+        "grid",
+        "contact-sheet",
+        "keyed",
+        "roster"
+      ]
+    },
+    {
+      "id": "meter",
+      "name": "Meter",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Token-driven capacity / utilisation bar (role=meter), square and hard-edged, keyed to a signal tone.",
+      "spec": "references/components.md#meter",
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "default fill"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "track"
+        },
+        {
+          "cssVar": "--brd-hair",
+          "description": "track outline"
+        }
+      ],
+      "keywords": [
+        "meter",
+        "bar",
+        "gauge",
+        "capacity",
+        "utilisation",
+        "progress"
+      ]
+    },
+    {
+      "id": "progress",
+      "name": "Progress",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Task progress (role=progressbar) — determinate fills to value/max; indeterminate runs an animated hazard sweep. Distinct from Meter (a static capacity reading).",
+      "spec": "references/components.md#progress",
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "fill"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "track"
+        }
+      ],
+      "keywords": [
+        "progress",
+        "progressbar",
+        "loading",
+        "task",
+        "indeterminate",
+        "bar"
+      ]
+    },
+    {
+      "id": "relative-time",
+      "name": "RelativeTime",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Relative-time display (\"5m ago\") as a semantic <time>; the clock is injected as a prop so SSR and client agree (no hydration flicker).",
+      "spec": "references/components.md#relative-time",
+      "variants": {},
+      "tokens": [],
+      "keywords": []
+    },
+    {
+      "id": "session-row",
+      "name": "SessionRow",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "One row of a live list — the densest unit; calm at rest, one-shot glitch on a real state change.",
+      "spec": "references/components.md#sessionrow",
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle"
+        ],
+        "event": [
+          "off",
+          "on"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--ink",
+          "description": "name"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "status"
+        },
+        {
+          "cssVar": "--border",
+          "description": "divider"
+        }
+      ],
+      "keywords": [
+        "row",
+        "session",
+        "list-item",
+        "live",
+        "status"
+      ]
+    },
+    {
+      "id": "shape",
+      "name": "Shape",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Severity glyph — polygon side-count encodes danger/focus (fewer sides = more urgent); a shape channel beside colour (Law 4).",
+      "spec": "references/components.md#severity-shapes",
+      "variants": {
+        "severity": [
+          "crit",
+          "warn",
+          "work",
+          "ok",
+          "idle"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-err",
+          "description": "crit (triangle) fill"
+        },
+        {
+          "cssVar": "--sig-wait",
+          "description": "warn (diamond) fill"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "work (pentagon) fill"
+        },
+        {
+          "cssVar": "--sig-done",
+          "description": "ok (hexagon) fill"
+        },
+        {
+          "cssVar": "--sig-idle",
+          "description": "idle (circle) fill"
+        }
+      ],
+      "keywords": [
+        "shape",
+        "severity",
+        "polygon",
+        "triangle",
+        "focus",
+        "danger",
+        "non-color",
+        "a11y"
+      ]
+    },
+    {
+      "id": "skeleton",
+      "name": "Skeleton",
+      "kind": "utility",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Loading placeholder — a blocky pulse (never rounded). Sizes: --line, --text, --block; give it a width inline.",
+      "spec": "references/components.md#skeleton",
+      "variants": {
+        "class": [
+          "cr-skeleton--line",
+          "cr-skeleton--text",
+          "cr-skeleton--block"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "placeholder fill"
+        }
+      ],
+      "keywords": [
+        "skeleton",
+        "loading",
+        "placeholder",
+        "shimmer",
+        "pulse",
+        "ghost"
+      ]
+    },
+    {
+      "id": "spinner",
+      "name": "Spinner",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Indeterminate loading indicator — role=status with an accessible label; the ring is aria-hidden and honours reduced-motion. For a known fraction use Progress or Meter.",
+      "spec": "references/components.md#spinner",
+      "variants": {
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "ring sweep"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "ring track"
+        }
+      ],
+      "keywords": [
+        "spinner",
+        "loading",
+        "busy",
+        "indeterminate",
+        "loader"
+      ]
+    },
+    {
+      "id": "status-dot",
+      "name": "StatusDot",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "The smallest state readout — a square keyed to the signal ramp, with an aria-label naming the state.",
+      "spec": "references/components.md#statusdot",
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "state fill (example)"
+        },
+        {
+          "cssVar": "--border",
+          "description": "outline"
+        }
+      ],
+      "keywords": [
+        "dot",
+        "status",
+        "indicator",
+        "state",
+        "square"
+      ]
+    },
+    {
+      "id": "tag",
+      "name": "Tag",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Inline status label inside dense content; variants map to the signal ramp.",
+      "spec": "references/components.md#tag",
+      "variants": {
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle",
+          "accent"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-done",
+          "description": "now/shipped"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "work"
+        },
+        {
+          "cssVar": "--sig-wait",
+          "description": "later/pending"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "no/ruled-out"
+        },
+        {
+          "cssVar": "--on-sig",
+          "description": "text"
+        }
+      ],
+      "keywords": [
+        "tag",
+        "badge",
+        "status",
+        "inline",
+        "label"
+      ]
+    },
+    {
+      "id": "timeline",
+      "name": "Timeline",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Vertical event timeline — an ordered list of moments on a rail, each with a signal-coloured node, machine time, title and optional detail. Presentational; node colour is the semantic signal.",
+      "spec": "references/components.md#timeline",
+      "variants": {
+        "signal": [
+          "work",
+          "done",
+          "wait",
+          "err"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-timeline-rail",
+          "description": "the connecting rail (chrome)"
+        }
+      ],
+      "keywords": []
+    }
+  ]
+}
