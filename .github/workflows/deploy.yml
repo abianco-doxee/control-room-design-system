@@ -54,6 +54,8 @@ jobs:
         run: npm run test:rtl
       - name: Appearance-separation guard (no brand colour in the feature layer)
         run: npm run test:separation
+      - name: Tooling gate (MCP server tools + skill installer)
+        run: npm run test:tooling
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
       - name: Accessibility gate (axe, all four themes)

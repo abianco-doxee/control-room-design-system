@@ -141,6 +141,7 @@
     "pretest:frameworks": "npm run build:components",
     "test:frameworks": "node --test tests/pkg-frameworks.test.mjs tests/cross-fw-contract.test.mjs",
     "test:contract": "node --test tests/styling-contract.test.mjs tests/responsive.test.mjs tests/utils-ports.test.mjs",
+    "test:tooling": "node --test tests/mcp.test.mjs tests/skill-install.test.mjs",
     "changeset": "changeset",
     "version": "changeset version",
     "verify": "npm run verify:tokens && npm run verify:theme && npm run verify:palette && npm run verify:styles && npm run verify:icons && npm run verify:catalog && npm run verify:llms && npm run verify:mcp && npm run verify:skill && npm run skills:check"
