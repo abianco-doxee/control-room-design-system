@@ -5,11 +5,6 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { oklch } from "culori";
-import { chassisFrom } from "../build/chassis.mjs";
-import { surfaceRamp } from "../build/ramp.mjs";
-import { fitSignals, SIGNAL_KEYS, toneSignals } from "../build/signals.mjs";
-import { typeFrom } from "../build/type.mjs";
 import {
   autoOnColor,
   CHASSIS_OVERRIDABLE,
@@ -22,7 +17,12 @@ import {
   THEME_ROLES,
   themeCss,
   validateTheme,
-} from "../lib/theme/index.js";
+} from "@control-room/utils/theme";
+import { oklch } from "culori";
+import { chassisFrom } from "../build/chassis.mjs";
+import { surfaceRamp } from "../build/ramp.mjs";
+import { fitSignals, SIGNAL_KEYS, toneSignals } from "../build/signals.mjs";
+import { typeFrom } from "../build/type.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => JSON.parse(readFileSync(join(ROOT, p), "utf8"));

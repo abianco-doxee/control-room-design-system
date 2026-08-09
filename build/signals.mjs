@@ -12,8 +12,9 @@
  * build-theme.mjs and references/theming.md). Explicitly-set signal roles are left
  * alone — the brand meant those exactly.
  */
+
+import { contrastRatio, THEME_ROLES } from "@control-room/utils/theme";
 import { clampChroma, formatHex, oklch } from "culori";
-import { contrastRatio, THEME_ROLES } from "../lib/theme/index.js";
 
 /** The signal role keys (bare, no leading --), from the contract. */
 export const SIGNAL_KEYS = THEME_ROLES.filter((r) => r.group === "signal").map((r) =>

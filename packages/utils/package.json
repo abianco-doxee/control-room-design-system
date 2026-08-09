@@ -2,5 +2,21 @@
   "name": "@control-room/utils",
   "version": "1.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "description": "Control Room framework-agnostic utilities — class merge, href/duration/position/time-scale helpers, forms (ArkType ⇄ JSON Schema) and theme runtime.",
+  "files": ["cn.js", "cn.d.ts", "href.js", "href.d.ts", "duration.js", "duration.d.ts", "position.js", "time-scale.js", "forms", "theme"],
+  "exports": {
+    "./cn": { "types": "./cn.d.ts", "default": "./cn.js" },
+    "./href": { "types": "./href.d.ts", "default": "./href.js" },
+    "./duration": { "types": "./duration.d.ts", "default": "./duration.js" },
+    "./position": "./position.js",
+    "./time-scale": "./time-scale.js",
+    "./forms": "./forms/index.js",
+    "./theme": "./theme/index.js"
+  },
+  "dependencies": {
+    "arktype": "^2.2.3",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0"
+  }
 }
