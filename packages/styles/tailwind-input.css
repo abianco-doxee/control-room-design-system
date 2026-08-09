@@ -4,7 +4,7 @@
  * Consumers running their own Tailwind should import styles/tailwind.css and let
  * Tailwind scan their content instead. Regenerate: npm run build:tw */
 @import "tailwindcss";
-@import "../packages/tokens/dist/tw-theme.css";
+@import "@control-room/tokens/tw-theme.css";
 
 @source inline("flex inline-flex grid block inline-block hidden");
 @source inline("items-{start,center,end,baseline} justify-{start,center,between,end} flex-{row,col,wrap}");
