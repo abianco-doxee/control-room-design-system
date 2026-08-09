@@ -296,6 +296,8 @@ const ISLAND_IDS = new Set([
   "form",
   // data grid
   "datagrid",
+  // new operator / form kit
+  "stepper", "pin-input", "tags-input", "input-group", "avatar", "spinner",
 ]);
 
 function stageHtml(id) {
