@@ -92,6 +92,11 @@
   --cr-hero-bg: var(--sig-accent);
   --cr-hero-fg: var(--on-accent);
   --cr-nav-w: 180px;
+  --cr-nav-bg: var(--rail);
+  --cr-nav-fg: var(--rail-ink);
+  --cr-nav-border: var(--border);
+  --cr-nav-active-bg: var(--sig-accent);
+  --cr-nav-active-fg: var(--on-accent);
   --cr-tabs-border: var(--border);
   --cr-tabs-tab-fg: var(--muted);
   --cr-tabs-tab-hover-fg: var(--ink);
@@ -175,6 +180,14 @@
   --cr-breadcrumb-current-fg: var(--ink);
   --cr-datagrid-bg: var(--board);
   --cr-datagrid-border: var(--border);
+  --cr-masthead-bg: var(--panel);
+  --cr-masthead-border: var(--border);
+  --cr-masthead-accent: var(--sig-accent);
+  --cr-alert-bg: var(--panel);
+  --cr-alert-border: var(--border);
+  --cr-spinner-track: var(--panel-2);
+  --cr-spinner-accent: var(--sig-work);
+  --cr-skeleton-bg: var(--panel-2);
   --ground: #0f0327;
   --board: #15092f;
   --panel: #1d133a;
