@@ -3,7 +3,7 @@
 // instead of reaching into .../components/CrSwitch. Runs after `mitosis build`;
 // the dist/frameworks/** tree is a git-ignored build artifact, so these barrels
 // are regenerated on every compile (CI included). --check fails on drift.
-import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -34,6 +34,17 @@ for (const [target, { ext, index }] of Object.entries(TARGETS)) {
     console.warn(`⚠ ${target}: no components/ dir — run 'mitosis build' first`);
     continue;
   }
+  // Shared styling helpers (lib/pt.ts) are imported by components as
+  // `../lib/pt.ts`; copy the source into each target's output so the relative
+  // import resolves for bundlers, the type-check, and the packaged build (which
+  // rewrites the .ts specifier to .js). It's a plain pure-function module — the
+  // same file across every target.
+  if (!check) {
+    const libDir = join(dir, "lib");
+    mkdirSync(libDir, { recursive: true });
+    copyFileSync(join(ROOT, "lib", "pt.ts"), join(libDir, "pt.ts"));
+  }
+
   const names = readdirSync(compDir)
     .filter((f) => f.endsWith("." + ext))
     .map((f) => f.slice(0, -(ext.length + 1)))
