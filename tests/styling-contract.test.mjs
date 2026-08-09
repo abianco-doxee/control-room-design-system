@@ -83,7 +83,7 @@ test("pt/dt/unstyled contract covers every functional component", () => {
 // (e.g. .cr-tab--on { border-bottom-color: var(--sig-work) }) the per-instance
 // override silently stops working, so guard both halves for the spike three.
 test("Tabs/Menu/Modal expose finer component tokens (dt is surgical)", () => {
-  const root = readFileSync(join(ROOT, "dist", "control-room.css"), "utf8");
+  const root = readFileSync(join(ROOT, "packages", "tokens", "dist", "control-room.css"), "utf8");
   const comp = readFileSync(join(ROOT, "styles", "components.css"), "utf8");
   const tokens = [
     // spike three

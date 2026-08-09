@@ -10,10 +10,10 @@
         "references",
         "templates",
         "checklists",
-        "tokens/tokens.json",
-        "dist/control-room.css",
-        "dist/tokens.flat.json",
-        "design-tokens/control-room.tokens.json",
+        "packages/tokens/tokens/tokens.json",
+        "packages/tokens/dist/control-room.css",
+        "packages/tokens/dist/tokens.flat.json",
+        "packages/tokens/design-tokens/control-room.tokens.json",
         "styles/components.css",
         "catalog/catalog.json"
       ]

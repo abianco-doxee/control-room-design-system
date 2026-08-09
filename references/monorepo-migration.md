@@ -1,7 +1,26 @@
 # Monorepo / multi-repo migration plan
 
-Status: **planned** (not yet executed). This is the concrete blueprint for splitting
-the single package into workspaces, and — later — into separate published repos.
+Status: **in progress** (branch `claude/monorepo-workspaces`). This is the concrete
+blueprint for splitting the single package into workspaces, and — later — into
+separate published repos.
+
+Decision (locked): **each package publishes independently** under the `@control-room/*`
+scope, owning its own `dist/`, its own `exports`, deps and version. The root
+`@control-room/design-system` stays as a convenience umbrella that re-points its
+subpath exports (`./css`, `./theme`, `./react`, …) into the sub-packages, so existing
+`@control-room/design-system/*` consumers keep working unchanged. Cross-package
+references use `@control-room/<pkg>` specifiers (resolved through the workspace
+symlinks), never relative `../` hops across package boundaries.
+
+Progress:
+- [x] Stage 1 — scaffold workspaces (`workspaces: ["packages/*"]`, stub manifests).
+- [x] Extract `@control-room/utils` (cn · href · duration · position · time-scale ·
+      forms · theme). Pure source move; green.
+- [x] Extract `@control-room/tokens` (tokens.json · brands · build-tokens/theme/palette
+      + chassis/ramp/signals/type helpers → dist/themes/*, control-room.css, structure.css,
+      theme-contract, tw-theme, flat, dtcg). Owns its own dist + theme.test; green.
+- [ ] Extract `@control-room/styles`, `@control-room/icons`, `@control-room/components`,
+      `@control-room/docs` (in that dependency order).
 
 ## Why this is staged, not done in one commit
 

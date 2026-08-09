@@ -16,9 +16,14 @@ import { timeTicks } from "@control-room/utils/time-scale";
 import { browserScript } from "./gallery-scripts.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const tokensCss = readFileSync(join(ROOT, "dist", "control-room.css"), "utf8");
+const tokensCss = readFileSync(
+  join(ROOT, "packages", "tokens", "dist", "control-room.css"),
+  "utf8"
+);
 const componentsCss = readFileSync(join(ROOT, "styles", "components.css"), "utf8");
-const flat = JSON.parse(readFileSync(join(ROOT, "dist", "tokens.flat.json"), "utf8"));
+const flat = JSON.parse(
+  readFileSync(join(ROOT, "packages", "tokens", "dist", "tokens.flat.json"), "utf8")
+);
 const dark = flat.themes.dark;
 
 // Inline the condensed display face (Saira Condensed 800) as "CR Display" — the

@@ -1425,6 +1425,8 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
  * 24×24, currentColor, single 2px stroke, square caps. Inherits text colour and
  * aligns to the text baseline; never shrinks in a flex row. */
 .cr-icon { display: inline-block; vertical-align: -0.15em; flex-shrink: 0; }
+/* pixel pack (set="pixel"): filled glyphs, rendered crisp for the pixel-art look */
+.cr-icon[data-set="pixel"] { shape-rendering: crispedges; }
 
 /* ── Ambient loops (Law 7 — alive at rest; low-fps, hardware-bound) ─────────
  * Opt-in classes. All are OFF under prefers-reduced-motion (global rule in
