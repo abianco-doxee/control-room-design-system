@@ -1457,6 +1457,114 @@
       "$extensions": {
         "com.doxee.cssVar": "--cr-togglechip-on-fg"
       }
+    },
+    "cr-rating-on": {
+      "$value": "var(--sig-work)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-rating-on"
+      }
+    },
+    "cr-rating-off": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-rating-off"
+      }
+    },
+    "cr-timeline-rail": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-timeline-rail"
+      }
+    },
+    "cr-timeline-node": {
+      "$value": "var(--muted)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-timeline-node"
+      }
+    },
+    "cr-toolbar-bg": {
+      "$value": "var(--panel-2)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-toolbar-bg"
+      }
+    },
+    "cr-toolbar-border": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-toolbar-border"
+      }
+    },
+    "cr-fileupload-bg": {
+      "$value": "var(--panel-2)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-fileupload-bg"
+      }
+    },
+    "cr-fileupload-fg": {
+      "$value": "var(--muted)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-fileupload-fg"
+      }
+    },
+    "cr-fileupload-border": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-fileupload-border"
+      }
+    },
+    "cr-fileupload-active-border": {
+      "$value": "var(--sig-work)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-fileupload-active-border"
+      }
+    },
+    "cr-carousel-bg": {
+      "$value": "var(--panel-2)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-carousel-bg"
+      }
+    },
+    "cr-carousel-dot": {
+      "$value": "var(--muted)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-carousel-dot"
+      }
+    },
+    "cr-carousel-dot-active": {
+      "$value": "var(--sig-work)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-carousel-dot-active"
+      }
+    },
+    "cr-calendar-bg": {
+      "$value": "var(--panel)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-calendar-bg"
+      }
+    },
+    "cr-calendar-muted": {
+      "$value": "var(--muted)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-calendar-muted"
+      }
+    },
+    "cr-calendar-selected-bg": {
+      "$value": "var(--sig-work)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-calendar-selected-bg"
+      }
+    },
+    "cr-calendar-selected-fg": {
+      "$value": "var(--on-sig)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-calendar-selected-fg"
+      }
+    },
+    "cr-calendar-today-ring": {
+      "$value": "var(--sig-accent)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-calendar-today-ring"
+      }
     }
   },
   "theme": {

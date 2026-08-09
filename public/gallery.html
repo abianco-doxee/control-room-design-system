@@ -240,6 +240,24 @@
   --cr-togglechip-border: var(--border);
   --cr-togglechip-on-bg: var(--sig-work);
   --cr-togglechip-on-fg: var(--on-sig);
+  --cr-rating-on: var(--sig-work);
+  --cr-rating-off: var(--border);
+  --cr-timeline-rail: var(--border);
+  --cr-timeline-node: var(--muted);
+  --cr-toolbar-bg: var(--panel-2);
+  --cr-toolbar-border: var(--border);
+  --cr-fileupload-bg: var(--panel-2);
+  --cr-fileupload-fg: var(--muted);
+  --cr-fileupload-border: var(--border);
+  --cr-fileupload-active-border: var(--sig-work);
+  --cr-carousel-bg: var(--panel-2);
+  --cr-carousel-dot: var(--muted);
+  --cr-carousel-dot-active: var(--sig-work);
+  --cr-calendar-bg: var(--panel);
+  --cr-calendar-muted: var(--muted);
+  --cr-calendar-selected-bg: var(--sig-work);
+  --cr-calendar-selected-fg: var(--on-sig);
+  --cr-calendar-today-ring: var(--sig-accent);
   --ground: #0f0327;
   --board: #15092f;
   --panel: #1d133a;
@@ -1880,7 +1898,10 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-tap { display: inline-flex; align-items: center; justify-content: center; }
 @media (pointer: coarse) {
   .cr-btn, .cr-input, .cr-select, .cr-textarea, .cr-datetime, .cr-tab, .cr-segmented__opt,
-  .cr-togglechip, .cr-menu__item, .cr-pager__btn, .cr-overflow, .cr-tap { min-height: 44px; }
+  .cr-togglechip, .cr-menu__item, .cr-pager__btn, .cr-overflow, .cr-tap,
+  .cr-rating__star, .cr-carousel__nav, .cr-carousel__dot, .cr-calendar__nav { min-height: 44px; }
+  .cr-rating__star, .cr-carousel__nav, .cr-carousel__dot, .cr-calendar__nav { min-width: 44px; }
+  .cr-calendar__day { min-width: 40px; min-height: 40px; }
 }
 
 /* ── Container-query layout (see references/responsive.md) ───────────────────
@@ -1893,6 +1914,89 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 @container (max-width: 22rem) {
   .cr-dl { grid-template-columns: 1fr; gap: var(--space-0-5) 0; }
 }
+
+/* ── Rating ──────────────────────────────────────────────────────────────────
+ * A radiogroup of geometric-glyph stars; fill (◆) vs outline (◇) is the state,
+ * colour asserts it (Law 2). No icon font. */
+.cr-rating { display: inline-flex; gap: var(--space-0-5); }
+.cr-rating__star { display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; margin: 0; padding: var(--space-0-5); cursor: pointer; color: var(--cr-rating-off); font-size: var(--text-lg); line-height: 1; }
+.cr-rating__star[data-state="on"] { color: var(--cr-rating-on); }
+.cr-rating__star:disabled { cursor: not-allowed; opacity: .5; }
+.cr-rating--readonly .cr-rating__star { cursor: default; }
+.cr-rating__star:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+
+/* ── Timeline ────────────────────────────────────────────────────────────────
+ * An <ol> on a vertical rail; each node is signal-coloured (Law 2), the rail is
+ * chrome. */
+.cr-timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.cr-timeline__item { position: relative; display: grid; grid-template-columns: auto 1fr; gap: var(--space-3); padding-block: var(--space-1) var(--space-4); }
+.cr-timeline__item::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: calc(0.375rem - (var(--brd) / 2)); width: var(--brd); background: var(--cr-timeline-rail); }
+.cr-timeline__item:first-child::before { inset-block-start: 0.5rem; }
+.cr-timeline__item:last-child::before { inset-block-end: auto; height: 0.5rem; }
+.cr-timeline__node { position: relative; z-index: 1; inline-size: 0.75rem; block-size: 0.75rem; margin-block-start: 0.35rem; flex: none; border: var(--brd) solid var(--panel); background: var(--cr-timeline-node); }
+.cr-timeline__node--work { background: var(--sig-work); }
+.cr-timeline__node--done { background: var(--sig-done); }
+.cr-timeline__node--wait { background: var(--sig-wait); }
+.cr-timeline__node--err { background: var(--sig-err); }
+.cr-timeline__body { display: flex; flex-direction: column; gap: var(--space-0-5); min-width: 0; }
+.cr-timeline__time { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.cr-timeline__title { font-weight: 700; font-size: var(--text-sm); color: var(--ink); }
+.cr-timeline__detail { margin: 0; font-size: var(--text-xs); color: var(--muted); }
+
+/* ── Toolbar ─────────────────────────────────────────────────────────────────
+ * A labelled row/column of the operator's own controls; a single tab stop with
+ * roving-tabindex arrows. */
+.cr-toolbar { display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-1); background: var(--cr-toolbar-bg); border: var(--brd) solid var(--cr-toolbar-border); }
+.cr-toolbar[aria-orientation="vertical"] { flex-direction: column; align-items: stretch; }
+
+/* ── FileUpload ──────────────────────────────────────────────────────────────
+ * A dropzone wrapping a real, visually-hidden native <input type=file>; the
+ * dragover border is the accent (a state, Law 2). */
+.cr-fileupload { position: relative; display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-5); background: var(--cr-fileupload-bg); border: var(--brd-heavy) dashed var(--cr-fileupload-border); color: var(--cr-fileupload-fg); cursor: pointer; text-align: center; }
+.cr-fileupload--over { border-color: var(--cr-fileupload-active-border); border-style: solid; }
+.cr-fileupload__input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.cr-fileupload__input:disabled { cursor: not-allowed; }
+.cr-fileupload__input:focus-visible + .cr-fileupload__prompt { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--space-2); }
+.cr-fileupload__prompt { display: flex; flex-direction: column; gap: var(--space-0-5); pointer-events: none; }
+.cr-fileupload__title { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: var(--text-sm); color: var(--ink); }
+.cr-fileupload__hint { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); }
+.cr-fileupload__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-0-5); font-family: var(--font-mono); font-size: var(--text-xs); text-align: start; }
+.cr-fileupload__file { color: var(--ink); border-block-start: var(--brd-hair) solid var(--border); padding-block-start: var(--space-1); }
+
+/* ── Carousel ────────────────────────────────────────────────────────────────
+ * A slide region with prev/next + dot tabs; the active dot is the accent. */
+.cr-carousel { display: flex; flex-direction: column; gap: var(--space-2); }
+.cr-carousel__frame { display: grid; grid-template-columns: auto 1fr auto; align-items: stretch; gap: var(--space-2); }
+.cr-carousel__viewport { display: flex; align-items: center; justify-content: center; min-height: 5rem; padding: var(--space-4); background: var(--cr-carousel-bg); border: var(--brd) solid var(--border); }
+.cr-carousel__slide { display: flex; flex-direction: column; gap: var(--space-1); text-align: center; }
+.cr-carousel__title { font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--ink); }
+.cr-carousel__caption { font-size: var(--text-xs); color: var(--muted); }
+.cr-carousel__nav { display: inline-flex; align-items: center; justify-content: center; min-width: var(--control-h-md); background: var(--panel-2); border: var(--brd) solid var(--border); color: var(--ink); cursor: pointer; font-size: var(--text-md); }
+.cr-carousel__nav:hover { background: var(--panel); }
+.cr-carousel__nav:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-carousel__dots { display: inline-flex; justify-content: center; gap: var(--space-1); }
+.cr-carousel__dot { display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; padding: var(--space-0-5); margin: 0; cursor: pointer; color: var(--cr-carousel-dot); font-size: var(--text-xs); line-height: 1; }
+.cr-carousel__dot[data-state="active"] { color: var(--cr-carousel-dot-active); }
+.cr-carousel__dot:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+
+/* ── Calendar ────────────────────────────────────────────────────────────────
+ * A month grid; the selected day is the accent (a state), today is ringed. */
+.cr-calendar { display: inline-flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); background: var(--cr-calendar-bg); border: var(--brd) solid var(--border); }
+.cr-calendar__header { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--space-2); }
+.cr-calendar__month { text-align: center; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: var(--text-sm); color: var(--ink); }
+.cr-calendar__nav { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: var(--panel-2); border: var(--brd) solid var(--border); color: var(--ink); cursor: pointer; }
+.cr-calendar__nav:hover { background: var(--panel); }
+.cr-calendar__nav:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-calendar__row--head { display: grid; grid-template-columns: repeat(7, 1fr); }
+.cr-calendar__body { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--space-px); }
+.cr-calendar__weekday { display: inline-flex; align-items: center; justify-content: center; padding: var(--space-1) 0; font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); text-transform: uppercase; }
+.cr-calendar__day { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; background: none; border: var(--brd-hair) solid transparent; color: var(--ink); font-family: var(--font-mono); font-size: var(--text-xs); cursor: pointer; }
+.cr-calendar__day:hover { background: var(--panel-2); }
+.cr-calendar__day--adjacent { color: var(--cr-calendar-muted); }
+.cr-calendar__day--today { border-color: var(--cr-calendar-today-ring); }
+.cr-calendar__day--selected { background: var(--cr-calendar-selected-bg); color: var(--cr-calendar-selected-fg); border-color: var(--cr-calendar-selected-bg); }
+.cr-calendar__day:disabled { color: var(--muted); opacity: .4; cursor: not-allowed; }
+.cr-calendar__day:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -2px; }
 
 
 /* gallery chrome only (not part of the system) */
