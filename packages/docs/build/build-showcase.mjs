@@ -18,18 +18,18 @@ import { browserScript } from "./gallery-scripts.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const tokensCss = readFileSync(
-  join(ROOT, "packages", "tokens", "dist", "control-room.css"),
+  join(ROOT, "..", "..", "packages", "tokens", "dist", "control-room.css"),
   "utf8"
 );
 const componentsCss = readFileSync(
-  join(ROOT, "packages", "styles", "styles", "components.css"),
+  join(ROOT, "..", "..", "packages", "styles", "styles", "components.css"),
   "utf8"
 );
 /* External BRANDS (brands/*.json → dist/themes/<name>.css) live outside the
  * built-in bundle. Appending each proves the whole browser reskins to a brand via
  * one appearance file + data-theme, with no component change. See theming.md. */
 const BUILTIN_THEMES = new Set(["dark", "light", "extreme", "phosphor"]);
-const themesDir = join(ROOT, "packages", "tokens", "dist", "themes");
+const themesDir = join(ROOT, "..", "..", "packages", "tokens", "dist", "themes");
 const brandThemes = existsSync(themesDir)
   ? readdirSync(themesDir)
       .filter((f) => f.endsWith(".css"))
@@ -46,13 +46,15 @@ const brandButtons = brandThemes
       `    <button data-set="${n}" aria-pressed="false" title="external brand — brands/${n}.json">${n} ▸</button>`
   )
   .join("\n");
-const catalog = JSON.parse(readFileSync(join(ROOT, "catalog", "catalog.json"), "utf8"));
+const catalog = JSON.parse(readFileSync(join(ROOT, "..", "..", "catalog", "catalog.json"), "utf8"));
 
 let displayFace = "";
 try {
   const woff2 = readFileSync(
     join(
       ROOT,
+      "..",
+      "..",
       "node_modules",
       "@fontsource",
       "saira-condensed",
@@ -457,7 +459,17 @@ const EXAMPLES = {
 
 const kbdBadge = (t) => `<span class="badge">${t}</span>`;
 // ── prop tables, generated from the compiled React interfaces ─────────────
-const REACT_DIR = join(ROOT, "packages", "components", "dist", "frameworks", "react", "components");
+const REACT_DIR = join(
+  ROOT,
+  "..",
+  "..",
+  "packages",
+  "components",
+  "dist",
+  "frameworks",
+  "react",
+  "components"
+);
 const COMP_INDEX = {}; // lowercased export name → actual file base (for case/hyphen mismatches)
 try {
   for (const f of readdirSync(REACT_DIR))

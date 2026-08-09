@@ -87,14 +87,14 @@ function rewriteLinks(txt) {
 }
 
 function pageFor(src, title) {
-  let body = readFileSync(join(ROOT, src), "utf8");
+  let body = readFileSync(join(ROOT, "..", "..", src), "utf8");
   body = stripLeadingH1(stripFrontmatter(body));
   body = rewriteLinks(body);
   return `---\ntitle: "${esc(title)}"\n---\n\n${body}`;
 }
 
 function catalogPage() {
-  const cat = JSON.parse(readFileSync(join(ROOT, "catalog", "catalog.json"), "utf8"));
+  const cat = JSON.parse(readFileSync(join(ROOT, "..", "..", "catalog", "catalog.json"), "utf8"));
   const byCat = {};
   for (const e of cat.entries) (byCat[e.category] ??= []).push(e);
   const specLink = (e) => {

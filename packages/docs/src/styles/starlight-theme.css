@@ -15,7 +15,7 @@
 @import "@fontsource/jetbrains-mono/700.css";
 
 /* the generated token layer (all four themes) */
-@import "../../dist/control-room.css";
+@import "@control-room/tokens/css";
 
 :root {
   /* type */

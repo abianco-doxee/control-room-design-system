@@ -19,15 +19,15 @@ import { fileURLToPath } from "node:url";
 import { contrastRatio } from "@control-room/utils/theme";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const THEMES = join(ROOT, "packages", "tokens", "dist", "themes");
-const BRANDS = join(ROOT, "packages", "tokens", "brands");
+const THEMES = join(ROOT, "..", "..", "packages", "tokens", "dist", "themes");
+const BRANDS = join(ROOT, "..", "..", "packages", "tokens", "brands");
 
 const structureCss = readFileSync(
-  join(ROOT, "packages", "tokens", "dist", "structure.css"),
+  join(ROOT, "..", "..", "packages", "tokens", "dist", "structure.css"),
   "utf8"
 );
 const componentsCss = readFileSync(
-  join(ROOT, "packages", "styles", "styles", "components.css"),
+  join(ROOT, "..", "..", "packages", "styles", "styles", "components.css"),
   "utf8"
 );
 
