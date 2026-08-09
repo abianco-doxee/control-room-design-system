@@ -6,11 +6,12 @@
 // physical flow property creeps back into the component stylesheet. (Positioning
 // `left:`/`right:` on fixed/absolute overlays and gradient/clip-path angles are out
 // of scope — they're not flow direction.)
-import { test } from "node:test";
+
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const css = readFileSync(join(ROOT, "styles", "components.css"), "utf8");
@@ -32,5 +33,9 @@ test("components.css uses logical, not physical, flow properties (RTL-safe)", ()
     const m = css.match(re);
     if (m) hits.push(`${m.length}× ${fix}`);
   }
-  assert.deepEqual(hits, [], `physical flow properties found — use logical:\n  ${hits.join("\n  ")}`);
+  assert.deepEqual(
+    hits,
+    [],
+    `physical flow properties found — use logical:\n  ${hits.join("\n  ")}`
+  );
 });

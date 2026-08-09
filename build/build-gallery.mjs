@@ -9,11 +9,11 @@
  * Output: public/gallery.html   (served by the site at /gallery.html)
  * Depends on: dist/control-room.css, dist/tokens.flat.json, styles/components.css
  */
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { browserScript } from "./gallery-scripts.mjs";
+import { fileURLToPath } from "node:url";
 import { timeTicks } from "../utils/time-scale.js";
+import { browserScript } from "./gallery-scripts.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const tokensCss = readFileSync(join(ROOT, "dist", "control-room.css"), "utf8");
@@ -27,10 +27,19 @@ const dark = flat.themes.dark;
 let displayFace = "";
 try {
   const woff2 = readFileSync(
-    join(ROOT, "node_modules", "@fontsource", "saira-condensed", "files", "saira-condensed-latin-800-normal.woff2"),
+    join(
+      ROOT,
+      "node_modules",
+      "@fontsource",
+      "saira-condensed",
+      "files",
+      "saira-condensed-latin-800-normal.woff2"
+    )
   ).toString("base64");
   displayFace = `@font-face{font-family:"CR Display";font-style:normal;font-weight:800;font-display:swap;src:url(data:font/woff2;base64,${woff2}) format("woff2");}`;
-} catch { /* font not installed — falls back to the rest of the --font-display stack */ }
+} catch {
+  /* font not installed — falls back to the rest of the --font-display stack */
+}
 
 const THEMES = ["dark", "light", "extreme", "phosphor"];
 
@@ -38,7 +47,18 @@ const GROUPS = [
   ["Surface", ["--ground", "--board", "--panel", "--panel-2", "--rail"]],
   ["Text", ["--ink", "--muted", "--rail-ink", "--on-sig"]],
   ["Line & mass", ["--border", "--mass", "--shadow-col"]],
-  ["Signal (state)", ["--sig-work", "--sig-wait", "--sig-done", "--sig-err", "--sig-idle", "--sig-accent", "--sig-accent-2"]],
+  [
+    "Signal (state)",
+    [
+      "--sig-work",
+      "--sig-wait",
+      "--sig-done",
+      "--sig-err",
+      "--sig-idle",
+      "--sig-accent",
+      "--sig-accent-2",
+    ],
+  ],
   ["Keyed & decay", ["--stage", "--stage-ink", "--drip"]],
 ];
 
@@ -51,7 +71,7 @@ const swatch = (v) => `
 const swatchGroups = GROUPS.map(
   ([h, vars]) => `
   <h3>${h}</h3>
-  <div class="swgrid">${vars.map(swatch).join("")}</div>`,
+  <div class="swgrid">${vars.map(swatch).join("")}</div>`
 ).join("");
 
 // ── Chart demo generators — mirror the CrSparkline/CrLineChart/CrBarChart/
@@ -68,114 +88,239 @@ const niceNum = (range, round) => {
   const exp = Math.floor(Math.log10(range));
   const f = range / Math.pow(10, exp);
   let nf;
-  if (round) { if (f < 1.5) nf = 1; else if (f < 3) nf = 2; else if (f < 7) nf = 5; else nf = 10; }
-  else { if (f <= 1) nf = 1; else if (f <= 2) nf = 2; else if (f <= 5) nf = 5; else nf = 10; }
+  if (round) {
+    if (f < 1.5) nf = 1;
+    else if (f < 3) nf = 2;
+    else if (f < 7) nf = 5;
+    else nf = 10;
+  } else {
+    if (f <= 1) nf = 1;
+    else if (f <= 2) nf = 2;
+    else if (f <= 5) nf = 5;
+    else nf = 10;
+  }
   return nf * Math.pow(10, exp);
 };
 const niceScale = (lo, hi, maxTicks) => {
-  let a = lo, b = hi;
+  let a = lo,
+    b = hi;
   if (b <= a) b = a + 1;
-  const range = niceNum(b - a, false), step = niceNum(range / (maxTicks - 1), true);
-  const niceLo = Math.floor(a / step) * step, niceHi = Math.ceil(b / step) * step;
+  const range = niceNum(b - a, false),
+    step = niceNum(range / (maxTicks - 1), true);
+  const niceLo = Math.floor(a / step) * step,
+    niceHi = Math.ceil(b / step) * step;
   const ticks = [];
   for (let v = niceLo; v <= niceHi + step * 0.5; v += step) ticks.push(Math.round(v / step) * step);
   return { min: niceLo, max: niceHi, ticks };
 };
 const fmtTick = (v) => {
   const a = Math.abs(v);
-  if (a >= 1000000) return (Math.round(v / 100000) / 10) + "M";
-  if (a >= 1000) return (Math.round(v / 100) / 10) + "k";
+  if (a >= 1000000) return Math.round(v / 100000) / 10 + "M";
+  if (a >= 1000) return Math.round(v / 100) / 10 + "k";
   return String(Math.round(v * 100) / 100);
 };
 function sparkSvg(data, { signal = "work", area = true, height = 32, label = "trend" } = {}) {
-  const W = 120, pad = 3, H = height, n = data.length;
-  const min = Math.min(...data), max = Math.max(...data), range = (max - min) || 1, innerH = H - pad * 2;
-  const pts = data.map((v, i) => ({ x: n === 1 ? W / 2 : (i / (n - 1)) * W, y: pad + (1 - (v - min) / range) * innerH }));
+  const W = 120,
+    pad = 3,
+    H = height,
+    n = data.length;
+  const min = Math.min(...data),
+    max = Math.max(...data),
+    range = max - min || 1,
+    innerH = H - pad * 2;
+  const pts = data.map((v, i) => ({
+    x: n === 1 ? W / 2 : (i / (n - 1)) * W,
+    y: pad + (1 - (v - min) / range) * innerH,
+  }));
   const line = pts.map((p) => p.x.toFixed(2) + "," + p.y.toFixed(2)).join(" ");
   let ap = "M " + pts[0].x.toFixed(2) + "," + H.toFixed(2);
   for (const p of pts) ap += " L " + p.x.toFixed(2) + "," + p.y.toFixed(2);
   ap += " L " + pts[n - 1].x.toFixed(2) + "," + H.toFixed(2) + " Z";
   const last = pts[n - 1];
-  return `<span class="cr-spark cr-spark--${signal}" role="img" aria-label="${label}: ${n} points, latest ${data[n - 1]}">`
-    + `<svg class="cr-spark__svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true" focusable="false">`
-    + (area ? `<path class="cr-spark__area" d="${ap}"/>` : "")
-    + `<polyline class="cr-spark__line" points="${line}" vector-effect="non-scaling-stroke"/>`
-    + `<circle class="cr-spark__dot" cx="${last.x.toFixed(2)}" cy="${last.y.toFixed(2)}" r="2.4" vector-effect="non-scaling-stroke"/></svg></span>`;
+  return (
+    `<span class="cr-spark cr-spark--${signal}" role="img" aria-label="${label}: ${n} points, latest ${data[n - 1]}">` +
+    `<svg class="cr-spark__svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true" focusable="false">` +
+    (area ? `<path class="cr-spark__area" d="${ap}"/>` : "") +
+    `<polyline class="cr-spark__line" points="${line}" vector-effect="non-scaling-stroke"/>` +
+    `<circle class="cr-spark__dot" cx="${last.x.toFixed(2)}" cy="${last.y.toFixed(2)}" r="2.4" vector-effect="non-scaling-stroke"/></svg></span>`
+  );
 }
-function lineChartSvg(series, labels, { area = true, height = 140, label = "line chart", axis = true, unit = "", x = null, xTime = false, xZone = "UTC" } = {}) {
-  const W = 320, H = height, L = axis ? 30 : 8, R = 8, T = 10, B = 18, plotW = W - L - R, plotH = H - T - B;
-  const xs = x && x.length ? x : null, continuous = !!xs;
-  let dlo = Infinity, dhi = -Infinity;
-  for (const s of series) for (const v of s.data) { if (v < dlo) dlo = v; if (v > dhi) dhi = v; }
-  if (!isFinite(dlo)) { dlo = 0; dhi = 1; }
-  const sc = niceScale(dlo, dhi, 5), lo = sc.min, hi = sc.max, range = (hi - lo) || 1;
-  const yAt = (v) => T + (1 - (v - lo) / range) * plotH;
-  let xmin = 0, xmax = 1, xticks = [];
-  if (continuous) {
-    xmin = Math.min(...xs); xmax = Math.max(...xs);
-    xticks = xTime
-      ? timeTicks(xmin, xmax, { zone: xZone, target: 6 }).filter((t) => t.value >= xmin && t.value <= xmax)
-      : niceScale(xmin, xmax, 5).ticks.filter((t) => t >= xmin && t <= xmax).map((v) => ({ value: v, label: fmtTick(v) }));
+function lineChartSvg(
+  series,
+  labels,
+  {
+    area = true,
+    height = 140,
+    label = "line chart",
+    axis = true,
+    unit = "",
+    x = null,
+    xTime = false,
+    xZone = "UTC",
+  } = {}
+) {
+  const W = 320,
+    H = height,
+    L = axis ? 30 : 8,
+    R = 8,
+    T = 10,
+    B = 18,
+    plotW = W - L - R,
+    plotH = H - T - B;
+  const xs = x && x.length ? x : null,
+    continuous = !!xs;
+  let dlo = Infinity,
+    dhi = -Infinity;
+  for (const s of series)
+    for (const v of s.data) {
+      if (v < dlo) dlo = v;
+      if (v > dhi) dhi = v;
+    }
+  if (!isFinite(dlo)) {
+    dlo = 0;
+    dhi = 1;
   }
-  const xspan = (xmax - xmin) || 1;
+  const sc = niceScale(dlo, dhi, 5),
+    lo = sc.min,
+    hi = sc.max,
+    range = hi - lo || 1;
+  const yAt = (v) => T + (1 - (v - lo) / range) * plotH;
+  let xmin = 0,
+    xmax = 1,
+    xticks = [];
+  if (continuous) {
+    xmin = Math.min(...xs);
+    xmax = Math.max(...xs);
+    xticks = xTime
+      ? timeTicks(xmin, xmax, { zone: xZone, target: 6 }).filter(
+          (t) => t.value >= xmin && t.value <= xmax
+        )
+      : niceScale(xmin, xmax, 5)
+          .ticks.filter((t) => t >= xmin && t <= xmax)
+          .map((v) => ({ value: v, label: fmtTick(v) }));
+  }
+  const xspan = xmax - xmin || 1;
   const xAtV = (v) => L + ((v - xmin) / xspan) * plotW;
   const xAtI = (i, n) => L + (n <= 1 ? plotW / 2 : (i / (n - 1)) * plotW);
-  const gridSvg = sc.ticks.map((v) => {
-    const gy = yAt(v).toFixed(2);
-    return `<line class="cr-chart__grid" x1="${L}" y1="${gy}" x2="${W - R}" y2="${gy}" vector-effect="non-scaling-stroke"/>`
-      + (axis ? `<text class="cr-chart__ytick" x="${L - 5}" y="${(yAt(v) + 3).toFixed(2)}" text-anchor="end">${fmtTick(v)}${unit}</text>` : "");
-  }).join("");
-  const seriesSvg = series.map((s, si) => {
-    const color = hue(s.signal, si), lim = continuous ? Math.min(s.data.length, xs.length) : s.data.length;
-    const pts = [];
-    for (let i = 0; i < lim; i++) pts.push({ x: continuous ? xAtV(xs[i]) : xAtI(i, lim), y: yAt(s.data[i]) });
-    const line = pts.map((p) => p.x.toFixed(2) + "," + p.y.toFixed(2)).join(" ");
-    let ap = "M " + pts[0].x.toFixed(2) + "," + (T + plotH).toFixed(2);
-    for (const p of pts) ap += " L " + p.x.toFixed(2) + "," + p.y.toFixed(2);
-    ap += " L " + pts[pts.length - 1].x.toFixed(2) + "," + (T + plotH).toFixed(2) + " Z";
-    const e = pts[pts.length - 1];
-    return (area ? `<path class="cr-linechart__area" d="${ap}" style="fill:${color}"/>` : "")
-      + `<polyline class="cr-linechart__line" points="${line}" style="stroke:${color}" vector-effect="non-scaling-stroke"/>`
-      + `<circle class="cr-linechart__end" cx="${e.x.toFixed(2)}" cy="${e.y.toFixed(2)}" r="2.6" style="fill:${color}" vector-effect="non-scaling-stroke"/>`;
-  }).join("");
+  const gridSvg = sc.ticks
+    .map((v) => {
+      const gy = yAt(v).toFixed(2);
+      return (
+        `<line class="cr-chart__grid" x1="${L}" y1="${gy}" x2="${W - R}" y2="${gy}" vector-effect="non-scaling-stroke"/>` +
+        (axis
+          ? `<text class="cr-chart__ytick" x="${L - 5}" y="${(yAt(v) + 3).toFixed(2)}" text-anchor="end">${fmtTick(v)}${unit}</text>`
+          : "")
+      );
+    })
+    .join("");
+  const seriesSvg = series
+    .map((s, si) => {
+      const color = hue(s.signal, si),
+        lim = continuous ? Math.min(s.data.length, xs.length) : s.data.length;
+      const pts = [];
+      for (let i = 0; i < lim; i++)
+        pts.push({ x: continuous ? xAtV(xs[i]) : xAtI(i, lim), y: yAt(s.data[i]) });
+      const line = pts.map((p) => p.x.toFixed(2) + "," + p.y.toFixed(2)).join(" ");
+      let ap = "M " + pts[0].x.toFixed(2) + "," + (T + plotH).toFixed(2);
+      for (const p of pts) ap += " L " + p.x.toFixed(2) + "," + p.y.toFixed(2);
+      ap += " L " + pts[pts.length - 1].x.toFixed(2) + "," + (T + plotH).toFixed(2) + " Z";
+      const e = pts[pts.length - 1];
+      return (
+        (area ? `<path class="cr-linechart__area" d="${ap}" style="fill:${color}"/>` : "") +
+        `<polyline class="cr-linechart__line" points="${line}" style="stroke:${color}" vector-effect="non-scaling-stroke"/>` +
+        `<circle class="cr-linechart__end" cx="${e.x.toFixed(2)}" cy="${e.y.toFixed(2)}" r="2.6" style="fill:${color}" vector-effect="non-scaling-stroke"/>`
+      );
+    })
+    .join("");
   const ticks = continuous
-    ? xticks.map((tk) => `<line class="cr-chart__grid cr-chart__grid--v" x1="${xAtV(tk.value).toFixed(2)}" y1="${T}" x2="${xAtV(tk.value).toFixed(2)}" y2="${(T + plotH).toFixed(2)}" vector-effect="non-scaling-stroke"/><text class="cr-chart__tick" x="${xAtV(tk.value).toFixed(2)}" y="${H - 5}" text-anchor="middle">${tk.label}</text>`).join("")
-    : (labels || []).map((t, i) => `<text class="cr-chart__tick" x="${xAtI(i, labels.length).toFixed(2)}" y="${H - 5}" text-anchor="middle">${t}</text>`).join("");
-  const legend = series.length > 1
-    ? `<figcaption class="cr-chart__legend">${series.map((s, si) => `<button type="button" class="cr-chart__key" aria-pressed="true"><span class="cr-chart__sw" style="background:${hue(s.signal, si)}" aria-hidden="true"></span>${s.name}</button>`).join("")}</figcaption>`
-    : "";
-  const summary = label + " — " + series.map((s) => s.name + " latest " + s.data[s.data.length - 1]).join(", ");
+    ? xticks
+        .map(
+          (tk) =>
+            `<line class="cr-chart__grid cr-chart__grid--v" x1="${xAtV(tk.value).toFixed(2)}" y1="${T}" x2="${xAtV(tk.value).toFixed(2)}" y2="${(T + plotH).toFixed(2)}" vector-effect="non-scaling-stroke"/><text class="cr-chart__tick" x="${xAtV(tk.value).toFixed(2)}" y="${H - 5}" text-anchor="middle">${tk.label}</text>`
+        )
+        .join("")
+    : (labels || [])
+        .map(
+          (t, i) =>
+            `<text class="cr-chart__tick" x="${xAtI(i, labels.length).toFixed(2)}" y="${H - 5}" text-anchor="middle">${t}</text>`
+        )
+        .join("");
+  const legend =
+    series.length > 1
+      ? `<figcaption class="cr-chart__legend">${series.map((s, si) => `<button type="button" class="cr-chart__key" aria-pressed="true"><span class="cr-chart__sw" style="background:${hue(s.signal, si)}" aria-hidden="true"></span>${s.name}</button>`).join("")}</figcaption>`
+      : "";
+  const summary =
+    label + " — " + series.map((s) => s.name + " latest " + s.data[s.data.length - 1]).join(", ");
   return `<figure class="cr-chart cr-linechart"><div class="cr-linechart__graphic" role="img" aria-label="${summary}"><svg class="cr-linechart__plot" viewBox="0 0 ${W} ${H}" aria-hidden="true" focusable="false">${gridSvg}${seriesSvg}${ticks}</svg></div>${legend}</figure>`;
 }
-function barChartSvg(data, { target, showValues = true, height = 140, label = "bar chart", axis = true, unit = "" } = {}) {
-  const W = 320, H = height, L = axis ? 30 : 6, R = 6, T = 14, B = 18, plotW = W - L - R, plotH = H - T - B, base = T + plotH;
+function barChartSvg(
+  data,
+  { target, showValues = true, height = 140, label = "bar chart", axis = true, unit = "" } = {}
+) {
+  const W = 320,
+    H = height,
+    L = axis ? 30 : 6,
+    R = 6,
+    T = 14,
+    B = 18,
+    plotW = W - L - R,
+    plotH = H - T - B,
+    base = T + plotH;
   let hi = target || 0;
   for (const d of data) if (d.value > hi) hi = d.value;
-  const sc = niceScale(0, hi || 1, 5), max = sc.max;
+  const sc = niceScale(0, hi || 1, 5),
+    max = sc.max;
   const yAt = (v) => base - Math.max(0, Math.min(1, v / max)) * plotH;
-  const gridSvg = sc.ticks.map((v) =>
-    `<line class="cr-chart__grid" x1="${L}" y1="${yAt(v).toFixed(2)}" x2="${W - R}" y2="${yAt(v).toFixed(2)}" vector-effect="non-scaling-stroke"/>`
-    + (axis ? `<text class="cr-chart__ytick" x="${L - 5}" y="${(yAt(v) + 3).toFixed(2)}" text-anchor="end">${fmtTick(v)}${unit}</text>` : "")
-  ).join("");
-  const n = data.length, gap = 2, bw = (plotW - gap * (n - 1)) / n;
-  const bars = data.map((d, i) => {
-    const h = Math.max(0, Math.min(1, d.value / max)) * plotH, x = L + i * (bw + gap), cx = x + bw / 2, color = hue(d.signal, i);
-    return `<rect class="cr-barchart__bar" x="${x.toFixed(2)}" y="${(base - h).toFixed(2)}" width="${bw.toFixed(2)}" height="${h.toFixed(2)}" rx="1.5" style="fill:${color}"/>`
-      + (showValues ? `<text class="cr-chart__val" x="${cx.toFixed(2)}" y="${(base - h - 3).toFixed(2)}" text-anchor="middle">${d.value}</text>` : "")
-      + `<text class="cr-chart__tick" x="${cx.toFixed(2)}" y="${H - 5}" text-anchor="middle">${d.label}</text>`;
-  }).join("");
-  const tline = target !== undefined ? `<line class="cr-chart__target" x1="${L}" y1="${yAt(target).toFixed(2)}" x2="${W - R}" y2="${yAt(target).toFixed(2)}" vector-effect="non-scaling-stroke"/>` : "";
+  const gridSvg = sc.ticks
+    .map(
+      (v) =>
+        `<line class="cr-chart__grid" x1="${L}" y1="${yAt(v).toFixed(2)}" x2="${W - R}" y2="${yAt(v).toFixed(2)}" vector-effect="non-scaling-stroke"/>` +
+        (axis
+          ? `<text class="cr-chart__ytick" x="${L - 5}" y="${(yAt(v) + 3).toFixed(2)}" text-anchor="end">${fmtTick(v)}${unit}</text>`
+          : "")
+    )
+    .join("");
+  const n = data.length,
+    gap = 2,
+    bw = (plotW - gap * (n - 1)) / n;
+  const bars = data
+    .map((d, i) => {
+      const h = Math.max(0, Math.min(1, d.value / max)) * plotH,
+        x = L + i * (bw + gap),
+        cx = x + bw / 2,
+        color = hue(d.signal, i);
+      return (
+        `<rect class="cr-barchart__bar" x="${x.toFixed(2)}" y="${(base - h).toFixed(2)}" width="${bw.toFixed(2)}" height="${h.toFixed(2)}" rx="1.5" style="fill:${color}"/>` +
+        (showValues
+          ? `<text class="cr-chart__val" x="${cx.toFixed(2)}" y="${(base - h - 3).toFixed(2)}" text-anchor="middle">${d.value}</text>`
+          : "") +
+        `<text class="cr-chart__tick" x="${cx.toFixed(2)}" y="${H - 5}" text-anchor="middle">${d.label}</text>`
+      );
+    })
+    .join("");
+  const tline =
+    target !== undefined
+      ? `<line class="cr-chart__target" x1="${L}" y1="${yAt(target).toFixed(2)}" x2="${W - R}" y2="${yAt(target).toFixed(2)}" vector-effect="non-scaling-stroke"/>`
+      : "";
   const summary = label + " — " + data.map((d) => d.label + " " + d.value).join(", ");
   return `<figure class="cr-chart cr-barchart" role="img" aria-label="${summary}"><svg class="cr-barchart__plot" viewBox="0 0 ${W} ${H}" aria-hidden="true" focusable="false">${gridSvg}${bars}${tline}</svg></figure>`;
 }
 function stackedBar(segments, { label, showLegend = true } = {}) {
   const total = segments.reduce((a, s) => a + s.value, 0) || 1;
   const rows = segments.map((s) => ({ ...s, pct: (s.value / total) * 100 }));
-  const bar = rows.map((r) => `<span class="cr-stack__seg cr-stack__seg--${r.signal}" style="flex-grow:${r.pct}" title="${r.label} · ${r.value}"></span>`).join("");
+  const bar = rows
+    .map(
+      (r) =>
+        `<span class="cr-stack__seg cr-stack__seg--${r.signal}" style="flex-grow:${r.pct}" title="${r.label} · ${r.value}"></span>`
+    )
+    .join("");
   const legend = showLegend
     ? `<div class="cr-stack__legend" aria-hidden="true">${rows.map((r) => `<span class="cr-stack__key"><span class="cr-stack__sw cr-stack__seg--${r.signal}"></span><span class="cr-stack__kl">${r.label}</span><span class="cr-stack__kv">${r.value}</span><span class="cr-stack__kp">${Math.round(r.pct)}%</span></span>`).join("")}</div>`
     : "";
-  const summary = (label || "breakdown") + " — " + rows.map((r) => r.label + " " + r.value + " (" + Math.round(r.pct) + "%)").join(", ");
+  const summary =
+    (label || "breakdown") +
+    " — " +
+    rows.map((r) => r.label + " " + r.value + " (" + Math.round(r.pct) + "%)").join(", ");
   return `<div class="cr-stack" role="img" aria-label="${summary}">${label ? `<span class="cr-stack__label">${label}</span>` : ""}<div class="cr-stack__bar" aria-hidden="true">${bar}</div>${legend}</div>`;
 }
 
@@ -192,45 +337,67 @@ const chartsSection = `
       <div style="display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));align-items:start">
         <div>
           <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:6px">throughput vs errors · 09→16</div>
-          ${lineChartSvg([
-            { name: "throughput", data: [12, 18, 15, 22, 19, 26, 24, 31], signal: "work" },
-            { name: "errors", data: [2, 3, 2, 5, 4, 3, 6, 4], signal: "err" },
-          ], ["09", "10", "11", "12", "13", "14", "15", "16"], { label: "Throughput vs errors" })}
+          ${lineChartSvg(
+            [
+              { name: "throughput", data: [12, 18, 15, 22, 19, 26, 24, 31], signal: "work" },
+              { name: "errors", data: [2, 3, 2, 5, 4, 3, 6, 4], signal: "err" },
+            ],
+            ["09", "10", "11", "12", "13", "14", "15", "16"],
+            { label: "Throughput vs errors" }
+          )}
         </div>
         <div>
           <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:6px">error budget · calendar axis (5 months)</div>
           ${(() => {
             // ~5 months of weekly samples → monthly calendar ticks (UTC, deterministic).
-            const start = Date.UTC(2025, 0, 6), week = 7 * 24 * 3600 * 1000;
-            const xs = [], data = [];
-            for (let i = 0; i < 22; i++) { xs.push(start + i * week); data.push(80 + Math.round(18 * Math.sin(i / 2.5)) + (i % 4)); }
+            const start = Date.UTC(2025, 0, 6),
+              week = 7 * 24 * 3600 * 1000;
+            const xs = [],
+              data = [];
+            for (let i = 0; i < 22; i++) {
+              xs.push(start + i * week);
+              data.push(80 + Math.round(18 * Math.sin(i / 2.5)) + (i % 4));
+            }
             return lineChartSvg([{ name: "budget", data, signal: "work" }], null, {
-              label: "error budget over five months", unit: "%", x: xs, xTime: true, xZone: "UTC",
+              label: "error budget over five months",
+              unit: "%",
+              x: xs,
+              xTime: true,
+              xZone: "UTC",
             });
           })()}
         </div>
         <div>
           <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:6px">sessions by region · target 35</div>
-          ${barChartSvg([
-            { label: "eu", value: 42 },
-            { label: "us", value: 31 },
-            { label: "ap", value: 18 },
-            { label: "sa", value: 9 },
-          ], { target: 35, label: "Sessions by region" })}
+          ${barChartSvg(
+            [
+              { label: "eu", value: 42 },
+              { label: "us", value: 31 },
+              { label: "ap", value: 18 },
+              { label: "sa", value: 9 },
+            ],
+            { target: 35, label: "Sessions by region" }
+          )}
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:12px;max-width:420px;margin-top:16px">
-        ${stackedBar([
-          { label: "working", value: 6, signal: "work" },
-          { label: "waiting", value: 3, signal: "wait" },
-          { label: "done", value: 9, signal: "done" },
-          { label: "failed", value: 1, signal: "err" },
-        ], { label: "Fleet state" })}
-        ${stackedBar([
-          { label: "cpu", value: 41, signal: "work" },
-          { label: "io", value: 22, signal: "accent" },
-          { label: "idle", value: 37, signal: "idle" },
-        ], { label: "Worker eu-01 budget" })}
+        ${stackedBar(
+          [
+            { label: "working", value: 6, signal: "work" },
+            { label: "waiting", value: 3, signal: "wait" },
+            { label: "done", value: 9, signal: "done" },
+            { label: "failed", value: 1, signal: "err" },
+          ],
+          { label: "Fleet state" }
+        )}
+        ${stackedBar(
+          [
+            { label: "cpu", value: 41, signal: "work" },
+            { label: "io", value: 22, signal: "accent" },
+            { label: "idle", value: 37, signal: "idle" },
+          ],
+          { label: "Worker eu-01 budget" }
+        )}
       </div>`;
 
 const html = `<!doctype html>

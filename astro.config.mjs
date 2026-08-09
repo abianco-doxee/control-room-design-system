@@ -1,6 +1,7 @@
 // @ts-check
-import { defineConfig } from "astro/config";
+
 import starlight from "@astrojs/starlight";
+import { defineConfig } from "astro/config";
 
 // Support `## Heading {#custom-id}` anchors (GitHub/kramdown syntax) so the
 // catalog + cross-doc links resolve to the right heading. Strips the literal
@@ -50,8 +51,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "Control Room",
-      description:
-        "A neon-noir, neobrutalist design system for dense operational dashboards.",
+      description: "A neon-noir, neobrutalist design system for dense operational dashboards.",
       customCss: ["./src/styles/starlight-theme.css"],
       pagination: false,
       social: [
@@ -86,7 +86,10 @@ export default defineConfig({
           label: "Building",
           items: [
             { label: "Component Library", link: "/reference/components/" },
-            { label: "Styling Contract — pt / dt / unstyled", link: "/reference/styling-contract/" },
+            {
+              label: "Styling Contract — pt / dt / unstyled",
+              link: "/reference/styling-contract/",
+            },
             { label: "Forms — validation", link: "/reference/forms/" },
             { label: "Component Catalog", link: "/reference/catalog/" },
             { label: "Seeded Pixel-Cat", link: "/reference/seeded-cat/" },

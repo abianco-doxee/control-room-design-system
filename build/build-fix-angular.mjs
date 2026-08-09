@@ -14,9 +14,9 @@
 //
 //   node build/build-fix-angular.mjs           patch dist/frameworks/angular
 //   node build/build-fix-angular.mjs --check   fail if any file needs patching
-import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const DIR = join(ROOT, "dist", "frameworks", "angular", "components");
@@ -66,4 +66,9 @@ if (CHECK && touched) {
   process.exit(1);
 }
 
-console.log("angular fixup: normalized " + files.length + " file(s)" + (touched ? " (" + touched + " changed)" : ""));
+console.log(
+  "angular fixup: normalized " +
+    files.length +
+    " file(s)" +
+    (touched ? " (" + touched + " changed)" : "")
+);

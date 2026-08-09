@@ -11,17 +11,24 @@
 //
 // The output is provenance + a tuning surface; theme values in tokens/tokens.json
 // are updated from it (see references/tokens.md#oklch).
-import { writeFileSync, readFileSync, existsSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { oklch, formatHex, clampChroma, wcagContrast } from "culori";
+import { clampChroma, formatHex, oklch, wcagContrast } from "culori";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 // Shared signal hues (OKLCH degrees). One hue per meaning — Law 2.
 const HUE = {
-  work: 218, wait: 77, done: 168, err: 22, accent: 354, accent2: 128,
-  idle: 285, stage: 150, violet: 300,
+  work: 218,
+  wait: 77,
+  done: 168,
+  err: 22,
+  accent: 354,
+  accent2: 128,
+  idle: 285,
+  stage: 150,
+  violet: 300,
 };
 
 // sRGB-gamut-mapped hex from OKLCH.
@@ -39,27 +46,39 @@ const THEMES = {
   // surface, not a void — while staying dark enough for text contrast.
   dark: {
     ground: { h: 292, c: 0.072, steps: [0.155, 0.185, 0.225, 0.265] },
-    sig:    { l: 0.80, c: 0.19 },
+    sig: { l: 0.8, c: 0.19 },
     // accent stays a HOT magenta (low-L keeps it saturated, not pale pink)
-    over:   { err: { l: 0.66, c: 0.20 }, accent: { l: 0.66, c: 0.28 }, idle: { l: 0.62, c: 0.026, h: HUE.idle } },
+    over: {
+      err: { l: 0.66, c: 0.2 },
+      accent: { l: 0.66, c: 0.28 },
+      idle: { l: 0.62, c: 0.026, h: HUE.idle },
+    },
     accent2: {},
   },
   extreme: {
     ground: { h: 312, c: 0.09, steps: [0.15, 0.185, 0.23, 0.275] },
-    sig:    { l: 0.84, c: 0.23 },
-    over:   { err: { l: 0.66, c: 0.22 }, accent: { l: 0.67, c: 0.29 }, idle: { l: 0.62, c: 0.05, h: 300 } },
+    sig: { l: 0.84, c: 0.23 },
+    over: {
+      err: { l: 0.66, c: 0.22 },
+      accent: { l: 0.67, c: 0.29 },
+      idle: { l: 0.62, c: 0.05, h: 300 },
+    },
     accent2: {},
   },
   // Light keeps its hand-tuned signals (character + AA), but the paper is
   // regenerated COOL (violet-grey, not warm cream) to sit with the neon signals.
-  light:    { ground: { h: 285, c: 0.01, steps: [0.94, 0.915, 0.99, 0.965] }, accent2: { l: 0.46, c: 0.15, h: HUE.violet } },
-  phosphor: { accent2: { l: 0.82, c: 0.20, h: 165 } },
+  light: {
+    ground: { h: 285, c: 0.01, steps: [0.94, 0.915, 0.99, 0.965] },
+    accent2: { l: 0.46, c: 0.15, h: HUE.violet },
+  },
+  phosphor: { accent2: { l: 0.82, c: 0.2, h: 165 } },
 };
 
 const NEAR_BLACK = "#06050c";
 const NEAR_WHITE = "#f4f2ff";
 const bestOn = (bg) => {
-  const b = wcagContrast(bg, NEAR_BLACK), w = wcagContrast(bg, NEAR_WHITE);
+  const b = wcagContrast(bg, NEAR_BLACK),
+    w = wcagContrast(bg, NEAR_WHITE);
   return b >= w ? { on: NEAR_BLACK, ratio: b } : { on: NEAR_WHITE, ratio: w };
 };
 
@@ -69,7 +88,9 @@ const report = [];
 
 const check = (name, s, value) => {
   const { on, ratio } = bestOn(value);
-  report.push(`  ${ratio < 4.5 ? "⚠" : "✓"} ${name}.${s} ${value} on ${on} = ${ratio.toFixed(2)}${ratio < 4.5 ? " (< AA 4.5)" : ""}`);
+  report.push(
+    `  ${ratio < 4.5 ? "⚠" : "✓"} ${name}.${s} ${value} on ${on} = ${ratio.toFixed(2)}${ratio < 4.5 ? " (< AA 4.5)" : ""}`
+  );
   return on;
 };
 
@@ -81,11 +102,14 @@ for (const [name, spec] of Object.entries(THEMES)) {
   if (spec.ground) {
     t.grounds = {};
     const gs = ["ground", "board", "panel", "panel-2"];
-    spec.ground.steps.forEach((l, i) => { t.grounds[gs[i]] = hex(l, spec.ground.c, spec.ground.h); });
+    spec.ground.steps.forEach((l, i) => {
+      t.grounds[gs[i]] = hex(l, spec.ground.c, spec.ground.h);
+    });
   }
   // signals — the full state ramp
   if (spec.sig) {
-    t.signals = t.signals || {}; t.on = t.on || {};
+    t.signals = t.signals || {};
+    t.on = t.on || {};
     for (const s of SIG_ONLY) {
       const o = spec.over?.[s] || {};
       const l = o.l ?? spec.sig.l;
@@ -98,7 +122,8 @@ for (const [name, spec] of Object.entries(THEMES)) {
   }
   // second accent — explicit L/C/H, or derived from the signal spec when "full"
   if (spec.accent2) {
-    t.signals = t.signals || {}; t.on = t.on || {};
+    t.signals = t.signals || {};
+    t.on = t.on || {};
     const a2 = spec.accent2;
     const l = a2.l ?? spec.sig.l;
     const c = a2.c ?? spec.sig.c;
@@ -126,17 +151,40 @@ if (CHECK) {
   // 2) tokens.json themes must actually contain the generated grounds/signals
   //    (closes the loop: generator output can't silently diverge from the source)
   const tokens = JSON.parse(readFileSync(join(ROOT, "tokens", "tokens.json"), "utf8"));
-  const SIGMAP = { work: "sig-work", wait: "sig-wait", done: "sig-done", err: "sig-err", idle: "sig-idle", accent: "sig-accent", stage: "stage", accent2: "sig-accent-2" };
+  const SIGMAP = {
+    work: "sig-work",
+    wait: "sig-wait",
+    done: "sig-done",
+    err: "sig-err",
+    idle: "sig-idle",
+    accent: "sig-accent",
+    stage: "stage",
+    accent2: "sig-accent-2",
+  };
   for (const [name, g] of Object.entries(out)) {
     const th = tokens.themes[name] || {};
-    if (g.grounds) for (const k of ["ground", "board", "panel", "panel-2"]) {
-      if (th[k] !== g.grounds[k]) { stale = true; console.error(`✗ ${name}.${k}: tokens.json=${th[k]} vs generated=${g.grounds[k]}`); }
-    }
-    if (g.signals) for (const [sk, val] of Object.entries(g.signals)) {
-      const tk = SIGMAP[sk]; if (tk && th[tk] !== val) { stale = true; console.error(`✗ ${name}.${tk}: tokens.json=${th[tk]} vs generated=${val}`); }
-    }
+    if (g.grounds)
+      for (const k of ["ground", "board", "panel", "panel-2"]) {
+        if (th[k] !== g.grounds[k]) {
+          stale = true;
+          console.error(`✗ ${name}.${k}: tokens.json=${th[k]} vs generated=${g.grounds[k]}`);
+        }
+      }
+    if (g.signals)
+      for (const [sk, val] of Object.entries(g.signals)) {
+        const tk = SIGMAP[sk];
+        if (tk && th[tk] !== val) {
+          stale = true;
+          console.error(`✗ ${name}.${tk}: tokens.json=${th[tk]} vs generated=${val}`);
+        }
+      }
   }
-  if (stale) { console.error("\nOKLCH generator output has drifted from tokens.json. Re-run the palette merge."); process.exit(1); }
+  if (stale) {
+    console.error(
+      "\nOKLCH generator output has drifted from tokens.json. Re-run the palette merge."
+    );
+    process.exit(1);
+  }
   console.log("✓ palette.generated.json is current and tokens.json matches the OKLCH generator");
   process.exit(0);
 }
@@ -148,4 +196,6 @@ if (!REPORT) {
 console.log("\nOKLCH palette — contrast report (near-black #06050c / near-white #f4f2ff):");
 console.log(report.join("\n"));
 const fails = report.filter((r) => r.includes("⚠")).length;
-console.log(`\n${fails === 0 ? "✓ all fills clear AA on their chosen on-colour" : "✗ " + fails + " under AA — retune spec"}`);
+console.log(
+  `\n${fails === 0 ? "✓ all fills clear AA on their chosen on-colour" : "✗ " + fails + " under AA — retune spec"}`
+);

@@ -12,10 +12,16 @@
  *   node scripts/skills-sync.mjs --provider=claude   install into one provider
  */
 import {
-  readFileSync, existsSync, mkdirSync, rmSync, cpSync, statSync, readdirSync,
+  cpSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
 } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { dirname, join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const manifest = JSON.parse(readFileSync(join(ROOT, "skills", "manifest.json"), "utf8"));
@@ -41,7 +47,8 @@ function validate(skill) {
     if (!existsSync(join(ROOT, inc))) errors.push(`include not found: ${inc}`);
   }
   // every repo-relative doc link in SKILL.md must resolve
-  const linkRe = /\((?:\.\/)?((?:references|templates|checklists|tokens|dist|design-tokens)\/[^)\s#]+)\)/g;
+  const linkRe =
+    /\((?:\.\/)?((?:references|templates|checklists|tokens|dist|design-tokens)\/[^)\s#]+)\)/g;
   let m;
   const seen = new Set();
   while ((m = linkRe.exec(txt))) seen.add(m[1]);
@@ -100,7 +107,7 @@ function checkInstall(skill, providerDir) {
 
 /* ── run ───────────────────────────────────────────────────────────────── */
 const providers = Object.entries(manifest.providers).filter(
-  ([name]) => !onlyProvider || name === onlyProvider,
+  ([name]) => !onlyProvider || name === onlyProvider
 );
 
 for (const skill of manifest.skills) {
@@ -119,4 +126,6 @@ if (errors.length) {
   if (CHECK) console.error("\nFix the source or run: npm run skills:sync");
   process.exit(1);
 }
-console.log(CHECK ? "✓ skill source is valid and installs are in sync" : "✓ skill installed to all providers");
+console.log(
+  CHECK ? "✓ skill source is valid and installs are in sync" : "✓ skill installed to all providers"
+);

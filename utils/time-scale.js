@@ -20,7 +20,10 @@
 // exactly like utils/position.js ↔ CrPopover. Keep the two in sync;
 // tests/time-scale.test.mjs guards this module.
 
-const S = 1000, MIN = 60 * S, HR = 60 * MIN, DAY = 24 * HR;
+const S = 1000,
+  MIN = 60 * S,
+  HR = 60 * MIN,
+  DAY = 24 * HR;
 const MON = {
   en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
   it: ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"],
@@ -36,9 +39,14 @@ const clampInt = (v, lo, hi, dflt) => {
 // Calendar parts of an instant as read in `zone` (month 1-12).
 function zoneParts(ms, zone) {
   const dtf = new Intl.DateTimeFormat("en-US", {
-    timeZone: zone, hourCycle: "h23",
-    year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", second: "2-digit",
+    timeZone: zone,
+    hourCycle: "h23",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
   });
   const out = { year: 0, month: 1, day: 1, hour: 0, minute: 0, second: 0 };
   for (const p of dtf.formatToParts(new Date(ms))) {
@@ -53,7 +61,9 @@ function zoneParts(ms, zone) {
 }
 
 function weekday(ms, zone) {
-  const s = new Intl.DateTimeFormat("en-US", { timeZone: zone, weekday: "short" }).format(new Date(ms));
+  const s = new Intl.DateTimeFormat("en-US", { timeZone: zone, weekday: "short" }).format(
+    new Date(ms)
+  );
   return WD[s] || 0;
 }
 
@@ -73,15 +83,19 @@ function zonedToEpoch(y, mo, d, h, mi, s, zone) {
 }
 
 // Fiscal year identified by the calendar year it *ends* in.
-function fyEnd(year, month, start) { return month >= start ? year + 1 : year; }
+function fyEnd(year, month, start) {
+  return month >= start ? year + 1 : year;
+}
 // 1-based fiscal quarter of a (1-12) month given the fiscal start month.
-function quarterOf(month, start) { return Math.floor(((month - 1 - (start - 1) + 12) % 12) / 3) + 1; }
+function quarterOf(month, start) {
+  return Math.floor(((month - 1 - (start - 1) + 12) % 12) / 3) + 1;
+}
 
 // ISO-8601 week number + week-year for a Gregorian date (mo 0-based).
 function isoWeek(y, mo, d) {
   const date = new Date(Date.UTC(y, mo, d));
-  const dayNr = (date.getUTCDay() + 6) % 7;        // Mon=0
-  date.setUTCDate(date.getUTCDate() - dayNr + 3);  // Thursday of this week
+  const dayNr = (date.getUTCDay() + 6) % 7; // Mon=0
+  date.setUTCDate(date.getUTCDate() - dayNr + 3); // Thursday of this week
   const isoYear = date.getUTCFullYear();
   const firstThu = new Date(Date.UTC(isoYear, 0, 4));
   firstThu.setUTCDate(firstThu.getUTCDate() - ((firstThu.getUTCDay() + 6) % 7) + 3);
@@ -98,7 +112,9 @@ function label(ms, unit, step, o) {
   const p = zoneParts(ms, o.zone);
   const mon = MON[o.locale][p.month - 1];
   if (unit === "year") {
-    return o.fiscalStart > 1 ? "FY" + pad(fyEnd(p.year, p.month, o.fiscalStart) % 100) : "" + p.year;
+    return o.fiscalStart > 1
+      ? "FY" + pad(fyEnd(p.year, p.month, o.fiscalStart) % 100)
+      : "" + p.year;
   }
   if (unit === "month") {
     if (step === 3 && o.fiscalStart > 1) {
@@ -114,7 +130,25 @@ function label(ms, unit, step, o) {
   return p.day + " " + mon; // day, week (date)
 }
 
-const FIXED = [S, 2 * S, 5 * S, 10 * S, 15 * S, 30 * S, MIN, 2 * MIN, 5 * MIN, 10 * MIN, 15 * MIN, 30 * MIN, HR, 2 * HR, 3 * HR, 6 * HR, 12 * HR];
+const FIXED = [
+  S,
+  2 * S,
+  5 * S,
+  10 * S,
+  15 * S,
+  30 * S,
+  MIN,
+  2 * MIN,
+  5 * MIN,
+  10 * MIN,
+  15 * MIN,
+  30 * MIN,
+  HR,
+  2 * HR,
+  3 * HR,
+  6 * HR,
+  12 * HR,
+];
 
 function fixedTicks(lo, hi, step, zone) {
   const withSec = step < MIN;
@@ -126,15 +160,19 @@ function fixedTicks(lo, hi, step, zone) {
 }
 
 function calTicks(lo, hi, unit, step, o) {
-  const zone = o.zone, fs = o.fiscalStart;
+  const zone = o.zone,
+    fs = o.fiscalStart;
   const p = zoneParts(lo, zone);
-  let cy = p.year, cmo = p.month - 1, cd = p.day;
+  let cy = p.year,
+    cmo = p.month - 1,
+    cd = p.day;
   if (unit === "year") {
-    cmo = fs - 1; cd = 1;
+    cmo = fs - 1;
+    cd = 1;
     if (fs > 1 && p.month - 1 < fs - 1) cy = cy - 1; // fiscal year started last calendar year
     cy = Math.floor(cy / step) * step;
   } else if (unit === "month") {
-    const off = (fs - 1) % step;                      // fiscal-quarter phase
+    const off = (fs - 1) % step; // fiscal-quarter phase
     cmo = Math.floor((p.month - 1 - off) / step) * step + off;
     cd = 1;
   }
@@ -176,13 +214,17 @@ export function timeTicks(lo, hi, opts = {}) {
   // precedence over locale/week/fiscal (which only shape the built-in text).
   const fmt = typeof opts.format === "function" ? opts.format : null;
   const fin = (arr) => (fmt ? arr.map((t) => ({ value: t.value, label: fmt(t.value) })) : arr);
-  let a = lo, b = hi;
+  let a = lo,
+    b = hi;
   if (b <= a) b = a + S;
   const span = b - a;
   for (const st of FIXED) if (span / st <= target) return fin(fixedTicks(a, b, st, o.zone));
-  for (const nd of [1, 2]) if (span / (nd * DAY) <= target) return fin(calTicks(a, b, "day", nd, o));
+  for (const nd of [1, 2])
+    if (span / (nd * DAY) <= target) return fin(calTicks(a, b, "day", nd, o));
   if (span / (7 * DAY) <= target) return fin(calTicks(a, b, "week", 1, o));
-  for (const nm of [1, 3]) if (span / (nm * 30.4 * DAY) <= target) return fin(calTicks(a, b, "month", nm, o));
-  for (const ny of [1, 2, 5, 10, 25, 50, 100]) if (span / (ny * 365 * DAY) <= target) return fin(calTicks(a, b, "year", ny, o));
+  for (const nm of [1, 3])
+    if (span / (nm * 30.4 * DAY) <= target) return fin(calTicks(a, b, "month", nm, o));
+  for (const ny of [1, 2, 5, 10, 25, 50, 100])
+    if (span / (ny * 365 * DAY) <= target) return fin(calTicks(a, b, "year", ny, o));
   return fin(calTicks(a, b, "year", 500, o));
 }

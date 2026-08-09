@@ -9,9 +9,9 @@
  *
  * Generated dirs (guide/, reference/, build/) are git-ignored; index.mdx is not.
  */
-import { readFileSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { dirname, join, basename } from "node:path";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const DOCS = join(ROOT, "src", "content", "docs");
@@ -25,13 +25,23 @@ const PAGES = [
   ["SKILL.md", "guide", "skill", "What is Control Room"],
   ["CONTRIBUTING.md", "guide", "contributing", "Contributing"],
   ["CHANGELOG.md", "guide", "changelog", "Changelog"],
-  ["references/design-language.md", "reference", "design-language", "Design Language — the Nine Laws"],
+  [
+    "references/design-language.md",
+    "reference",
+    "design-language",
+    "Design Language — the Nine Laws",
+  ],
   ["references/tokens.md", "reference", "tokens", "Tokens"],
   ["references/theming.md", "reference", "theming", "Theming & Branding"],
   ["references/responsive.md", "reference", "responsive", "Responsive Architecture"],
   ["references/tailwind.md", "reference", "tailwind", "Tailwind-first"],
   ["references/components.md", "reference", "components", "Component Library"],
-  ["references/styling-contract.md", "reference", "styling-contract", "Styling Contract — pt / dt / unstyled"],
+  [
+    "references/styling-contract.md",
+    "reference",
+    "styling-contract",
+    "Styling Contract — pt / dt / unstyled",
+  ],
   ["references/forms.md", "reference", "forms", "Forms — validation (ArkType · JSON Schema)"],
   ["references/motion.md", "reference", "motion", "Motion"],
   ["references/accessibility.md", "reference", "accessibility", "Accessibility"],
@@ -106,7 +116,8 @@ function catalogPage() {
 }
 
 // clean generated sections (keep index.mdx)
-for (const dir of ["guide", "reference", "build"]) rmSync(join(DOCS, dir), { recursive: true, force: true });
+for (const dir of ["guide", "reference", "build"])
+  rmSync(join(DOCS, dir), { recursive: true, force: true });
 
 let n = 0;
 for (const [src, section, slug, title] of PAGES) {

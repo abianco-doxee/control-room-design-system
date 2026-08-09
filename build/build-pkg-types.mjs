@@ -12,9 +12,9 @@
 // best-effort per-framework shim (Vue DefineComponent, Solid render fn, Svelte
 // component constructor, Angular class). dist/frameworks/** is git-ignored and
 // regenerated every build:components; --check fails on drift.
-import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const COMPONENTS = join(ROOT, "components");
@@ -57,10 +57,10 @@ function extractTypeBlocks(src) {
   while ((m = re.exec(src))) {
     const kind = m[1];
     const name = m[2];
-    let i = m.index;
+    const i = m.index;
     if (kind === "interface") {
       // advance to the first '{', then balance braces
-      let j = src.indexOf("{", i);
+      const j = src.indexOf("{", i);
       if (j === -1) continue;
       let depth = 0;
       let k = j;
@@ -68,7 +68,10 @@ function extractTypeBlocks(src) {
         if (src[k] === "{") depth++;
         else if (src[k] === "}") {
           depth--;
-          if (depth === 0) { k++; break; }
+          if (depth === 0) {
+            k++;
+            break;
+          }
         }
       }
       blocks.push({ name, text: src.slice(i, k) });
@@ -80,7 +83,10 @@ function extractTypeBlocks(src) {
       for (; k < src.length; k++) {
         if (src[k] === "{" || src[k] === "(" || src[k] === "[") depth++;
         else if (src[k] === "}" || src[k] === ")" || src[k] === "]") depth--;
-        else if (src[k] === ";" && depth === 0) { k++; break; }
+        else if (src[k] === ";" && depth === 0) {
+          k++;
+          break;
+        }
       }
       blocks.push({ name, text: src.slice(i, k) });
     }
@@ -123,13 +129,7 @@ for (const [target, { ext, value }] of Object.entries(TARGETS)) {
     valueDecls.push(value(name, hasProps));
   }
 
-  const body =
-    HEADER +
-    "\n" +
-    typeDecls.join("\n\n") +
-    "\n\n" +
-    valueDecls.join("\n") +
-    "\n";
+  const body = HEADER + "\n" + typeDecls.join("\n\n") + "\n\n" + valueDecls.join("\n") + "\n";
 
   const outFile = join(dir, "index.d.ts");
   if (CHECK) {
@@ -145,6 +145,9 @@ for (const [target, { ext, value }] of Object.entries(TARGETS)) {
 }
 
 if (CHECK) {
-  if (drift) { console.error("\n✗ package type declarations are stale"); process.exit(1); }
+  if (drift) {
+    console.error("\n✗ package type declarations are stale");
+    process.exit(1);
+  }
   console.log("✓ package type declarations are in sync");
 }

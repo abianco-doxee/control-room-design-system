@@ -14,10 +14,15 @@
  * Run:   node build/build-tokens.mjs
  * Check: node build/build-tokens.mjs --check   (fails if dist/ is stale)
  */
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { themeCss, THEME_ROLES, CHASSIS_OVERRIDABLE, TYPE_OVERRIDABLE } from "../lib/theme/index.js";
+import { fileURLToPath } from "node:url";
+import {
+  CHASSIS_OVERRIDABLE,
+  THEME_ROLES,
+  TYPE_OVERRIDABLE,
+  themeCss,
+} from "../lib/theme/index.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = join(ROOT, "tokens", "tokens.json");
@@ -162,15 +167,18 @@ function structureCss() {
   return `${STRUCTURE_BANNER}\n:root {\n${body}\n}\n${BASELINE}`;
 }
 
-const THEME_BANNER = (theme) => `/* Control Room theme: ${theme} (GENERATED). Appearance layer only — pair with
+const THEME_BANNER = (
+  theme
+) => `/* Control Room theme: ${theme} (GENERATED). Appearance layer only — pair with
  * dist/structure.css. Source: tokens/tokens.json → npm run build:tokens. */\n`;
 
 // one standalone theme file: the semantic role values (dark also claims :root).
 function splitThemeCss(theme) {
-  const selector = theme === src.meta.defaultTheme
-    ? `:root, [data-theme="${theme}"]`
-    : `[data-theme="${theme}"]`;
-  return THEME_BANNER(theme) + themeCss(theme, themeVars(theme), { selector, scheme: SCHEME[theme] });
+  const selector =
+    theme === src.meta.defaultTheme ? `:root, [data-theme="${theme}"]` : `[data-theme="${theme}"]`;
+  return (
+    THEME_BANNER(theme) + themeCss(theme, themeVars(theme), { selector, scheme: SCHEME[theme] })
+  );
 }
 
 /* ── 3c. the theme contract (machine-readable appearance surface) ─────────
@@ -186,24 +194,26 @@ function themeContract() {
       roles.push({ cssVar: v.cssVar, group, role: v.role || "", required: true });
     }
   }
-  return JSON.stringify(
-    {
-      $generated: true,
-      $description:
-        "Control Room theme contract — the appearance surface a theme/brand must define. " +
-        "Components reference ONLY these roles, so any complete theme reskins the whole system. " +
-        "See references/theming.md.",
-      source: "tokens/tokens.json",
-      version: src.meta.version,
-      defaultTheme: src.meta.defaultTheme,
-      selector: src.meta.selector,
-      roles,
-      chassisOverridable: CHASSIS_OVERRIDABLE,
-      typeOverridable: TYPE_OVERRIDABLE,
-    },
-    null,
-    2,
-  ) + "\n";
+  return (
+    JSON.stringify(
+      {
+        $generated: true,
+        $description:
+          "Control Room theme contract — the appearance surface a theme/brand must define. " +
+          "Components reference ONLY these roles, so any complete theme reskins the whole system. " +
+          "See references/theming.md.",
+        source: "tokens/tokens.json",
+        version: src.meta.version,
+        defaultTheme: src.meta.defaultTheme,
+        selector: src.meta.selector,
+        roles,
+        chassisOverridable: CHASSIS_OVERRIDABLE,
+        typeOverridable: TYPE_OVERRIDABLE,
+      },
+      null,
+      2
+    ) + "\n"
+  );
 }
 
 /* Guard: the contract derived from tokens.json must match lib/theme's runtime copy
@@ -216,7 +226,7 @@ function assertContractInSync() {
   if (a !== b) {
     throw new Error(
       "Theme contract drift: tokens.json semantic roles ≠ lib/theme THEME_ROLES.\n" +
-        `  tokens: ${a}\n  lib:    ${b}`,
+        `  tokens: ${a}\n  lib:    ${b}`
     );
   }
 }
@@ -226,10 +236,13 @@ function assertContractInSync() {
 function flatJson() {
   const out = {};
   for (const theme of THEMES) {
-    const merged = theme === src.meta.defaultTheme ? { ...base, ...themeVars(theme) } : themeVars(theme);
+    const merged =
+      theme === src.meta.defaultTheme ? { ...base, ...themeVars(theme) } : themeVars(theme);
     out[theme] = Object.fromEntries(Object.entries(merged).map(([k, v]) => [`--${k}`, v]));
   }
-  return JSON.stringify({ $generated: true, source: "tokens/tokens.json", themes: out }, null, 2) + "\n";
+  return (
+    JSON.stringify({ $generated: true, source: "tokens/tokens.json", themes: out }, null, 2) + "\n"
+  );
 }
 
 /* ── 5. DTCG export (Design Tokens Community Group format) ────────────────
@@ -267,7 +280,11 @@ function dtcg() {
     const walk = (node) => {
       if (node && typeof node === "object") {
         if (typeof node.cssVar === "string" && "value" in node)
-          g[node.cssVar.replace(/^--/, "")] = tok(node.cssVar.replace(/^--/, ""), node.value, node.use || node.role);
+          g[node.cssVar.replace(/^--/, "")] = tok(
+            node.cssVar.replace(/^--/, ""),
+            node.value,
+            node.use || node.role
+          );
         else for (const [k, v] of Object.entries(node)) if (!k.startsWith("$")) walk(v);
       }
     };
@@ -298,10 +315,12 @@ function dtcg() {
     }
     if (tvals.$chassisOverride) {
       themeOut.chassis = {};
-      for (const [k, val] of Object.entries(tvals.$chassisOverride)) themeOut.chassis[k] = tok(k, val, "chassis override");
+      for (const [k, val] of Object.entries(tvals.$chassisOverride))
+        themeOut.chassis[k] = tok(k, val, "chassis override");
     }
     for (const extra of ["extra-purple", "extra-orange"]) {
-      if (extra in tvals) (themeOut.extra ??= {})[extra] = tok(extra, tvals[extra], "extreme-only extension hue");
+      if (extra in tvals)
+        (themeOut.extra ??= {})[extra] = tok(extra, tvals[extra], "extreme-only extension hue");
     }
     out.theme[theme] = themeOut;
   }
@@ -313,21 +332,39 @@ function dtcg() {
  * scales/fonts are literal. Import after "tailwindcss" (see styles/tailwind.css). */
 function twTheme() {
   const colorMap = {
-    ground: "--ground", board: "--board", panel: "--panel", "panel-2": "--panel-2",
-    ink: "--ink", muted: "--muted", border: "--border", rail: "--rail", "rail-ink": "--rail-ink",
-    "on-sig": "--on-sig", "on-err": "--on-err", stage: "--stage", drip: "--drip",
-    work: "--sig-work", wait: "--sig-wait", done: "--sig-done", err: "--sig-err",
-    idle: "--sig-idle", accent: "--sig-accent", accent2: "--sig-accent-2",
-    "on-accent": "--on-accent", "on-idle": "--on-idle",
+    ground: "--ground",
+    board: "--board",
+    panel: "--panel",
+    "panel-2": "--panel-2",
+    ink: "--ink",
+    muted: "--muted",
+    border: "--border",
+    rail: "--rail",
+    "rail-ink": "--rail-ink",
+    "on-sig": "--on-sig",
+    "on-err": "--on-err",
+    stage: "--stage",
+    drip: "--drip",
+    work: "--sig-work",
+    wait: "--sig-wait",
+    done: "--sig-done",
+    err: "--sig-err",
+    idle: "--sig-idle",
+    accent: "--sig-accent",
+    accent2: "--sig-accent-2",
+    "on-accent": "--on-accent",
+    "on-idle": "--on-idle",
   };
   const L = [];
   for (const [name, v] of Object.entries(colorMap)) L.push(`  --color-${name}: var(${v});`);
-  for (const [k, t] of Object.entries(src.primitive.text)) if (t.cssVar) L.push(`  --text-${k}: ${t.value};`);
+  for (const [k, t] of Object.entries(src.primitive.text))
+    if (t.cssVar) L.push(`  --text-${k}: ${t.value};`);
   L.push(`  --font-sans: ${src.typography.family.sans.value};`);
   L.push(`  --font-display: ${src.typography.family.display.value};`);
   L.push(`  --font-mono: ${src.typography.family.mono.value};`);
   L.push(`  --spacing: 0.25rem;`); // 4px base → p-1=4px … matches --space-*
-  for (const r of ["xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl"]) L.push(`  --radius-${r}: 0px;`);
+  for (const r of ["xs", "sm", "md", "lg", "xl", "2xl", "3xl", "4xl"])
+    L.push(`  --radius-${r}: 0px;`);
   return (
     `/* GENERATED from tokens.json — Tailwind v4 @theme. Do not edit.\n` +
     ` * Import after "tailwindcss"; colors follow html[data-theme] via the runtime vars\n` +
@@ -360,9 +397,15 @@ if (CHECK) {
   for (const [rel, content] of targets) {
     const p = join(ROOT, rel);
     const cur = existsSync(p) ? readFileSync(p, "utf8") : "";
-    if (cur !== content) { stale = true; console.error(`✗ ${rel} is out of date`); }
+    if (cur !== content) {
+      stale = true;
+      console.error(`✗ ${rel} is out of date`);
+    }
   }
-  if (stale) { console.error("\nRun: npm run build:tokens, then commit the generated files."); process.exit(1); }
+  if (stale) {
+    console.error("\nRun: npm run build:tokens, then commit the generated files.");
+    process.exit(1);
+  }
   console.log("✓ generated token artifacts are up to date with tokens/tokens.json");
   process.exit(0);
 }

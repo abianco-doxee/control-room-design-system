@@ -1,0 +1,59 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.7/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "includes": [
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.mjs",
+      "**/*.cjs",
+      "!node_modules",
+      "!dist",
+      "!site-dist",
+      "!.astro",
+      "!.mitosis-cache",
+      "!public",
+      "!test-results",
+      "!coverage",
+      "!examples",
+      "!overrides",
+      "!components"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": { "quoteStyle": "double", "trailingCommas": "es5", "semicolons": "always" }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noAssignInExpressions": "off"
+      },
+      "style": {
+        "noParameterAssign": "off",
+        "useNodejsImportProtocol": "off",
+        "useTemplate": "off",
+        "useExponentiationOperator": "off"
+      },
+      "complexity": {
+        "noForEach": "off"
+      },
+      "performance": {
+        "noDynamicNamespaceImportAccess": "off"
+      },
+      "correctness": {
+        "useQwikValidLexicalScope": "off"
+      }
+    }
+  }
+}

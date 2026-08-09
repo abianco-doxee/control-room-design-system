@@ -5,11 +5,12 @@
 // consumer would (`import { CrButton } from ".../react"`), renders a component to
 // HTML through react-dom/server, and confirms the typed declarations ship. This is
 // the difference between "compiles" and "installable".
-import { test } from "node:test";
+
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as CR from "../dist/pkg/react/index.js";
@@ -19,7 +20,16 @@ const PKG = join(ROOT, "dist", "pkg", "react");
 
 test("the package exposes every component as a named export", () => {
   // a representative spread across categories
-  const expected = ["CrButton", "CrPanel", "CrChip", "CrForm", "CrCombobox", "CrTabs", "CrBarChart", "CrSigil"];
+  const expected = [
+    "CrButton",
+    "CrPanel",
+    "CrChip",
+    "CrForm",
+    "CrCombobox",
+    "CrTabs",
+    "CrBarChart",
+    "CrSigil",
+  ];
   for (const name of expected) {
     assert.equal(typeof CR[name], "function", `${name} should be a named export function`);
   }
@@ -30,7 +40,7 @@ test("the package exposes every component as a named export", () => {
 
 test("a named export renders to correct Control Room markup", () => {
   const html = renderToStaticMarkup(
-    createElement(CR.CrButton, { signal: "accent", emphasis: "outline" }, "Deploy"),
+    createElement(CR.CrButton, { signal: "accent", emphasis: "outline" }, "Deploy")
   );
   assert.match(html, /<button/);
   assert.match(html, /class="cr-btn cr-btn--outline cr-btn--sig-accent"/, `got: ${html}`);
@@ -39,7 +49,7 @@ test("a named export renders to correct Control Room markup", () => {
 
 test("CrButton renders as an anchor when href is set (external → safe rel)", () => {
   const ext = renderToStaticMarkup(
-    createElement(CR.CrButton, { href: "https://example.com", signal: "work" }, "Docs"),
+    createElement(CR.CrButton, { href: "https://example.com", signal: "work" }, "Docs")
   );
   assert.match(ext, /<a[^>]+href="https:\/\/example\.com"/, `external anchor: ${ext}`);
   assert.match(ext, /target="_blank"/, "external opens a new tab");
@@ -55,29 +65,33 @@ test("CrButton renders as an anchor when href is set (external → safe rel)", (
 });
 
 test("ported components render with correct a11y (ToggleChip/Overflow/RelativeTime)", () => {
-  const chip = renderToStaticMarkup(createElement(CR.CrToggleChip, { label: "PRs", pressed: true, count: 3 }));
+  const chip = renderToStaticMarkup(
+    createElement(CR.CrToggleChip, { label: "PRs", pressed: true, count: 3 })
+  );
   assert.match(chip, /role="checkbox"/, "toggle-chip is a checkbox");
   assert.match(chip, /aria-checked="true"/, "pressed → aria-checked");
   assert.match(chip, /data-state="on"/, "exposes data-state");
   assert.match(chip, />3</, "renders the count");
 
-  const ov = renderToStaticMarkup(createElement(CR.CrOverflow, { count: 4, noun: "sessions", onToggle: () => {} }));
+  const ov = renderToStaticMarkup(
+    createElement(CR.CrOverflow, { count: 4, noun: "sessions", onToggle: () => {} })
+  );
   assert.match(ov, /aria-expanded="false"/, "overflow reflects expanded");
   assert.match(ov, /aria-label="show 4 more sessions"/, `accessible name includes noun: ${ov}`);
 
   const ovStatic = renderToStaticMarkup(createElement(CR.CrOverflow, { count: 2, noun: "tags" }));
   assert.doesNotMatch(ovStatic, /<button/, "no onToggle → inert (not a button)");
 
-  const rt = renderToStaticMarkup(createElement(CR.CrRelativeTime, { time: 1000000000000, now: 1000000300000 }));
+  const rt = renderToStaticMarkup(
+    createElement(CR.CrRelativeTime, { time: 1000000000000, now: 1000000300000 })
+  );
   assert.match(rt, /<time/, "semantic time element");
   assert.match(rt, /datetime="/i, "machine-readable datetime");
   assert.match(rt, />5m ago</, `relative phrase from injected clock: ${rt}`);
 });
 
 test("a controlled component renders with its a11y wiring intact", () => {
-  const html = renderToStaticMarkup(
-    createElement(CR.CrChip, { signal: "done" }, "merged"),
-  );
+  const html = renderToStaticMarkup(createElement(CR.CrChip, { signal: "done" }, "merged"));
   assert.match(html, /cr-chip/);
   assert.match(html, />merged</);
 });
@@ -120,7 +134,7 @@ test("pt / dt / unstyled styling contract (portable subset) on CrTabs", () => {
       unstyled: true,
       pt: { tab: { class: "mine", "data-testid": "tab" } },
       dt: { "--sig-work": "#ff00ff" },
-    }),
+    })
   );
   assert.doesNotMatch(html, /cr-tab\b/, "unstyled drops the cr-* class");
   assert.match(html, /data-part="root"/, "parts expose data-part");

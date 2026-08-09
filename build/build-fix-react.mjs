@@ -14,9 +14,9 @@
 //
 //   node build/build-fix-react.mjs           patch dist/frameworks/react
 //   node build/build-fix-react.mjs --check   fail if any file needs patching
-import { readdirSync, readFileSync, writeFileSync, copyFileSync, existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { copyFileSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import prettier from "prettier";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -109,4 +109,9 @@ if (CHECK && touched) {
   process.exit(1);
 }
 
-console.log("react fixup: normalized " + files.length + " file(s)" + (touched ? " (" + touched + " changed)" : ""));
+console.log(
+  "react fixup: normalized " +
+    files.length +
+    " file(s)" +
+    (touched ? " (" + touched + " changed)" : "")
+);

@@ -13,9 +13,9 @@
  *
  * Run: node build/build-brand-preview.mjs → public/brands.html
  */
-import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { dirname, join, basename } from "node:path";
 import { contrastRatio } from "../lib/theme/index.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -26,7 +26,11 @@ const structureCss = readFileSync(join(ROOT, "dist", "structure.css"), "utf8");
 const componentsCss = readFileSync(join(ROOT, "styles", "components.css"), "utf8");
 
 const BUILTIN = ["dark", "light", "extreme", "phosphor"];
-const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const esc = (s) =>
+  String(s).replace(
+    /[&<>"]/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]
+  );
 
 /** Parse a theme file's first rule block into { scheme, vars }. */
 function parseTheme(css) {
@@ -39,35 +43,48 @@ function parseTheme(css) {
 
 /** Read every theme (built-ins first, then brands), each with a label. */
 function collectThemes() {
-  const files = readdirSync(THEMES).filter((f) => f.endsWith(".css")).map((f) => basename(f, ".css"));
-  const order = [...BUILTIN.filter((b) => files.includes(b)), ...files.filter((f) => !BUILTIN.includes(f)).sort()];
+  const files = readdirSync(THEMES)
+    .filter((f) => f.endsWith(".css"))
+    .map((f) => basename(f, ".css"));
+  const order = [
+    ...BUILTIN.filter((b) => files.includes(b)),
+    ...files.filter((f) => !BUILTIN.includes(f)).sort(),
+  ];
   return order.map((name) => {
     const { scheme, vars } = parseTheme(readFileSync(join(THEMES, `${name}.css`), "utf8"));
     let label = name;
     const brandBase = name.replace(/-(light|dark|hc)$/, "");
     const bp = join(BRANDS, `${brandBase}.json`);
-    if (existsSync(bp)) label = (JSON.parse(readFileSync(bp, "utf8")).$label || name);
+    if (existsSync(bp)) label = JSON.parse(readFileSync(bp, "utf8")).$label || name;
     else if (BUILTIN.includes(name)) label = `${name} · built-in`;
     return { name, label, scheme, vars, brand: !BUILTIN.includes(name) };
   });
 }
 
 const SURFACES = [
-  { k: "ground", on: "ink" }, { k: "board", on: "ink" }, { k: "panel", on: "ink" },
-  { k: "panel-2", on: "ink" }, { k: "rail", on: "rail-ink" },
+  { k: "ground", on: "ink" },
+  { k: "board", on: "ink" },
+  { k: "panel", on: "ink" },
+  { k: "panel-2", on: "ink" },
+  { k: "rail", on: "rail-ink" },
 ];
 const SIGNALS = [
-  { k: "sig-work", on: "on-sig", t: "work" }, { k: "sig-wait", on: "on-sig", t: "wait" },
-  { k: "sig-done", on: "on-sig", t: "done" }, { k: "sig-err", on: "on-err", t: "err" },
-  { k: "sig-idle", on: "on-idle", t: "idle" }, { k: "sig-accent", on: "on-accent", t: "accent" },
+  { k: "sig-work", on: "on-sig", t: "work" },
+  { k: "sig-wait", on: "on-sig", t: "wait" },
+  { k: "sig-done", on: "on-sig", t: "done" },
+  { k: "sig-err", on: "on-err", t: "err" },
+  { k: "sig-idle", on: "on-idle", t: "idle" },
+  { k: "sig-accent", on: "on-accent", t: "accent" },
   { k: "sig-accent-2", on: "on-accent-2", t: "accent2" },
 ];
 
 /** A swatch showing a fill, its on-colour label, and the measured contrast. */
 function swatch(vars, fillKey, onKey, text, min) {
-  const fill = vars[fillKey], on = vars[onKey];
+  const fill = vars[fillKey],
+    on = vars[onKey];
   const r = contrastRatio(on, fill);
-  const badge = r == null ? "" : `<b class="ratio ${r >= (min || 3) ? "ok" : "no"}">${r.toFixed(1)}</b>`;
+  const badge =
+    r == null ? "" : `<b class="ratio ${r >= (min || 3) ? "ok" : "no"}">${r.toFixed(1)}</b>`;
   return `<div class="sw" style="background:var(--${fillKey});color:var(--${onKey})">
     <span>${esc(text)}</span>${badge}</div>`;
 }
@@ -102,7 +119,14 @@ function section(t) {
 
 const themes = collectThemes();
 const scopedVars = themes
-  .map((t) => `.brand-${t.name}{color-scheme:${t.scheme};` + Object.entries(t.vars).map(([k, v]) => `--${k}:${v}`).join(";") + "}")
+  .map(
+    (t) =>
+      `.brand-${t.name}{color-scheme:${t.scheme};` +
+      Object.entries(t.vars)
+        .map(([k, v]) => `--${k}:${v}`)
+        .join(";") +
+      "}"
+  )
   .join("\n");
 
 const PAGE_CSS = `

@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { createHash } from "node:crypto";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 /**
  * Incremental Mitosis compiler — a drop-in replacement for `mitosis build` that
  * only re-generates the components whose source (or the shared build key) changed.
@@ -14,10 +16,8 @@
  * force a full rebuild (used by the parity check).
  */
 import { createRequire } from "node:module";
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, rmSync, existsSync } from "node:fs";
-import { createHash } from "node:crypto";
-import { fileURLToPath } from "node:url";
 import { dirname, join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -53,12 +53,15 @@ function globalKey() {
   const parts = [
     "v1",
     JSON.stringify({ targets: TARGET_LIST, options: config.options, dest: config.dest }),
-    JSON.parse(readFileSync(join(ROOT, "node_modules/@builder.io/mitosis/package.json"), "utf8")).version,
+    JSON.parse(readFileSync(join(ROOT, "node_modules/@builder.io/mitosis/package.json"), "utf8"))
+      .version,
     readFileSync(fileURLToPath(import.meta.url), "utf8"),
   ];
   if (existsSync(OVERRIDES_DIR)) {
     const walk = (dir) => {
-      for (const e of readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      for (const e of readdirSync(dir, { withFileTypes: true }).sort((a, b) =>
+        a.name.localeCompare(b.name)
+      )) {
         const p = join(dir, e.name);
         if (e.isDirectory()) walk(p);
         else parts.push(relative(ROOT, p) + ":" + sha(readFileSync(p, "utf8")));
@@ -94,8 +97,14 @@ async function emit(path) {
   const written = [];
   for (const o of outs) {
     const overrideFilePath = join(OVERRIDES_DIR, o.target);
-    const override = await getOverrideFile({ filename: o.outputFilePath, path: overrideFilePath, target: o.target });
-    let code = override ?? GENERATORS[o.target](o.options.options[o.target])({ path, component: o.component });
+    const override = await getOverrideFile({
+      filename: o.outputFilePath,
+      path: overrideFilePath,
+      target: o.target,
+    });
+    let code =
+      override ??
+      GENERATORS[o.target](o.options.options[o.target])({ path, component: o.component });
     code = transformImports({ target: o.target, options: o.options })(code);
     const dest = join(DEST, o.target, o.outputFilePath);
     mkdirSync(dirname(dest), { recursive: true });
@@ -126,7 +135,9 @@ async function main() {
   const gkey = globalKey();
   let manifest = { globalKey: null, files: {} };
   if (!NO_CACHE && existsSync(MANIFEST)) {
-    try { manifest = JSON.parse(readFileSync(MANIFEST, "utf8")); } catch {}
+    try {
+      manifest = JSON.parse(readFileSync(MANIFEST, "utf8"));
+    } catch {}
   }
   const cacheUsable = !NO_CACHE && manifest.globalKey === gkey;
 
@@ -140,7 +151,10 @@ async function main() {
   let cached = 0;
   for (const p of componentPaths) {
     const hit = cacheUsable && manifest.files[p] === current[p] && outputsExist(p);
-    if (hit) { cached++; continue; }
+    if (hit) {
+      cached++;
+      continue;
+    }
     await emit(p);
     built++;
   }
@@ -155,4 +169,7 @@ async function main() {
   );
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

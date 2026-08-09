@@ -12,11 +12,11 @@
  * Build-time only (uses culori); brands opt in with `$ramp` (see build-theme.mjs
  * and references/theming.md). A brand can still override any individual surface.
  */
-import { oklch, formatHex, clampChroma } from "culori";
+import { clampChroma, formatHex, oklch } from "culori";
 
 // target OKLCH lightness per role, per scheme
 const TARGETS = {
-  dark: { ground: 0.17, board: 0.21, panel: 0.25, "panel-2": 0.30, rail: 0.13 },
+  dark: { ground: 0.17, board: 0.21, panel: 0.25, "panel-2": 0.3, rail: 0.13 },
   light: { ground: 0.95, board: 0.925, panel: 0.995, "panel-2": 0.965, rail: 0.17 },
 };
 

@@ -62,13 +62,22 @@ export function computePosition(anchor, floating, viewport, opts = {}) {
     else y = Math.max(padding, Math.min(y, vh - fh - padding));
   }
 
-  return { x: Math.round(x), y: Math.round(y), placement: vertical ? `${side}-${align}` : `${side}-${align}` };
+  return {
+    x: Math.round(x),
+    y: Math.round(y),
+    placement: vertical ? `${side}-${align}` : `${side}-${align}`,
+  };
 }
 
 /** Apply computePosition to real elements (position: fixed). Returns { x, y, placement }. */
 export function place(anchorEl, floatingEl, opts = {}) {
   const vp = { width: window.innerWidth, height: window.innerHeight };
-  const pos = computePosition(anchorEl.getBoundingClientRect(), floatingEl.getBoundingClientRect(), vp, opts);
+  const pos = computePosition(
+    anchorEl.getBoundingClientRect(),
+    floatingEl.getBoundingClientRect(),
+    vp,
+    opts
+  );
   floatingEl.style.position = "fixed";
   floatingEl.style.left = pos.x + "px";
   floatingEl.style.top = pos.y + "px";
