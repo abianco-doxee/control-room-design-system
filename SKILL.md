@@ -56,9 +56,9 @@ Detail lives in `references/`. Load only what the task needs.
 | `references/seeded-cat.md` | The seeded pixel-cat: identity-from-seed, pose-is-state, the `paint()` contract. |
 | `references/seeded-sigil.md` | The seeded cyber-sigil: identity-from-seed pixel glyph (cyber-sigilism), state-keyed hue, the drip vocabulary. |
 | `references/decoration.md` | ASCII/pixel decoration for **dead space** — seeded density fields (Braille/block), telemetry frame trim, drafting grids, empty-states; the decorative-only contract (aria-hidden, whisper, mask-faded). |
-| `tokens/tokens.json` | Machine-readable token source (parse this to generate CSS/Tailwind/JSON). |
-| `dist/control-room.css` | Ready-to-use CSS custom properties for all four themes. Import first. |
-| `styles/components.css` | The shipped component layer — `cr-`prefixed classes (`.cr-panel`, `.cr-btn`, …) built on the tokens. Import after the tokens. |
+| `packages/tokens/tokens/tokens.json` (`@control-room/tokens/tokens.json`) | Machine-readable token source (parse this to generate CSS/Tailwind/JSON). |
+| `@control-room/tokens/css` (`@control-room/design-system/css`) | Ready-to-use CSS custom properties for all four themes. Import first. |
+| `@control-room/styles/components` (`@control-room/design-system/components`) | The shipped component layer — `cr-`prefixed classes (`.cr-panel`, `.cr-btn`, …) built on the tokens. Import after the tokens. |
 | `references/tailwind.md` | Tailwind-first authoring — the token-driven Tailwind v4 `@theme`, utility→token map, and theme-reactive utilities. |
 | `references/frameworks.md` | Author-once interactive components (Mitosis) compiled to idiomatic React/Vue/Svelte/Angular/Solid/Qwik; styling stays in the `cr-` classes. |
 | `references/styling-contract.md` | **Styling contract — pt / dt / unstyled + finer tokens** — the PrimeVue-shaped API on the single-source model. |
@@ -80,7 +80,7 @@ system *generable* rather than merely described.
 
 The irreducible rules. Each expands in the references.
 
-- **MUST** build on the token layer (`dist/control-room.css`). Never hardcode a
+- **MUST** build on the token layer (`@control-room/tokens/css`). Never hardcode a
   hex, a border width, or a shadow that a token already names.
 - **MUST** keep every corner square. `--radius` is `0` and stays `0`. **NEVER**
   round a corner, blur a shadow, or add a gradient to a content surface — with
@@ -120,8 +120,8 @@ geometric-glyph icons (no icon font), the `.cr-mark` registration ticks, the dri
 
 ```html
 <!-- 1. Load the token layer, then the component layer (order matters). -->
-<link rel="stylesheet" href="dist/control-room.css" />
-<link rel="stylesheet" href="styles/components.css" />
+<link rel="stylesheet" href="@control-room/design-system/css" />
+<link rel="stylesheet" href="@control-room/design-system/components" />
 
 <!-- 2. Set a theme on <html>. Omit for dark. -->
 <html data-theme="dark">
@@ -138,4 +138,5 @@ geometric-glyph icons (no icon font), the `.cr-mark` registration ticks, the dri
 ```
 
 For the full anatomy, variants, and token bindings of every component, see
-`references/components.md`; the class list lives in `styles/components.css`.
+`references/components.md`; the class list lives in `@control-room/styles`
+(`components.css`).
