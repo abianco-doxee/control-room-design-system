@@ -58,6 +58,13 @@ Each component exposes tokens (see `component` in `tokens.json`), e.g. Button:
 `--cr-btn-bg`, `--cr-btn-fg`, `--cr-btn-pad-x`, `--cr-btn-pad-y`, `--cr-btn-size`.
 Variants are just token overrides — e.g. `.cr-btn--sm { --cr-btn-pad-x: var(--space-3); }`.
 
+Interactive components expose per-part / per-state tokens at the same granularity
+as PrimeVue's `dt` — e.g. Tabs: `--cr-tabs-indicator` (active underline),
+`--cr-tabs-tab-active-fg`, `--cr-tabs-tab-fg`; Menu: `--cr-menu-item-hover-bg`,
+`--cr-menu-panel-bg`, `--cr-menu-item-danger-fg`; Modal: `--cr-modal-bg`,
+`--cr-modal-backdrop`. A component's `dt` prop sets exactly these on that one
+instance, so an override stays surgical (see `references/styling-contract.md`).
+
 ## How theming works
 
 Themes are selected by `html[data-theme]`:
