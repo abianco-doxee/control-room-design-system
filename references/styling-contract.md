@@ -19,17 +19,49 @@ emits (`data-pc-section`). Three props drive the rest:
   **spread** onto the part. Parts are documented per component (e.g. Tabs:
   `root` · `tab`).
 - **`dt`** (design tokens) — a map of CSS custom properties applied to the root and
-  inherited by the parts: `dt={{ "--sig-work": "#f0f" }}`. Instance-scoped token
-  override, same idea as PrimeVue's `dt`, at the granularity our tokens expose.
+  inherited by the parts. Instance-scoped token override, same idea as PrimeVue's
+  `dt`. Prefer the **finer per-component tokens** (below) so an override is
+  surgical: `dt={{ "--cr-tabs-indicator": "#f0f" }}` retargets *only* the active
+  underline, where the coarse `dt={{ "--sig-work": "#f0f" }}` would repaint every
+  work-signal in the subtree.
 
 ```tsx
 <CrTabs
   tabs={["A","B"]} active={1}
   unstyled                                   // no cr-* on this instance
   pt={{ tab: { class: "px-3", "data-testid": "tab" } }}
-  dt={{ "--sig-work": "oklch(0.7 0.2 320)" }}
+  dt={{ "--cr-tabs-indicator": "oklch(0.7 0.2 320)" }}   // just the underline
 />
 ```
+
+### Finer component tokens (the PrimeVue-`dt` granularity)
+
+The token system has a **component tier** (`tokens/tokens.json → "component"`,
+emitted into `dist/control-room.css` as `--cr-<comp>-*`, each defaulting to a
+semantic/primitive token). `styles/components.css` consumes those vars, so `dt`
+can override one part/state without disturbing the global palette. Covered here
+(spike three); the pattern matches the pre-existing `--cr-btn-*` / `--cr-panel-*`
+/ `--cr-chip-*` groups and extends the same way to any component.
+
+| Component | Tokens |
+| --- | --- |
+| Tabs | `--cr-tabs-border` · `--cr-tabs-tab-fg` · `--cr-tabs-tab-hover-fg` · `--cr-tabs-tab-active-fg` · `--cr-tabs-indicator` · `--cr-tabs-tab-pad-x/y` |
+| Menu | `--cr-menu-panel-bg` · `--cr-menu-panel-border` · `--cr-menu-item-fg` · `--cr-menu-item-hover-bg` · `--cr-menu-item-danger-fg` · `--cr-menu-item-pad-x/y` |
+| Modal | `--cr-modal-bg` · `--cr-modal-border` · `--cr-modal-backdrop`¹ · `--cr-modal-head-pad-x/y` · `--cr-modal-body-pad` |
+
+¹ `--cr-modal-backdrop`'s default lives in `:root` so the look is preserved
+everywhere; a per-instance `dt` override of the backdrop is best-effort — it
+relies on `::backdrop` inheriting from its `<dialog>`, which only modern browsers
+do.
+
+Two guards in `tests/styling-contract.test.mjs` keep this honest: the token must
+be **defined** in `control-room.css` *and* **consumed** in `components.css` — if
+either half reverts to a coarse global, surgical `dt` silently breaks and the test
+fails.
+
+> Kept deliberately on `.cr-*` classes, **not** `data-part`/`data-state`: those
+> are the consumer hooks that survive `unstyled`, so theming through them would
+> defeat the opt-out (the styling would come back once the classes were dropped).
 
 Implementation is one shared, framework-agnostic module — **`lib/pt.ts`** — with
 three pure functions: `ptClass()` (unstyled + class-merge), `ptAttrs()` (spread the

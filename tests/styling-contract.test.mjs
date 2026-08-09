@@ -30,3 +30,25 @@ test("every target exposes the data-part styling hook on CrTabs", () => {
     assert.match(fw(t, file), /data-part/, `${t}: exposes data-part`);
   }
 });
+
+// Finer per-component design tokens (PrimeVue-dt-style): what makes `dt` surgical
+// is the two-sided contract — the token is DEFINED in the shipped stylesheet AND
+// CONSUMED by the component CSS. If either half reverts to a coarse global token
+// (e.g. .cr-tab--on { border-bottom-color: var(--sig-work) }) the per-instance
+// override silently stops working, so guard both halves for the spike three.
+test("Tabs/Menu/Modal expose finer component tokens (dt is surgical)", () => {
+  const root = readFileSync(join(ROOT, "dist", "control-room.css"), "utf8");
+  const comp = readFileSync(join(ROOT, "styles", "components.css"), "utf8");
+  const tokens = [
+    "--cr-tabs-indicator",
+    "--cr-tabs-tab-active-fg",
+    "--cr-menu-item-hover-bg",
+    "--cr-menu-panel-bg",
+    "--cr-modal-bg",
+    "--cr-modal-backdrop",
+  ];
+  for (const v of tokens) {
+    assert.match(root, new RegExp(`${v}\\s*:`), `control-room.css defines ${v}`);
+    assert.match(comp, new RegExp(`var\\(${v}`), `components.css consumes ${v}`);
+  }
+});
