@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const css = readFileSync(join(ROOT, "packages", "tokens", "dist", "control-room.css"), "utf8");
-const comp = readFileSync(join(ROOT, "styles", "components.css"), "utf8");
+const comp = readFileSync(join(ROOT, "packages", "styles", "styles", "components.css"), "utf8");
 
 test("the text scale is fluid + container-relative (cqi), floored at legacy px", () => {
   for (const [v, floor] of [

@@ -84,7 +84,7 @@ test("pt/dt/unstyled contract covers every functional component", () => {
 // override silently stops working, so guard both halves for the spike three.
 test("Tabs/Menu/Modal expose finer component tokens (dt is surgical)", () => {
   const root = readFileSync(join(ROOT, "packages", "tokens", "dist", "control-room.css"), "utf8");
-  const comp = readFileSync(join(ROOT, "styles", "components.css"), "utf8");
+  const comp = readFileSync(join(ROOT, "packages", "styles", "styles", "components.css"), "utf8");
   const tokens = [
     // spike three
     "--cr-tabs-indicator",

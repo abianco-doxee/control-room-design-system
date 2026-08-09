@@ -26,7 +26,10 @@ const structureCss = readFileSync(
   join(ROOT, "packages", "tokens", "dist", "structure.css"),
   "utf8"
 );
-const componentsCss = readFileSync(join(ROOT, "styles", "components.css"), "utf8");
+const componentsCss = readFileSync(
+  join(ROOT, "packages", "styles", "styles", "components.css"),
+  "utf8"
+);
 
 const BUILTIN = ["dark", "light", "extreme", "phosphor"];
 const esc = (s) =>
