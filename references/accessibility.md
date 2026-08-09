@@ -96,6 +96,14 @@ angles are direction-neutral and out of scope.)
 - **Roving focus / active-descendant** is implemented for the composite widgets:
   Tabs, Radio group, Segmented, Combobox, and the Command palette
   (`aria-activedescendant` + arrow-key navigation), so each is a single tab stop.
+- **Menu** adds **typeahead** — printable keys focus the next item whose label
+  matches (keys within ~600ms accumulate), alongside arrows / Home / End / Esc.
+- **Tabs** wire the tab↔panel relationship when given an `id`: each tab gets
+  `aria-controls` and each panel is a `role="tabpanel"` with `aria-labelledby`
+  back to its tab (and is focusable), so the pairing is exposed to assistive tech.
+- **Content on hover or focus is dismissable** (WCAG 1.4.13): Tooltip and Hover
+  card hide on `Esc` **without moving focus**, stay open while hovered/focused, and
+  re-show on the next hover/focus. Dialog overlays dismiss on `Esc` natively.
 
 ## Component acceptance (a11y slice)
 

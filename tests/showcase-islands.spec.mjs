@@ -41,9 +41,19 @@ test.describe("component browser — live islands", () => {
 
     // tabs: selecting a tab updates the controlled panel + aria-selected
     const tabs = scope("tabs");
-    await tabs.getByRole("tab").nth(2).click();
-    await expect(tabs.getByRole("tab").nth(2)).toHaveAttribute("aria-selected", "true");
-    await expect(tabs.locator("p")).toContainText("panel 3");
+    const tab3 = tabs.getByRole("tab").nth(2);
+    await tab3.click();
+    await expect(tab3).toHaveAttribute("aria-selected", "true");
+    // WAI-ARIA tab↔panel association: the active tab points at a tabpanel that
+    // points back at it, and only the active panel is shown.
+    const panelId = await tab3.getAttribute("aria-controls");
+    const tabId = await tab3.getAttribute("id");
+    expect(panelId).toBeTruthy();
+    const panel = tabs.locator(`#${panelId}`);
+    await expect(panel).toHaveAttribute("role", "tabpanel");
+    await expect(panel).toHaveAttribute("aria-labelledby", tabId || "");
+    await expect(panel).toContainText("panel 3");
+    await expect(panel).toBeVisible();
 
     // switch: toggles its controlled state
     const sw = scope("switch").getByRole("switch");
@@ -56,6 +66,48 @@ test.describe("component browser — live islands", () => {
     const wasOpen = (await hdr.getAttribute("aria-expanded")) === "true";
     await hdr.click();
     await expect(hdr).toHaveAttribute("aria-expanded", wasOpen ? "false" : "true");
+  });
+
+  test("a11y: tooltip & hover-card are dismissable with Escape (WCAG 1.4.13)", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const scope = (id) => page.locator(`[data-island="${id}"]`);
+
+    // tooltip: focus reveals the bubble; Escape hides it without moving focus;
+    // leaving + re-entering focus shows it again (latch resets).
+    const tip = scope("tooltip");
+    const tipTrigger = tip.locator(".cr-tooltip__trigger button");
+    const bubble = tip.locator(".cr-tooltip__bubble");
+    await tipTrigger.focus();
+    await expect(bubble).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(bubble).toBeHidden();
+    await expect(tipTrigger).toBeFocused(); // focus not moved by the dismiss
+    await tipTrigger.blur();
+    await tipTrigger.focus();
+    await expect(bubble).toBeVisible(); // latch reset on re-focus
+
+    // hover-card: same contract for structured content.
+    const hc = scope("hover-card");
+    const hcTrigger = hc.locator(".cr-hovercard__trigger");
+    const panel = hc.locator(".cr-hovercard__panel");
+    await hcTrigger.focus();
+    await expect(panel).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(panel).toBeHidden();
+  });
+
+  test("a11y: menu supports typeahead (type-to-focus an item)", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const menu = page.locator('[data-island="menu"]');
+
+    // open with ArrowDown (opens + focuses the first item), then type to jump
+    await menu.getByRole("button").first().focus();
+    await page.keyboard.press("ArrowDown");
+    await expect(menu.getByRole("menuitem").first()).toBeFocused();
+    await page.keyboard.press("d"); // items: Rename, Duplicate, Delete
+    await expect(menu.getByRole("menuitem", { name: "Duplicate" })).toBeFocused();
   });
 
   test("schema-driven form validates and coerces via the ArkType core", async ({ page }) => {
