@@ -403,7 +403,7 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
 .stage--empty { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
 .stage--empty a { color: var(--ink); }
 .cell { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.cell__demo { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.cell__demo { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; overflow-x: auto; }
 /* keep fixed-size decorative canvases from forcing horizontal scroll on narrow screens */
 .stage canvas { max-width: 100%; height: auto; }
 .cell__label { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
