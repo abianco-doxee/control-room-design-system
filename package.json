@@ -28,6 +28,8 @@
     "./theme-contract": "./dist/theme-contract.json",
     "./theme": "./lib/theme/index.js",
     "./components": "./styles/components.css",
+    "./base": "./styles/base.css",
+    "./styles/*": "./styles/parts/*",
     "./tailwind.css": "./styles/tailwind.css",
     "./tw-theme.css": "./dist/tw-theme.css",
     "./flat": "./dist/tokens.flat.json",
@@ -88,6 +90,7 @@
     "build:theme": "node build/build-theme.mjs",
     "build:palette": "node build/build-palette.mjs",
     "build:tw": "tailwindcss -i build/tailwind-input.css -o dist/utilities.css",
+    "build:styles": "node build/build-styles.mjs",
     "build:components": "node build/compile-mitosis.mjs && node build/build-fix-qwik.mjs && node build/build-fix-react.mjs && node build/build-fix-angular.mjs && node build/build-barrels.mjs && node build/build-pkg-types.mjs",
     "build:components:cli": "mitosis build && node build/build-fix-qwik.mjs && node build/build-fix-react.mjs && node build/build-fix-angular.mjs && node build/build-barrels.mjs && node build/build-pkg-types.mjs",
     "build:pkg": "node build/build-pkg.mjs",
@@ -98,7 +101,7 @@
     "build:content": "node build/build-docs-content.mjs",
     "prebuild:site": "npm run build:content",
     "build:site": "astro build",
-    "build": "npm run build:tokens && npm run build:theme && npm run build:brand-preview && npm run build:tw && npm run build:catalog && npm run build:gallery && npm run build:components && npm run build:pkg && npm run build:showcase && npm run build:content && astro build",
+    "build": "npm run build:tokens && npm run build:theme && npm run build:brand-preview && npm run build:tw && npm run build:styles && npm run build:catalog && npm run build:gallery && npm run build:components && npm run build:pkg && npm run build:showcase && npm run build:content && astro build",
     "prepack": "npm run build:components && npm run build:pkg",
     "dev": "npm run build:content && astro dev",
     "preview": "astro preview",
@@ -109,6 +112,7 @@
     "verify:types": "tsc -p build/tsconfig.frameworks.json",
     "verify:pkg-types": "node build/build-pkg-types.mjs --check",
     "verify:palette": "node build/build-palette.mjs --check",
+    "verify:styles": "node build/build-styles.mjs --check",
     "skills:sync": "node scripts/skills-sync.mjs",
     "skills:check": "node scripts/skills-sync.mjs --check",
     "lint": "biome check",
@@ -134,7 +138,7 @@
     "test:contract": "node --test tests/styling-contract.test.mjs tests/responsive.test.mjs tests/utils-ports.test.mjs",
     "changeset": "changeset",
     "version": "changeset version",
-    "verify": "npm run verify:tokens && npm run verify:theme && npm run verify:palette && npm run verify:catalog && npm run skills:check"
+    "verify": "npm run verify:tokens && npm run verify:theme && npm run verify:palette && npm run verify:styles && npm run verify:catalog && npm run skills:check"
   },
   "devDependencies": {
     "@angular/common": "^21.2.19",
