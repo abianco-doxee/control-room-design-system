@@ -5,22 +5,22 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 66,
+    "count": 72,
     "categories": {
       "action": 1,
       "behavior": 1,
       "chart": 4,
-      "forms": 13,
-      "identity": 2,
+      "forms": 16,
+      "identity": 3,
       "layout": 8,
       "media": 8,
-      "navigation": 6,
+      "navigation": 7,
       "overlay": 9,
       "primitives": 2,
-      "state": 12
+      "state": 13
     },
     "lifecycles": {
-      "stable": 65,
+      "stable": 71,
       "experimental": 1
     }
   },
@@ -580,6 +580,44 @@
       ]
     },
     {
+      "id": "input-group",
+      "name": "InputGroup",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "An input flanked by decorative prefix / suffix addons (protocol, currency, unit). Addons are aria-hidden; give the field a label. For a validated field use Field or Form.",
+      "spec": "references/components.md#input-group",
+      "variants": {
+        "prop": [
+          "prefix",
+          "suffix"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "addon fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "contour"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "addon text"
+        }
+      ],
+      "keywords": [
+        "input group",
+        "addon",
+        "prefix",
+        "suffix",
+        "unit",
+        "affix"
+      ]
+    },
+    {
       "id": "number-field",
       "name": "Number field",
       "kind": "component",
@@ -617,6 +655,43 @@
         "input",
         "quantity",
         "form"
+      ]
+    },
+    {
+      "id": "pin-input",
+      "name": "PinInput",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "One-time-code / PIN entry — N single-digit cells acting as one field; typing advances, Backspace steps back, arrows move, paste fills across. role=group with per-cell labels.",
+      "spec": "references/components.md#pin-input",
+      "variants": {
+        "prop": [
+          "length"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "cell fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "cell border"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "focused cell"
+        }
+      ],
+      "keywords": [
+        "pin",
+        "otp",
+        "one-time-code",
+        "code",
+        "verification",
+        "2fa"
       ]
     },
     {
@@ -771,6 +846,43 @@
       ]
     },
     {
+      "id": "tags-input",
+      "name": "TagsInput",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Token entry — Enter or comma adds a tag, Backspace on an empty field removes the last, each tag has a labelled remove button. role=group; duplicates ignored.",
+      "spec": "references/components.md#tags-input",
+      "variants": {
+        "prop": [
+          "value"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel",
+          "description": "tag fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "contour"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "remove affordance"
+        }
+      ],
+      "keywords": [
+        "tags",
+        "tags input",
+        "tokens",
+        "chips input",
+        "multi",
+        "keywords"
+      ]
+    },
+    {
       "id": "textarea",
       "name": "Textarea",
       "kind": "component",
@@ -801,6 +913,51 @@
         "textarea",
         "multiline",
         "form"
+      ]
+    },
+    {
+      "id": "avatar",
+      "name": "Avatar",
+      "kind": "component",
+      "category": "identity",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Image with an initials fallback and optional presence dot. With a src it's an img[alt=name]; without one the wrapper is role=img[aria-label=name] over the initials.",
+      "spec": "references/components.md#avatar",
+      "variants": {
+        "status": [
+          "online",
+          "idle",
+          "busy",
+          "offline"
+        ],
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--panel-2",
+          "description": "fallback fill"
+        },
+        {
+          "cssVar": "--border",
+          "description": "ring"
+        },
+        {
+          "cssVar": "--sig-done",
+          "description": "online dot"
+        }
+      ],
+      "keywords": [
+        "avatar",
+        "user",
+        "profile",
+        "initials",
+        "presence",
+        "identity"
       ]
     },
     {
@@ -1756,6 +1913,49 @@
       ]
     },
     {
+      "id": "stepper",
+      "name": "Stepper",
+      "kind": "component",
+      "category": "navigation",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Numbered progress indicator for a multi-step flow — ordered list with done/active/upcoming states; current step carries aria-current, optional navigable step buttons.",
+      "spec": "references/components.md#stepper",
+      "variants": {
+        "state": [
+          "upcoming",
+          "active",
+          "done"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "active step"
+        },
+        {
+          "cssVar": "--sig-done",
+          "description": "completed step"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "upcoming step"
+        },
+        {
+          "cssVar": "--border",
+          "description": "connector line"
+        }
+      ],
+      "keywords": [
+        "stepper",
+        "wizard",
+        "steps",
+        "progress",
+        "multi-step",
+        "flow"
+      ]
+    },
+    {
       "id": "tabs",
       "name": "Tabs",
       "kind": "component",
@@ -2664,6 +2864,40 @@
         "shimmer",
         "pulse",
         "ghost"
+      ]
+    },
+    {
+      "id": "spinner",
+      "name": "Spinner",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Indeterminate loading indicator — role=status with an accessible label; the ring is aria-hidden and honours reduced-motion. For a known fraction use Progress or Meter.",
+      "spec": "references/components.md#spinner",
+      "variants": {
+        "size": [
+          "sm",
+          "md",
+          "lg"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "ring sweep"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "ring track"
+        }
+      ],
+      "keywords": [
+        "spinner",
+        "loading",
+        "busy",
+        "indeterminate",
+        "loader"
       ]
     },
     {

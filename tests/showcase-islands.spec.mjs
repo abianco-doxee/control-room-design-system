@@ -532,4 +532,48 @@ test.describe("component browser — live islands", () => {
     expect(calm.motion, "calm kills non-essential motion").toBe("0");
     expect(calm.decor, "calm tones decoration down").toBe("0.4");
   });
+
+  test("stepper marks the current step and navigates on click", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const stepper = page.locator('[data-island="stepper"]');
+    await expect(stepper.locator('[aria-current="step"]')).toContainText("Limits"); // active=1 default
+    await stepper.getByRole("button").first().click(); // → Source
+    await expect(stepper.locator('[aria-current="step"]')).toContainText("Source");
+  });
+
+  test("pin-input: typing fills cells and advances focus", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const cells = page.locator('[data-island="pin-input"] .cr-pin__cell');
+    await cells.first().click();
+    await page.keyboard.type("123456");
+    await expect(cells.nth(0)).toHaveValue("1");
+    await expect(cells.nth(5)).toHaveValue("6");
+    await expect(cells.nth(5)).toBeFocused(); // focus advanced to the last cell
+  });
+
+  test("tags-input: add with Enter, remove via the labelled button", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const tags = page.locator('[data-island="tags-input"]');
+    const input = tags.locator(".cr-tags__input");
+    await input.fill("prod");
+    await input.press("Enter");
+    await expect(tags.getByText("prod", { exact: true })).toBeVisible();
+    await tags.getByRole("button", { name: "Remove eu-west" }).click(); // seeded tag
+    await expect(tags.getByText("eu-west", { exact: true })).toHaveCount(0);
+  });
+
+  test("a11y: avatar and spinner expose their roles + accessible names", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    // avatar with no src → wrapper is role=img labelled by the name
+    const avatarWrap = page.locator('[data-island="avatar"] .cr-avatar');
+    await expect(avatarWrap).toHaveAttribute("role", "img");
+    await expect(avatarWrap).toHaveAttribute("aria-label", /Ada/);
+    // spinner announces via role=status + label
+    const spinner = page.locator('[data-island="spinner"]').getByRole("status");
+    await expect(spinner).toHaveAttribute("aria-label", /Provisioning/);
+  });
 });
