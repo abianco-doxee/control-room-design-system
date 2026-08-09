@@ -1,16 +1,24 @@
 {
   "name": "@control-room/utils",
   "version": "1.0.0",
-  "private": true,
+  "license": "UNLICENSED",
   "type": "module",
   "description": "Control Room framework-agnostic utilities — class merge, href/duration/position/time-scale helpers, forms (ArkType ⇄ JSON Schema) and theme runtime.",
-  "files": ["cn.js", "cn.d.ts", "href.js", "href.d.ts", "duration.js", "duration.d.ts", "position.js", "time-scale.js", "forms", "theme"],
+  "keywords": ["control-room", "design-system", "utilities", "theme", "forms", "positioning"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alebianco/control-room-design-system.git",
+    "directory": "packages/utils"
+  },
+  "homepage": "https://github.com/alebianco/control-room-design-system#readme",
+  "sideEffects": false,
+  "files": ["cn.js", "cn.d.ts", "href.js", "href.d.ts", "duration.js", "duration.d.ts", "position.js", "position.d.ts", "time-scale.js", "time-scale.d.ts", "forms", "theme"],
   "exports": {
     "./cn": { "types": "./cn.d.ts", "default": "./cn.js" },
     "./href": { "types": "./href.d.ts", "default": "./href.js" },
     "./duration": { "types": "./duration.d.ts", "default": "./duration.js" },
-    "./position": "./position.js",
-    "./time-scale": "./time-scale.js",
+    "./position": { "types": "./position.d.ts", "default": "./position.js" },
+    "./time-scale": { "types": "./time-scale.d.ts", "default": "./time-scale.js" },
     "./forms": "./forms/index.js",
     "./theme": "./theme/index.js"
   },

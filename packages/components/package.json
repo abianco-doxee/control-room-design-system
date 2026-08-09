@@ -4,6 +4,14 @@
   "license": "UNLICENSED",
   "type": "module",
   "description": "Control Room components — authored once as Mitosis .lite.tsx, compiled to idiomatic React/Vue/Svelte/Angular/Solid/Qwik. Structure + props + a11y + state only; styling lives in @control-room/styles, tokens in @control-room/tokens, icon packs in @control-room/icons.",
+  "keywords": ["control-room", "design-system", "components", "mitosis", "react", "vue", "svelte", "angular", "solid", "qwik"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alebianco/control-room-design-system.git",
+    "directory": "packages/components"
+  },
+  "homepage": "https://github.com/alebianco/control-room-design-system#readme",
+  "sideEffects": false,
   "files": ["dist/frameworks", "dist/pkg", "components", "overrides", "lib", "mitosis.config.cjs", "build"],
   "exports": {
     "./react": {
