@@ -299,6 +299,8 @@ const ISLAND_IDS = new Set([
   // new operator / form kit
   "stepper", "pin-input", "tags-input", "input-group", "avatar", "spinner",
   "scroll-area", "resizable",
+  // component-coverage batch
+  "rating", "timeline", "toolbar", "file-upload", "carousel", "calendar",
 ]);
 
 function stageHtml(id) {

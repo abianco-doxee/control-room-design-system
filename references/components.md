@@ -1869,3 +1869,123 @@ with a machine-readable `datetime`. The clock is **injected** (`now` prop, epoch
 ms) — never read internally — so SSR and client agree and there's no hydration
 flicker; omit `now` to show the absolute date. Props: `time`, `now?`, `prefix?`.
 See also `utils/duration` for the same formatting outside a component.
+
+### Rating {#rating}
+
+A **star-rating** control. Interactive mode is a WAI-ARIA `role="radiogroup"` with
+**roving tabindex** (←/→/Home/End move and select; the value is the number of the
+focused star); `readonly` mode is an inert `role="img"` whose accessible name is
+the score ("rating: 3 of 5"). The mark is a **geometric glyph** — filled `◆` vs
+outline `◇`, never an icon font — and its colour encodes the value. Props: `value`,
+`max` (default 5), `onChange`, `readonly`, `disabled`, `label`.
+
+```tsx
+<CrRating value={3} max={5} label="severity" onChange={setV} />
+<CrRating value={4} readonly label="score" />
+```
+
+**Tokens** — `--cr-rating-on` (filled) · `--cr-rating-off` (empty). Per Law 2 the
+fill is the accent (a *state*), not a per-star identity hue. **A11y** — radiogroup
+with a single tab stop; readonly collapses to a labelled image.
+
+### Timeline {#timeline}
+
+A **vertical event timeline** — an ordered list (`<ol>`) of moments on a rail, each
+with a signal-coloured node, a machine `<time>`, a title and optional detail.
+Presentational; the **node colour is the semantic signal** (`work` · `done` ·
+`wait` · `err`), never decoration (Law 2). Props: `items` (`{ time, title, detail?,
+signal? }[]`), `label`.
+
+```tsx
+<CrTimeline label="incident" items={[
+  { time: "09:41", title: "alert raised", signal: "err" },
+  { time: "09:43", title: "ack by on-call", signal: "wait" },
+  { time: "10:02", title: "mitigated", signal: "done" },
+]} />
+```
+
+**Tokens** — `--cr-timeline-rail` (the connecting rail is chrome). Nodes are
+signal-driven, so they have no per-component token — retheme through the signal
+tokens. **A11y** — a semantic ordered list; nodes are `aria-hidden`, the title
+carries the meaning.
+
+### Toolbar {#toolbar}
+
+A **WAI-ARIA toolbar** — a labelled group of *your own* controls (buttons, links,
+fields, passed as children) with a **single tab stop** and roving-tabindex arrow
+navigation (←/→ horizontal, ↑/↓ vertical, Home/End to the ends). Enter/Space still
+activate the focused control natively. The first control is made the tab stop on
+mount; the arrows move focus and the stop together. Props: `label` (required),
+`orientation?` (`horizontal` default · `vertical`), children.
+
+```tsx
+<CrToolbar label="editor actions">
+  <button class="cr-btn cr-btn--sm">bold</button>
+  <button class="cr-btn cr-btn--sm">italic</button>
+  <button class="cr-btn cr-btn--sm">link</button>
+</CrToolbar>
+```
+
+**Tokens** — `--cr-toolbar-bg` · `--cr-toolbar-border`. **A11y** — `role="toolbar"`
+with `aria-orientation`; roving tabindex keeps the whole bar one Tab stop.
+
+### File upload {#file-upload}
+
+A **file dropzone** over a *real* native `<input type="file">` — click or keyboard
+opens the picker, drag-and-drop is also accepted, and the dragover state is
+announced via `data-state`. The input stays a focusable, labelled control (visually
+hidden, **not** `display:none`) so keyboard and screen-reader users get the native
+experience; the styled surface is `aria-hidden` decoration. Props: `label`
+(required), `accept?`, `multiple?`, `disabled?`, `hint?`, `files?` (names to list),
+`onFiles` (fires with the native `FileList`).
+
+```tsx
+<CrFileUpload label="Drop a CSV or browse" hint="CSV up to 10 MB"
+  accept=".csv" onFiles={(fl) => ingest(fl)} files={["runs-2026.csv"]} />
+```
+
+**Tokens** — `--cr-fileupload-active-border` is the dragover accent (a *state*,
+Law 2), plus `--cr-fileupload-bg/fg/border`. **A11y** — the native input is the
+control; the label associates the accessible name; focus ring rides the visible
+surface.
+
+### Carousel {#carousel}
+
+A **slide carousel** on the WAI-ARIA carousel pattern — a labelled region
+(`aria-roledescription="carousel"`), each slide a group announced as "N of M",
+previous/next controls, and optional dot indicators (a `tablist`). The viewport is
+`aria-live="polite"` so a slide change is spoken; ←/→ move slides from anywhere
+inside. Controlled via `index`/`onIndex`. Props: `slides` (`{ title, caption? }[]`),
+`index?`, `label` (required), `onIndex`, `dots?` (default true).
+
+```tsx
+<CrCarousel label="onboarding" index={i} onIndex={setI} slides={[
+  { title: "connect", caption: "point at your cluster" },
+  { title: "observe", caption: "watch the first signals land" },
+]} />
+```
+
+**Tokens** — `--cr-carousel-dot-active` is the active-dot accent (a *state*, Law 2),
+plus `--cr-carousel-bg` · `--cr-carousel-dot`. **A11y** — labelled region + slide
+groups; prev/next and dots are named; the viewport announces changes.
+
+### Calendar {#calendar}
+
+A **month calendar grid** — `role="grid"` with weekday columnheaders and day
+buttons, **roving tabindex** (←/→ ±1 day, ↑/↓ ±1 week, Home/End to the week ends,
+PageUp/PageDown step months, Enter/Space select). Fully **controlled and SSR-safe**:
+the displayed `month` and `today` are **injected props**, never read from the clock,
+so server and client render the same grid. Props: `month` (`YYYY-MM`), `value?`
+(`YYYY-MM-DD`), `today?`, `min?`/`max?`, `weekStart?` (0 Sun · 1 Mon), `label`,
+`onSelect`, `onMonthChange`.
+
+```tsx
+<CrCalendar month="2026-08" value="2026-08-09" today="2026-08-09"
+  onSelect={setDate} onMonthChange={setMonth} label="run date" />
+```
+
+**Tokens** — `--cr-calendar-selected-bg` (selected-day fill, a *state*) ·
+`--cr-calendar-today-ring` · `--cr-calendar-muted` (adjacent-month days) ·
+`--cr-calendar-bg`. **A11y** — grid semantics with `aria-selected`, `aria-current="date"`
+for today, `aria-disabled` outside `min`/`max`; one tab stop with full keyboard
+traversal.

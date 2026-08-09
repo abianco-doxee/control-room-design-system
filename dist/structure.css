@@ -232,6 +232,24 @@
   --cr-togglechip-border: var(--border);
   --cr-togglechip-on-bg: var(--sig-work);
   --cr-togglechip-on-fg: var(--on-sig);
+  --cr-rating-on: var(--sig-work);
+  --cr-rating-off: var(--border);
+  --cr-timeline-rail: var(--border);
+  --cr-timeline-node: var(--muted);
+  --cr-toolbar-bg: var(--panel-2);
+  --cr-toolbar-border: var(--border);
+  --cr-fileupload-bg: var(--panel-2);
+  --cr-fileupload-fg: var(--muted);
+  --cr-fileupload-border: var(--border);
+  --cr-fileupload-active-border: var(--sig-work);
+  --cr-carousel-bg: var(--panel-2);
+  --cr-carousel-dot: var(--muted);
+  --cr-carousel-dot-active: var(--sig-work);
+  --cr-calendar-bg: var(--panel);
+  --cr-calendar-muted: var(--muted);
+  --cr-calendar-selected-bg: var(--sig-work);
+  --cr-calendar-selected-fg: var(--on-sig);
+  --cr-calendar-today-ring: var(--sig-accent);
 }
 
 /* ── GLOBAL BASELINE ──────────────────────────────────────────────────── */

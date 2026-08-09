@@ -117,9 +117,13 @@ Directive: **prefer the most modern responsive option at each choice.**
 - **Phase 1 — token foundation** ✅: all 8 type roles + `--pad`/`--gap` density
   aliases + `--control-h-*` + `--bp-panel-*` in `tokens.json` → `dist/control-room.css`.
 - **Phase 2 — fluid type** ✅: the `--text-*` rungs are now bounded `cqi` clamps
-  (floor = legacy px → never shrinks / no new overflow); panel surfaces
-  (`.cr-panel`/`.cr-hero`/`.cr-masthead`) are `container-type: inline-size` query
-  containers, so dense text sizes to the panel. Opt-in `.cr-type-*` role utilities.
+  (floor = legacy px → never shrinks / no new overflow); the `.cr-panel` surface is
+  a `container-type: inline-size` query container, so its dense text sizes to the
+  panel. Opt-in `.cr-type-*` role utilities. (Hero/masthead are deliberately *not*
+  containers: they carry dark-text-on-bright signal fills, and `container-type`
+  blocks axe's `getBackgroundColor` from resolving a descendant's background through
+  the container — a false low-contrast reading — for no responsive gain, since the
+  only `@container` consumer, the stacking `.cr-dl`, lives in panels.)
 - **Phase 3 — per-container density** ✅: component pad/gap tokens route through
   `--pad`/`--gap`; `[data-density="compact"]` on any container tightens its
   subtree via the cascade. Comfortable = default = pixel-neutral.

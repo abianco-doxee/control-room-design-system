@@ -26,6 +26,7 @@ import {
   CrSparkline, CrLineChart, CrBarChart, CrStackedBar, CrForm, CrDataGrid,
   CrStepper, CrPinInput, CrTagsInput, CrInputGroup, CrAvatar, CrSpinner,
   CrScrollArea, CrResizable,
+  CrRating, CrTimeline, CrToolbar, CrFileUpload, CrCarousel, CrCalendar,
 } from "../dist/frameworks/react/index.ts";
 import { defineForm, type as ark } from "../lib/forms/index.js";
 
@@ -731,6 +732,59 @@ const DEMOS = {
         h("div", { style: { padding: "10px", fontFamily: "var(--font-mono)", fontSize: "12px" } }, "queue"),
         h("div", { style: { padding: "10px", fontFamily: "var(--font-mono)", fontSize: "12px" } }, "detail"))),
   },
+  rating: {
+    tag: "CrRating",
+    defs: [T("number", "value", 3, { min: 0, max: 5 }), T("boolean", "readonly", false)],
+    render: (s, set) => h(CrRating, { value: s.value, max: 5, label: "severity", readonly: s.readonly, onChange: (v) => set("value", v) }),
+  },
+  timeline: {
+    tag: "CrTimeline",
+    defs: [],
+    render: () => h(CrTimeline, { label: "incident", items: [
+      { time: "09:41", title: "alert raised", detail: "SSE closed on nova-01", signal: "err" },
+      { time: "09:43", title: "ack by on-call", signal: "wait" },
+      { time: "09:58", title: "restart issued", signal: "work" },
+      { time: "10:02", title: "mitigated", signal: "done" },
+    ] }),
+  },
+  toolbar: {
+    tag: "CrToolbar",
+    defs: [T("enum", "orientation", "horizontal", { options: ["horizontal", "vertical"] })],
+    render: (s) => h(CrToolbar, { label: "editor actions", orientation: s.orientation },
+      h("button", { type: "button", className: "cr-btn cr-btn--outline cr-btn--sm" }, "bold"),
+      h("button", { type: "button", className: "cr-btn cr-btn--outline cr-btn--sm" }, "italic"),
+      h("button", { type: "button", className: "cr-btn cr-btn--outline cr-btn--sm" }, "link"),
+      h("button", { type: "button", className: "cr-btn cr-btn--outline cr-btn--sm" }, "code")),
+  },
+  "file-upload": {
+    tag: "CrFileUpload",
+    defs: [T("boolean", "multiple", false), T("text", "hint", "CSV up to 10 MB")],
+    render: (s, set) => h(CrFileUpload, {
+      label: "Drop a file or browse", hint: s.hint, multiple: s.multiple, accept: ".csv",
+      files: s.files, onFiles: (fl) => set("files", Array.from(fl).map((f) => f.name)),
+    }),
+  },
+  carousel: {
+    tag: "CrCarousel",
+    defs: [T("boolean", "dots", true)],
+    render: (s, set) => h(CrCarousel, {
+      label: "onboarding", index: s.index || 0, dots: s.dots, onIndex: (i) => set("index", i),
+      slides: [
+        { title: "connect", caption: "point at your cluster" },
+        { title: "observe", caption: "watch the first signals land" },
+        { title: "act", caption: "wire an alert to a runbook" },
+      ],
+    }),
+  },
+  calendar: {
+    tag: "CrCalendar",
+    defs: [T("enum", "weekStart", "0", { options: ["0", "1"] })],
+    render: (s, set) => h(CrCalendar, {
+      month: s.month || "2026-08", value: s.value || "2026-08-09", today: "2026-08-09",
+      weekStart: s.weekStart === "1" ? 1 : 0, label: "run date",
+      onSelect: (iso) => set("value", iso), onMonthChange: (m) => set("month", m),
+    }),
+  },
 };
 
 // ── mount ────────────────────────────────────────────────────────────────
@@ -754,6 +808,25 @@ function mountAll() {
   });
 }
 
+// A demo cell that overflows horizontally scrolls (.cell__demo is overflow-x:auto,
+// so wide demos — DataGrid, Calendar, a long Toolbar — never push the page wide).
+// A scrollable region must be keyboard-operable (WCAG 2.1.1); axe flags any that
+// isn't focusable. Rather than a blanket tabindex on every cell (dead tab stops),
+// tag ONLY the ones that actually scroll, once layout has settled, giving each a
+// role + accessible name so keyboard users can reach and scroll it.
+function tagScrollables() {
+  document.querySelectorAll(".cell__demo").forEach((el) => {
+    const scrolls = el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1;
+    if (!scrolls) return;
+    el.setAttribute("tabindex", "0");
+    el.setAttribute("role", "group");
+    if (!el.getAttribute("aria-label")) {
+      const label = el.closest(".cell")?.querySelector(".cell__label")?.textContent?.trim();
+      el.setAttribute("aria-label", label ? `${label} (scrollable)` : "scrollable demo");
+    }
+  });
+}
+
 // Expose the readiness signal (`__CR_ISLANDS__`) only AFTER React has committed
 // the first paint of every island. createRoot().render() commits asynchronously,
 // so setting it synchronously let tests that gate on it read an island's DOM
@@ -764,6 +837,7 @@ function boot() {
   mountAll();
   requestAnimationFrame(() =>
     requestAnimationFrame(() => {
+      tagScrollables(); // layout has settled — mark overflowing demo cells focusable
       window.__CR_ISLANDS__ = Object.keys(DEMOS);
     }),
   );

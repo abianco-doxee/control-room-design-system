@@ -5,22 +5,22 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 77,
+    "count": 83,
     "categories": {
-      "action": 1,
+      "action": 2,
       "behavior": 1,
       "chart": 4,
-      "forms": 17,
+      "forms": 20,
       "identity": 3,
       "layout": 10,
-      "media": 8,
+      "media": 9,
       "navigation": 8,
       "overlay": 9,
       "primitives": 2,
-      "state": 14
+      "state": 15
     },
     "lifecycles": {
-      "stable": 76,
+      "stable": 82,
       "experimental": 1
     }
   },
@@ -88,6 +88,33 @@
         "press",
         "snap"
       ]
+    },
+    {
+      "id": "toolbar",
+      "name": "Toolbar",
+      "kind": "component",
+      "category": "action",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "WAI-ARIA toolbar — a labelled group of the operator's own controls with a single tab stop and roving-tabindex arrow navigation (horizontal or vertical).",
+      "spec": "references/components.md#toolbar",
+      "variants": {
+        "orientation": [
+          "horizontal",
+          "vertical"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-toolbar-bg",
+          "description": "bar surface"
+        },
+        {
+          "cssVar": "--cr-toolbar-border",
+          "description": "bar border"
+        }
+      ],
+      "keywords": []
     },
     {
       "id": "key-hints",
@@ -286,6 +313,33 @@
       ]
     },
     {
+      "id": "calendar",
+      "name": "Calendar",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Month calendar grid — role=grid with roving tabindex (arrows move day/week, PageUp/Down step months, Enter/Space select). Fully controlled, SSR-safe (month + today injected, never read from the clock).",
+      "spec": "references/components.md#calendar",
+      "variants": {
+        "weekStart": [
+          "0 (Sun)",
+          "1 (Mon)"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-calendar-selected-bg",
+          "description": "selected-day fill (a state — Law 2)"
+        },
+        {
+          "cssVar": "--cr-calendar-today-ring",
+          "description": "today ring"
+        }
+      ],
+      "keywords": []
+    },
+    {
       "id": "checkbox",
       "name": "Checkbox / Radio",
       "kind": "component",
@@ -443,6 +497,29 @@
         "schedule",
         "form"
       ]
+    },
+    {
+      "id": "file-upload",
+      "name": "FileUpload",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "File dropzone over a real native <input type=file> — click/keyboard opens the picker, drag-drop is accepted, dragover is announced via data-state. Selected files listed.",
+      "spec": "references/components.md#file-upload",
+      "variants": {
+        "state": [
+          "idle",
+          "dragover"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-fileupload-active-border",
+          "description": "dragover accent border (a state — Law 2)"
+        }
+      ],
+      "keywords": []
     },
     {
       "id": "form",
@@ -731,6 +808,33 @@
         "single-select",
         "form"
       ]
+    },
+    {
+      "id": "rating",
+      "name": "Rating",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Star-rating control — a radiogroup with roving tabindex (interactive) or an inert score readout (readonly). Geometric-glyph marks (no icon font); fill encodes the value.",
+      "spec": "references/components.md#rating",
+      "variants": {
+        "mode": [
+          "interactive",
+          "readonly"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-rating-on",
+          "description": "filled-star colour (a state, not a per-item hue — Law 2)"
+        },
+        {
+          "cssVar": "--cr-rating-off",
+          "description": "empty-star colour"
+        }
+      ],
+      "keywords": []
     },
     {
       "id": "select",
@@ -1576,6 +1680,29 @@
         "marker",
         "bullet"
       ]
+    },
+    {
+      "id": "carousel",
+      "name": "Carousel",
+      "kind": "component",
+      "category": "media",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Slide carousel with the WAI-ARIA carousel pattern — labelled region, prev/next, dot indicators, aria-live viewport, ←/→ navigation. Controlled via index/onIndex.",
+      "spec": "references/components.md#carousel",
+      "variants": {
+        "dots": [
+          "true",
+          "false"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-carousel-dot-active",
+          "description": "active-dot accent (a state — Law 2)"
+        }
+      ],
+      "keywords": []
     },
     {
       "id": "chrome",
@@ -3106,6 +3233,31 @@
         "inline",
         "label"
       ]
+    },
+    {
+      "id": "timeline",
+      "name": "Timeline",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Vertical event timeline — an ordered list of moments on a rail, each with a signal-coloured node, machine time, title and optional detail. Presentational; node colour is the semantic signal.",
+      "spec": "references/components.md#timeline",
+      "variants": {
+        "signal": [
+          "work",
+          "done",
+          "wait",
+          "err"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-timeline-rail",
+          "description": "the connecting rail (chrome)"
+        }
+      ],
+      "keywords": []
     }
   ]
 }

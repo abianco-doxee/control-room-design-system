@@ -1,5 +1,5 @@
 {
-  "$comment": "Component registry — the hand-authored source of truth for the catalog. Prose specs live in references/components.md; this is the structured index. Run `npm run build:catalog` to generate catalog/catalog.json.",
+  "$comment": "Component registry \u2014 the hand-authored source of truth for the catalog. Prose specs live in references/components.md; this is the structured index. Run `npm run build:catalog` to generate catalog/catalog.json.",
   "origin": "control-room",
   "components": [
     {
@@ -8,7 +8,7 @@
       "category": "layout",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "The default container for a group of related data — the system's workhorse surface.",
+      "description": "The default container for a group of related data \u2014 the system's workhorse surface.",
       "spec": "references/components.md#panel",
       "variants": {
         "weight": [
@@ -64,7 +64,7 @@
       "category": "identity",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "The stark title card — page identity and headline state in the display register; optional drip host.",
+      "description": "The stark title card \u2014 page identity and headline state in the display register; optional drip host.",
       "spec": "references/components.md#masthead",
       "variants": {
         "glitch": [
@@ -150,7 +150,7 @@
       "category": "navigation",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Primary navigation — persistent left chassis; active item keyed to accent, count badge to its state.",
+      "description": "Primary navigation \u2014 persistent left chassis; active item keyed to accent, count badge to its state.",
       "spec": "references/components.md#rail--nav",
       "variants": {
         "item": [
@@ -199,7 +199,7 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "One row of a live list — the densest unit; calm at rest, one-shot glitch on a real state change.",
+      "description": "One row of a live list \u2014 the densest unit; calm at rest, one-shot glitch on a real state change.",
       "spec": "references/components.md#sessionrow",
       "variants": {
         "signal": [
@@ -242,7 +242,7 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "The smallest state readout — a square keyed to the signal ramp, with an aria-label naming the state.",
+      "description": "The smallest state readout \u2014 a square keyed to the signal ramp, with an aria-label naming the state.",
       "spec": "references/components.md#statusdot",
       "variants": {
         "signal": [
@@ -277,7 +277,7 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Severity glyph — polygon side-count encodes danger/focus (fewer sides = more urgent); a shape channel beside colour (Law 4).",
+      "description": "Severity glyph \u2014 polygon side-count encodes danger/focus (fewer sides = more urgent); a shape channel beside colour (Law 4).",
       "spec": "references/components.md#severity-shapes",
       "variants": {
         "severity": [
@@ -434,7 +434,7 @@
       "category": "layout",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "The only legal host for texture (Law 6) — a physical instrument enclosing a recessed, halftoned screen.",
+      "description": "The only legal host for texture (Law 6) \u2014 a physical instrument enclosing a recessed, halftoned screen.",
       "spec": "references/components.md#bezel--screen",
       "variants": {},
       "tokens": [
@@ -602,7 +602,7 @@
       "category": "chart",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Inline micro line/area chart for a KPI or table cell — no axes, a crisp non-scaling 2px stroke, a data-end dot. Stretches to fill its box.",
+      "description": "Inline micro line/area chart for a KPI or table cell \u2014 no axes, a crisp non-scaling 2px stroke, a data-end dot. Stretches to fill its box.",
       "spec": "references/components.md#sparkline",
       "variants": {
         "signal": [
@@ -642,7 +642,7 @@
       "category": "chart",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Time-series line chart — recessive grid, non-scaling 2px lines, a data-end dot per series, tick labels and a legend for ≥2 series. One y-axis only.",
+      "description": "Time-series line chart \u2014 recessive grid, non-scaling 2px lines, a data-end dot per series, tick labels and a legend for \u22652 series. One y-axis only.",
       "spec": "references/components.md#line-chart",
       "variants": {
         "signal": [
@@ -686,7 +686,7 @@
       "category": "chart",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Categorical bar chart — baseline-anchored bars with rounded data-ends, a 2px surface gap, optional dashed target line, monospace value/category labels.",
+      "description": "Categorical bar chart \u2014 baseline-anchored bars with rounded data-ends, a 2px surface gap, optional dashed target line, monospace value/category labels.",
       "spec": "references/components.md#bar-chart",
       "variants": {
         "signal": [
@@ -730,7 +730,7 @@
       "category": "chart",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "A single composition bar (\"stacked progress\") — signal-toned segments sized by share, with a 2px surface gap and a legend (label · value · %). Compose several for a comparison.",
+      "description": "A single composition bar (\"stacked progress\") \u2014 signal-toned segments sized by share, with a 2px surface gap and a legend (label \u00b7 value \u00b7 %). Compose several for a comparison.",
       "spec": "references/components.md#stacked-bar",
       "variants": {
         "signal": [
@@ -818,7 +818,7 @@
       "category": "primitives",
       "kind": "block",
       "lifecycle": "stable",
-      "description": "Four shapes with four fixed meanings (Law 4): chevron=direction, notch=state, wedge=focus, arrow-rail=sequence. Max 15° off-axis.",
+      "description": "Four shapes with four fixed meanings (Law 4): chevron=direction, notch=state, wedge=focus, arrow-rail=sequence. Max 15\u00b0 off-axis.",
       "spec": "references/components.md#diagonal-primitives-law-4",
       "variants": {
         "shape": [
@@ -889,7 +889,7 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "The house glitch for failure — vertical downward bleed in --drip over a --sig-err field. Errors only.",
+      "description": "The house glitch for failure \u2014 vertical downward bleed in --drip over a --sig-err field. Errors only.",
       "spec": "references/components.md#drip--error-surface-law-3",
       "variants": {},
       "tokens": [
@@ -920,7 +920,7 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Zero-data (calm) and failure (error keying + drip) fallbacks for any panel — must not look alike.",
+      "description": "Zero-data (calm) and failure (error keying + drip) fallbacks for any panel \u2014 must not look alike.",
       "spec": "references/components.md#emptystate--errorstate",
       "variants": {
         "kind": [
@@ -995,7 +995,7 @@
       "category": "layout",
       "kind": "block",
       "lifecycle": "stable",
-      "description": "The dashboard chassis — composes the nav rail and a board (masthead/hero + panels).",
+      "description": "The dashboard chassis \u2014 composes the nav rail and a board (masthead/hero + panels).",
       "spec": "references/components.md#instrument-shell",
       "variants": {},
       "tokens": [
@@ -1026,7 +1026,7 @@
       "category": "forms",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Label + control + hint/error wrapper; error state shows a non-color ✗ marker.",
+      "description": "Label + control + hint/error wrapper; error state shows a non-color \u2717 marker.",
       "spec": "references/components.md#form-controls",
       "variants": {
         "state": [
@@ -1062,7 +1062,7 @@
       "category": "forms",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Schema-driven form. Feed it a Form Model + a validate() function (built by the headless forms core from an ArkType type OR a JSON Schema) and it renders and validates the whole form — value/touched/error state, validate on blur + submit, re-check on change once touched.",
+      "description": "Schema-driven form. Feed it a Form Model + a validate() function (built by the headless forms core from an ArkType type OR a JSON Schema) and it renders and validates the whole form \u2014 value/touched/error state, validate on blur + submit, re-check on change once touched.",
       "spec": "references/forms.md",
       "variants": {
         "kind": [
@@ -1429,7 +1429,7 @@
       "category": "media",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Seeded cyber-sigil — a retro-futuristic pixel glyph generated from a seed; optional state keys the hue.",
+      "description": "Seeded cyber-sigil \u2014 a retro-futuristic pixel glyph generated from a seed; optional state keys the hue.",
       "spec": "references/seeded-sigil.md",
       "variants": {
         "state": [
@@ -1474,7 +1474,7 @@
       "category": "media",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Seeded hardware chrome strip — a pixel-art metal bar with deterministically varied fasteners, panel seams, wear scratches, and an indicator LED.",
+      "description": "Seeded hardware chrome strip \u2014 a pixel-art metal bar with deterministically varied fasteners, panel seams, wear scratches, and an indicator LED.",
       "spec": "references/components.md#seeded-chrome",
       "variants": {
         "prop": [
@@ -1510,7 +1510,7 @@
       "category": "layout",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "The one sanctioned rule-break per screen (Law 9) — soft corner, colour glow, blurred blob, optional gradient wash — to spotlight the single most exceptional item.",
+      "description": "The one sanctioned rule-break per screen (Law 9) \u2014 soft corner, colour glow, blurred blob, optional gradient wash \u2014 to spotlight the single most exceptional item.",
       "spec": "references/components.md#breach",
       "variants": {
         "signal": [
@@ -1562,7 +1562,7 @@
       "category": "media",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Seeded ASCII/Unicode density field (braille/block/ramp) for dead space — whisper contrast, aria-hidden, mask-faded off content.",
+      "description": "Seeded ASCII/Unicode density field (braille/block/ramp) for dead space \u2014 whisper contrast, aria-hidden, mask-faded off content.",
       "spec": "references/decoration.md",
       "variants": {
         "variant": [
@@ -1627,7 +1627,7 @@
       "category": "media",
       "kind": "utility",
       "lifecycle": "stable",
-      "description": "The FUI/decoration utility layer for dead space and chassis edges: styled scrollbar, tick-ruler edge, whisper drafting field, hazard stripe, and the Breach blur-blob. All aria-hidden, non-interactive, whisper contrast — never on a content field.",
+      "description": "The FUI/decoration utility layer for dead space and chassis edges: styled scrollbar, tick-ruler edge, whisper drafting field, hazard stripe, and the Breach blur-blob. All aria-hidden, non-interactive, whisper contrast \u2014 never on a content field.",
       "spec": "references/decoration.md",
       "variants": {
         "class": [
@@ -1680,7 +1680,7 @@
       "category": "overlay",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Dropdown menu — a trigger toggles a role=menu panel; a transparent full-viewport scrim closes it on outside click (no global listeners). Optional danger items.",
+      "description": "Dropdown menu \u2014 a trigger toggles a role=menu panel; a transparent full-viewport scrim closes it on outside click (no global listeners). Optional danger items.",
       "spec": "references/components.md#menu",
       "variants": {
         "align": [
@@ -1721,7 +1721,7 @@
       "category": "navigation",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Controlled pager — prev/next plus a windowed run of page numbers with ellipses; current page keyed and aria-current.",
+      "description": "Controlled pager \u2014 prev/next plus a windowed run of page numbers with ellipses; current page keyed and aria-current.",
       "spec": "references/components.md#pagination",
       "variants": {
         "prop": [
@@ -1762,7 +1762,7 @@
       "category": "overlay",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "A fixed screen corner that stacks live toasts (parent owns the list). Each toast is its own live region — err announces assertively — so nothing double-announces. Bottom corners stack newest nearest the edge.",
+      "description": "A fixed screen corner that stacks live toasts (parent owns the list). Each toast is its own live region \u2014 err announces assertively \u2014 so nothing double-announces. Bottom corners stack newest nearest the edge.",
       "spec": "references/components.md#toast-region",
       "variants": {
         "position": [
@@ -1797,7 +1797,7 @@
       "category": "primitives",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "A keycap badge for a keyboard shortcut. Decorative (aria-hidden) — the real binding rides aria-keyshortcuts on the action. Main actions show it always; secondary use the hint variant, revealed on host hover/focus or a global peek.",
+      "description": "A keycap badge for a keyboard shortcut. Decorative (aria-hidden) \u2014 the real binding rides aria-keyshortcuts on the action. Main actions show it always; secondary use the hint variant, revealed on host hover/focus or a global peek.",
       "spec": "references/components.md#key-hint",
       "variants": {
         "flag": [
@@ -1834,7 +1834,7 @@
       "category": "behavior",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Headless behavior — while the reveal key (default Alt) is held, sets data-cr-keys on the root so every secondary key hint fades in at once (a peek-all-shortcuts gesture). Renders nothing visible.",
+      "description": "Headless behavior \u2014 while the reveal key (default Alt) is held, sets data-cr-keys on the root so every secondary key hint fades in at once (a peek-all-shortcuts gesture). Renders nothing visible.",
       "spec": "references/components.md#key-hint",
       "variants": {
         "prop": [
@@ -1857,7 +1857,7 @@
       "category": "overlay",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "A ⌘K command palette on the native dialog (focus-trap + Esc + backdrop). The input is a combobox driving a listbox — focus stays in the field while ↑/↓ move the active option (aria-activedescendant), Enter runs it; live query filter with per-command keycap hints.",
+      "description": "A \u2318K command palette on the native dialog (focus-trap + Esc + backdrop). The input is a combobox driving a listbox \u2014 focus stays in the field while \u2191/\u2193 move the active option (aria-activedescendant), Enter runs it; live query filter with per-command keycap hints.",
       "spec": "references/components.md#command-palette",
       "variants": {
         "prop": [
@@ -1901,7 +1901,7 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Inline callout keyed to a signal (info/wait/done/err) — a left brush-bar in the signal hue, optional dismiss. err announces assertively (role=alert).",
+      "description": "Inline callout keyed to a signal (info/wait/done/err) \u2014 a left brush-bar in the signal hue, optional dismiss. err announces assertively (role=alert).",
       "spec": "references/components.md#alert",
       "variants": {
         "signal": [
@@ -1940,7 +1940,7 @@
       "category": "forms",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Single-choice group (role=radiogroup) with roving tabindex + arrow-key nav. Square radios (radius 0) — a filled inner square marks the choice.",
+      "description": "Single-choice group (role=radiogroup) with roving tabindex + arrow-key nav. Square radios (radius 0) \u2014 a filled inner square marks the choice.",
       "spec": "references/components.md#radio-group",
       "variants": {
         "prop": [
@@ -1977,7 +1977,7 @@
       "category": "forms",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Styled native range input — square track + thumb, keyboard for free (arrows, Home/End, PageUp/Down).",
+      "description": "Styled native range input \u2014 square track + thumb, keyboard for free (arrows, Home/End, PageUp/Down).",
       "spec": "references/components.md#slider",
       "variants": {
         "prop": [
@@ -2016,7 +2016,7 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Task progress (role=progressbar) — determinate fills to value/max; indeterminate runs an animated hazard sweep. Distinct from Meter (a static capacity reading).",
+      "description": "Task progress (role=progressbar) \u2014 determinate fills to value/max; indeterminate runs an animated hazard sweep. Distinct from Meter (a static capacity reading).",
       "spec": "references/components.md#progress",
       "variants": {
         "signal": [
@@ -2051,7 +2051,7 @@
       "category": "state",
       "kind": "utility",
       "lifecycle": "stable",
-      "description": "Loading placeholder — a blocky pulse (never rounded). Sizes: --line, --text, --block; give it a width inline.",
+      "description": "Loading placeholder \u2014 a blocky pulse (never rounded). Sizes: --line, --text, --block; give it a width inline.",
       "spec": "references/components.md#skeleton",
       "variants": {
         "class": [
@@ -2081,7 +2081,7 @@
       "category": "layout",
       "kind": "utility",
       "lifecycle": "stable",
-      "description": "Key → value readout (dl/dt/dd) on a two-column grid — mono/label keys, data-register values. For detail panels.",
+      "description": "Key \u2192 value readout (dl/dt/dd) on a two-column grid \u2014 mono/label keys, data-register values. For detail panels.",
       "spec": "references/components.md#data-list",
       "variants": {
         "class": [
@@ -2115,7 +2115,7 @@
       "category": "layout",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Collapsible sections — header buttons (aria-expanded + aria-controls) reveal region panels. single = exclusive; ↑/↓/Home/End move between headers.",
+      "description": "Collapsible sections \u2014 header buttons (aria-expanded + aria-controls) reveal region panels. single = exclusive; \u2191/\u2193/Home/End move between headers.",
       "spec": "references/components.md#accordion",
       "variants": {
         "prop": [
@@ -2152,7 +2152,7 @@
       "category": "overlay",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Generic anchored overlay for arbitrary content — a trigger toggles a floating panel; scrim closes on outside click, Esc closes and returns focus. Use Menu for a list of actions.",
+      "description": "Generic anchored overlay for arbitrary content \u2014 a trigger toggles a floating panel; scrim closes on outside click, Esc closes and returns focus. Use Menu for a list of actions.",
       "spec": "references/components.md#popover",
       "variants": {
         "align": [
@@ -2189,7 +2189,7 @@
       "category": "overlay",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "An edge sheet on the native dialog (focus-trap + Esc + backdrop) — slides from the left or right, full height. For detail/inspector panels.",
+      "description": "An edge sheet on the native dialog (focus-trap + Esc + backdrop) \u2014 slides from the left or right, full height. For detail/inspector panels.",
       "spec": "references/components.md#drawer",
       "variants": {
         "side": [
@@ -2226,7 +2226,7 @@
       "category": "navigation",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Navigation trail — ascii \"/\" separators from CSS; the last crumb is the current page (aria-current).",
+      "description": "Navigation trail \u2014 ascii \"/\" separators from CSS; the last crumb is the current page (aria-current).",
       "spec": "references/components.md#breadcrumb",
       "variants": {
         "prop": [
@@ -2258,7 +2258,7 @@
       "category": "navigation",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Single-select connected button bar (role=radiogroup, roving tabindex; ←/→/Home/End). Same semantics as a radio group, distinct connected visual.",
+      "description": "Single-select connected button bar (role=radiogroup, roving tabindex; \u2190/\u2192/Home/End). Same semantics as a radio group, distinct connected visual.",
       "spec": "references/components.md#segmented",
       "variants": {
         "prop": [
@@ -2294,7 +2294,7 @@
       "category": "forms",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Autocomplete — an input (role=combobox) filtering a listbox; ↑/↓ move the active option (aria-activedescendant), Enter selects, Esc closes. Active row shows an ascii ▸ marker.",
+      "description": "Autocomplete \u2014 an input (role=combobox) filtering a listbox; \u2191/\u2193 move the active option (aria-activedescendant), Enter selects, Esc closes. Active row shows an ascii \u25b8 marker.",
       "spec": "references/components.md#combobox",
       "variants": {
         "prop": [
@@ -2309,7 +2309,7 @@
         },
         {
           "cssVar": "--sig-work",
-          "description": "active option + ▸ marker"
+          "description": "active option + \u25b8 marker"
         },
         {
           "cssVar": "--panel",
@@ -2332,7 +2332,7 @@
       "category": "forms",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Number input with −/+ steppers, clamped to min/max; the native input keeps its own keyboard.",
+      "description": "Number input with \u2212/+ steppers, clamped to min/max; the native input keeps its own keyboard.",
       "spec": "references/components.md#number-field",
       "variants": {
         "prop": [
@@ -2371,7 +2371,7 @@
       "category": "media",
       "kind": "utility",
       "lifecycle": "stable",
-      "description": "Character-flavored detail utilities: .cr-sep / .cr-sep-label box-rule separators (dashed/dotted, labeled), .cr-list ascii-marker lists (▸ · » +), and .cr-leader dot-leader rows (label ····· value).",
+      "description": "Character-flavored detail utilities: .cr-sep / .cr-sep-label box-rule separators (dashed/dotted, labeled), .cr-list ascii-marker lists (\u25b8 \u00b7 \u00bb +), and .cr-leader dot-leader rows (label \u00b7\u00b7\u00b7\u00b7\u00b7 value).",
       "spec": "references/components.md#ascii-detail",
       "variants": {
         "class": [
@@ -2393,7 +2393,7 @@
         },
         {
           "cssVar": "--sig-work",
-          "description": "▸ / » markers"
+          "description": "\u25b8 / \u00bb markers"
         }
       ],
       "keywords": [
@@ -2414,7 +2414,7 @@
       "category": "media",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "The house operational glyph set — 24×24, currentColor, single 2px stroke, square caps to match the neobrutalist geometry. Decorative by default; pass a label to name it.",
+      "description": "The house operational glyph set \u2014 24\u00d724, currentColor, single 2px stroke, square caps to match the neobrutalist geometry. Decorative by default; pass a label to name it.",
       "spec": "references/components.md#icon",
       "variants": {
         "name": [
@@ -2507,7 +2507,7 @@
       "category": "navigation",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Hierarchical tree (role=tree) for nested data like a worker→session fleet. Rendered as a flat list of visible rows; full keyboard nav (arrows expand/collapse/step, Home/End) and aria-level/aria-expanded.",
+      "description": "Hierarchical tree (role=tree) for nested data like a worker\u2192session fleet. Rendered as a flat list of visible rows; full keyboard nav (arrows expand/collapse/step, Home/End) and aria-level/aria-expanded.",
       "spec": "references/components.md#tree",
       "variants": {
         "prop": [
@@ -2545,7 +2545,7 @@
       "category": "forms",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "A styled native date/time input (datetime-local / date / time) — the browser owns the picker, keyboard, and locale.",
+      "description": "A styled native date/time input (datetime-local / date / time) \u2014 the browser owns the picker, keyboard, and locale.",
       "spec": "references/components.md#datetime",
       "variants": {
         "kind": [
@@ -2622,7 +2622,7 @@
       "category": "layout",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "A dense, VIRTUALIZED data grid for large datasets: only the rows in (or near) the viewport are in the DOM, so thousands of rows scroll smoothly. Fixed row height; sortable headers (asc → desc → none, stable); optional row selection (checkbox column + select-all + aria-selected); sticky header; grid a11y (role=grid/row/columnheader/gridcell, aria-sort, aria-rowcount). Div-grid (not a <table>) so virtualization offsets cleanly across all targets.",
+      "description": "A dense, VIRTUALIZED data grid for large datasets: only the rows in (or near) the viewport are in the DOM, so thousands of rows scroll smoothly. Fixed row height; sortable headers (asc \u2192 desc \u2192 none, stable); optional row selection (checkbox column + select-all + aria-selected); sticky header; grid a11y (role=grid/row/columnheader/gridcell, aria-sort, aria-rowcount). Div-grid (not a <table>) so virtualization offsets cleanly across all targets.",
       "spec": "references/components.md#data-grid",
       "variants": {
         "prop": [
@@ -2668,7 +2668,7 @@
       "category": "navigation",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Numbered progress indicator for a multi-step flow — ordered list with done/active/upcoming states; current step carries aria-current, optional navigable step buttons.",
+      "description": "Numbered progress indicator for a multi-step flow \u2014 ordered list with done/active/upcoming states; current step carries aria-current, optional navigable step buttons.",
       "spec": "references/components.md#stepper",
       "variants": {
         "state": [
@@ -2710,7 +2710,7 @@
       "category": "forms",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "One-time-code / PIN entry — N single-digit cells acting as one field; typing advances, Backspace steps back, arrows move, paste fills across. role=group with per-cell labels.",
+      "description": "One-time-code / PIN entry \u2014 N single-digit cells acting as one field; typing advances, Backspace steps back, arrows move, paste fills across. role=group with per-cell labels.",
       "spec": "references/components.md#pin-input",
       "variants": {
         "prop": [
@@ -2746,7 +2746,7 @@
       "category": "forms",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Token entry — Enter or comma adds a tag, Backspace on an empty field removes the last, each tag has a labelled remove button. role=group; duplicates ignored.",
+      "description": "Token entry \u2014 Enter or comma adds a tag, Backspace on an empty field removes the last, each tag has a labelled remove button. role=group; duplicates ignored.",
       "spec": "references/components.md#tags-input",
       "variants": {
         "prop": [
@@ -2863,7 +2863,7 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Indeterminate loading indicator — role=status with an accessible label; the ring is aria-hidden and honours reduced-motion. For a known fraction use Progress or Meter.",
+      "description": "Indeterminate loading indicator \u2014 role=status with an accessible label; the ring is aria-hidden and honours reduced-motion. For a known fraction use Progress or Meter.",
       "spec": "references/components.md#spinner",
       "variants": {
         "size": [
@@ -2973,7 +2973,7 @@
       "tokens": [
         {
           "cssVar": "--cr-togglechip-on-bg",
-          "description": "ON-state fill (a state, not a per-option identity hue — Law 2)"
+          "description": "ON-state fill (a state, not a per-option identity hue \u2014 Law 2)"
         }
       ]
     },
@@ -3003,6 +3003,146 @@
       "spec": "references/components.md#relative-time",
       "variants": {},
       "tokens": []
+    },
+    {
+      "id": "rating",
+      "name": "Rating",
+      "category": "forms",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Star-rating control \u2014 a radiogroup with roving tabindex (interactive) or an inert score readout (readonly). Geometric-glyph marks (no icon font); fill encodes the value.",
+      "spec": "references/components.md#rating",
+      "variants": {
+        "mode": [
+          "interactive",
+          "readonly"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-rating-on",
+          "description": "filled-star colour (a state, not a per-item hue \u2014 Law 2)"
+        },
+        {
+          "cssVar": "--cr-rating-off",
+          "description": "empty-star colour"
+        }
+      ]
+    },
+    {
+      "id": "timeline",
+      "name": "Timeline",
+      "category": "state",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Vertical event timeline \u2014 an ordered list of moments on a rail, each with a signal-coloured node, machine time, title and optional detail. Presentational; node colour is the semantic signal.",
+      "spec": "references/components.md#timeline",
+      "variants": {
+        "signal": [
+          "work",
+          "done",
+          "wait",
+          "err"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-timeline-rail",
+          "description": "the connecting rail (chrome)"
+        }
+      ]
+    },
+    {
+      "id": "toolbar",
+      "name": "Toolbar",
+      "category": "action",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "WAI-ARIA toolbar \u2014 a labelled group of the operator's own controls with a single tab stop and roving-tabindex arrow navigation (horizontal or vertical).",
+      "spec": "references/components.md#toolbar",
+      "variants": {
+        "orientation": [
+          "horizontal",
+          "vertical"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-toolbar-bg",
+          "description": "bar surface"
+        },
+        {
+          "cssVar": "--cr-toolbar-border",
+          "description": "bar border"
+        }
+      ]
+    },
+    {
+      "id": "file-upload",
+      "name": "FileUpload",
+      "category": "forms",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "File dropzone over a real native <input type=file> \u2014 click/keyboard opens the picker, drag-drop is accepted, dragover is announced via data-state. Selected files listed.",
+      "spec": "references/components.md#file-upload",
+      "variants": {
+        "state": [
+          "idle",
+          "dragover"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-fileupload-active-border",
+          "description": "dragover accent border (a state \u2014 Law 2)"
+        }
+      ]
+    },
+    {
+      "id": "carousel",
+      "name": "Carousel",
+      "category": "media",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Slide carousel with the WAI-ARIA carousel pattern \u2014 labelled region, prev/next, dot indicators, aria-live viewport, \u2190/\u2192 navigation. Controlled via index/onIndex.",
+      "spec": "references/components.md#carousel",
+      "variants": {
+        "dots": [
+          "true",
+          "false"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-carousel-dot-active",
+          "description": "active-dot accent (a state \u2014 Law 2)"
+        }
+      ]
+    },
+    {
+      "id": "calendar",
+      "name": "Calendar",
+      "category": "forms",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Month calendar grid \u2014 role=grid with roving tabindex (arrows move day/week, PageUp/Down step months, Enter/Space select). Fully controlled, SSR-safe (month + today injected, never read from the clock).",
+      "spec": "references/components.md#calendar",
+      "variants": {
+        "weekStart": [
+          "0 (Sun)",
+          "1 (Mon)"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-calendar-selected-bg",
+          "description": "selected-day fill (a state \u2014 Law 2)"
+        },
+        {
+          "cssVar": "--cr-calendar-today-ring",
+          "description": "today ring"
+        }
+      ]
     }
   ]
 }
