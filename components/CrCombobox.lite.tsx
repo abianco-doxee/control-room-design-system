@@ -1,4 +1,5 @@
 import { useStore, useRef, onMount, Show, For } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrComboOption {
   value: string;
@@ -17,6 +18,11 @@ export interface CrComboboxProps {
   /** Accessible name for the field. */
   label?: string;
   onChange?: (value: string) => void;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" · "input" · "scrim" · "list" · "empty" · "option". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* Autocomplete: an input (role=combobox) over a listbox. Focus stays in the
@@ -106,10 +112,19 @@ export default function CrCombobox(props: CrComboboxProps) {
   });
 
   return (
-    <div class="cr-combobox">
+    <div
+      {...ptAttrs(props.pt, "root")}
+      class={ptClass(props.pt, props.unstyled, "cr-combobox", "root")}
+      data-part="root"
+      data-state={state.open ? "open" : "closed"}
+      style={ptStyle(props.pt, props.dt, "root")}
+    >
       <input
+        {...ptAttrs(props.pt, "input")}
         ref={inputRef}
-        class="cr-combobox__input"
+        class={ptClass(props.pt, props.unstyled, "cr-combobox__input", "input")}
+        data-part="input"
+        data-state={state.open ? "open" : "closed"}
         type="text"
         role="combobox"
         aria-expanded={state.open ? "true" : "false"}
@@ -124,15 +139,18 @@ export default function CrCombobox(props: CrComboboxProps) {
         onKeyDown={(event) => state.onKey(event)}
       />
       <Show when={state.open}>
-        <button type="button" class="cr-combobox__scrim" aria-hidden="true" tabIndex={-1} onClick={() => state.close()}></button>
-        <ul class="cr-combobox__list" id="cr-combobox-list" role="listbox">
+        <button {...ptAttrs(props.pt, "scrim")} type="button" class={ptClass(props.pt, props.unstyled, "cr-combobox__scrim", "scrim")} data-part="scrim" aria-hidden="true" tabIndex={-1} onClick={() => state.close()}></button>
+        <ul {...ptAttrs(props.pt, "list")} class={ptClass(props.pt, props.unstyled, "cr-combobox__list", "list")} data-part="list" id="cr-combobox-list" role="listbox">
           <Show when={state.loading}>
-            <li class="cr-combobox__empty" aria-disabled="true">searching…</li>
+            <li {...ptAttrs(props.pt, "empty")} class={ptClass(props.pt, props.unstyled, "cr-combobox__empty", "empty")} data-part="empty" aria-disabled="true">searching…</li>
           </Show>
           <For each={state.results()}>
             {(opt: CrComboOption, i: number) => (
               <li
-                class={"cr-combobox__opt" + (i === state.active ? " cr-combobox__opt--active" : "")}
+                {...ptAttrs(props.pt, "option")}
+                class={ptClass(props.pt, props.unstyled, "cr-combobox__opt" + (i === state.active ? " cr-combobox__opt--active" : ""), "option")}
+                data-part="option"
+                data-state={i === state.active ? "active" : "inactive"}
                 id={"cr-combo-" + i}
                 role="option"
                 aria-selected={i === state.active ? "true" : "false"}
@@ -144,7 +162,7 @@ export default function CrCombobox(props: CrComboboxProps) {
             )}
           </For>
           <Show when={!state.loading && state.results().length === 0}>
-            <li class="cr-combobox__empty" aria-disabled="true">no matches</li>
+            <li {...ptAttrs(props.pt, "empty")} class={ptClass(props.pt, props.unstyled, "cr-combobox__empty", "empty")} data-part="empty" aria-disabled="true">no matches</li>
           </Show>
         </ul>
       </Show>

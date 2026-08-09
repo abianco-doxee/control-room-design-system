@@ -1,4 +1,5 @@
 import { useStore, useRef, Show, For } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrGridColumn {
   key: string;
@@ -28,6 +29,11 @@ export interface CrDataGridProps {
   emptyLabel?: string;
   onSortChange?: (key: string, dir: string) => void;
   onSelectionChange?: (keys: string[]) => void;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" · "head" · "cell" · "sort" · "glyph" · "viewport" · "empty" · "sizer" · "rows" · "row". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* Control Room data grid — a dense, virtualized table for large datasets.
@@ -272,17 +278,20 @@ export default function CrDataGrid(props: CrDataGridProps) {
 
   return (
     <div
-      class="cr-grid"
+      {...ptAttrs(props.pt, "root")}
+      class={ptClass(props.pt, props.unstyled, "cr-grid", "root")}
       role="grid"
       aria-rowcount={props.rows.length}
       tabIndex={0}
       aria-activedescendant={state.activeId()}
+      data-part="root"
+      style={ptStyle(props.pt, props.dt, "root")}
       onFocus={() => state.onGridFocus()}
       onKeyDown={(event) => state.onGridKey(event)}
     >
-      <div class="cr-grid__head" role="row" style={{ gridTemplateColumns: state.template() }}>
+      <div {...ptAttrs(props.pt, "head")} class={ptClass(props.pt, props.unstyled, "cr-grid__head", "head")} data-part="head" role="row" style={{ gridTemplateColumns: state.template() }}>
         <Show when={props.selectable}>
-          <div class="cr-grid__cell cr-grid__cell--check" role="columnheader">
+          <div {...ptAttrs(props.pt, "cell")} class={ptClass(props.pt, props.unstyled, "cr-grid__cell cr-grid__cell--check", "cell")} data-part="cell" role="columnheader">
             <input
               type="checkbox"
               aria-label="Select all rows"
@@ -294,14 +303,16 @@ export default function CrDataGrid(props: CrDataGridProps) {
         <For each={props.columns}>
           {(col: CrGridColumn) => (
             <div
-              class={"cr-grid__cell cr-grid__cell--" + state.align(col)}
+              {...ptAttrs(props.pt, "cell")}
+              class={ptClass(props.pt, props.unstyled, "cr-grid__cell cr-grid__cell--" + state.align(col), "cell")}
+              data-part="cell"
               role="columnheader"
               aria-sort={col.sortable ? state.ariaSort(col) : undefined}
             >
               <Show when={col.sortable}>
-                <button type="button" class="cr-grid__sort" onClick={() => state.toggleSort(col)}>
+                <button {...ptAttrs(props.pt, "sort")} type="button" class={ptClass(props.pt, props.unstyled, "cr-grid__sort", "sort")} data-part="sort" onClick={() => state.toggleSort(col)}>
                   {col.label}
-                  <span class="cr-grid__glyph" aria-hidden="true">{state.sortGlyph(col)}</span>
+                  <span {...ptAttrs(props.pt, "glyph")} class={ptClass(props.pt, props.unstyled, "cr-grid__glyph", "glyph")} data-part="glyph" aria-hidden="true">{state.sortGlyph(col)}</span>
                 </button>
               </Show>
               <Show when={!col.sortable}>
@@ -312,24 +323,30 @@ export default function CrDataGrid(props: CrDataGridProps) {
         </For>
       </div>
 
-      <div class="cr-grid__viewport" ref={vpRef} style={{ height: state.viewportH() + "px" }} onScroll={(event) => state.onScroll(event)}>
+      <div {...ptAttrs(props.pt, "viewport")} class={ptClass(props.pt, props.unstyled, "cr-grid__viewport", "viewport")} data-part="viewport" ref={vpRef} style={{ height: state.viewportH() + "px" }} onScroll={(event) => state.onScroll(event)}>
         <Show when={props.rows.length === 0}>
-          <div class="cr-grid__empty">{props.emptyLabel || "No rows"}</div>
+          <div {...ptAttrs(props.pt, "empty")} class={ptClass(props.pt, props.unstyled, "cr-grid__empty", "empty")} data-part="empty">{props.emptyLabel || "No rows"}</div>
         </Show>
-        <div class="cr-grid__sizer" style={{ height: state.totalH() + "px" }}>
-          <div class="cr-grid__rows" style={{ transform: "translateY(" + state.offsetY() + "px)" }}>
+        <div {...ptAttrs(props.pt, "sizer")} class={ptClass(props.pt, props.unstyled, "cr-grid__sizer", "sizer")} data-part="sizer" style={{ height: state.totalH() + "px" }}>
+          <div {...ptAttrs(props.pt, "rows")} class={ptClass(props.pt, props.unstyled, "cr-grid__rows", "rows")} data-part="rows" style={{ transform: "translateY(" + state.offsetY() + "px)" }}>
             <For each={state.windowRows()}>
               {(row: any, i: number) => (
                 <div
-                  class="cr-grid__row"
+                  {...ptAttrs(props.pt, "row")}
+                  class={ptClass(props.pt, props.unstyled, "cr-grid__row", "row")}
+                  data-part="row"
                   role="row"
                   aria-rowindex={state.absIndex(i) + 1}
                   aria-selected={props.selectable ? (state.isSelected(row, state.absIndex(i)) ? "true" : "false") : undefined}
+                  data-state={props.selectable ? (state.isSelected(row, state.absIndex(i)) ? "selected" : "unselected") : undefined}
                   style={{ gridTemplateColumns: state.template(), height: state.rowPx(row, state.absIndex(i)) + "px" }}
                 >
                   <Show when={props.selectable}>
                     <div
-                      class={"cr-grid__cell cr-grid__cell--check" + (state.isActive(state.absIndex(i), 0) ? " cr-grid__cell--active" : "")}
+                      {...ptAttrs(props.pt, "cell")}
+                      class={ptClass(props.pt, props.unstyled, "cr-grid__cell cr-grid__cell--check" + (state.isActive(state.absIndex(i), 0) ? " cr-grid__cell--active" : ""), "cell")}
+                      data-part="cell"
+                      data-state={state.isActive(state.absIndex(i), 0) ? "active" : "inactive"}
                       role="gridcell"
                       id={state.cellId(state.absIndex(i), 0)}
                     >
@@ -344,7 +361,10 @@ export default function CrDataGrid(props: CrDataGridProps) {
                   <For each={props.columns}>
                     {(col: CrGridColumn, ci: number) => (
                       <div
-                        class={"cr-grid__cell cr-grid__cell--" + state.align(col) + (state.isActive(state.absIndex(i), (props.selectable ? 1 : 0) + ci) ? " cr-grid__cell--active" : "")}
+                        {...ptAttrs(props.pt, "cell")}
+                        class={ptClass(props.pt, props.unstyled, "cr-grid__cell cr-grid__cell--" + state.align(col) + (state.isActive(state.absIndex(i), (props.selectable ? 1 : 0) + ci) ? " cr-grid__cell--active" : ""), "cell")}
+                        data-part="cell"
+                        data-state={state.isActive(state.absIndex(i), (props.selectable ? 1 : 0) + ci) ? "active" : "inactive"}
                         role="gridcell"
                         id={state.cellId(state.absIndex(i), (props.selectable ? 1 : 0) + ci)}
                       >

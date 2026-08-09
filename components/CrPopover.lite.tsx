@@ -1,4 +1,5 @@
 import { useStore, useRef, Show } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrPopoverProps {
   /** Trigger button text. */
@@ -7,6 +8,11 @@ export interface CrPopoverProps {
   title?: string;
   align?: "left" | "right";
   children?: any;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" · "trigger" · "scrim" · "panel". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* Generic anchored overlay. A trigger toggles a floating panel; a transparent
@@ -83,10 +89,13 @@ export default function CrPopover(props: CrPopoverProps) {
   });
 
   return (
-    <div class="cr-popover" ref={rootRef}>
+    <div {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-popover", "root")} data-part="root" style={ptStyle(props.pt, props.dt, "root")} ref={rootRef}>
       <button
+        {...ptAttrs(props.pt, "trigger")}
         type="button"
-        class="cr-btn cr-btn--outline cr-btn--sm"
+        class={ptClass(props.pt, props.unstyled, "cr-btn cr-btn--outline cr-btn--sm", "trigger")}
+        data-part="trigger"
+        data-state={state.open ? "open" : "closed"}
         aria-haspopup="dialog"
         aria-expanded={state.open ? "true" : "false"}
         onClick={() => state.toggle()}
@@ -94,9 +103,12 @@ export default function CrPopover(props: CrPopoverProps) {
         {props.label}
       </button>
       <Show when={state.open}>
-        <button type="button" class="cr-popover__scrim" aria-hidden="true" tabIndex={-1} onClick={() => state.close()}></button>
+        <button {...ptAttrs(props.pt, "scrim")} type="button" class={ptClass(props.pt, props.unstyled, "cr-popover__scrim", "scrim")} data-part="scrim" aria-hidden="true" tabIndex={-1} onClick={() => state.close()}></button>
         <div
-          class={"cr-popover__panel" + (props.align === "right" ? " cr-popover__panel--right" : "")}
+          {...ptAttrs(props.pt, "panel")}
+          class={ptClass(props.pt, props.unstyled, "cr-popover__panel" + (props.align === "right" ? " cr-popover__panel--right" : ""), "panel")}
+          data-part="panel"
+          data-state={state.open ? "open" : "closed"}
           role="dialog"
           aria-label={props.title || props.label}
           tabIndex={-1}

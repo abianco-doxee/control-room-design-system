@@ -1,4 +1,5 @@
 import { useStore } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrNumberFieldProps {
   value: number;
@@ -8,6 +9,11 @@ export interface CrNumberFieldProps {
   label?: string;
   disabled?: boolean;
   onChange?: (value: number) => void;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" · "btn" · "input". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* Number input with −/+ steppers, clamped to min/max. The native input keeps its
@@ -37,10 +43,17 @@ export default function CrNumberField(props: CrNumberFieldProps) {
   });
 
   return (
-    <div class="cr-numberfield">
+    <div
+      {...ptAttrs(props.pt, "root")}
+      class={ptClass(props.pt, props.unstyled, "cr-numberfield", "root")}
+      data-part="root"
+      style={ptStyle(props.pt, props.dt, "root")}
+    >
       <button
+        {...ptAttrs(props.pt, "btn")}
         type="button"
-        class="cr-numberfield__btn"
+        class={ptClass(props.pt, props.unstyled, "cr-numberfield__btn", "btn")}
+        data-part="btn"
         aria-label="Decrease"
         disabled={props.disabled || state.atMin()}
         onClick={() => state.bump(-1)}
@@ -48,8 +61,10 @@ export default function CrNumberField(props: CrNumberFieldProps) {
         −
       </button>
       <input
+        {...ptAttrs(props.pt, "input")}
         type="number"
-        class="cr-numberfield__input"
+        class={ptClass(props.pt, props.unstyled, "cr-numberfield__input", "input")}
+        data-part="input"
         value={props.value}
         min={props.min}
         max={props.max}
@@ -59,8 +74,10 @@ export default function CrNumberField(props: CrNumberFieldProps) {
         onInput={(event) => state.onInput((event.target as HTMLInputElement).value)}
       />
       <button
+        {...ptAttrs(props.pt, "btn")}
         type="button"
-        class="cr-numberfield__btn"
+        class={ptClass(props.pt, props.unstyled, "cr-numberfield__btn", "btn")}
+        data-part="btn"
         aria-label="Increase"
         disabled={props.disabled || state.atMax()}
         onClick={() => state.bump(1)}

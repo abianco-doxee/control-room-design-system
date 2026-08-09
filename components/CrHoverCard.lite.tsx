@@ -1,4 +1,5 @@
 import { useStore } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrHoverCardProps {
   /** Trigger text (focusable so keyboard users get the card too). */
@@ -7,6 +8,11 @@ export interface CrHoverCardProps {
   title?: string;
   align?: "left" | "right";
   children?: any;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" · "trigger" · "panel". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* A rich hover/focus card — like Tooltip but for structured content. Reveal is
@@ -27,12 +33,14 @@ export default function CrHoverCard(props: CrHoverCardProps) {
   });
 
   return (
-    <span class="cr-hovercard" data-dismissed={state.dismissed ? "true" : undefined} onMouseLeave={() => state.reset()}>
-      <span class="cr-hovercard__trigger" tabIndex={0} onKeyDown={(event) => state.onKey(event)} onBlur={() => state.reset()}>
+    <span {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-hovercard", "root")} data-part="root" data-state={state.dismissed ? "dismissed" : undefined} style={ptStyle(props.pt, props.dt, "root")} data-dismissed={state.dismissed ? "true" : undefined} onMouseLeave={() => state.reset()}>
+      <span {...ptAttrs(props.pt, "trigger")} class={ptClass(props.pt, props.unstyled, "cr-hovercard__trigger", "trigger")} data-part="trigger" tabIndex={0} onKeyDown={(event) => state.onKey(event)} onBlur={() => state.reset()}>
         {props.label}
       </span>
       <span
-        class={"cr-hovercard__panel" + (props.align === "right" ? " cr-hovercard__panel--right" : "")}
+        {...ptAttrs(props.pt, "panel")}
+        class={ptClass(props.pt, props.unstyled, "cr-hovercard__panel" + (props.align === "right" ? " cr-hovercard__panel--right" : ""), "panel")}
+        data-part="panel"
         role="group"
         aria-label={props.title || props.label}
       >

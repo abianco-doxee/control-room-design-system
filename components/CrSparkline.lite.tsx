@@ -1,4 +1,5 @@
 import { useStore, Show } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrSparklineProps {
   /** The series to draw. Sampled left→right; the last point gets the end dot. */
@@ -11,6 +12,11 @@ export interface CrSparklineProps {
   height?: number;
   /** Accessible name — the reading it stands in for (e.g. "p95 latency"). */
   label?: string;
+  /* ── styling contract (portable pt/dt subset). Part: "root" (SVG internals are
+   * aria-hidden decoration and stay on the cr-spark classes). */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* An inline micro line/area chart for a KPI or table cell — no axes, no grid,
@@ -56,7 +62,7 @@ export default function CrSparkline(props: CrSparklineProps) {
   });
 
   return (
-    <span class={"cr-spark cr-spark--" + (props.signal || "work")} role="img" aria-label={state.summary}>
+    <span {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-spark cr-spark--" + (props.signal || "work"), "root")} data-part="root" style={ptStyle(props.pt, props.dt, "root")} role="img" aria-label={state.summary}>
       <svg class="cr-spark__svg" viewBox={"0 0 " + state.geo.W + " " + state.geo.H} preserveAspectRatio="none" aria-hidden="true" focusable="false">
         <Show when={props.area}>
           <path class="cr-spark__area" d={state.geo.area} />
