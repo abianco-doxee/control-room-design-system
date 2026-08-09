@@ -8,6 +8,23 @@ the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Monorepo — independently-publishable `@control-room/*` packages.** Split into
+  npm workspaces: `@control-room/tokens`, `styles`, `utils`, `icons`, `components`,
+  plus a private `docs` site — each with its own `dist` and `exports`. The root
+  `@control-room/design-system` stays a convenience umbrella re-exporting every
+  subpath, so existing `@control-room/design-system/*` imports are unchanged.
+- **AI-native surfaces.** `@control-room/mcp` — a Model Context Protocol server
+  (`npx @control-room/mcp`) exposing the catalog, theme contract, and reference
+  docs as tools/resources; `llms.txt` + `llms-full.txt` and `catalog.json` /
+  `theme-contract.json` served at the docs site root. Guarded by `test:tooling`.
+- **One-command skill install.** `@control-room/skill` — a Claude Code plugin
+  (`/plugin marketplace add …` + `/plugin install`, which also wires the MCP
+  server) and an npx installer (`npx @control-room/skill`, `--global` /
+  `--provider` / `--dir`) for Claude / Cursor / opencode.
+- **`CrIcon` raw-path escape hatch** (`path` / `filled`) — inject any Iconify
+  family or hand-drawn 24×24 glyph per-use without a rebuild; `@control-room/icons`
+  ships importable per-family path-data packs (`./pixel`).
+- **Prebuilt Tailwind utilities** — `@control-room/styles/utilities.css`.
 - **Framework components (Mitosis)** — interactive components authored once as
   `.lite.tsx` and compiled to six targets (React, Vue, Svelte, Angular, Solid,
   Qwik), shipped as per-framework package exports with typed props. Guarded by
@@ -18,10 +35,10 @@ the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Forms** — `CrForm`, a schema-driven form with ArkType ⇄ JSON-Schema
   validation and per-field re-render isolation (`references/forms.md`).
 - **pt / dt / unstyled styling contract** — a PrimeVue-shaped styling API across
-  the functional component library (61 of 71): `unstyled` opt-out, `pt`
-  pass-through, and per-instance `dt` design tokens, with `data-part` /
-  `data-state` hooks. Backed by a shared `lib/pt.ts` and finer per-component
-  `--cr-<comp>-*` tokens (`references/styling-contract.md`).
+  every functional component (library-wide, enforced by the styling-contract
+  gate): `unstyled` opt-out, `pt` pass-through, and per-instance `dt` design
+  tokens, with `data-part` / `data-state` hooks. Backed by a shared `pt.ts` helper
+  and finer per-component `--cr-<comp>-*` tokens (`references/styling-contract.md`).
 - **Theming & branding** — per-brand `data-theme` layers over the four base
   themes (`references/theming.md`).
 - **Accessibility gate + visual regression (Playwright + axe-core)** —
