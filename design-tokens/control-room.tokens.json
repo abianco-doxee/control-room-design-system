@@ -344,6 +344,78 @@
       "$extensions": {
         "com.doxee.cssVar": "--breach-glow-size"
       }
+    },
+    "pad": {
+      "$value": "var(--space-3)",
+      "$extensions": {
+        "com.doxee.cssVar": "--pad"
+      }
+    },
+    "pad-tight": {
+      "$value": "var(--space-2)",
+      "$extensions": {
+        "com.doxee.cssVar": "--pad-tight"
+      }
+    },
+    "pad-loose": {
+      "$value": "var(--space-4)",
+      "$extensions": {
+        "com.doxee.cssVar": "--pad-loose"
+      }
+    },
+    "gap": {
+      "$value": "var(--space-3)",
+      "$extensions": {
+        "com.doxee.cssVar": "--gap"
+      }
+    },
+    "gap-tight": {
+      "$value": "var(--space-2)",
+      "$extensions": {
+        "com.doxee.cssVar": "--gap-tight"
+      }
+    },
+    "control-h-sm": {
+      "$type": "dimension",
+      "$value": "28px",
+      "$extensions": {
+        "com.doxee.cssVar": "--control-h-sm"
+      }
+    },
+    "control-h-md": {
+      "$type": "dimension",
+      "$value": "34px",
+      "$extensions": {
+        "com.doxee.cssVar": "--control-h-md"
+      }
+    },
+    "control-h-lg": {
+      "$type": "dimension",
+      "$value": "42px",
+      "$extensions": {
+        "com.doxee.cssVar": "--control-h-lg"
+      }
+    },
+    "bp-panel-sm": {
+      "$type": "dimension",
+      "$value": "22rem",
+      "$extensions": {
+        "com.doxee.cssVar": "--bp-panel-sm"
+      }
+    },
+    "bp-panel-md": {
+      "$type": "dimension",
+      "$value": "34rem",
+      "$extensions": {
+        "com.doxee.cssVar": "--bp-panel-md"
+      }
+    },
+    "bp-panel-lg": {
+      "$type": "dimension",
+      "$value": "52rem",
+      "$extensions": {
+        "com.doxee.cssVar": "--bp-panel-lg"
+      }
     }
   },
   "typography": {
@@ -394,6 +466,12 @@
         "com.doxee.cssVar": "--type-display-transform"
       }
     },
+    "type-display-size": {
+      "$value": "clamp(2.5rem, 5.5vw, 4.5rem)",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-display-size"
+      }
+    },
     "type-data-size": {
       "$type": "dimension",
       "$value": "13px",
@@ -420,6 +498,187 @@
       "$value": "uppercase",
       "$extensions": {
         "com.doxee.cssVar": "--type-label-transform"
+      }
+    },
+    "type-data-size-fluid": {
+      "$value": "clamp(12px, 1.45cqi, 14px)",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-data-size-fluid"
+      }
+    },
+    "type-data-weight": {
+      "$type": "fontWeight",
+      "$value": 500,
+      "$extensions": {
+        "com.doxee.cssVar": "--type-data-weight"
+      }
+    },
+    "type-data-leading": {
+      "$type": "number",
+      "$value": 1.4,
+      "$extensions": {
+        "com.doxee.cssVar": "--type-data-leading"
+      }
+    },
+    "type-data-tracking": {
+      "$value": "0",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-data-tracking"
+      }
+    },
+    "type-label-size": {
+      "$value": "clamp(11px, 1.3cqi, 12px)",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-label-size"
+      }
+    },
+    "type-label-weight": {
+      "$type": "fontWeight",
+      "$value": 800,
+      "$extensions": {
+        "com.doxee.cssVar": "--type-label-weight"
+      }
+    },
+    "type-label-leading": {
+      "$type": "number",
+      "$value": 1.2,
+      "$extensions": {
+        "com.doxee.cssVar": "--type-label-leading"
+      }
+    },
+    "type-h1-size": {
+      "$value": "clamp(1.5rem, 3.2vw, 2.25rem)",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-h1-size"
+      }
+    },
+    "type-h1-weight": {
+      "$type": "fontWeight",
+      "$value": 900,
+      "$extensions": {
+        "com.doxee.cssVar": "--type-h1-weight"
+      }
+    },
+    "type-h1-leading": {
+      "$type": "number",
+      "$value": 0.95,
+      "$extensions": {
+        "com.doxee.cssVar": "--type-h1-leading"
+      }
+    },
+    "type-h1-tracking": {
+      "$type": "dimension",
+      "$value": "-0.03em",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-h1-tracking"
+      }
+    },
+    "type-h2-size": {
+      "$value": "clamp(1.15rem, 1.8vw, 1.5rem)",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-h2-size"
+      }
+    },
+    "type-h2-weight": {
+      "$type": "fontWeight",
+      "$value": 800,
+      "$extensions": {
+        "com.doxee.cssVar": "--type-h2-weight"
+      }
+    },
+    "type-h2-leading": {
+      "$type": "number",
+      "$value": 1.05,
+      "$extensions": {
+        "com.doxee.cssVar": "--type-h2-leading"
+      }
+    },
+    "type-h2-tracking": {
+      "$type": "dimension",
+      "$value": "-0.02em",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-h2-tracking"
+      }
+    },
+    "type-body-size": {
+      "$value": "clamp(13px, 1.6cqi, 15px)",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-body-size"
+      }
+    },
+    "type-body-weight": {
+      "$type": "fontWeight",
+      "$value": 400,
+      "$extensions": {
+        "com.doxee.cssVar": "--type-body-weight"
+      }
+    },
+    "type-body-leading": {
+      "$type": "number",
+      "$value": 1.5,
+      "$extensions": {
+        "com.doxee.cssVar": "--type-body-leading"
+      }
+    },
+    "type-body-tracking": {
+      "$value": "0",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-body-tracking"
+      }
+    },
+    "type-meta-size": {
+      "$value": "clamp(10px, 1.2cqi, 11px)",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-meta-size"
+      }
+    },
+    "type-meta-weight": {
+      "$type": "fontWeight",
+      "$value": 700,
+      "$extensions": {
+        "com.doxee.cssVar": "--type-meta-weight"
+      }
+    },
+    "type-meta-leading": {
+      "$type": "number",
+      "$value": 1.3,
+      "$extensions": {
+        "com.doxee.cssVar": "--type-meta-leading"
+      }
+    },
+    "type-meta-tracking": {
+      "$type": "dimension",
+      "$value": "0.04em",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-meta-tracking"
+      }
+    },
+    "type-chrome-size": {
+      "$type": "dimension",
+      "$value": "10px",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-chrome-size"
+      }
+    },
+    "type-chrome-weight": {
+      "$type": "fontWeight",
+      "$value": 800,
+      "$extensions": {
+        "com.doxee.cssVar": "--type-chrome-weight"
+      }
+    },
+    "type-chrome-leading": {
+      "$type": "number",
+      "$value": 1,
+      "$extensions": {
+        "com.doxee.cssVar": "--type-chrome-leading"
+      }
+    },
+    "type-chrome-tracking": {
+      "$type": "dimension",
+      "$value": "0.1em",
+      "$extensions": {
+        "com.doxee.cssVar": "--type-chrome-tracking"
       }
     }
   },
