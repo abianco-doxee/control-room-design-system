@@ -13,13 +13,13 @@
  *
  * This module is the framework-agnostic core for authoring, validating and
  * emitting themes. It has no fs / DOM dependency at import time (applyTheme is the
- * one browser-only helper, guarded). The token build (build/build-tokens.mjs) and
- * the brand build (build/build-theme.mjs) both render through `themeCss` here, so
- * built-in themes and external brands are produced by exactly one code path.
+ * one browser-only helper, guarded). @control-room/tokens's token build and brand
+ * build both render through `themeCss` here, so built-in themes and external
+ * brands are produced by exactly one code path.
  *
- * `THEME_ROLES` is the runtime copy of the theme contract. A node test
- * (tests/theme.test.mjs) asserts it stays identical to tokens.json's semantic tier
- * and to the generated dist/theme-contract.json, so the three can never drift.
+ * `THEME_ROLES` is the runtime copy of the theme contract. @control-room/tokens's
+ * theme test asserts it stays identical to that package's tokens.json semantic
+ * tier and its generated theme-contract.json, so the three can never drift.
  * See references/theming.md.
  */
 

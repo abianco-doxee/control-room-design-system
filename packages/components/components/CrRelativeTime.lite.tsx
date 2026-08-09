@@ -18,7 +18,7 @@ export interface CrRelativeTimeProps {
 
 /* Relative-time display (e.g. "5m ago", "in 2h"). Renders a semantic <time>
  * with a machine-readable datetime; the human phrase is derived from `now`
- * (injected, never read internally — SSR-stable). Mirrors utils/duration's
+ * (injected, never read internally — SSR-stable). Mirrors @control-room/utils/duration's
  * relativeTime. Styling: .cr-reltime; data-part="root". */
 export default function CrRelativeTime(props: CrRelativeTimeProps) {
   function iso(ms: number): string {

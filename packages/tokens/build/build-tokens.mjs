@@ -3,9 +3,9 @@
  * Control Room token build.
  *
  * Single source of truth: tokens/tokens.json.
- * Style Dictionary transforms the per-theme dictionaries and emits the CSS
- * custom-property declarations; this script assembles them into the themed
- * selectors and writes the runtime artifacts:
+ * A plain flattener resolves the per-theme dictionaries to CSS custom-property
+ * declarations (no build framework needed — see below), assembles them into the
+ * themed selectors, and writes the runtime artifacts:
  *
  *   dist/control-room.css     — all four themes + global baseline
  *   dist/tw-theme.css         — Tailwind v4 @theme (colors resolve to CSS vars)
@@ -184,7 +184,7 @@ function splitThemeCss(theme) {
 /* ── 3c. the theme contract (machine-readable appearance surface) ─────────
  * Every semantic role a complete theme must fill — the boundary a brand author
  * writes to. Derived straight from tokens.json's semantic tier; a node test keeps
- * it in lock-step with lib/theme's THEME_ROLES. */
+ * it in lock-step with @control-room/utils/theme's THEME_ROLES. */
 function themeContract() {
   const GROUPS = ["surface", "text", "line", "signal", "keyed", "texture"];
   const roles = [];
@@ -216,7 +216,7 @@ function themeContract() {
   );
 }
 
-/* Guard: the contract derived from tokens.json must match lib/theme's runtime copy
+/* Guard: the contract derived from tokens.json must match @control-room/utils/theme's runtime copy
  * so the two never drift (also asserted from the test suite). */
 function assertContractInSync() {
   const fromTokens = JSON.parse(themeContract()).roles.map((r) => r.cssVar);
@@ -225,7 +225,7 @@ function assertContractInSync() {
   const b = JSON.stringify(fromLib);
   if (a !== b) {
     throw new Error(
-      "Theme contract drift: tokens.json semantic roles ≠ lib/theme THEME_ROLES.\n" +
+      "Theme contract drift: tokens.json semantic roles ≠ @control-room/utils/theme THEME_ROLES.\n" +
         `  tokens: ${a}\n  lib:    ${b}`
     );
   }
@@ -381,7 +381,7 @@ const flat = flatJson();
 const dtcgJson = dtcg();
 const twThemeCss = twTheme();
 
-// [path relative to repo root, content]
+// [path relative to the package root (packages/tokens), content]
 const targets = [
   ["dist/control-room.css", css],
   ["dist/structure.css", structureCss()],

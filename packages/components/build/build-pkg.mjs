@@ -2,7 +2,7 @@
 /**
  * Build the compiled, typed framework packages (dist/pkg/<framework>).
  *
- * Today: React — the runtime-verified target. tsc compiles dist/frameworks/react
+ * React and Qwik (see PACKAGES below). tsc compiles each dist/frameworks/<fw>
  * (TSX + typed prop interfaces) into ESM JS + .d.ts. A normalisation pass then
  * rewrites any remaining relative `.tsx`/`.ts` import specifiers to `.js` so the
  * JS and the declarations agree and resolve in both Node ESM and bundlers (tsc's

@@ -2,7 +2,7 @@
 /**
  * Brand preview — a self-contained swatch page for every theme (built-in + brand).
  *
- * Reads the generated appearance files (dist/themes/*.css), re-scopes each theme's
+ * Reads the generated appearance files (@control-room/tokens themes/*.css), re-scopes each theme's
  * role values to a container class, and renders — on one page — the surface ladder,
  * the signal ramp with its on-colour text and measured WCAG contrast, and a strip
  * of live components. It's the brand author's proof sheet: does this brand read

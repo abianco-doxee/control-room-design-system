@@ -92,9 +92,8 @@ function generateComponent(path) {
     const ts = checkShouldOutputTypeScript({ options, target });
     const component = JSON.parse(JSON.stringify(ts ? tsJson : jsJson)); // clone: generators may mutate
     component.pluginData = { outputFilePath, outputDir: join(DEST, target), path, target };
-    let code;
-    // Per-target override wins verbatim (async helper → resolve synchronously below).
-    outputs.push({ target, outputFilePath, component, options, code });
+    // Actual codegen + per-target override resolution happens in emit().
+    outputs.push({ target, outputFilePath, component, options });
   }
   return outputs;
 }

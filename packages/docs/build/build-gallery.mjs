@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
  * Build the living gallery — a self-contained page that inlines the generated
- * tokens AND the shipped component layer (styles/components.css), then demoes
+ * tokens AND the shipped component layer (@control-room/styles), then demoes
  * them live across all four themes. It doubles as the visual quality gate
  * (see checklists/component-checklist.md) and consumes the SAME CSS a real
  * consumer would — no separate demo styles to drift.
  *
  * Output: public/gallery.html   (served by the site at /gallery.html)
- * Depends on: dist/control-room.css, dist/tokens.flat.json, styles/components.css
+ * Depends on: @control-room/tokens (css + tokens.flat.json) and @control-room/styles (components.css)
  */
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -481,7 +481,7 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       ${THEMES.map((t, i) => `<button type="button" data-set="${t}" aria-pressed="${i === 0}">${t}</button>`).join("\n      ")}
     </div>
   </div>
-  <p class="note">Everything below is built from the generated token layer + the shipped <code>styles/components.css</code>. Flip the theme — nothing has per-theme code.</p>
+  <p class="note">Everything below is built from the generated token layer + the shipped <code>@control-room/styles</code>. Flip the theme — nothing has per-theme code.</p>
 
   <h2 id="tokens">01 · Color tokens</h2>
   ${swatchGroups}
@@ -1067,4 +1067,4 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
 
 mkdirSync(join(ROOT, "public"), { recursive: true });
 writeFileSync(join(ROOT, "public", "gallery.html"), html);
-console.log(`wrote public/gallery.html  (${html.length} bytes, consumes styles/components.css)`);
+console.log(`wrote public/gallery.html  (${html.length} bytes, consumes @control-room/styles)`);

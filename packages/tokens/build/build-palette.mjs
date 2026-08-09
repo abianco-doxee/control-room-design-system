@@ -14,7 +14,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { clampChroma, formatHex, oklch, wcagContrast } from "culori";
+import { clampChroma, formatHex, wcagContrast } from "culori";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
