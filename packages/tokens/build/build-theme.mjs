@@ -11,7 +11,7 @@
  *
  * Every brand is validated against the theme contract (all required roles present
  * once merged) and contrast-checked before it's written. Rendering goes through
- * lib/theme's themeCss — the SAME renderer the built-in themes use.
+ * @control-room/utils/theme's themeCss — the SAME renderer the built-in themes use.
  *
  * Run:   node build/build-theme.mjs            (all brands/*.json)
  *        node build/build-theme.mjs slate      (one brand)

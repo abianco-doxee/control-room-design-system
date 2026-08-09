@@ -43,7 +43,7 @@ const brandThemeCss = brandThemes
 const brandButtons = brandThemes
   .map(
     (n) =>
-      `    <button data-set="${n}" aria-pressed="false" title="external brand — brands/${n}.json">${n} ▸</button>`
+      `    <button data-set="${n}" aria-pressed="false" title="external brand — packages/tokens/brands/${n}.json">${n} ▸</button>`
   )
   .join("\n");
 const catalog = JSON.parse(readFileSync(join(ROOT, "..", "..", "catalog", "catalog.json"), "utf8"));

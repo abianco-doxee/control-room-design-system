@@ -21,7 +21,7 @@ export interface CrTableProps {
 
 /* Dense operator table. Sort (scalar state), row selection (re-assigned object
  * so every target re-renders), and a sticky header — all from tokens via the
- * .cr-table classes. Styling lives in styles/components.css. */
+ * .cr-table classes. Styling lives in @control-room/styles (components.css). */
 export default function CrTable(props: CrTableProps) {
   const state = useStore({
     sortCol: -1,

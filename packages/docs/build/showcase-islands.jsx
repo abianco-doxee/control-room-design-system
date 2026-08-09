@@ -2,7 +2,7 @@
  * Live playgrounds for the Component Browser.
  *
  * Every entry mounts the ACTUAL compiled React component from
- * dist/frameworks/react (the shipped output) inside a Playground harness: a
+ * @control-room/components (the shipped output) inside a Playground harness: a
  * typed controls panel edits the component's props and re-renders it live, and a
  * code snippet reflects the current props — the Doxee-hub playground model.
  *
@@ -12,11 +12,6 @@
  * hand-written for a live component, so it can't drift from the real thing.
  */
 
-import { type as ark, defineForm } from "@control-room/utils/forms";
-import * as React from "react";
-import { useState } from "react";
-import { flushSync } from "react-dom";
-import { createRoot } from "react-dom/client";
 import {
   CrAccordion,
   CrAlert,
@@ -78,7 +73,12 @@ import {
   CrToolbar,
   CrTooltip,
   CrTree,
-} from "../../../packages/components/dist/frameworks/react/index.ts";
+} from "@control-room/components/frameworks/react/index.ts";
+import { type as ark, defineForm } from "@control-room/utils/forms";
+import * as React from "react";
+import { useState } from "react";
+import { flushSync } from "react-dom";
+import { createRoot } from "react-dom/client";
 
 // A big, deterministic dataset to exercise the data grid's virtualization.
 const GRID_REGIONS = ["eu-west", "us-east", "ap-south", "sa-east"];
