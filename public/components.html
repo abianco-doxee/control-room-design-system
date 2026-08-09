@@ -2160,6 +2160,17 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
   .cr-togglechip, .cr-menu__item, .cr-pager__btn, .cr-overflow, .cr-tap { min-height: 44px; }
 }
 
+/* ── Container-query layout (see references/responsive.md) ───────────────────
+ * Panel surfaces are query containers (phase 2), so layout inside them responds
+ * to the PANEL width, not the viewport. Breakpoints (literal — @container can't
+ * read var()): --bp-panel-sm 22rem · -md 34rem · -lg 52rem. */
+.cr-grid-auto { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fill, minmax(var(--col-min, 16rem), 1fr)); }
+/* the data list keeps its two-column default everywhere; only inside a narrow
+   panel does term/definition stack — proof of the container-query model. */
+@container (max-width: 22rem) {
+  .cr-dl { grid-template-columns: 1fr; gap: var(--space-0-5) 0; }
+}
+
 /* browser chrome (not part of the shipped system) */
 * { box-sizing: border-box; }
 body { margin: 0; }
