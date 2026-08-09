@@ -37,6 +37,23 @@ test("a named export renders to correct Control Room markup", () => {
   assert.match(html, />Deploy</);
 });
 
+test("CrButton renders as an anchor when href is set (external → safe rel)", () => {
+  const ext = renderToStaticMarkup(
+    createElement(CR.CrButton, { href: "https://example.com", signal: "work" }, "Docs"),
+  );
+  assert.match(ext, /<a[^>]+href="https:\/\/example\.com"/, `external anchor: ${ext}`);
+  assert.match(ext, /target="_blank"/, "external opens a new tab");
+  assert.match(ext, /rel="noopener noreferrer"/, "external carries a safe rel");
+  assert.match(ext, /class="cr-btn cr-btn--sig-work"/, "keeps the button classes");
+
+  const internal = renderToStaticMarkup(createElement(CR.CrButton, { href: "/dashboard" }, "Home"));
+  assert.match(internal, /<a[^>]+href="\/dashboard"/, "internal anchor");
+  assert.doesNotMatch(internal, /target="_blank"/, "internal link stays in-tab");
+
+  const btn = renderToStaticMarkup(createElement(CR.CrButton, {}, "Save"));
+  assert.match(btn, /<button/, "no href → real button");
+});
+
 test("a controlled component renders with its a11y wiring intact", () => {
   const html = renderToStaticMarkup(
     createElement(CR.CrChip, { signal: "done" }, "merged"),

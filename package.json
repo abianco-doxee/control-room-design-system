@@ -72,6 +72,14 @@
       "types": "./utils/cn.d.ts",
       "default": "./utils/cn.js"
     },
+    "./href": {
+      "types": "./utils/href.d.ts",
+      "default": "./utils/href.js"
+    },
+    "./duration": {
+      "types": "./utils/duration.d.ts",
+      "default": "./utils/duration.js"
+    },
     "./position": "./utils/position.js",
     "./time-scale": "./utils/time-scale.js"
   },
