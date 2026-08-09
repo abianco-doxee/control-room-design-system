@@ -29,10 +29,13 @@ control-room-design-system/
 │  ├─ styles/                   # @control-room/styles  (depends on tokens)
 │  │   styles/components.css (authored) · build/build-styles.mjs → base.css + parts/*
 │  ├─ utils/                    # @control-room/utils   (cn · href · duration · position · time-scale · forms · theme)
-│  ├─ components/               # @control-room/components (depends on tokens, styles, utils)
-│  │   components/*.lite.tsx · overrides/ · lib/pt.ts · lib/icons/ · build/compile-mitosis.mjs
-│  │   build/build-fix-*.mjs · build/build-barrels.mjs · build/build-pkg*.mjs · build/build-icons.mjs
-│  │   → dist/frameworks/* · dist/pkg/*
+│  ├─ icons/                    # @control-room/icons   (icon DATA + Iconify build tooling)
+│  │   lib/icons/*.ts (pixel + future families) · build/build-icons.mjs
+│  │   → per-pack path-data modules, one per Iconify set, keyed by name
+│  ├─ components/               # @control-room/components (depends on tokens, styles, utils, icons)
+│  │   components/*.lite.tsx · overrides/ · lib/pt.ts · build/compile-mitosis.mjs
+│  │   build/build-fix-*.mjs · build/build-barrels.mjs · build/build-pkg*.mjs
+│  │   → dist/frameworks/* · dist/pkg/*  (CrIcon renders; reads packs from @control-room/icons)
 │  └─ docs/                     # @control-room/docs (private) — astro/starlight
 │      src/ · build/build-docs-content.mjs · build/build-gallery.mjs · build/build-showcase.mjs
 │      astro.config.mjs · public/
@@ -40,7 +43,16 @@ control-room-design-system/
 ```
 
 Dependency edges: `tokens ← styles ← components`; `utils ← components`;
-`docs ← (everything, dev-only)`. No cycles.
+`icons ← components`; `docs ← (everything, dev-only)`. No cycles.
+
+**Why icons get their own package.** The icon *data* (baked path packs) and the
+Iconify build tooling are separable from component logic and are the thing most
+likely to grow — one pack per Iconify set (pixelarticons today; add a family = add
+one `@iconify-json/<set>` devDep + a name-map, run `build-icons`). Keeping them in
+`@control-room/icons` isolates that growth (and the Iconify devDeps) from the
+component runtime, and lets an app consume raw icon path data directly. `CrIcon`
+stays in `@control-room/components` and depends on `@control-room/icons` for the
+packs; the house geometric glyph map (the identity set) stays inline in `CrIcon`.
 
 ## Staged execution (each stage: move → rewire paths → `verify` + gates green → commit)
 
@@ -57,12 +69,16 @@ Dependency edges: `tokens ← styles ← components`; `utils ← components`;
 4. **Extract `utils`.** Move `utils/` + `lib/forms` + `lib/theme`; move their tests.
    Pure move; `utils-ports`/`forms`/`theme`/`position`/`time-scale` tests follow.
 5. **Extract `styles`** (depends on tokens). Move `styles/` + `build-styles`.
-6. **Extract `components`** (the big one). Move `components/`, `overrides/`, `lib/pt.ts`,
-   `lib/icons/`, the Mitosis compiler + fix + barrels + pkg + icons builds, and the
-   component/contract/framework tests. Rewire `compile-mitosis.mjs`, `mitosis.config`,
-   and `build-barrels` roots. This is where the incremental compiler + byte-identical
-   guarantees get re-verified against a pre-move snapshot.
-7. **Root orchestration.** Root `build`/`verify`/`lint`/test scripts fan out via
+6. **Extract `icons`** (leaf data + tooling). Move `lib/icons/` + `build-icons.mjs`;
+   re-point `verify:icons`. `CrIcon` (still in `components`) imports the packs from
+   `@control-room/icons` instead of `../lib/icons/…`; `build-barrels` copies the pack
+   from the icons package into each target tree.
+7. **Extract `components`** (the big one). Move `components/`, `overrides/`, `lib/pt.ts`,
+   the Mitosis compiler + fix + barrels + pkg builds, and the component/contract/
+   framework tests. Rewire `compile-mitosis.mjs`, `mitosis.config`, and `build-barrels`
+   roots. This is where the incremental compiler + byte-identical guarantees get
+   re-verified against a pre-move snapshot.
+8. **Root orchestration.** Root `build`/`verify`/`lint`/test scripts fan out via
    `npm -ws` (or turbo/nx if we want caching). CI runs the aggregate. Re-confirm the
    full gate matrix + a green Pages deploy.
 
