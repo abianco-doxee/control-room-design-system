@@ -83,7 +83,13 @@ for (const f of files) {
   let patched = src
     .replace(NEEDS_SEMI, "$1;")
     .replace(NEEDS_SEMI_EFFECT, "$1;$2")
-    .replace(/from (["'])(\.\/Cr[A-Za-z0-9]+)\1/g, "from $1$2.tsx$1");
+    .replace(/from (["'])(\.\/Cr[A-Za-z0-9]+)\1/g, "from $1$2.tsx$1")
+    // Mitosis's React generator doesn't state-process a store call inside a JSX
+    // spread — it leaves `{...(state.foo())}`, but `state` doesn't exist in the
+    // React output (store methods are hoisted to plain functions). Drop the
+    // `state.` (keeping any wrapping paren) so the spread resolves — used by the
+    // pt pass-through spread.
+    .replace(/\{\.\.\.(\(?)state\./g, "{...$1");
   if (MEMOIZE.has(f)) patched = wrapInMemo(patched, f);
   let formatted;
   try {
