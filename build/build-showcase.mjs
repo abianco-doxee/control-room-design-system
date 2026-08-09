@@ -21,7 +21,10 @@ const tokensCss = readFileSync(
   join(ROOT, "packages", "tokens", "dist", "control-room.css"),
   "utf8"
 );
-const componentsCss = readFileSync(join(ROOT, "styles", "components.css"), "utf8");
+const componentsCss = readFileSync(
+  join(ROOT, "packages", "styles", "styles", "components.css"),
+  "utf8"
+);
 /* External BRANDS (brands/*.json → dist/themes/<name>.css) live outside the
  * built-in bundle. Appending each proves the whole browser reskins to a brand via
  * one appearance file + data-theme, with no component change. See theming.md. */

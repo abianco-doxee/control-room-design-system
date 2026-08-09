@@ -34,7 +34,7 @@ const colorFuncs = (src) => src.match(/\b(?:rgb|rgba|hsl|hsla|hwb|lab|lch|oklch|
 const GENERATIVE = ["CrAscii", "CrCat", "CrChrome", "CrSigil"];
 
 test("components.css carries no brand colour (only physical black/white)", () => {
-  const css = read("styles/components.css");
+  const css = read("packages/styles/styles/components.css");
   const hex = brandHex(css);
   assert.deepEqual(hex, [], `raw brand hex in components.css: ${[...new Set(hex)].join(", ")}`);
   const fns = colorFuncs(css);

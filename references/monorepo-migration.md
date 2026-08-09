@@ -19,8 +19,11 @@ Progress:
 - [x] Extract `@control-room/tokens` (tokens.json · brands · build-tokens/theme/palette
       + chassis/ramp/signals/type helpers → dist/themes/*, control-room.css, structure.css,
       theme-contract, tw-theme, flat, dtcg). Owns its own dist + theme.test; green.
-- [ ] Extract `@control-room/styles`, `@control-room/icons`, `@control-room/components`,
-      `@control-room/docs` (in that dependency order).
+- [x] Extract `@control-room/styles` (components.css authored bundle · base.css + parts/*
+      partials · tailwind.css entry · build-styles). Depends on `@control-room/tokens`
+      (tailwind.css imports `@control-room/tokens/tw-theme.css`). Green.
+- [ ] Extract `@control-room/icons`, `@control-room/components`, `@control-room/docs`
+      (in that dependency order).
 
 ## Why this is staged, not done in one commit
 

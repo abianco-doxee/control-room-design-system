@@ -290,7 +290,7 @@ test("chassis tokens (incl --radius) are known to the contract, not 'unknown'", 
 
 test("rectangular surfaces are wired to the brandable --radius (rounding works)", () => {
   // components.css lives in the sibling styles layer (repo root), not this package.
-  const css = readFileSync(join(ROOT, "..", "..", "styles/components.css"), "utf8");
+  const css = readFileSync(join(ROOT, "..", "styles", "styles", "components.css"), "utf8");
   assert.ok(
     css.includes("border-radius: var(--radius)"),
     "components reference the brandable --radius"
