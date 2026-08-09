@@ -1,0 +1,18 @@
+{
+  "docs": [
+    "design-language",
+    "tokens",
+    "theming",
+    "responsive",
+    "tailwind",
+    "motion",
+    "accessibility",
+    "components",
+    "styling-contract",
+    "forms",
+    "frameworks",
+    "seeded-cat",
+    "seeded-sigil",
+    "decoration"
+  ]
+}

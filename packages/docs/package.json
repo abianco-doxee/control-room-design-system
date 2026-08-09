@@ -9,6 +9,8 @@
     "build:gallery": "node build/build-gallery.mjs",
     "build:showcase": "node build/build-showcase.mjs",
     "build:brand-preview": "node build/build-brand-preview.mjs",
+    "build:llms": "node build/build-llms.mjs",
+    "verify:llms": "node build/build-llms.mjs --check",
     "prebuild:site": "npm run build:content",
     "build:site": "astro build",
     "dev": "npm run build:content && astro dev",
