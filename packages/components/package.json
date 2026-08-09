@@ -4,7 +4,18 @@
   "license": "UNLICENSED",
   "type": "module",
   "description": "Control Room components — authored once as Mitosis .lite.tsx, compiled to idiomatic React/Vue/Svelte/Angular/Solid/Qwik. Structure + props + a11y + state only; styling lives in @control-room/styles, tokens in @control-room/tokens, icon packs in @control-room/icons.",
-  "keywords": ["control-room", "design-system", "components", "mitosis", "react", "vue", "svelte", "angular", "solid", "qwik"],
+  "keywords": [
+    "control-room",
+    "design-system",
+    "components",
+    "mitosis",
+    "react",
+    "vue",
+    "svelte",
+    "angular",
+    "solid",
+    "qwik"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/abianco-doxee/control-room-design-system.git",
@@ -12,7 +23,15 @@
   },
   "homepage": "https://github.com/abianco-doxee/control-room-design-system#readme",
   "sideEffects": false,
-  "files": ["dist/frameworks", "dist/pkg", "components", "overrides", "lib", "mitosis.config.cjs", "build"],
+  "files": [
+    "dist/frameworks",
+    "dist/pkg",
+    "components",
+    "overrides",
+    "lib",
+    "mitosis.config.cjs",
+    "build"
+  ],
   "exports": {
     "./react": {
       "types": "./dist/pkg/react/index.d.ts",
@@ -56,7 +75,7 @@
     "verify:types": "tsc -p build/tsconfig.frameworks.json"
   },
   "dependencies": {
-    "@control-room/icons": "1.0.0"
+    "@control-room/icons": "workspace:*"
   },
   "peerDependencies": {
     "@angular/core": ">=17",
@@ -68,12 +87,29 @@
     "vue": ">=3.4"
   },
   "peerDependenciesMeta": {
-    "@angular/core": { "optional": true },
-    "@builder.io/qwik": { "optional": true },
-    "react": { "optional": true },
-    "react-dom": { "optional": true },
-    "solid-js": { "optional": true },
-    "svelte": { "optional": true },
-    "vue": { "optional": true }
+    "@angular/core": {
+      "optional": true
+    },
+    "@builder.io/qwik": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "solid-js": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   }
 }

@@ -23,11 +23,11 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@control-room/components": "1.0.0",
-    "@control-room/icons": "1.0.0",
-    "@control-room/styles": "1.0.0",
-    "@control-room/tokens": "1.0.0",
-    "@control-room/utils": "1.0.0"
+    "@control-room/components": "workspace:*",
+    "@control-room/icons": "workspace:*",
+    "@control-room/styles": "workspace:*",
+    "@control-room/tokens": "workspace:*",
+    "@control-room/utils": "workspace:*"
   },
   "devDependencies": {
     "@astrojs/starlight": "^0.41.7",
