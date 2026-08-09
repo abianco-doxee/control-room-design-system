@@ -417,6 +417,12 @@ isn't, whatever the palette. Use this as the identity checklist.
    font (`◈ ◧ ▦ ▸ ✕ ◆`), not a rounded icon-font set. It costs nothing, never
    de-syncs from a CDN, and reads as instrument etching. **NEVER** pull in
    Lucide/Heroicons/Font-Awesome — a soft icon set fights every other tell.
+   The house `CrIcon` set (`set="cr"`, default) is a hand-authored, single-stroke
+   24×24 SVG family that embodies this. The one sanctioned deviation is a **soft
+   pixel-art pack** (`set="pixel"`), built offline from Iconify's *pixelarticons*
+   and baked to local path data (no icon font, no runtime CDN, still single-`<path>`
+   so it ports to all six targets). It is **opt-in per subtree/theme** for a
+   deliberately softer register — never the default, and never mixed on one surface.
 7. **Registration marks.** The industrial framing tick — a `--border`-weight
    crop mark at opposite corners of a title surface (`.cr-mark`) — is structure,
    not signal, and marks "this is the primary readout." Ink weight only; **never**

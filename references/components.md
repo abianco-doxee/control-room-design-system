@@ -1695,10 +1695,25 @@ icon as an image with an accessible name. Pair an icon-only control with a `labe
 or visually-hidden text.
 
 **API.** `name` (glyph id), `size` (px, default 20), `label` (optional accessible
-name). The set: `play · pause · stop · retry · deploy · scan · search · alert ·
-error · done · clock · cpu · logs · filter · sliders · close · chevron · plus ·
-minus · trash · external · copy · session · menu`. Add one by adding a single-`d`,
-square-geometry path to the map in `components/CrIcon.lite.tsx`.
+name), `set` (`"cr"` default · `"pixel"`). The set: `play · pause · stop · retry ·
+deploy · scan · search · alert · error · done · clock · cpu · logs · filter ·
+sliders · close · chevron · plus · minus · trash · external · copy · session · menu`.
+Add one by adding a single-`d`, square-geometry path to the map in
+`components/CrIcon.lite.tsx`.
+
+**Packs (`set`) — the soft escape hatch.** `set="cr"` (default) is the hand-authored
+stroked geometric set above. `set="pixel"` swaps in a **pixel-art pack** built
+offline from Iconify's *pixelarticons* (`build/build-icons.mjs` → `lib/icons/pixel.ts`,
+guarded by `npm run verify:icons`) — filled instead of stroked, same 24×24 grid, same
+names, still a single `<path>` so it ports to all six targets (no icon font, no
+runtime fetch). Use it to give one theme or subtree a softer register:
+```tsx
+<section data-theme="phosphor">
+  <CrIcon name="deploy" set="pixel" label="deploy" />
+</section>
+```
+Per the design language it is opt-in and never mixed with the geometric set on one
+surface; a name missing from the pixel pack falls back to the house glyph.
 
 ## Stepper {#stepper}
 

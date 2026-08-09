@@ -50,6 +50,11 @@ for (const [target, { ext, index }] of Object.entries(TARGETS)) {
     const libDir = join(dir, "lib");
     mkdirSync(libDir, { recursive: true });
     copyFileSync(join(ROOT, "lib", "pt.ts"), join(libDir, "pt.ts"));
+    // CrIcon imports the generated pixel pack as `../lib/icons/pixel.js` — copy it
+    // alongside so the relative import resolves in every target's output tree.
+    const iconsDir = join(libDir, "icons");
+    mkdirSync(iconsDir, { recursive: true });
+    copyFileSync(join(ROOT, "lib", "icons", "pixel.ts"), join(iconsDir, "pixel.ts"));
   }
 
   const names = readdirSync(compDir)

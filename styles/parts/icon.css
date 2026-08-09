@@ -4,4 +4,6 @@
  * 24×24, currentColor, single 2px stroke, square caps. Inherits text colour and
  * aligns to the text baseline; never shrinks in a flex row. */
 .cr-icon { display: inline-block; vertical-align: -0.15em; flex-shrink: 0; }
+/* pixel pack (set="pixel"): filled glyphs, rendered crisp for the pixel-art look */
+.cr-icon[data-set="pixel"] { shape-rendering: crispedges; }
 
