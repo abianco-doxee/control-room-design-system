@@ -1842,3 +1842,30 @@ there are no global listeners and it can't get stuck. `orientation` is
 **Tokens** — `--border` (divider + frame), `--sig-work` (active divider).
 **A11y** — the handle is a labelled, focusable `role="separator"` with live
 `aria-valuenow`; full keyboard resize.
+
+### ToggleChip {#togglechip}
+
+An interactive **multi-select filter pill** — several toggle independently (unlike
+the single-select [Segmented](#segmented) or the static [Chip](#chip)). It is a
+`role="checkbox"` button; on/off is announced via `aria-checked` and exposed as
+`data-state`. Props: `label`, `pressed`, `count?`, `onToggle`, `disabled`.
+**Tokens** — `--cr-togglechip-on-bg` / `--cr-togglechip-on-fg` (the ON state).
+Per Law 2 the ON colour is the accent (a *state*), **not** a per-option identity
+hue; override `--cr-togglechip-on-bg` via `dt` only when a facet genuinely needs
+its own on-colour. **A11y** — labelled checkbox semantics; keyboard-operable.
+
+### Overflow {#overflow}
+
+An a11y-correct **"+N more" disclosure** for truncated lists. With `onToggle`
+it's a `<button aria-expanded>` that reveals/hides the overflow; without it, an
+inert count. The accessible name **always includes the `noun`** (screen readers
+never hear a bare "+3"). Props: `count`, `expanded`, `noun`, `onToggle?`.
+**A11y** — `aria-expanded` reflects state; `aria-label` = "show N more <noun>".
+
+### RelativeTime {#relative-time}
+
+A **relative-time display** ("5m ago", "in 2h") rendered as a semantic `<time>`
+with a machine-readable `datetime`. The clock is **injected** (`now` prop, epoch
+ms) — never read internally — so SSR and client agree and there's no hydration
+flicker; omit `now` to show the absolute date. Props: `time`, `now?`, `prefix?`.
+See also `utils/duration` for the same formatting outside a component.

@@ -188,6 +188,11 @@
   --cr-spinner-track: var(--panel-2);
   --cr-spinner-accent: var(--sig-work);
   --cr-skeleton-bg: var(--panel-2);
+  --cr-togglechip-bg: var(--panel-2);
+  --cr-togglechip-fg: var(--muted);
+  --cr-togglechip-border: var(--border);
+  --cr-togglechip-on-bg: var(--sig-work);
+  --cr-togglechip-on-fg: var(--on-sig);
 }
 
 /* ── GLOBAL BASELINE ──────────────────────────────────────────────────── */

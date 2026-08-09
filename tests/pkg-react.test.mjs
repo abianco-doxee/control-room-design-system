@@ -54,6 +54,26 @@ test("CrButton renders as an anchor when href is set (external → safe rel)", (
   assert.match(btn, /<button/, "no href → real button");
 });
 
+test("ported components render with correct a11y (ToggleChip/Overflow/RelativeTime)", () => {
+  const chip = renderToStaticMarkup(createElement(CR.CrToggleChip, { label: "PRs", pressed: true, count: 3 }));
+  assert.match(chip, /role="checkbox"/, "toggle-chip is a checkbox");
+  assert.match(chip, /aria-checked="true"/, "pressed → aria-checked");
+  assert.match(chip, /data-state="on"/, "exposes data-state");
+  assert.match(chip, />3</, "renders the count");
+
+  const ov = renderToStaticMarkup(createElement(CR.CrOverflow, { count: 4, noun: "sessions", onToggle: () => {} }));
+  assert.match(ov, /aria-expanded="false"/, "overflow reflects expanded");
+  assert.match(ov, /aria-label="show 4 more sessions"/, `accessible name includes noun: ${ov}`);
+
+  const ovStatic = renderToStaticMarkup(createElement(CR.CrOverflow, { count: 2, noun: "tags" }));
+  assert.doesNotMatch(ovStatic, /<button/, "no onToggle → inert (not a button)");
+
+  const rt = renderToStaticMarkup(createElement(CR.CrRelativeTime, { time: 1000000000000, now: 1000000300000 }));
+  assert.match(rt, /<time/, "semantic time element");
+  assert.match(rt, /datetime="/i, "machine-readable datetime");
+  assert.match(rt, />5m ago</, `relative phrase from injected clock: ${rt}`);
+});
+
 test("a controlled component renders with its a11y wiring intact", () => {
   const html = renderToStaticMarkup(
     createElement(CR.CrChip, { signal: "done" }, "merged"),
