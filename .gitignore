@@ -52,3 +52,4 @@ figma-token*
 /board-*.png
 /scratch-shot.mjs
 /*.png
+.mitosis-cache/
