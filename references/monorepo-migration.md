@@ -27,7 +27,16 @@ Progress:
       `@control-room/icons` into every target so `CrIcon`'s relative import resolves and the
       compiled bundles stay self-contained + byte-identical. `CrIcon` also gained a raw-path
       escape hatch (`path`/`filled`) so any glyph/family can be injected per-use. Green.
-- [ ] Extract `@control-room/components`, `@control-room/docs` (in that dependency order).
+- [x] Extract `@control-room/components` (all 80 `.lite.tsx` + overrides + `lib/pt.ts` +
+      the full Mitosis pipeline: compile-mitosis, build-fix-*, build-barrels, build-pkg,
+      build-pkg-types, render-fw, mitosis.config + tsconfigs). Owns its `dist/frameworks`
+      + `dist/pkg` and the framework exports (./react ./vue ./svelte ./angular ./solid
+      ./qwik ./frameworks/*); depends on @control-room/icons. compile-mitosis resolves the
+      Mitosis version via require.resolve (hoist-safe); build:components:cli runs the CLI
+      oracle in-package via workspace delegation. Green: build:components (driver + CLI),
+      verify:types, pkg (17/17), frameworks (24/24), contract (16/16), separation, biome.
+- [ ] Extract `@control-room/docs` (astro/starlight + gallery/showcase/docs-content
+      builders; the last, dev-only leaf).
 
 ## Why this is staged, not done in one commit
 

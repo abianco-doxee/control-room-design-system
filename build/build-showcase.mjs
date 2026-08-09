@@ -457,7 +457,7 @@ const EXAMPLES = {
 
 const kbdBadge = (t) => `<span class="badge">${t}</span>`;
 // ── prop tables, generated from the compiled React interfaces ─────────────
-const REACT_DIR = join(ROOT, "dist", "frameworks", "react", "components");
+const REACT_DIR = join(ROOT, "packages", "components", "dist", "frameworks", "react", "components");
 const COMP_INDEX = {}; // lowercased export name → actual file base (for case/hyphen mismatches)
 try {
   for (const f of readdirSync(REACT_DIR))

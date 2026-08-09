@@ -9,7 +9,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { instantiateAngular, RENDERERS } from "../build/render-fw.mjs";
+import { instantiateAngular, RENDERERS } from "../packages/components/build/render-fw.mjs";
 
 // components that render cleanly headless (no children needed), with any required props
 const BREADTH = [
