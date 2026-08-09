@@ -14,6 +14,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { createRoot } from "react-dom/client";
+import { flushSync } from "react-dom";
 import {
   CrAccordion, CrTabs, CrMenu, CrCombobox, CrPalette, CrTree, CrDrawer,
   CrPopover, CrHoverCard, CrSegmented, CrRadioGroup, CrSlider, CrNumberField,
@@ -739,7 +740,12 @@ function mountAll() {
     const demo = DEMOS[id];
     if (!demo) return;
     try {
-      createRoot(el).render(h(Playground, demo));
+      // flushSync forces this root's initial render to COMMIT synchronously.
+      // With ~70 roots, React's time-sliced concurrent render otherwise leaves
+      // the last islands (charts, near the bottom) uncommitted for several
+      // frames — an order-dependent flake for tests that read island DOM. This
+      // makes "mountAll returned" == "every island is in the DOM".
+      flushSync(() => createRoot(el).render(h(Playground, demo)));
       el.setAttribute("data-island-ready", "1");
     } catch (err) {
       el.setAttribute("data-island-error", String(err && err.message ? err.message : err));
@@ -748,7 +754,20 @@ function mountAll() {
   });
 }
 
-if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mountAll);
-else mountAll();
+// Expose the readiness signal (`__CR_ISLANDS__`) only AFTER React has committed
+// the first paint of every island. createRoot().render() commits asynchronously,
+// so setting it synchronously let tests that gate on it read an island's DOM
+// before its content existed — order-dependent flake (worse the further down the
+// page an island sits). A double rAF lands after the commit, so the signal means
+// "islands are rendered", which is what the e2e suite assumes.
+function boot() {
+  mountAll();
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      window.__CR_ISLANDS__ = Object.keys(DEMOS);
+    }),
+  );
+}
 
-window.__CR_ISLANDS__ = Object.keys(DEMOS);
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+else boot();
