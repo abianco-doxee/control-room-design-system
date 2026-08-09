@@ -1,7 +1,7 @@
 /* Control Room brand: boardroom — Boardroom · light, soft corners, heavy chassis (GENERATED
  * from brands/boardroom.json). Appearance layer only — pair with dist/structure.css.
  * Regenerate: npm run build:theme. */
-:root[data-theme="boardroom"] {
+[data-theme="boardroom"] {
   color-scheme: light;
   --ground: #edeef1;
   --board: #e5e6e9;

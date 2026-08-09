@@ -221,8 +221,9 @@ test("$modes emits a dark + light pair (aurora); the light mode fits its signals
   const light = readFileSync(join(ROOT, "dist/themes/aurora-light.css"), "utf8");
   const pick = (css, k) => (css.match(new RegExp(`--${k}: (#[0-9a-f]{6})`)) || [])[1];
 
-  assert.match(dark, /:root\[data-theme="aurora"\]/);
-  assert.match(light, /:root\[data-theme="aurora-light"\]/);
+  // element-level selector (theme can scope to any container, not just :root)
+  assert.match(dark, /\[data-theme="aurora"\]/);
+  assert.match(light, /\[data-theme="aurora-light"\]/);
 
   const lPanel = pick(light, "panel");
   const lWork = pick(light, "sig-work");
@@ -339,7 +340,7 @@ test("generated dist/themes/slate.css carries every merged role (build not stale
   const vars = mergeTheme(base, overrides);
 
   const onDisk = readFileSync(join(ROOT, "dist/themes/slate.css"), "utf8");
-  assert.match(onDisk, /:root\[data-theme="slate"\]/);
+  assert.match(onDisk, /\[data-theme="slate"\]/);
   for (const role of THEME_ROLES) {
     assert.ok(onDisk.includes(`${role.cssVar}: ${vars[role.cssVar.replace(/^--/, "")]};`),
       `slate.css should carry ${role.cssVar} from the merge`);

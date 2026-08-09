@@ -1,7 +1,7 @@
 /* Control Room brand: aurora — Aurora · one brand, dark + light (GENERATED
  * from brands/aurora.json). Appearance layer only — pair with dist/structure.css.
  * Regenerate: npm run build:theme. */
-:root[data-theme="aurora"] {
+[data-theme="aurora"] {
   color-scheme: dark;
   --ground: #0b0f18;
   --board: #141822;

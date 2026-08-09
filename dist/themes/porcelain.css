@@ -1,7 +1,7 @@
 /* Control Room brand: porcelain — Porcelain · light corporate re-skin (GENERATED
  * from brands/porcelain.json). Appearance layer only — pair with dist/structure.css.
  * Regenerate: npm run build:theme. */
-:root[data-theme="porcelain"] {
+[data-theme="porcelain"] {
   color-scheme: light;
   --ground: #f4f5f7;
   --board: #eceef2;

@@ -134,7 +134,7 @@ function render(name) {
  * from brands/${name}.json). Appearance layer only — pair with dist/structure.css.
  * Regenerate: npm run build:theme. */\n`;
     const css = banner + themeCss(themeName, vars, {
-      selector: brand.$selector || `:root[data-theme="${themeName}"]`,
+      selector: brand.$selector || `[data-theme="${themeName}"]`,
       scheme: brand.$scheme || "dark",
     });
     return { themeName, css, contrast: checkThemeContrast(vars), unknown: v.unknown };

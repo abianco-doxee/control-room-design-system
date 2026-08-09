@@ -1,7 +1,7 @@
 /* Control Room brand: ember — Ember · warm dark, surfaces from one tone (GENERATED
  * from brands/ember.json). Appearance layer only — pair with dist/structure.css.
  * Regenerate: npm run build:theme. */
-:root[data-theme="ember"] {
+[data-theme="ember"] {
   color-scheme: dark;
   --ground: #120e11;
   --board: #1b171a;

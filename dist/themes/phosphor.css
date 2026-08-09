@@ -1,6 +1,6 @@
 /* Control Room theme: phosphor (GENERATED). Appearance layer only — pair with
  * dist/structure.css. Source: tokens/tokens.json → npm run build:tokens. */
-:root[data-theme="phosphor"] {
+[data-theme="phosphor"] {
   color-scheme: dark;
   --ground: #020a04;
   --board: #041207;

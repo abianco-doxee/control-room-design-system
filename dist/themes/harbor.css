@@ -1,7 +1,7 @@
 /* Control Room brand: harbor — Harbor · calm cool dark, muted signals (GENERATED
  * from brands/harbor.json). Appearance layer only — pair with dist/structure.css.
  * Regenerate: npm run build:theme. */
-:root[data-theme="harbor"] {
+[data-theme="harbor"] {
   color-scheme: dark;
   --ground: #0a1114;
   --board: #121a1d;
