@@ -1,0 +1,22 @@
+{
+  "name": "@control-room/skill",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "type": "module",
+  "description": "Install the Control Room design-system skill into any agent — a one-command npx installer (Claude/Cursor/opencode) and the Claude Code plugin bundle. Ships SKILL.md, the reference docs, and the machine-readable token/catalog artifacts.",
+  "keywords": ["control-room", "design-system", "skill", "claude", "claude-code", "cursor", "opencode", "agent"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abianco-doxee/control-room-design-system.git",
+    "directory": "packages/skill"
+  },
+  "homepage": "https://github.com/abianco-doxee/control-room-design-system#readme",
+  "bin": {
+    "control-room-skill": "./bin/install.mjs"
+  },
+  "files": ["bin", "skills", ".claude-plugin", "build", "README.md"],
+  "scripts": {
+    "build": "node build/build-skill-bundle.mjs",
+    "verify": "node build/build-skill-bundle.mjs --check"
+  }
+}
