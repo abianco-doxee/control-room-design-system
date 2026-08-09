@@ -1,6 +1,21 @@
 {
   "name": "@control-room/styles",
   "version": "1.0.0",
-  "private": true,
-  "type": "module"
+  "license": "UNLICENSED",
+  "type": "module",
+  "description": "Control Room component styles — the authored all-in-one bundle (components.css), the thin global/base layer (base.css) and the per-component partials (parts/*.css) for PrimeVue-style import-on-use, plus the Tailwind v4 entry. Pairs with @control-room/tokens.",
+  "files": ["styles", "build"],
+  "exports": {
+    "./components": "./styles/components.css",
+    "./base": "./styles/base.css",
+    "./parts/*": "./styles/parts/*",
+    "./tailwind.css": "./styles/tailwind.css"
+  },
+  "scripts": {
+    "build": "node build/build-styles.mjs",
+    "verify": "node build/build-styles.mjs --check"
+  },
+  "dependencies": {
+    "@control-room/tokens": "1.0.0"
+  }
 }

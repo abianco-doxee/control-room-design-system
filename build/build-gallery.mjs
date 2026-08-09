@@ -20,7 +20,10 @@ const tokensCss = readFileSync(
   join(ROOT, "packages", "tokens", "dist", "control-room.css"),
   "utf8"
 );
-const componentsCss = readFileSync(join(ROOT, "styles", "components.css"), "utf8");
+const componentsCss = readFileSync(
+  join(ROOT, "packages", "styles", "styles", "components.css"),
+  "utf8"
+);
 const flat = JSON.parse(
   readFileSync(join(ROOT, "packages", "tokens", "dist", "tokens.flat.json"), "utf8")
 );
