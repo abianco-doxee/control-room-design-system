@@ -1,6 +1,71 @@
 {
   "name": "@control-room/components",
   "version": "1.0.0",
-  "private": true,
-  "type": "module"
+  "license": "UNLICENSED",
+  "type": "module",
+  "description": "Control Room components — authored once as Mitosis .lite.tsx, compiled to idiomatic React/Vue/Svelte/Angular/Solid/Qwik. Structure + props + a11y + state only; styling lives in @control-room/styles, tokens in @control-room/tokens, icon packs in @control-room/icons.",
+  "files": ["dist/frameworks", "dist/pkg", "components", "overrides", "lib", "mitosis.config.cjs", "build"],
+  "exports": {
+    "./react": {
+      "types": "./dist/pkg/react/index.d.ts",
+      "import": "./dist/pkg/react/index.js",
+      "default": "./dist/pkg/react/index.js"
+    },
+    "./vue": {
+      "types": "./dist/frameworks/vue/index.d.ts",
+      "vue": "./dist/frameworks/vue/index.ts",
+      "import": "./dist/frameworks/vue/index.ts",
+      "default": "./dist/frameworks/vue/index.ts"
+    },
+    "./svelte": {
+      "types": "./dist/frameworks/svelte/index.d.ts",
+      "svelte": "./dist/frameworks/svelte/index.js",
+      "import": "./dist/frameworks/svelte/index.js",
+      "default": "./dist/frameworks/svelte/index.js"
+    },
+    "./angular": {
+      "types": "./dist/frameworks/angular/index.d.ts",
+      "import": "./dist/frameworks/angular/index.ts",
+      "default": "./dist/frameworks/angular/index.ts"
+    },
+    "./solid": {
+      "types": "./dist/frameworks/solid/index.d.ts",
+      "solid": "./dist/frameworks/solid/index.jsx",
+      "import": "./dist/frameworks/solid/index.jsx",
+      "default": "./dist/frameworks/solid/index.jsx"
+    },
+    "./qwik": {
+      "types": "./dist/pkg/qwik/index.d.ts",
+      "import": "./dist/pkg/qwik/index.js",
+      "default": "./dist/pkg/qwik/index.js"
+    },
+    "./frameworks/*": "./dist/frameworks/*"
+  },
+  "scripts": {
+    "build": "node build/compile-mitosis.mjs && node build/build-fix-qwik.mjs && node build/build-fix-react.mjs && node build/build-fix-angular.mjs && node build/build-barrels.mjs && node build/build-pkg-types.mjs",
+    "build:cli": "mitosis build && node build/build-fix-qwik.mjs && node build/build-fix-react.mjs && node build/build-fix-angular.mjs && node build/build-barrels.mjs && node build/build-pkg-types.mjs",
+    "build:pkg": "node build/build-pkg.mjs",
+    "verify:types": "tsc -p build/tsconfig.frameworks.json"
+  },
+  "dependencies": {
+    "@control-room/icons": "1.0.0"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=17",
+    "@builder.io/qwik": ">=1.5",
+    "react": ">=18",
+    "react-dom": ">=18",
+    "solid-js": ">=1.8",
+    "svelte": ">=4",
+    "vue": ">=3.4"
+  },
+  "peerDependenciesMeta": {
+    "@angular/core": { "optional": true },
+    "@builder.io/qwik": { "optional": true },
+    "react": { "optional": true },
+    "react-dom": { "optional": true },
+    "solid-js": { "optional": true },
+    "svelte": { "optional": true },
+    "vue": { "optional": true }
+  }
 }

@@ -16,7 +16,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import * as CR from "../dist/pkg/react/index.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const PKG = join(ROOT, "dist", "pkg", "react");
+const PKG = join(ROOT, "packages", "components", "dist", "pkg", "react");
 
 test("the package exposes every component as a named export", () => {
   // a representative spread across categories

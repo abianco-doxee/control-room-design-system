@@ -13,7 +13,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const VUE = join(ROOT, "dist", "frameworks", "vue");
+const VUE = join(ROOT, "packages", "components", "dist", "frameworks", "vue");
 
 test("the vue barrel exports every component", () => {
   const index = readFileSync(join(VUE, "index.ts"), "utf8");

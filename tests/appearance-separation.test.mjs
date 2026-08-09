@@ -46,9 +46,11 @@ test("components.css carries no brand colour (only physical black/white)", () =>
 });
 
 test("no component source uses a colour-function literal", () => {
-  const files = readdirSync(join(ROOT, "components")).filter((f) => f.endsWith(".lite.tsx"));
+  const files = readdirSync(join(ROOT, "packages", "components", "components")).filter((f) =>
+    f.endsWith(".lite.tsx")
+  );
   for (const f of files) {
-    const fns = colorFuncs(read(`components/${f}`));
+    const fns = colorFuncs(read(`packages/components/components/${f}`));
     assert.deepEqual(
       fns,
       [],
@@ -58,9 +60,11 @@ test("no component source uses a colour-function literal", () => {
 });
 
 test("only the generative-canvas components embed palette — and only as var fallbacks", () => {
-  const files = readdirSync(join(ROOT, "components")).filter((f) => f.endsWith(".lite.tsx"));
+  const files = readdirSync(join(ROOT, "packages", "components", "components")).filter((f) =>
+    f.endsWith(".lite.tsx")
+  );
   const withPalette = files
-    .filter((f) => brandHex(read(`components/${f}`)).length > 0)
+    .filter((f) => brandHex(read(`packages/components/components/${f}`)).length > 0)
     .map((f) => f.replace(".lite.tsx", ""));
 
   // the pinned set: exactly the generative-art components, nothing new
@@ -72,7 +76,7 @@ test("only the generative-canvas components embed palette — and only as var fa
 
   // each of them must read the palette from the theme at runtime (fallbacks only)
   for (const name of GENERATIVE) {
-    const src = read(`components/${name}.lite.tsx`);
+    const src = read(`packages/components/components/${name}.lite.tsx`);
     assert.match(
       src,
       /getPropertyValue\(/,

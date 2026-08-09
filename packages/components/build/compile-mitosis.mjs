@@ -23,6 +23,14 @@ const require = createRequire(import.meta.url);
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const NO_CACHE = process.argv.includes("--no-cache");
 
+// Resolve the Mitosis package root from its (exported) main entry, so the version
+// read below works regardless of workspace hoisting and the package's exports map
+// (which does not expose ./package.json).
+const MITOSIS_MAIN = require.resolve("@builder.io/mitosis");
+const MITOSIS_PKG = MITOSIS_MAIN.slice(
+  0,
+  MITOSIS_MAIN.lastIndexOf("@builder.io/mitosis") + "@builder.io/mitosis".length
+);
 const mitosis = require("@builder.io/mitosis");
 const { parseJsx, targets: GENERATORS, renameComponentFile, checkShouldOutputTypeScript } = mitosis;
 const { transformImports } = require("@builder.io/mitosis-cli/dist/build/helpers/transpile.js");
@@ -53,8 +61,7 @@ function globalKey() {
   const parts = [
     "v1",
     JSON.stringify({ targets: TARGET_LIST, options: config.options, dest: config.dest }),
-    JSON.parse(readFileSync(join(ROOT, "node_modules/@builder.io/mitosis/package.json"), "utf8"))
-      .version,
+    JSON.parse(readFileSync(join(MITOSIS_PKG, "package.json"), "utf8")).version,
     readFileSync(fileURLToPath(import.meta.url), "utf8"),
   ];
   if (existsSync(OVERRIDES_DIR)) {

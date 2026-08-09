@@ -16,7 +16,8 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const fw = (rel) => readFileSync(join(ROOT, "dist", "frameworks", rel), "utf8");
+const fw = (rel) =>
+  readFileSync(join(ROOT, "packages", "components", "dist", "frameworks", rel), "utf8");
 
 // target → { file, keydown: <how a keydown handler binds in that framework> }
 const TARGETS = {
