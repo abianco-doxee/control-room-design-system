@@ -8,13 +8,13 @@
  * Vue can't slip through. (React is covered by react-dom/server in the pkg gate;
  * Qwik by its import gate.) Used by tests/pkg-frameworks.test.mjs.
  */
-import { readFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const src = (fw, name, ext) => readFileSync(join(ROOT, "dist", "frameworks", fw, "components", `${name}.${ext}`), "utf8");
+const src = (fw, name, ext) =>
+  readFileSync(join(ROOT, "dist", "frameworks", fw, "components", `${name}.${ext}`), "utf8");
 
 /** write `code` to a fresh temp module inside the repo (so it resolves node_modules)
  *  and dynamic-import it; the temp dir is removed after. */
@@ -23,7 +23,10 @@ async function loadTemp(code, filename) {
   try {
     const p = join(dir, filename);
     writeFileSync(p, code);
-    return { mod: await import(pathToFileURL(p).href), cleanup: () => rmSync(dir, { recursive: true, force: true }) };
+    return {
+      mod: await import(pathToFileURL(p).href),
+      cleanup: () => rmSync(dir, { recursive: true, force: true }),
+    };
   } catch (e) {
     rmSync(dir, { recursive: true, force: true });
     throw e;
@@ -32,9 +35,17 @@ async function loadTemp(code, filename) {
 
 export async function renderSvelte(name, props = {}) {
   const { compile } = await import("svelte/compiler");
-  const { js } = compile(src("svelte", name, "svelte"), { generate: "ssr", css: "injected", filename: `${name}.svelte` });
+  const { js } = compile(src("svelte", name, "svelte"), {
+    generate: "ssr",
+    css: "injected",
+    filename: `${name}.svelte`,
+  });
   const { mod, cleanup } = await loadTemp(js.code, `${name}.mjs`);
-  try { return mod.default.render(props).html; } finally { cleanup(); }
+  try {
+    return mod.default.render(props).html;
+  } finally {
+    cleanup();
+  }
 }
 
 export async function renderSolid(name, props = {}) {
@@ -47,7 +58,9 @@ export async function renderSolid(name, props = {}) {
   try {
     const web = await import("solid-js/web");
     return web.renderToString(() => mod.default(props));
-  } finally { cleanup(); }
+  } finally {
+    cleanup();
+  }
 }
 
 export async function renderVue(name, props = {}) {
@@ -59,7 +72,11 @@ export async function renderVue(name, props = {}) {
   const compiled = sfc.compileScript(descriptor, { id: name, inlineTemplate: true });
   const js = (await esbuild.transform(compiled.content, { loader: "ts", format: "esm" })).code;
   const { mod, cleanup } = await loadTemp(js, `${name}.mjs`);
-  try { return await renderToString(vue.createSSRApp(mod.default, props)); } finally { cleanup(); }
+  try {
+    return await renderToString(vue.createSSRApp(mod.default, props));
+  } finally {
+    cleanup();
+  }
 }
 
 export const RENDERERS = { vue: renderVue, svelte: renderSvelte, solid: renderSolid };

@@ -1,14 +1,15 @@
 // Unit tests for the headless form core (node:test). Run: npm run test:forms
-import { test } from "node:test";
+
 import assert from "node:assert/strict";
+import { test } from "node:test";
 import { type } from "arktype";
 import {
-  defineForm,
-  toJsonSchema,
-  toFormModel,
-  toArkType,
   createValidator,
+  defineForm,
   jsonSchemaToArkDef,
+  toArkType,
+  toFormModel,
+  toJsonSchema,
 } from "../lib/forms/index.js";
 
 // A representative "new session" schema authored in ArkType.
@@ -50,7 +51,17 @@ test("JSON Schema → ArkType definition + validation", () => {
   assert.equal(def.email, "string.email");
   assert.equal(def["notes?"], "string <= 140"); // optional key gets ?
   const arkT = toArkType(JsonSchema);
-  assert.ok(arkT({ name: "Ada", email: "a@b.co", replicas: 2, region: "eu-west", autoscale: true }) instanceof type.errors === false);
+  assert.ok(
+    arkT({
+      name: "Ada",
+      email: "a@b.co",
+      replicas: 2,
+      region: "eu-west",
+      autoscale: true,
+    }) instanceof
+      type.errors ===
+      false
+  );
 });
 
 test("Form Model inference (both directions agree)", () => {
@@ -68,7 +79,11 @@ test("Form Model inference (both directions agree)", () => {
   // alphabetises (ArkType's .toJsonSchema() sorts enum members). Compare as sets.
   const arkRegion = fromArk.find((f) => f.name === "region").options.map((o) => o.value);
   const jsonRegion = fromJson.find((f) => f.name === "region").options.map((o) => o.value);
-  assert.deepEqual(jsonRegion, ["eu-west", "us-east", "ap-south"], "JSON path keeps authored order");
+  assert.deepEqual(
+    jsonRegion,
+    ["eu-west", "us-east", "ap-south"],
+    "JSON path keeps authored order"
+  );
   assert.deepEqual([...arkRegion].sort(), [...jsonRegion].sort(), "same option set both ways");
   const notes = fromArk.find((f) => f.name === "notes");
   assert.equal(notes.required, false);
@@ -77,7 +92,13 @@ test("Form Model inference (both directions agree)", () => {
 test("validate: coercion + per-field errors + valid path", () => {
   const { validate } = defineForm(ArkSchema);
   // strings from inputs; replicas as a string should coerce to number
-  const bad = validate({ name: "a", email: "nope", replicas: "0", region: "boss", autoscale: "true" });
+  const bad = validate({
+    name: "a",
+    email: "nope",
+    replicas: "0",
+    region: "boss",
+    autoscale: "true",
+  });
   assert.equal(bad.valid, false);
   assert.ok(bad.errors.name, "name error present");
   assert.ok(bad.errors.email, "email error present");
@@ -85,7 +106,13 @@ test("validate: coercion + per-field errors + valid path", () => {
   assert.ok(bad.errors.region, "region error present");
   assert.equal(bad.errors.notes, undefined, "optional untouched field has no error");
 
-  const ok = validate({ name: "Ada", email: "a@b.co", replicas: "3", region: "eu-west", autoscale: "on" });
+  const ok = validate({
+    name: "Ada",
+    email: "a@b.co",
+    replicas: "3",
+    region: "eu-west",
+    autoscale: "on",
+  });
   assert.equal(ok.valid, true);
   assert.equal(ok.data.replicas, 3, "replicas coerced to number");
   assert.equal(ok.data.autoscale, true, "checkbox coerced to boolean");
@@ -130,7 +157,10 @@ test("nested objects + arrays: model shape, dotted error paths, coercion", () =>
     name: "Ada",
     address: { city: "", zip: "1" },
     tags: ["ok"],
-    members: [{ email: "a@b.co", admin: "on" }, { email: "nope", admin: "" }],
+    members: [
+      { email: "a@b.co", admin: "on" },
+      { email: "nope", admin: "" },
+    ],
   });
   assert.equal(bad.valid, false);
   assert.ok(bad.errors["address.city"], "nested object error keyed by dotted path");
@@ -204,11 +234,19 @@ test("composition: $ref into $defs (model group + validation)", () => {
 test("composition: allOf merges properties + required (extend a base)", () => {
   const schema = {
     $defs: {
-      Timestamped: { type: "object", properties: { createdAt: { type: "string" } }, required: ["createdAt"] },
+      Timestamped: {
+        type: "object",
+        properties: { createdAt: { type: "string" } },
+        required: ["createdAt"],
+      },
     },
     allOf: [
       { $ref: "#/$defs/Timestamped" },
-      { type: "object", properties: { name: { type: "string", minLength: 2 } }, required: ["name"] },
+      {
+        type: "object",
+        properties: { name: { type: "string", minLength: 2 } },
+        required: ["name"],
+      },
     ],
   };
   const { model, validate } = defineForm(schema);
@@ -217,7 +255,11 @@ test("composition: allOf merges properties + required (extend a base)", () => {
   assert.equal(model.fields.find((f) => f.name === "name").required, true);
   assert.equal(model.fields.find((f) => f.name === "createdAt").required, true);
 
-  assert.equal(validate({ name: "x", createdAt: "t" }).valid, false, "min-length from one branch enforced");
+  assert.equal(
+    validate({ name: "x", createdAt: "t" }).valid,
+    false,
+    "min-length from one branch enforced"
+  );
   assert.equal(validate({ name: "Ada" }).valid, false, "required from the other branch enforced");
   assert.equal(validate({ name: "Ada", createdAt: "2020" }).valid, true);
 });
@@ -226,7 +268,12 @@ test("composition: anyOf builds a validating union", () => {
   const schema = {
     type: "object",
     properties: {
-      id: { anyOf: [{ type: "string", minLength: 1 }, { type: "integer", minimum: 1 }] },
+      id: {
+        anyOf: [
+          { type: "string", minLength: 1 },
+          { type: "integer", minimum: 1 },
+        ],
+      },
     },
     required: ["id"],
   };
@@ -239,6 +286,24 @@ test("composition: anyOf builds a validating union", () => {
 test("roundtrip: ArkType → JSON Schema → ArkType still validates", () => {
   const js = toJsonSchema(ArkSchema);
   const back = toArkType(js);
-  assert.ok(back({ name: "Ada", email: "a@b.co", replicas: 2, region: "us-east", autoscale: false }) instanceof type.errors === false);
-  assert.ok(back({ name: "x", email: "a@b.co", replicas: 2, region: "us-east", autoscale: false }) instanceof type.errors);
+  assert.ok(
+    back({
+      name: "Ada",
+      email: "a@b.co",
+      replicas: 2,
+      region: "us-east",
+      autoscale: false,
+    }) instanceof
+      type.errors ===
+      false
+  );
+  assert.ok(
+    back({
+      name: "x",
+      email: "a@b.co",
+      replicas: 2,
+      region: "us-east",
+      autoscale: false,
+    }) instanceof type.errors
+  );
 });

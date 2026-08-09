@@ -8,23 +8,24 @@
 // keyboard-heavy CrTabs (roving-tabindex tablist), and confirms Angular applies
 // `dt` via [ngStyle] (custom props → setProperty; see references/styling-contract).
 // Run after `npm run build:components`.
-import { test } from "node:test";
+
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const fw = (rel) => readFileSync(join(ROOT, "dist", "frameworks", rel), "utf8");
 
 // target → { file, keydown: <how a keydown handler binds in that framework> }
 const TARGETS = {
-  react:   { file: "react/components/CrTabs.tsx",     keydown: /onKeyDown=/ },
-  vue:     { file: "vue/components/CrTabs.vue",        keydown: /@keydown|onKeydown|v-on:keydown/i },
-  svelte:  { file: "svelte/components/CrTabs.svelte",  keydown: /on:keydown/ },
-  solid:   { file: "solid/components/CrTabs.jsx",      keydown: /onKeyDown=/ },
-  qwik:    { file: "qwik/components/CrTabs.tsx",       keydown: /onKeyDown\$?=/ },
-  angular: { file: "angular/components/CrTabs.js",     keydown: /\(keydown\)/ },
+  react: { file: "react/components/CrTabs.tsx", keydown: /onKeyDown=/ },
+  vue: { file: "vue/components/CrTabs.vue", keydown: /@keydown|onKeydown|v-on:keydown/i },
+  svelte: { file: "svelte/components/CrTabs.svelte", keydown: /on:keydown/ },
+  solid: { file: "solid/components/CrTabs.jsx", keydown: /onKeyDown=/ },
+  qwik: { file: "qwik/components/CrTabs.tsx", keydown: /onKeyDown\$?=/ },
+  angular: { file: "angular/components/CrTabs.js", keydown: /\(keydown\)/ },
 };
 
 for (const [target, spec] of Object.entries(TARGETS)) {
@@ -42,12 +43,12 @@ for (const [target, spec] of Object.entries(TARGETS)) {
 // CrRating is the other keyboard-heavy pattern shipped in the component-coverage
 // batch — a roving-tabindex radiogroup. Assert the same contract in every target.
 const RATING = {
-  react:   { file: "react/components/CrRating.tsx",     keydown: /onKeyDown=/ },
-  vue:     { file: "vue/components/CrRating.vue",        keydown: /@keydown|onKeydown|v-on:keydown/i },
-  svelte:  { file: "svelte/components/CrRating.svelte",  keydown: /on:keydown/ },
-  solid:   { file: "solid/components/CrRating.jsx",      keydown: /onKeyDown=/ },
-  qwik:    { file: "qwik/components/CrRating.tsx",       keydown: /onKeyDown\$?=/ },
-  angular: { file: "angular/components/CrRating.js",     keydown: /\(keydown\)/ },
+  react: { file: "react/components/CrRating.tsx", keydown: /onKeyDown=/ },
+  vue: { file: "vue/components/CrRating.vue", keydown: /@keydown|onKeydown|v-on:keydown/i },
+  svelte: { file: "svelte/components/CrRating.svelte", keydown: /on:keydown/ },
+  solid: { file: "solid/components/CrRating.jsx", keydown: /onKeyDown=/ },
+  qwik: { file: "qwik/components/CrRating.tsx", keydown: /onKeyDown\$?=/ },
+  angular: { file: "angular/components/CrRating.js", keydown: /\(keydown\)/ },
 };
 
 for (const [target, spec] of Object.entries(RATING)) {

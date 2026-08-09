@@ -1,27 +1,28 @@
 // Unit tests for the theme / brand core (node:test). Run: npm run test:theme
-import { test } from "node:test";
+
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import {
-  THEME_ROLES,
-  CHASSIS_OVERRIDABLE,
-  validateTheme,
-  mergeTheme,
-  themeCss,
-  defineTheme,
-  contrastRatio,
-  checkThemeContrast,
-  autoOnColor,
-  deriveOnColors,
-  ON_PAIRS,
-} from "../lib/theme/index.js";
-import { surfaceRamp } from "../build/ramp.mjs";
-import { toneSignals, fitSignals, SIGNAL_KEYS } from "../build/signals.mjs";
-import { chassisFrom } from "../build/chassis.mjs";
-import { typeFrom } from "../build/type.mjs";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { oklch } from "culori";
+import { chassisFrom } from "../build/chassis.mjs";
+import { surfaceRamp } from "../build/ramp.mjs";
+import { fitSignals, SIGNAL_KEYS, toneSignals } from "../build/signals.mjs";
+import { typeFrom } from "../build/type.mjs";
+import {
+  autoOnColor,
+  CHASSIS_OVERRIDABLE,
+  checkThemeContrast,
+  contrastRatio,
+  defineTheme,
+  deriveOnColors,
+  mergeTheme,
+  ON_PAIRS,
+  THEME_ROLES,
+  themeCss,
+  validateTheme,
+} from "../lib/theme/index.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => JSON.parse(readFileSync(join(ROOT, p), "utf8"));
@@ -34,7 +35,8 @@ const contract = read("dist/theme-contract.json");
 test("theme contract is in lock-step (tokens.json ≡ lib ≡ dist/theme-contract.json)", () => {
   const GROUPS = ["surface", "text", "line", "signal", "keyed", "texture"];
   const fromTokens = [];
-  for (const g of GROUPS) for (const v of Object.values(tokens.semantic[g])) if (v && v.cssVar) fromTokens.push(v.cssVar);
+  for (const g of GROUPS)
+    for (const v of Object.values(tokens.semantic[g])) if (v && v.cssVar) fromTokens.push(v.cssVar);
   const fromLib = THEME_ROLES.map((r) => r.cssVar);
   const fromContract = contract.roles.map((r) => r.cssVar);
   assert.deepEqual(fromLib, fromTokens, "lib THEME_ROLES == tokens.json semantic roles");
@@ -73,10 +75,14 @@ test("mergeTheme: overrides win, keys normalise (--x or x)", () => {
 });
 
 test("themeCss emits a scoped block with role + chassis + extra vars", () => {
-  const css = themeCss("acme", { ground: "#0e1116", "brd-heavy": "4px", "brand-x": "#f00" }, {
-    selector: ':root[data-theme="acme"]',
-    scheme: "dark",
-  });
+  const css = themeCss(
+    "acme",
+    { ground: "#0e1116", "brd-heavy": "4px", "brand-x": "#f00" },
+    {
+      selector: ':root[data-theme="acme"]',
+      scheme: "dark",
+    }
+  );
   assert.match(css, /:root\[data-theme="acme"\] \{/);
   assert.match(css, /color-scheme: dark;/);
   assert.match(css, /--ground: #0e1116;/);
@@ -99,7 +105,11 @@ test("defineTheme: extends dark, validates, renders, contrast-checks", () => {
   assert.equal(brand.validation.valid, true, "merged theme is complete");
   assert.match(brand.css, /--ink: #f5f5f5;/);
   assert.match(brand.css, /--sig-work: #00d3fb;/); // inherited from dark
-  assert.equal(brand.contrast.ok, true, `contrast failures: ${JSON.stringify(brand.contrast.failures)}`);
+  assert.equal(
+    brand.contrast.ok,
+    true,
+    `contrast failures: ${JSON.stringify(brand.contrast.failures)}`
+  );
 
   // strict by default: missing roles throw
   assert.throws(() => defineTheme("bad", { ground: "#000" }), /missing required roles/);
@@ -111,7 +121,12 @@ test("autoOnColor picks the more legible ink for a fill", () => {
 });
 
 test("deriveOnColors: fills missing, re-derives changed fills, keeps hand-set", () => {
-  const base = { "sig-accent": "#4338ca", "on-accent": "#ffffff", "sig-wait": "#f9ad00", "on-sig": "#06050c" };
+  const base = {
+    "sig-accent": "#4338ca",
+    "on-accent": "#ffffff",
+    "sig-wait": "#f9ad00",
+    "on-sig": "#06050c",
+  };
 
   // (a) missing on-colour is filled
   const filled = deriveOnColors({ ...base, "on-sig": undefined });
@@ -120,14 +135,14 @@ test("deriveOnColors: fills missing, re-derives changed fills, keeps hand-set", 
   // (b) inherited on-colour is re-derived when the brand changed its fill
   const rederived = deriveOnColors(
     { ...base, "sig-accent": "#fff2cc" }, // brand recoloured the accent to a pale fill
-    { changed: ["sig-accent"] },
+    { changed: ["sig-accent"] }
   );
   assert.equal(rederived["on-accent"], "#06050c", "stale white flipped to dark for the pale fill");
 
   // (c) a hand-set on-colour is never touched, even if its fill changed
   const kept = deriveOnColors(
     { ...base, "sig-accent": "#fff2cc", "on-accent": "#123456" },
-    { changed: ["sig-accent", "on-accent"] },
+    { changed: ["sig-accent", "on-accent"] }
   );
   assert.equal(kept["on-accent"], "#123456", "author-set on-colour preserved");
 });
@@ -157,7 +172,9 @@ test("ember brand ($ramp + accent, extends dark) is complete + legible", () => {
   for (const [k, v] of Object.entries(dark)) if (!k.startsWith("$")) base[k] = v;
   const surfaces = surfaceRamp(ember.$ramp, ember.$scheme || "dark");
   const overrides = Object.fromEntries(Object.entries(ember).filter(([k]) => !k.startsWith("$")));
-  const vars = deriveOnColors(mergeTheme(mergeTheme(base, surfaces), overrides), { changed: Object.keys(overrides) });
+  const vars = deriveOnColors(mergeTheme(mergeTheme(base, surfaces), overrides), {
+    changed: Object.keys(overrides),
+  });
 
   // surfaces really came from the ramp (not the inherited dark values)
   assert.equal(vars.ground, surfaces.ground);
@@ -196,9 +213,16 @@ test("harbor brand ($ramp + muted signals, extends dark) is complete + legible",
   for (const [k, v] of Object.entries(dark)) if (!k.startsWith("$")) base[k] = v;
   const surfaces = surfaceRamp(harbor.$ramp, "dark");
   const overrides = Object.fromEntries(Object.entries(harbor).filter(([k]) => !k.startsWith("$")));
-  const signals = toneSignals(mergeTheme(base, surfaces), harbor.$signalTone, new Set(Object.keys(overrides)));
+  const signals = toneSignals(
+    mergeTheme(base, surfaces),
+    harbor.$signalTone,
+    new Set(Object.keys(overrides))
+  );
   const changed = [...Object.keys(overrides), ...Object.keys(signals)];
-  const vars = deriveOnColors(mergeTheme(mergeTheme(mergeTheme(base, surfaces), signals), overrides), { changed });
+  const vars = deriveOnColors(
+    mergeTheme(mergeTheme(mergeTheme(base, surfaces), signals), overrides),
+    { changed }
+  );
 
   assert.notEqual(vars["sig-work"], base["sig-work"], "inherited signal was re-voiced");
   assert.equal(vars["sig-accent"], "#3aa0b0", "explicit accent kept (not toned)");
@@ -231,14 +255,22 @@ test("$modes emits a dark + light pair (aurora); the light mode fits its signals
   assert.notEqual(lWork, pick(dark, "sig-work"), "light mode re-fit the neon signal");
   assert.ok(contrastRatio(lWork, lPanel) >= 3, "fitted signal clears 3:1 on the light panel");
   // shared brand identity carries across modes (explicit accent untouched)
-  assert.equal(pick(light, "sig-accent"), pick(dark, "sig-accent"), "brand accent shared across modes");
+  assert.equal(
+    pick(light, "sig-accent"),
+    pick(dark, "sig-accent"),
+    "brand accent shared across modes"
+  );
 });
 
 test("chassisFrom expands $shape / $weight; regular is identity", () => {
   assert.equal(chassisFrom({ $shape: "soft" }).radius, "6px");
   assert.equal(chassisFrom({ $shape: "sharp" }).radius, "0px");
   assert.equal(chassisFrom({ $weight: "heavy" })["brd-heavy"], "4px");
-  assert.deepEqual(chassisFrom({ $weight: "regular" }), {}, "regular weight is the default (no output)");
+  assert.deepEqual(
+    chassisFrom({ $weight: "regular" }),
+    {},
+    "regular weight is the default (no output)"
+  );
   const both = chassisFrom({ $shape: "round", $weight: "heavy" });
   assert.equal(both.radius, "12px");
   assert.equal(both["shadow-off"], "6px");
@@ -252,15 +284,26 @@ test("chassis tokens (incl --radius) are known to the contract, not 'unknown'", 
   full["row-h"] = "40px";
   const v = validateTheme(full);
   assert.equal(v.valid, true);
-  for (const k of ["radius", "brd-heavy", "row-h"]) assert.equal(v.unknown.includes(k), false, `${k} should be a known chassis token`);
+  for (const k of ["radius", "brd-heavy", "row-h"])
+    assert.equal(v.unknown.includes(k), false, `${k} should be a known chassis token`);
 });
 
 test("rectangular surfaces are wired to the brandable --radius (rounding works)", () => {
   const css = readFileSync(join(ROOT, "styles/components.css"), "utf8");
-  assert.ok(css.includes("border-radius: var(--radius)"), "components reference the brandable --radius");
-  assert.match(css, /\.cr-drip \{ border-radius: var\(--radius-none\)/, "decorative drip stays square");
+  assert.ok(
+    css.includes("border-radius: var(--radius)"),
+    "components reference the brandable --radius"
+  );
+  assert.match(
+    css,
+    /\.cr-drip \{ border-radius: var\(--radius-none\)/,
+    "decorative drip stays square"
+  );
   // the core form controls round with the brand
-  assert.match(css, /\.cr-input, \.cr-textarea, \.cr-select \{[^}]*border-radius: var\(--radius\)/s);
+  assert.match(
+    css,
+    /\.cr-input, \.cr-textarea, \.cr-select \{[^}]*border-radius: var\(--radius\)/s
+  );
 });
 
 test("boardroom brand: structural branding (soft corners + heavy chassis) applied", () => {
@@ -272,7 +315,9 @@ test("boardroom brand: structural branding (soft corners + heavy chassis) applie
 });
 
 test("typeFrom maps $fonts; type tokens are known to the contract", () => {
-  const t = typeFrom({ $fonts: { display: "'Inter', sans-serif", mono: "'IBM Plex Mono', monospace" } });
+  const t = typeFrom({
+    $fonts: { display: "'Inter', sans-serif", mono: "'IBM Plex Mono', monospace" },
+  });
   assert.equal(t["font-display"], "'Inter', sans-serif");
   assert.equal(t["font-mono"], "'IBM Plex Mono', monospace");
   assert.equal(t["font-sans"], undefined, "only provided families are set");
@@ -312,12 +357,15 @@ test("porcelain brand (extends light, on-colours auto-derived) is complete + leg
   const porcelain = read("brands/porcelain.json");
   assert.equal(porcelain.$extends, "light");
   // the brand file declares NO on-* — they're derived by the build
-  for (const on of Object.keys(ON_PAIRS)) assert.equal(on in porcelain, false, `${on} should be omitted, not authored`);
+  for (const on of Object.keys(ON_PAIRS))
+    assert.equal(on in porcelain, false, `${on} should be omitted, not authored`);
 
   const light = tokens.themes.light;
   const base = {};
   for (const [k, v] of Object.entries(light)) if (!k.startsWith("$")) base[k] = v;
-  const overrides = Object.fromEntries(Object.entries(porcelain).filter(([k]) => !k.startsWith("$")));
+  const overrides = Object.fromEntries(
+    Object.entries(porcelain).filter(([k]) => !k.startsWith("$"))
+  );
   const vars = deriveOnColors(mergeTheme(base, overrides), { changed: Object.keys(overrides) });
 
   const v = validateTheme(vars);
@@ -342,8 +390,10 @@ test("generated dist/themes/slate.css carries every merged role (build not stale
   const onDisk = readFileSync(join(ROOT, "dist/themes/slate.css"), "utf8");
   assert.match(onDisk, /\[data-theme="slate"\]/);
   for (const role of THEME_ROLES) {
-    assert.ok(onDisk.includes(`${role.cssVar}: ${vars[role.cssVar.replace(/^--/, "")]};`),
-      `slate.css should carry ${role.cssVar} from the merge`);
+    assert.ok(
+      onDisk.includes(`${role.cssVar}: ${vars[role.cssVar.replace(/^--/, "")]};`),
+      `slate.css should carry ${role.cssVar} from the merge`
+    );
   }
   assert.ok(onDisk.includes("--sig-accent: #6d7cff;"), "slate's own accent override is present");
 });

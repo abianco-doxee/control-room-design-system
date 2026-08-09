@@ -5,18 +5,21 @@
 // consumer's bundler compiles the .vue files and Volar types them from the SFC.
 // So this gate is structural — the barrel exports every component and each SFC is
 // well-formed — rather than a Node render (SFCs need a Vue compiler to run).
-import { test } from "node:test";
+
 import assert from "node:assert/strict";
-import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const VUE = join(ROOT, "dist", "frameworks", "vue");
 
 test("the vue barrel exports every component", () => {
   const index = readFileSync(join(VUE, "index.ts"), "utf8");
-  const exported = [...index.matchAll(/export \{ default as (\w+) \} from "\.\/components\/\1\.vue";/g)].map((m) => m[1]);
+  const exported = [
+    ...index.matchAll(/export \{ default as (\w+) \} from "\.\/components\/\1\.vue";/g),
+  ].map((m) => m[1]);
   assert.ok(exported.includes("CrButton"), "CrButton exported");
   assert.ok(exported.length >= 60, `expected ~61 component exports, got ${exported.length}`);
   // every referenced SFC actually exists on disk

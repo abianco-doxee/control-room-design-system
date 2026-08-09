@@ -25,6 +25,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Lint + format check (Biome)
+        run: npm run lint
       - name: Verify generated artifacts match sources (tokens, catalog, skill)
         run: npm run verify
       - name: Build tokens + catalog + gallery + docs site

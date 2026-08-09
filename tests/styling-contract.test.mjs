@@ -1,10 +1,11 @@
 // Spike guard for the pt/dt/unstyled styling contract + per-target override.
 // Reads the compiled framework output (run `npm run build:components` first).
-import { test } from "node:test";
+
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const fw = (t, f) => readFileSync(join(ROOT, "dist", "frameworks", t, "components", f), "utf8");
@@ -20,12 +21,18 @@ test("the other targets are generated from the single .lite source (portable pt)
   const react = fw("react", "CrTabs.tsx");
   assert.doesNotMatch(react, /crGlobalPT/, "override did NOT leak into React");
   assert.match(react, /data-part/, "generated output exposes data-part hooks");
-  assert.match(react, /\.\.\.ptAttrs\(/, "generated output has the portable pt spread (shared lib/pt helper)");
+  assert.match(
+    react,
+    /\.\.\.ptAttrs\(/,
+    "generated output has the portable pt spread (shared lib/pt helper)"
+  );
 });
 
 test("every target exposes the data-part styling hook on CrTabs", () => {
   for (const t of ["react", "vue", "svelte", "solid", "qwik", "angular"]) {
-    const file = readdirSync(join(ROOT, "dist", "frameworks", t, "components")).find((f) => /^CrTabs\./.test(f));
+    const file = readdirSync(join(ROOT, "dist", "frameworks", t, "components")).find((f) =>
+      /^CrTabs\./.test(f)
+    );
     assert.ok(file, `${t}: CrTabs output exists`);
     assert.match(fw(t, file), /data-part/, `${t}: exposes data-part`);
   }
@@ -40,8 +47,16 @@ test("every target exposes the data-part styling hook on CrTabs", () => {
 test("pt/dt/unstyled contract covers every functional component", () => {
   const COMPONENTS = join(ROOT, "components");
   const DECORATIVE = new Set([
-    "CrArrowRail", "CrAscii", "CrBezel", "CrBreach", "CrCat",
-    "CrChrome", "CrDrip", "CrPalette", "CrShape", "CrSigil",
+    "CrArrowRail",
+    "CrAscii",
+    "CrBezel",
+    "CrBreach",
+    "CrCat",
+    "CrChrome",
+    "CrDrip",
+    "CrPalette",
+    "CrShape",
+    "CrSigil",
   ]);
   const sources = readdirSync(COMPONENTS).filter((f) => f.endsWith(".lite.tsx"));
   const missing = [];
@@ -55,7 +70,11 @@ test("pt/dt/unstyled contract covers every functional component", () => {
       /\bunstyled\?\s*:/.test(src);
     if (!ok) missing.push(name);
   }
-  assert.deepEqual(missing, [], `functional components missing the contract: ${missing.join(", ")}`);
+  assert.deepEqual(
+    missing,
+    [],
+    `functional components missing the contract: ${missing.join(", ")}`
+  );
 });
 
 // Finer per-component design tokens (PrimeVue-dt-style): what makes `dt` surgical

@@ -3,8 +3,15 @@
 // instead of reaching into .../components/CrSwitch. Runs after `mitosis build`;
 // the dist/frameworks/** tree is a git-ignored build artifact, so these barrels
 // are regenerated on every compile (CI included). --check fails on drift.
-import { readdirSync, readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync } from "node:fs";
-import { join, dirname } from "node:path";
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -12,12 +19,12 @@ const FRAMEWORKS = join(ROOT, "dist", "frameworks");
 
 // target → { ext: component-file extension, index: barrel filename }
 const TARGETS = {
-  react:   { ext: "tsx",    index: "index.ts" },
-  vue:     { ext: "vue",    index: "index.ts" },
-  svelte:  { ext: "svelte", index: "index.js" },
-  angular: { ext: "js",     index: "index.ts" },
-  solid:   { ext: "jsx",    index: "index.jsx" },
-  qwik:    { ext: "tsx",    index: "index.ts" },
+  react: { ext: "tsx", index: "index.ts" },
+  vue: { ext: "vue", index: "index.ts" },
+  svelte: { ext: "svelte", index: "index.js" },
+  angular: { ext: "js", index: "index.ts" },
+  solid: { ext: "jsx", index: "index.jsx" },
+  qwik: { ext: "tsx", index: "index.ts" },
 };
 
 const check = process.argv.includes("--check");

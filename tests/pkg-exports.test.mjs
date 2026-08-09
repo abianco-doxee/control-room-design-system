@@ -2,11 +2,12 @@
 // Guards the package.json exports map + peer deps + the generated declarations,
 // so a consumer of any of the six targets gets resolvable code and real types.
 // Run after `npm run build:components`. (node:test — no browser needed.)
-import { test } from "node:test";
+
 import assert from "node:assert/strict";
-import { readFileSync, existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const pkg = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));
@@ -20,10 +21,14 @@ test("every framework target has a resolvable types + runtime entry", () => {
     const entry = pkg.exports[`./${t}`];
     assert.ok(entry, `exports["./${t}"] is declared`);
     const types = cond(entry, "types");
-    const runtime = cond(entry, "import") || cond(entry, "default") || (typeof entry === "string" ? entry : null);
+    const runtime =
+      cond(entry, "import") || cond(entry, "default") || (typeof entry === "string" ? entry : null);
     assert.ok(types, `./${t} declares a "types" condition`);
     assert.ok(existsSync(join(ROOT, types)), `./${t} types file exists: ${types}`);
-    assert.ok(runtime && existsSync(join(ROOT, runtime)), `./${t} runtime entry exists: ${runtime}`);
+    assert.ok(
+      runtime && existsSync(join(ROOT, runtime)),
+      `./${t} runtime entry exists: ${runtime}`
+    );
   }
 });
 
@@ -42,8 +47,20 @@ test("each target's declarations expose a component value + its Props type", () 
 test("all six framework peers are declared and optional", () => {
   const peers = pkg.peerDependencies || {};
   const meta = pkg.peerDependenciesMeta || {};
-  for (const dep of ["react", "react-dom", "vue", "svelte", "solid-js", "@angular/core", "@builder.io/qwik"]) {
+  for (const dep of [
+    "react",
+    "react-dom",
+    "vue",
+    "svelte",
+    "solid-js",
+    "@angular/core",
+    "@builder.io/qwik",
+  ]) {
     assert.ok(peers[dep], `peerDependencies includes ${dep}`);
-    assert.equal(meta[dep] && meta[dep].optional, true, `${dep} is marked optional (one target shouldn't force the rest)`);
+    assert.equal(
+      meta[dep] && meta[dep].optional,
+      true,
+      `${dep} is marked optional (one target shouldn't force the rest)`
+    );
   }
 });

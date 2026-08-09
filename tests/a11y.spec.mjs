@@ -1,9 +1,10 @@
 // Accessibility gate — runs axe-core over the living gallery (all tokens +
 // components) in every theme. Fails CI on any serious/critical WCAG violation.
-import { test, expect } from "@playwright/test";
-import AxeBuilder from "@axe-core/playwright";
-import { pathToFileURL } from "node:url";
+
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test } from "@playwright/test";
 
 const GALLERY = pathToFileURL(join(process.cwd(), "public", "gallery.html")).href;
 const THEMES = ["dark", "light", "extreme", "phosphor"];
@@ -21,11 +22,13 @@ for (const theme of THEMES) {
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
       .analyze();
 
-    const blocking = results.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
+    const blocking = results.violations.filter(
+      (v) => v.impact === "serious" || v.impact === "critical"
+    );
     if (blocking.length) {
       console.log(
         `\n[${theme}] blocking a11y violations:\n` +
-          blocking.map((v) => `  • ${v.id} (${v.impact}) ×${v.nodes.length} — ${v.help}`).join("\n"),
+          blocking.map((v) => `  • ${v.id} (${v.impact}) ×${v.nodes.length} — ${v.help}`).join("\n")
       );
     }
     expect(blocking, blocking.map((v) => v.id).join(", ") || "none").toEqual([]);

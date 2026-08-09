@@ -17,9 +17,9 @@
  * Check: node build/build-pkg.mjs --check   (compile only; fail on type errors)
  */
 import { execFileSync } from "node:child_process";
-import { readdirSync, readFileSync, writeFileSync, statSync, existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CHECK = process.argv.includes("--check");
@@ -30,9 +30,16 @@ const ALL_PACKAGES = [
   // Qwik's generated refs type as `Element` (no showModal/close/focus), so tsc
   // reports type errors while still emitting correct JS + .d.ts. Same leniency as
   // verify:types for React — we accept the emit as long as it actually landed.
-  { framework: "qwik", tsconfig: "build/tsconfig.pkg.qwik.json", out: "dist/pkg/qwik", tolerant: true },
+  {
+    framework: "qwik",
+    tsconfig: "build/tsconfig.pkg.qwik.json",
+    out: "dist/pkg/qwik",
+    tolerant: true,
+  },
 ];
-const PACKAGES = only.length ? ALL_PACKAGES.filter((p) => only.includes(p.framework)) : ALL_PACKAGES;
+const PACKAGES = only.length
+  ? ALL_PACKAGES.filter((p) => only.includes(p.framework))
+  : ALL_PACKAGES;
 
 // rewrite `from "./x.tsx"` / `from './x.ts'` (and dynamic import) → `.js`
 function normalizeExtensions(dir) {
@@ -43,8 +50,14 @@ function normalizeExtensions(dir) {
       if (e.isDirectory()) walk(p);
       else if (/\.(js|d\.ts)$/.test(e.name)) {
         const src = readFileSync(p, "utf8");
-        const next = src.replace(/((?:from|import)\s*\(?\s*["'][^"']*?)\.(tsx|ts)(["'])/g, "$1.js$3");
-        if (next !== src) { writeFileSync(p, next); touched++; }
+        const next = src.replace(
+          /((?:from|import)\s*\(?\s*["'][^"']*?)\.(tsx|ts)(["'])/g,
+          "$1.js$3"
+        );
+        if (next !== src) {
+          writeFileSync(p, next);
+          touched++;
+        }
       }
     }
   };
@@ -54,10 +67,14 @@ function normalizeExtensions(dir) {
 
 for (const { framework, tsconfig, out, tolerant } of PACKAGES) {
   process.stdout.write(`compiling ${framework} package … `);
-  const emitted = () => existsSync(join(ROOT, out, "index.js")) && existsSync(join(ROOT, out, "index.d.ts"));
+  const emitted = () =>
+    existsSync(join(ROOT, out, "index.js")) && existsSync(join(ROOT, out, "index.d.ts"));
   let typeErrors = 0;
   try {
-    execFileSync("npx", ["tsc", "-p", join(ROOT, tsconfig)], { cwd: ROOT, stdio: ["ignore", "pipe", "pipe"] });
+    execFileSync("npx", ["tsc", "-p", join(ROOT, tsconfig)], {
+      cwd: ROOT,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
   } catch (err) {
     // tsc emits JS + .d.ts even with type errors; only bail if the emit is missing
     // (or if this package isn't allowed to carry type errors).
@@ -69,7 +86,9 @@ for (const { framework, tsconfig, out, tolerant } of PACKAGES) {
     }
   }
   if (CHECK) {
-    console.log(typeErrors ? `ok (emitted; ${typeErrors} tolerated type notes)` : "ok (type-checked)");
+    console.log(
+      typeErrors ? `ok (emitted; ${typeErrors} tolerated type notes)` : "ok (type-checked)"
+    );
     continue;
   }
   const n = normalizeExtensions(join(ROOT, out));

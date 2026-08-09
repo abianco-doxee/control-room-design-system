@@ -20,9 +20,9 @@
 //
 //   node build/build-fix-qwik.mjs           patch dist/frameworks/qwik
 //   node build/build-fix-qwik.mjs --check   fail if any unpatched IIFE remains
-import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const QWIK = join(ROOT, "dist", "frameworks", "qwik", "components");
@@ -34,7 +34,10 @@ const CHECK = process.argv.includes("--check");
 const IIFE = /\{\(\(\) => \{([\s\S]*?)\}\)\(\)\}/g;
 
 if (!existsSync(QWIK)) {
-  if (CHECK) { console.log("✓ qwik fixup: nothing compiled yet"); process.exit(0); }
+  if (CHECK) {
+    console.log("✓ qwik fixup: nothing compiled yet");
+    process.exit(0);
+  }
   console.warn("⚠ qwik fixup: no dist/frameworks/qwik/components — run mitosis build first");
   process.exit(0);
 }
@@ -58,14 +61,21 @@ for (const file of readdirSync(QWIK).filter((f) => f.endsWith(".tsx"))) {
     // emitted package can't resolve the cross-component import.
     .replace(/from (["'])(\.\/Cr[A-Za-z0-9]+)\.jsx\1/g, "from $1$2.tsx$1");
   if (out !== src) {
-    if (CHECK) { unpatched++; console.error(`✗ ${file} has an unpatched Qwik class IIFE`); continue; }
+    if (CHECK) {
+      unpatched++;
+      console.error(`✗ ${file} has an unpatched Qwik class IIFE`);
+      continue;
+    }
     writeFileSync(p, out);
     patched++;
   }
 }
 
 if (CHECK) {
-  if (unpatched) { console.error("\nRun: npm run build:components (regenerates + patches)."); process.exit(1); }
+  if (unpatched) {
+    console.error("\nRun: npm run build:components (regenerates + patches).");
+    process.exit(1);
+  }
   console.log("✓ qwik fixup: no unpatched class IIFEs");
   process.exit(0);
 }

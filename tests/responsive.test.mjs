@@ -1,16 +1,21 @@
 // Guards the responsive architecture: fluid type + per-container density.
-import { test } from "node:test";
+
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const css = readFileSync(join(ROOT, "dist", "control-room.css"), "utf8");
 const comp = readFileSync(join(ROOT, "styles", "components.css"), "utf8");
 
 test("the text scale is fluid + container-relative (cqi), floored at legacy px", () => {
-  for (const [v, floor] of [["--text-base", "13px"], ["--text-sm", "12px"], ["--text-xs", "11px"]]) {
+  for (const [v, floor] of [
+    ["--text-base", "13px"],
+    ["--text-sm", "12px"],
+    ["--text-xs", "11px"],
+  ]) {
     const m = css.match(new RegExp(v + ":\\s*([^;]+);"));
     assert.ok(m, `${v} defined`);
     assert.match(m[1], /clamp\(/, `${v} is a clamp`);
@@ -20,7 +25,11 @@ test("the text scale is fluid + container-relative (cqi), floored at legacy px",
 });
 
 test("panel surfaces are query containers (type sizes to the panel)", () => {
-  assert.match(comp, /\.cr-panel[^{]*\{[^}]*container-type:\s*inline-size/s, "panel declares inline-size container");
+  assert.match(
+    comp,
+    /\.cr-panel[^{]*\{[^}]*container-type:\s*inline-size/s,
+    "panel declares inline-size container"
+  );
 });
 
 test("all 8 type roles are emitted", () => {
@@ -32,8 +41,16 @@ test("all 8 type roles are emitted", () => {
 });
 
 test("container-query layout: an @container rule + a responsive grid exist", () => {
-  assert.match(comp, /@container\s*\([^)]*max-width:\s*22rem\)/, "a panel-width @container rule exists");
-  assert.match(comp, /\.cr-grid-auto[^{]*\{[^}]*repeat\(auto-fill/s, "container-reflowing grid utility");
+  assert.match(
+    comp,
+    /@container\s*\([^)]*max-width:\s*22rem\)/,
+    "a panel-width @container rule exists"
+  );
+  assert.match(
+    comp,
+    /\.cr-grid-auto[^{]*\{[^}]*repeat\(auto-fill/s,
+    "container-reflowing grid utility"
+  );
 });
 
 test("density is per-container: compact remaps the spacing aliases", () => {
