@@ -1,11 +1,13 @@
 import { useStore } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 /** Control Room Button. Two independent axes:
  *  - `emphasis` = visual GRAVITY (form): solid (primary) · outline (secondary) ·
  *    ghost (inline/tertiary) · link (text). This is the hierarchy, not the colour.
  *  - `signal`   = COLOUR key: work · wait · done · err · accent · accent2.
  *  A destructive secondary is `emphasis="outline" signal="err"`.
- *  Styling: styles/components.css (.cr-btn). */
+ *  Styling: styles/components.css (.cr-btn); `unstyled` drops the classes,
+ *  `pt`/`dt` retarget it, the root exposes data-part. */
 export interface CrButtonProps {
   emphasis?: "solid" | "outline" | "ghost" | "link";
   signal?: "work" | "wait" | "done" | "err" | "accent" | "accent2";
@@ -16,6 +18,11 @@ export interface CrButtonProps {
   keyshortcuts?: string;
   onClick?: () => void;
   children?: any;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Single part: "root". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 export default function CrButton(props: CrButtonProps) {
@@ -31,11 +38,14 @@ export default function CrButton(props: CrButtonProps) {
 
   return (
     <button
+      {...ptAttrs(props.pt, "root")}
       type={props.type || "button"}
       disabled={props.disabled}
       aria-keyshortcuts={props.keyshortcuts}
+      data-part="root"
       onClick={() => props.onClick && props.onClick()}
-      class={state.cls}
+      class={ptClass(props.pt, props.unstyled, state.cls, "root")}
+      style={ptStyle(props.pt, props.dt, "root")}
     >
       {props.children}
     </button>
