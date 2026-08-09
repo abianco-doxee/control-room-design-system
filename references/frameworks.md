@@ -25,8 +25,17 @@ private, but every entry is a genuine, consumable package:
 | --- | --- | --- |
 | `./react` | **compiled** ESM JS + `.d.ts` (`dist/pkg/react`) | React needs no special compiler, so we prebuild it. `react`/`react-dom` are peer deps. |
 | `./qwik` | **compiled** ESM JS + `.d.ts` (`dist/pkg/qwik`) | Same tsc build; JSX via Qwik's automatic runtime. `@builder.io/qwik` is a peer dep. The consumer's Qwik **optimizer** still adds QRL lazy-loading when it processes the package. |
-| `./vue` | **SFC source** (`dist/frameworks/vue`) | Vue libraries ship `.vue` — the consumer's bundler compiles them and Volar types them from the SFC. `vue` is a peer dep. |
-| `./svelte` · `./angular` · `./solid` | source | shipped as compiled framework source; consumed by that framework's toolchain. |
+| `./vue` | **SFC source** + `.d.ts` (`dist/frameworks/vue`) | Vue libraries ship `.vue` — the consumer's bundler compiles them and Volar types them from the SFC; the generated `index.d.ts` types the barrel. `vue` is a peer dep. |
+| `./svelte` · `./angular` · `./solid` | source + `.d.ts` | shipped as compiled framework source, consumed by that framework's toolchain, each with a generated `index.d.ts`. |
+
+**Types for every target.** All six entries expose a `types` condition. React and
+Qwik are TSX, so `tsc` emits full declarations. For Vue/Svelte/Solid/Angular
+(non-TSX source), `build/build-pkg-types.mjs` generates an `index.d.ts` from the
+shared, framework-agnostic prop interfaces — every component's `<Name>Props` is
+re-exported, and the component value is typed per framework (Vue `DefineComponent`,
+Solid render fn, Svelte component constructor, Angular class). Peer deps cover all
+six frameworks, each marked `optional` so installing for one target doesn't pull
+the rest. Guarded by `verify:pkg-types` (drift) and `tests/pkg-exports.test.mjs`.
 
 The build compiles the typed packages with `npm run build:pkg` (relative import
 extensions rewritten `.tsx → .js` so the emit resolves in Node ESM and bundlers);
