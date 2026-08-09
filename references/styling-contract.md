@@ -1,8 +1,16 @@
-# Styling contract — pt / dt / unstyled (spike)
+# Styling contract — pt / dt / unstyled
 
-A PrimeVue-shaped styling API on the Mitosis single-source model, prototyped on
-**Tabs, Menu, Modal**. Everything here is verified against the compiled output of
-all six targets (`npm run build:components`) and SSR/e2e tests.
+A PrimeVue-shaped styling API on the Mitosis single-source model. Prototyped on
+**Tabs, Menu, Modal**, now rolled out **library-wide**: every functional component
+takes `unstyled` / `pt` / `dt`, exposes a `data-part="root"` (plus per-part and
+`data-state` hooks), and routes its classes/attrs/tokens through the shared
+`lib/pt.ts` helpers. The only exclusions are the signature/decoration components
+(Ascii, Cat, Sigil, Shape, Drip, Breach, Chrome, Bezel, Palette, ArrowRail) —
+their look *is* the identity, not something consumers retheme. A guard test
+(`tests/styling-contract.test.mjs`) enforces this split in both directions.
+
+Everything here is verified against the compiled output of all six targets
+(`npm run build:components`), the type-check, and the SSR/e2e/framework tests.
 
 ## The portable layer (one `.lite` source → all six targets)
 
@@ -92,8 +100,16 @@ package. Because these are plain functions of `props.pt`/`props.dt` (no `state.`
 receiver), Mitosis state-processes the arguments correctly inside a JSX spread —
 which is what let the earlier `{...(state.pta())}` post-processor patch be removed.
 
-### One Mitosis codegen quirk this still requires (patched, not worked around in userland)
+### Mitosis codegen quirks this requires (patched in the build, not worked around in userland)
 
+- **Angular escapes string args inside spread handlers.** `{...ptAttrs(props.pt,
+  "root")}` compiles to a `setAttributes(el, ptAttrs(this.pt, "root"))` call in the
+  class body, but Mitosis HTML-escapes the string literal to `&quot;root&quot;` —
+  valid in a template, a syntax error in JS. `build/build-fix-angular.mjs` (in the
+  `build:components` chain, with a `--check` mode) unescapes only the
+  `setAttributes(...)` lines, leaving template HTML untouched. Surfacing the
+  contract library-wide is what first exercised this (only Button had an
+  esbuild-compiled Angular test before).
 - **`dt` custom-properties in a `style` object** survive on React/Vue/Svelte
   (Svelte's `stringifyStyles` only kebab-cases uppercase, so `--sig-work` passes
   through). **Angular** applies `style` via `setAttribute` and does **not** take a

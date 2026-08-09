@@ -1,3 +1,5 @@
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+
 export interface CrScrollAreaProps {
   /** Max size along the scroll axis (e.g. "16rem", "40vh"). */
   maxHeight?: string;
@@ -7,6 +9,11 @@ export interface CrScrollAreaProps {
    *  announced (a focusable scroll container needs a name). */
   label?: string;
   children?: any;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* ScrollArea — a container with cross-browser styled scrollbars (thin, inked,
@@ -18,7 +25,9 @@ export interface CrScrollAreaProps {
 export default function CrScrollArea(props: CrScrollAreaProps) {
   return (
     <div
-      class={"cr-scroll" + (props.axis === "x" ? " cr-scroll--x" : props.axis === "both" ? " cr-scroll--both" : "")}
+      {...ptAttrs(props.pt, "root")}
+      class={ptClass(props.pt, props.unstyled, "cr-scroll" + (props.axis === "x" ? " cr-scroll--x" : props.axis === "both" ? " cr-scroll--both" : ""), "root")}
+      data-part="root"
       tabIndex={0}
       role={props.label ? "group" : undefined}
       aria-label={props.label}

@@ -1,10 +1,16 @@
 import { useStore } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrTooltipProps {
   /** Unique id wiring the trigger's aria-describedby to the bubble. */
   id: string;
   label?: string;
   children?: any;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" · "trigger" · "bubble". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /** A hint bubble revealed on hover/focus. The bubble carries role=tooltip and
@@ -26,9 +32,11 @@ export default function CrTooltip(props: CrTooltipProps) {
   });
 
   return (
-    <span class="cr-tooltip" data-dismissed={state.dismissed ? "true" : undefined} onMouseLeave={() => state.reset()}>
+    <span {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-tooltip", "root")} data-part="root" data-state={state.dismissed ? "dismissed" : undefined} style={ptStyle(props.pt, props.dt, "root")} data-dismissed={state.dismissed ? "true" : undefined} onMouseLeave={() => state.reset()}>
       <span
-        class="cr-tooltip__trigger"
+        {...ptAttrs(props.pt, "trigger")}
+        class={ptClass(props.pt, props.unstyled, "cr-tooltip__trigger", "trigger")}
+        data-part="trigger"
         tabIndex={0}
         aria-describedby={props.id}
         onKeyDown={(event) => state.onKey(event)}
@@ -36,7 +44,7 @@ export default function CrTooltip(props: CrTooltipProps) {
       >
         {props.children}
       </span>
-      <span class="cr-tooltip__bubble" role="tooltip" id={props.id}>
+      <span {...ptAttrs(props.pt, "bubble")} class={ptClass(props.pt, props.unstyled, "cr-tooltip__bubble", "bubble")} data-part="bubble" role="tooltip" id={props.id}>
         {props.label}
       </span>
     </span>

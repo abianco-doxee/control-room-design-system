@@ -31,6 +31,33 @@ test("every target exposes the data-part styling hook on CrTabs", () => {
   }
 });
 
+// The pt/dt/unstyled contract is rolled out library-wide. Every functional
+// component's source must import the shared helper and expose at least a "root"
+// data-part — EXCEPT the signature/decoration set, which is deliberately excluded
+// (its look is the identity, not something consumers retheme). This guards both
+// directions: a new functional component that forgets the contract fails, and so
+// does a decorative one that unexpectedly grows it (update the set on purpose).
+test("pt/dt/unstyled contract covers every functional component", () => {
+  const COMPONENTS = join(ROOT, "components");
+  const DECORATIVE = new Set([
+    "CrArrowRail", "CrAscii", "CrBezel", "CrBreach", "CrCat",
+    "CrChrome", "CrDrip", "CrPalette", "CrShape", "CrSigil",
+  ]);
+  const sources = readdirSync(COMPONENTS).filter((f) => f.endsWith(".lite.tsx"));
+  const missing = [];
+  for (const f of sources) {
+    const name = f.replace(/\.lite\.tsx$/, "");
+    if (DECORATIVE.has(name)) continue;
+    const src = readFileSync(join(COMPONENTS, f), "utf8");
+    const ok =
+      /from "\.\.\/lib\/pt\.ts"/.test(src) &&
+      /data-part="root"/.test(src) &&
+      /\bunstyled\?\s*:/.test(src);
+    if (!ok) missing.push(name);
+  }
+  assert.deepEqual(missing, [], `functional components missing the contract: ${missing.join(", ")}`);
+});
+
 // Finer per-component design tokens (PrimeVue-dt-style): what makes `dt` surgical
 // is the two-sided contract — the token is DEFINED in the shipped stylesheet AND
 // CONSUMED by the component CSS. If either half reverts to a coarse global token

@@ -1,4 +1,5 @@
 import { useStore, Show, For } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrStackSegment {
   label: string;
@@ -12,6 +13,11 @@ export interface CrStackedBarProps {
   label?: string;
   /** Show the legend row (swatch · label · value · %). Default true. */
   showLegend?: boolean;
+  /* ── styling contract (portable pt/dt subset). Part: "root". Segment fills are
+   * signal-driven (color IS the status) and stay on the cr-stack classes. */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* A single composition bar — "stacked progress". One track split into signal-toned
@@ -47,7 +53,7 @@ export default function CrStackedBar(props: CrStackedBarProps) {
   });
 
   return (
-    <div class="cr-stack" role="img" aria-label={state.summary}>
+    <div {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-stack", "root")} data-part="root" style={ptStyle(props.pt, props.dt, "root")} role="img" aria-label={state.summary}>
       <Show when={props.label}>
         <span class="cr-stack__label">{props.label}</span>
       </Show>

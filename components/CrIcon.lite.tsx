@@ -1,4 +1,5 @@
 import { useStore } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 /* Control Room icon set — the house operational glyphs.
  *
@@ -13,6 +14,11 @@ export interface CrIconProps {
   name: string;
   size?: number;
   label?: string;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 export default function CrIcon(props: CrIconProps) {
   const state = useStore({
@@ -49,7 +55,10 @@ export default function CrIcon(props: CrIconProps) {
 
   return (
     <svg
-      class="cr-icon"
+      {...ptAttrs(props.pt, "root")}
+      class={ptClass(props.pt, props.unstyled, "cr-icon", "root")}
+      data-part="root"
+      style={ptStyle(props.pt, props.dt, "root")}
       width={props.size || 20}
       height={props.size || 20}
       viewBox="0 0 24 24"

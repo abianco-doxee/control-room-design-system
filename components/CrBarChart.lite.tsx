@@ -1,4 +1,5 @@
 import { useStore, Show, For } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrBarDatum {
   label: string;
@@ -23,6 +24,11 @@ export interface CrBarChartProps {
   unit?: string;
   /** Accessible name for the whole figure. */
   label?: string;
+  /* ── styling contract (portable pt/dt subset). Part: "root" (the SVG plot is
+   * aria-hidden viz and stays on the cr-chart/cr-barchart classes). */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* A categorical bar chart: baseline-anchored bars with rounded data-ends, a 2px
@@ -148,7 +154,7 @@ export default function CrBarChart(props: CrBarChartProps) {
   });
 
   return (
-    <figure class="cr-chart cr-barchart" role="img" aria-label={state.summary()}>
+    <figure {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-chart cr-barchart", "root")} data-part="root" style={ptStyle(props.pt, props.dt, "root")} role="img" aria-label={state.summary()}>
       <svg
         class="cr-barchart__plot"
         viewBox={"0 0 " + state.geo().W + " " + state.geo().H}

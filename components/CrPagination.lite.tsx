@@ -1,4 +1,5 @@
 import { useStore, For } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrPaginationProps {
   /** Current page, 1-based (controlled). */
@@ -6,6 +7,11 @@ export interface CrPaginationProps {
   /** Total number of pages. */
   total: number;
   onChange?: (page: number) => void;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" · "btn" · "ellipsis". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* Controlled pager: ‹ prev · windowed page numbers with ellipses · next ›.
@@ -43,10 +49,12 @@ export default function CrPagination(props: CrPaginationProps) {
   });
 
   return (
-    <nav class="cr-pager" aria-label="Pagination">
+    <nav {...ptAttrs(props.pt, "root")} data-part="root" class={ptClass(props.pt, props.unstyled, "cr-pager", "root")} aria-label="Pagination" style={ptStyle(props.pt, props.dt, "root")}>
       <button
+        {...ptAttrs(props.pt, "btn")}
         type="button"
-        class="cr-pager__btn"
+        data-part="btn"
+        class={ptClass(props.pt, props.unstyled, "cr-pager__btn", "btn")}
         aria-label="Previous page"
         disabled={state.cur <= 1}
         onClick={() => state.go(state.cur - 1)}
@@ -56,11 +64,14 @@ export default function CrPagination(props: CrPaginationProps) {
       <For each={state.items}>
         {(n: number) =>
           n < 0 ? (
-            <span class="cr-pager__ellipsis" aria-hidden="true">…</span>
+            <span {...ptAttrs(props.pt, "ellipsis")} data-part="ellipsis" class={ptClass(props.pt, props.unstyled, "cr-pager__ellipsis", "ellipsis")} aria-hidden="true">…</span>
           ) : (
             <button
+              {...ptAttrs(props.pt, "btn")}
               type="button"
-              class={"cr-pager__btn" + (n === state.cur ? " cr-pager__btn--on" : "")}
+              data-part="btn"
+              data-state={n === state.cur ? "current" : "inactive"}
+              class={ptClass(props.pt, props.unstyled, "cr-pager__btn" + (n === state.cur ? " cr-pager__btn--on" : ""), "btn")}
               aria-label={"Page " + n}
               aria-current={n === state.cur ? "page" : "false"}
               onClick={() => state.go(n)}
@@ -71,8 +82,10 @@ export default function CrPagination(props: CrPaginationProps) {
         }
       </For>
       <button
+        {...ptAttrs(props.pt, "btn")}
         type="button"
-        class="cr-pager__btn"
+        data-part="btn"
+        class={ptClass(props.pt, props.unstyled, "cr-pager__btn", "btn")}
         aria-label="Next page"
         disabled={state.cur >= state.last}
         onClick={() => state.go(state.cur + 1)}

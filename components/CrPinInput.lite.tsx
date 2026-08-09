@@ -1,4 +1,5 @@
 import { useStore, useRef, For } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrPinInputProps {
   /** Number of digit cells. Default 6. */
@@ -9,6 +10,11 @@ export interface CrPinInputProps {
   onChange?: (code: string) => void;
   /** Fires once every cell is filled. */
   onComplete?: (code: string) => void;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" · "cell". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* PinInput — a one-time-code / PIN entry: N single-digit cells that behave as one
@@ -72,11 +78,13 @@ export default function CrPinInput(props: CrPinInputProps) {
   });
 
   return (
-    <div class="cr-pin" role="group" aria-label={props.label || "Verification code"} ref={rootRef} onPaste={(event) => state.onPaste(event)}>
+    <div {...ptAttrs(props.pt, "root")} data-part="root" class={ptClass(props.pt, props.unstyled, "cr-pin", "root")} style={ptStyle(props.pt, props.dt, "root")} role="group" aria-label={props.label || "Verification code"} ref={rootRef} onPaste={(event) => state.onPaste(event)}>
       <For each={state.slots()}>
         {(i: number) => (
           <input
-            class="cr-pin__cell"
+            {...ptAttrs(props.pt, "cell")}
+            data-part="cell"
+            class={ptClass(props.pt, props.unstyled, "cr-pin__cell", "cell")}
             type="text"
             inputMode="numeric"
             autocomplete={i === 0 ? "one-time-code" : "off"}

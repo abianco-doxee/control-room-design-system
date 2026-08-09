@@ -1,4 +1,5 @@
 import { Show, useRef, onUpdate } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrDrawerProps {
   open?: boolean;
@@ -7,6 +8,11 @@ export interface CrDrawerProps {
   side?: "left" | "right";
   onClose?: () => void;
   children?: any;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" (dialog) · "box" · "head" · "title" · "close" · "body". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* An edge sheet built on the native <dialog> — the browser owns focus-trap,
@@ -24,21 +30,24 @@ export default function CrDrawer(props: CrDrawerProps) {
 
   return (
     <dialog
-      class={"cr-drawer" + (props.side === "left" ? " cr-drawer--left" : "")}
+      {...ptAttrs(props.pt, "root")}
+      class={ptClass(props.pt, props.unstyled, "cr-drawer" + (props.side === "left" ? " cr-drawer--left" : ""), "root")}
+      data-part="root"
+      style={ptStyle(props.pt, props.dt, "root")}
       ref={dialogRef}
       aria-label={props.title || "Drawer"}
       onClose={() => props.onClose && props.onClose()}
     >
-      <div class="cr-drawer__box">
-        <div class="cr-drawer__head">
+      <div {...ptAttrs(props.pt, "box")} class={ptClass(props.pt, props.unstyled, "cr-drawer__box", "box")} data-part="box">
+        <div {...ptAttrs(props.pt, "head")} class={ptClass(props.pt, props.unstyled, "cr-drawer__head", "head")} data-part="head">
           <Show when={props.title}>
-            <h2 class="cr-drawer__title">{props.title}</h2>
+            <h2 {...ptAttrs(props.pt, "title")} class={ptClass(props.pt, props.unstyled, "cr-drawer__title", "title")} data-part="title">{props.title}</h2>
           </Show>
-          <button type="button" class="cr-drawer__close" aria-label="Close" onClick={() => props.onClose && props.onClose()}>
+          <button {...ptAttrs(props.pt, "close")} type="button" class={ptClass(props.pt, props.unstyled, "cr-drawer__close", "close")} data-part="close" aria-label="Close" onClick={() => props.onClose && props.onClose()}>
             ✕
           </button>
         </div>
-        <div class="cr-drawer__body">{props.children}</div>
+        <div {...ptAttrs(props.pt, "body")} class={ptClass(props.pt, props.unstyled, "cr-drawer__body", "body")} data-part="body">{props.children}</div>
       </div>
     </dialog>
   );

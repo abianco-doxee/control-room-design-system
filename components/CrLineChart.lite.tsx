@@ -1,4 +1,5 @@
 import { useStore, Show, For } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrLineSeries {
   name: string;
@@ -54,6 +55,11 @@ export interface CrLineChartProps {
   unit?: string;
   /** Accessible name for the whole figure. */
   label?: string;
+  /* ── styling contract (portable pt/dt subset). Part: "root" (the SVG plot is
+   * aria-hidden viz and stays on the cr-chart/cr-linechart classes). */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* A time-series line chart: recessive gridlines, crisp non-scaling 2px lines,
@@ -527,7 +533,7 @@ export default function CrLineChart(props: CrLineChartProps) {
   });
 
   return (
-    <figure class="cr-chart cr-linechart">
+    <figure {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-chart cr-linechart", "root")} data-part="root" style={ptStyle(props.pt, props.dt, "root")}>
       <div class="cr-linechart__graphic" role="img" aria-label={state.summary()}>
       <svg
         class="cr-linechart__plot"

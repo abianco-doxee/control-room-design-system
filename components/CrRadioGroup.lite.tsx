@@ -1,4 +1,5 @@
 import { useStore, For } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrRadioOption {
   value: string;
@@ -14,6 +15,11 @@ export interface CrRadioGroupProps {
   row?: boolean;
   label?: string;
   onChange?: (value: string) => void;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" · "radio" · "box". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* Radio group (role=radiogroup) with roving tabindex: only the checked radio (or
@@ -50,7 +56,10 @@ export default function CrRadioGroup(props: CrRadioGroupProps) {
 
   return (
     <div
-      class={"cr-radiogroup" + (props.row ? " cr-radiogroup--row" : "")}
+      {...ptAttrs(props.pt, "root")}
+      data-part="root"
+      class={ptClass(props.pt, props.unstyled, "cr-radiogroup" + (props.row ? " cr-radiogroup--row" : ""), "root")}
+      style={ptStyle(props.pt, props.dt, "root")}
       role="radiogroup"
       aria-label={props.label}
       onKeyDown={(event) => state.onKey(event)}
@@ -58,16 +67,19 @@ export default function CrRadioGroup(props: CrRadioGroupProps) {
       <For each={props.options}>
         {(opt: CrRadioOption, i: number) => (
           <button
+            {...ptAttrs(props.pt, "radio")}
+            data-part="radio"
+            data-state={props.value === opt.value ? "checked" : "unchecked"}
             type="button"
             role="radio"
-            class="cr-radio"
+            class={ptClass(props.pt, props.unstyled, "cr-radio", "radio")}
             data-value={opt.value}
             aria-checked={props.value === opt.value ? "true" : "false"}
             disabled={opt.disabled}
             tabIndex={state.tabbable(i)}
             onClick={() => state.select(opt.value)}
           >
-            <span class="cr-radio__box" aria-hidden="true"></span>
+            <span {...ptAttrs(props.pt, "box")} data-part="box" class={ptClass(props.pt, props.unstyled, "cr-radio__box", "box")} aria-hidden="true"></span>
             {opt.label}
           </button>
         )}

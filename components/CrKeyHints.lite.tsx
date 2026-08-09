@@ -1,8 +1,14 @@
 import { useStore, onMount, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrKeyHintsProps {
   /** Hold this key to reveal every secondary key-hint at once. Default "Alt". */
   revealKey?: string;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* Headless behavior: while the reveal key is held, sets data-cr-keys="on" on the
@@ -43,7 +49,9 @@ export default function CrKeyHints(props: CrKeyHintsProps) {
      actually runs — a display:none host would never become "visible". */
   return (
     <span
-      class="cr-keyhints"
+      {...ptAttrs(props.pt, "root")}
+      class={ptClass(props.pt, props.unstyled, "cr-keyhints", "root")}
+      data-part="root"
       aria-hidden="true"
       style={{ position: "fixed", left: "0", top: "0", width: "1px", height: "1px", opacity: "0", pointerEvents: "none" }}
     ></span>

@@ -1,5 +1,6 @@
 import { useStore, Show, For } from "@builder.io/mitosis";
 import CrFormRow from "./CrFormRow.lite";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrFormField {
   name: string;
@@ -66,6 +67,11 @@ export interface CrFormProps {
   onChange?: (values: Record<string, any>) => void;
   /** May be async — the submit button shows its pending state until it settles. */
   onSubmit?: (values: Record<string, any>) => void | Promise<void>;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" (form) · "title" · "actions". Rows are CrFormRow (own contract). */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* CrForm — a schema-driven form. Feed it a Form Model (which may nest: `group`
@@ -541,7 +547,10 @@ export default function CrForm(props: CrFormProps) {
 
   return (
     <form
-      class="cr-form"
+      {...ptAttrs(props.pt, "root")}
+      class={ptClass(props.pt, props.unstyled, "cr-form", "root")}
+      data-part="root"
+      style={ptStyle(props.pt, props.dt, "root")}
       noValidate
       onSubmit={(event) => state.submit(event)}
       onInput={(event) => state.onFormInput(event)}
@@ -555,7 +564,7 @@ export default function CrForm(props: CrFormProps) {
       onFocusIn={(event) => state.onFormEnter(event)}
     >
       <Show when={props.title}>
-        <h3 class="cr-form__title">{props.title}</h3>
+        <h3 {...ptAttrs(props.pt, "title")} class={ptClass(props.pt, props.unstyled, "cr-form__title", "title")} data-part="title">{props.title}</h3>
       </Show>
       <Show when={state.hasSummary()}>
         <div class="cr-form__summary" role="alert">
@@ -592,7 +601,7 @@ export default function CrForm(props: CrFormProps) {
           />
         )}
       </For>
-      <div class="cr-form__actions">
+      <div {...ptAttrs(props.pt, "actions")} class={ptClass(props.pt, props.unstyled, "cr-form__actions", "actions")} data-part="actions">
         <button type="submit" class="cr-btn" disabled={props.disabled || state.submitting} aria-busy={state.submitting ? "true" : undefined}>
           {state.submitBtnLabel()}
         </button>

@@ -1,4 +1,5 @@
 import { Show, useStore } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrMeterProps {
   value: number;
@@ -6,6 +7,11 @@ export interface CrMeterProps {
   label?: string;
   /** Signal for the fill (canonical vocabulary). */
   signal?: "work" | "wait" | "done" | "err" | "idle";
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" · "label" · "track" · "fill". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* A token-driven bar meter (capacity / utilisation). Square, hard-edged, keyed
@@ -24,19 +30,21 @@ export default function CrMeter(props: CrMeterProps) {
     },
   });
   return (
-    <div class={"cr-meter cr-meter--" + (props.signal || "work")}>
+    <div {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-meter cr-meter--" + (props.signal || "work"), "root")} data-part="root" data-state={props.signal || "work"} style={ptStyle(props.pt, props.dt, "root")}>
       <Show when={props.label}>
-        <span class="cr-meter__label">{props.label}</span>
+        <span {...ptAttrs(props.pt, "label")} class={ptClass(props.pt, props.unstyled, "cr-meter__label", "label")} data-part="label">{props.label}</span>
       </Show>
       <span
-        class="cr-meter__track"
+        {...ptAttrs(props.pt, "track")}
+        class={ptClass(props.pt, props.unstyled, "cr-meter__track", "track")}
+        data-part="track"
         role="meter"
         aria-valuenow={props.value}
         aria-valuemin={0}
         aria-valuemax={state.max}
         aria-label={props.label || "meter"}
       >
-        <span class="cr-meter__fill" style={{ width: state.pct + "%" }}></span>
+        <span {...ptAttrs(props.pt, "fill")} class={ptClass(props.pt, props.unstyled, "cr-meter__fill", "fill")} data-part="fill" style={{ width: state.pct + "%" }}></span>
       </span>
     </div>
   );

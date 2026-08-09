@@ -1,4 +1,5 @@
 import { useStore, useRef } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrResizableProps {
   /** Split axis: "horizontal" (default, side-by-side) · "vertical" (stacked). */
@@ -12,6 +13,11 @@ export interface CrResizableProps {
   label?: string;
   /** Exactly TWO panes — the leading (left/top) and trailing (right/bottom). */
   children?: any;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" · "separator". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* Resizable — two panes with a draggable divider. Pass the two panes as children
@@ -88,14 +94,20 @@ export default function CrResizable(props: CrResizableProps) {
 
   return (
     <div
-      class={"cr-resizable" + (props.orientation === "vertical" ? " cr-resizable--vertical" : "")}
+      {...ptAttrs(props.pt, "root")}
+      class={ptClass(props.pt, props.unstyled, "cr-resizable" + (props.orientation === "vertical" ? " cr-resizable--vertical" : ""), "root")}
+      data-part="root"
+      data-state={state.dragging ? "dragging" : "idle"}
       ref={rootRef}
       data-dragging={state.dragging ? "true" : undefined}
       style={state.trackStyle()}
     >
       {props.children}
       <div
-        class="cr-resizable__handle"
+        {...ptAttrs(props.pt, "separator")}
+        class={ptClass(props.pt, props.unstyled, "cr-resizable__handle", "separator")}
+        data-part="separator"
+        data-state={state.dragging ? "dragging" : "idle"}
         role="separator"
         tabIndex={0}
         aria-orientation={props.orientation === "vertical" ? "horizontal" : "vertical"}

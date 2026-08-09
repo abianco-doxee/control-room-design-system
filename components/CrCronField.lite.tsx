@@ -1,4 +1,5 @@
 import { Show, For } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrCronPreset {
   label: string;
@@ -29,6 +30,11 @@ export interface CrCronFieldProps {
   disabled?: boolean;
   onChange?: (value: string) => void;
   onBlur?: () => void;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" · "label" · "req" · "input" · "presets" · "preset" · "error" · "out" · "hint". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* Control Room cron Field — a proper form field: label + input + presets + a live
@@ -40,19 +46,28 @@ export interface CrCronFieldProps {
  * leave. Styling via .cr-cron (+ the shared .cr-field__* label/hint/error). */
 export default function CrCronField(props: CrCronFieldProps) {
   return (
-    <div class={"cr-cron" + (props.error ? " cr-cron--error" : "")}>
+    <div
+      {...ptAttrs(props.pt, "root")}
+      class={ptClass(props.pt, props.unstyled, "cr-cron" + (props.error ? " cr-cron--error" : ""), "root")}
+      data-part="root"
+      data-state={props.error ? "error" : undefined}
+      style={ptStyle(props.pt, props.dt, "root")}
+    >
       <Show when={props.label}>
-        <label class="cr-field__label" for={props.id}>
+        <label {...ptAttrs(props.pt, "label")} class={ptClass(props.pt, props.unstyled, "cr-field__label", "label")} data-part="label" for={props.id}>
           {props.label}
           <Show when={props.required}>
-            <span class="cr-field__req" aria-hidden="true"> *</span>
+            <span {...ptAttrs(props.pt, "req")} class={ptClass(props.pt, props.unstyled, "cr-field__req", "req")} data-part="req" aria-hidden="true"> *</span>
           </Show>
         </label>
       </Show>
       <input
+        {...ptAttrs(props.pt, "input")}
         id={props.id}
         name={props.name}
-        class="cr-cron__input"
+        class={ptClass(props.pt, props.unstyled, "cr-cron__input", "input")}
+        data-part="input"
+        data-state={props.error ? "error" : undefined}
         type="text"
         spellcheck={false}
         value={props.value}
@@ -67,10 +82,10 @@ export default function CrCronField(props: CrCronFieldProps) {
         onBlur={() => props.onBlur && props.onBlur()}
       />
       <Show when={props.presets}>
-        <div class="cr-cron__presets">
+        <div {...ptAttrs(props.pt, "presets")} class={ptClass(props.pt, props.unstyled, "cr-cron__presets", "presets")} data-part="presets">
           <For each={props.presets}>
             {(pre: CrCronPreset) => (
-              <button type="button" class="cr-cron__preset" disabled={props.disabled} onClick={() => props.onChange && props.onChange(pre.cron)}>
+              <button {...ptAttrs(props.pt, "preset")} type="button" class={ptClass(props.pt, props.unstyled, "cr-cron__preset", "preset")} data-part="preset" disabled={props.disabled} onClick={() => props.onChange && props.onChange(pre.cron)}>
                 {pre.label}
               </button>
             )}
@@ -78,13 +93,13 @@ export default function CrCronField(props: CrCronFieldProps) {
         </div>
       </Show>
       <Show when={props.error}>
-        <span class="cr-field__error" id={props.id + "-err"} role="alert">{props.error}</span>
+        <span {...ptAttrs(props.pt, "error")} class={ptClass(props.pt, props.unstyled, "cr-field__error", "error")} data-part="error" id={props.id + "-err"} role="alert">{props.error}</span>
       </Show>
       <Show when={props.description && !props.error}>
-        <p class="cr-cron__out" id={props.id + "-desc"} aria-live="polite">{props.description}</p>
+        <p {...ptAttrs(props.pt, "out")} class={ptClass(props.pt, props.unstyled, "cr-cron__out", "out")} data-part="out" id={props.id + "-desc"} aria-live="polite">{props.description}</p>
       </Show>
       <Show when={props.hint && !props.description && !props.error}>
-        <span class="cr-field__hint" id={props.id + "-hint"}>{props.hint}</span>
+        <span {...ptAttrs(props.pt, "hint")} class={ptClass(props.pt, props.unstyled, "cr-field__hint", "hint")} data-part="hint" id={props.id + "-hint"}>{props.hint}</span>
       </Show>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useStore, Show } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrAvatarProps {
   /** Person / entity name — the accessible name, and the source of the initials
@@ -10,6 +11,10 @@ export interface CrAvatarProps {
   status?: string;
   /** Size token: "sm" · "lg" (default medium). */
   size?: string;
+  /* ── styling contract (portable pt/dt subset) — parts: "root" · "img" · "initials" · "status". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* Avatar — an image with an initials fallback. With a src it's an <img alt=name>;
@@ -29,18 +34,21 @@ export default function CrAvatar(props: CrAvatarProps) {
 
   return (
     <span
-      class={"cr-avatar" + (props.size ? " cr-avatar--" + props.size : "")}
+      {...ptAttrs(props.pt, "root")}
+      class={ptClass(props.pt, props.unstyled, "cr-avatar" + (props.size ? " cr-avatar--" + props.size : ""), "root")}
+      data-part="root"
+      style={ptStyle(props.pt, props.dt, "root")}
       role={props.src ? undefined : "img"}
       aria-label={props.src ? undefined : props.name}
     >
       <Show when={props.src}>
-        <img class="cr-avatar__img" src={props.src} alt={props.name} />
+        <img {...ptAttrs(props.pt, "img")} class={ptClass(props.pt, props.unstyled, "cr-avatar__img", "img")} data-part="img" src={props.src} alt={props.name} />
       </Show>
       <Show when={!props.src}>
-        <span class="cr-avatar__initials" aria-hidden="true">{state.initials()}</span>
+        <span {...ptAttrs(props.pt, "initials")} class={ptClass(props.pt, props.unstyled, "cr-avatar__initials", "initials")} data-part="initials" aria-hidden="true">{state.initials()}</span>
       </Show>
       <Show when={props.status}>
-        <span class={"cr-avatar__status cr-avatar__status--" + props.status} role="img" aria-label={props.status}></span>
+        <span {...ptAttrs(props.pt, "status")} class={ptClass(props.pt, props.unstyled, "cr-avatar__status cr-avatar__status--" + props.status, "status")} data-part="status" role="img" aria-label={props.status}></span>
       </Show>
     </span>
   );

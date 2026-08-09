@@ -1,4 +1,5 @@
 import { Show, useStore } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrAlertProps {
   /** Signal the alert carries: info (work) · wait · done · err. */
@@ -9,6 +10,11 @@ export interface CrAlertProps {
   dismissible?: boolean;
   onClose?: () => void;
   children?: any;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" · "icon" · "body" · "title" · "msg" · "close". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* Inline callout keyed to a signal (Law 2) — a left brush-bar in the signal hue.
@@ -26,22 +32,26 @@ export default function CrAlert(props: CrAlertProps) {
   return (
     <Show when={state.open}>
       <div
-        class={"cr-alert cr-alert--" + (props.signal || "info")}
+        {...ptAttrs(props.pt, "root")}
+        class={ptClass(props.pt, props.unstyled, "cr-alert cr-alert--" + (props.signal || "info"), "root")}
+        data-part="root"
+        data-state={props.signal || "info"}
+        style={ptStyle(props.pt, props.dt, "root")}
         role={props.signal === "err" ? "alert" : "status"}
         aria-live={props.signal === "err" ? "assertive" : "polite"}
       >
-        <span class="cr-alert__icon" aria-hidden="true"></span>
-        <div class="cr-alert__body">
+        <span {...ptAttrs(props.pt, "icon")} class={ptClass(props.pt, props.unstyled, "cr-alert__icon", "icon")} data-part="icon" aria-hidden="true"></span>
+        <div {...ptAttrs(props.pt, "body")} class={ptClass(props.pt, props.unstyled, "cr-alert__body", "body")} data-part="body">
           <Show when={props.title}>
-            <p class="cr-alert__title">{props.title}</p>
+            <p {...ptAttrs(props.pt, "title")} class={ptClass(props.pt, props.unstyled, "cr-alert__title", "title")} data-part="title">{props.title}</p>
           </Show>
-          <p class="cr-alert__msg">
+          <p {...ptAttrs(props.pt, "msg")} class={ptClass(props.pt, props.unstyled, "cr-alert__msg", "msg")} data-part="msg">
             {props.message}
             {props.children}
           </p>
         </div>
         <Show when={props.dismissible}>
-          <button type="button" class="cr-alert__close" aria-label="Dismiss" onClick={() => state.dismiss()}>
+          <button {...ptAttrs(props.pt, "close")} type="button" class={ptClass(props.pt, props.unstyled, "cr-alert__close", "close")} data-part="close" aria-label="Dismiss" onClick={() => state.dismiss()}>
             ✕
           </button>
         </Show>

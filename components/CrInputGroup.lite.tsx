@@ -1,4 +1,5 @@
 import { Show } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrInputGroupProps {
   id?: string;
@@ -14,6 +15,11 @@ export interface CrInputGroupProps {
   type?: string;
   disabled?: boolean;
   onInput?: (value: string) => void;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" · "addon" · "input". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* InputGroup — an input flanked by prefix / suffix addons (protocol, currency,
@@ -23,13 +29,20 @@ export interface CrInputGroupProps {
  * Styling via .cr-input-group. */
 export default function CrInputGroup(props: CrInputGroupProps) {
   return (
-    <div class="cr-input-group">
+    <div
+      {...ptAttrs(props.pt, "root")}
+      class={ptClass(props.pt, props.unstyled, "cr-input-group", "root")}
+      data-part="root"
+      style={ptStyle(props.pt, props.dt, "root")}
+    >
       <Show when={props.prefix}>
-        <span class="cr-input-group__addon cr-input-group__addon--prefix" aria-hidden="true">{props.prefix}</span>
+        <span {...ptAttrs(props.pt, "addon")} class={ptClass(props.pt, props.unstyled, "cr-input-group__addon cr-input-group__addon--prefix", "addon")} data-part="addon" aria-hidden="true">{props.prefix}</span>
       </Show>
       <input
+        {...ptAttrs(props.pt, "input")}
         id={props.id}
-        class="cr-input cr-input-group__input"
+        class={ptClass(props.pt, props.unstyled, "cr-input cr-input-group__input", "input")}
+        data-part="input"
         type={props.type || "text"}
         value={props.value}
         placeholder={props.placeholder}
@@ -38,7 +51,7 @@ export default function CrInputGroup(props: CrInputGroupProps) {
         onInput={(event) => props.onInput && props.onInput((event.target as HTMLInputElement).value)}
       />
       <Show when={props.suffix}>
-        <span class="cr-input-group__addon cr-input-group__addon--suffix" aria-hidden="true">{props.suffix}</span>
+        <span {...ptAttrs(props.pt, "addon")} class={ptClass(props.pt, props.unstyled, "cr-input-group__addon cr-input-group__addon--suffix", "addon")} data-part="addon" aria-hidden="true">{props.suffix}</span>
       </Show>
     </div>
   );
