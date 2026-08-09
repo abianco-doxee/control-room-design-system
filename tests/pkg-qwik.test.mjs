@@ -13,7 +13,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import * as CR from "../dist/pkg/qwik/index.js";
+import * as CR from "../packages/components/dist/pkg/qwik/index.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const PKG = join(ROOT, "packages", "components", "dist", "pkg", "qwik");
