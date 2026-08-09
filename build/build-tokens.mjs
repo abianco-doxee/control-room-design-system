@@ -79,11 +79,16 @@ function varsBody(theme) {
 
 /* ── 3. assemble control-room.css ───────────────────────────────────────── */
 
+// Themes select on ANY element carrying [data-theme], not just :root — so a
+// container can run a different theme than the page (a light panel inside a dark
+// app). [data-theme="x"] still matches <html data-theme="x">, so root theming is
+// unchanged; token indirection (--cr-* → var(--sig-*)) resolves at the use-site,
+// so a scoped subtree re-themes correctly. See references/theming.md#local-scope.
 const SELECTOR = {
-  dark: ':root, :root[data-theme="dark"]',
-  light: ':root[data-theme="light"]',
-  extreme: ':root[data-theme="extreme"]',
-  phosphor: ':root[data-theme="phosphor"]',
+  dark: ':root, [data-theme="dark"]',
+  light: '[data-theme="light"]',
+  extreme: '[data-theme="extreme"]',
+  phosphor: '[data-theme="phosphor"]',
 };
 const SCHEME = { dark: "dark", light: "light", extreme: "dark", phosphor: "dark" };
 
@@ -163,8 +168,8 @@ const THEME_BANNER = (theme) => `/* Control Room theme: ${theme} (GENERATED). Ap
 // one standalone theme file: the semantic role values (dark also claims :root).
 function splitThemeCss(theme) {
   const selector = theme === src.meta.defaultTheme
-    ? `:root, :root[data-theme="${theme}"]`
-    : `:root[data-theme="${theme}"]`;
+    ? `:root, [data-theme="${theme}"]`
+    : `[data-theme="${theme}"]`;
   return THEME_BANNER(theme) + themeCss(theme, themeVars(theme), { selector, scheme: SCHEME[theme] });
 }
 

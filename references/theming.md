@@ -41,6 +41,31 @@ Then select a theme on the root element:
 
 `dark` also claims bare `:root`, so it's the default when no `data-theme` is set.
 
+## Local scope — a theme on any container {#local-scope}
+
+`data-theme` is **not** root-only. Every theme (and brand) selects on bare
+`[data-theme="…"]`, so you can run a different theme on a **subtree** than the
+page around it — a light report panel inside a dark app, a phosphor status strip,
+a brand-skinned island in an otherwise-neutral shell:
+
+```html
+<html data-theme="dark">
+  …dark app…
+  <section data-theme="light">    <!-- this panel + everything inside it is light -->
+    <div class="cr-panel">…</div>
+    <button class="cr-btn cr-btn--sig-work">run</button>
+  </section>
+</html>
+```
+
+The nearest `[data-theme]` ancestor wins for its subtree, and `color-scheme`
+flips with it (so native controls, scrollbars and form widgets match). It works
+because a component's `--cr-*` tokens resolve their `var(--sig-*)`/`var(--panel)`
+references **at the element where they're used** — the re-themed values on the
+container cascade in automatically, with no per-component change and no JS. Nest
+freely; a deeper `[data-theme]` re-scopes again. (This is also exactly how the
+Component Browser puts every card under one page theme while you flip it.)
+
 ## The theme contract
 
 `dist/theme-contract.json` (`@control-room/design-system/theme-contract`) is the

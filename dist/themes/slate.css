@@ -1,7 +1,7 @@
 /* Control Room brand: slate — Slate · neutral corporate re-skin (GENERATED
  * from brands/slate.json). Appearance layer only — pair with dist/structure.css.
  * Regenerate: npm run build:theme. */
-:root[data-theme="slate"] {
+[data-theme="slate"] {
   color-scheme: dark;
   --ground: #0e1116;
   --board: #141922;
