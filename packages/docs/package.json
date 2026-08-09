@@ -2,5 +2,37 @@
   "name": "@control-room/docs",
   "version": "1.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "description": "Control Room documentation site (Astro + Starlight) — the dev-only leaf. Builds the reference docs, the live gallery, the component browser (React islands from @control-room/components), and the brand preview from the sibling packages; plus the Playwright a11y / islands / responsive / visual suites.",
+  "scripts": {
+    "build:content": "node build/build-docs-content.mjs",
+    "build:gallery": "node build/build-gallery.mjs",
+    "build:showcase": "node build/build-showcase.mjs",
+    "build:brand-preview": "node build/build-brand-preview.mjs",
+    "prebuild:site": "npm run build:content",
+    "build:site": "astro build",
+    "dev": "npm run build:content && astro dev",
+    "preview": "astro preview",
+    "test:a11y": "playwright test tests/a11y.spec.mjs tests/a11y-showcase.spec.mjs",
+    "test:islands": "playwright test tests/showcase-islands.spec.mjs",
+    "test:responsive": "playwright test tests/responsive.spec.mjs",
+    "test:visual": "playwright test tests/visual.spec.mjs",
+    "test:visual:update": "playwright test tests/visual.spec.mjs --update-snapshots",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@control-room/components": "1.0.0",
+    "@control-room/icons": "1.0.0",
+    "@control-room/styles": "1.0.0",
+    "@control-room/tokens": "1.0.0",
+    "@control-room/utils": "1.0.0"
+  },
+  "devDependencies": {
+    "@astrojs/starlight": "^0.41.7",
+    "@axe-core/playwright": "^4.12.1",
+    "@fontsource/saira-condensed": "^5.3.0",
+    "@playwright/test": "^1.62.1",
+    "astro": "^7.2.0",
+    "esbuild": "^0.28.2"
+  }
 }
