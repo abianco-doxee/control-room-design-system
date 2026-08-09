@@ -93,18 +93,37 @@ Eight roles, each carrying size + weight + leading + tracking:
 - **a11y** — respect `prefers-reduced-motion` (already) and add the pointer tap
   floor; fluid type must keep min sizes ≥ the AA-legible floor.
 
-## Open decisions (need your call)
+## Agreed direction (decided)
 
-1. **Density switch surface** — `data-density` on the root (global) only, or also
-   per-container? (Per-container is more flexible, slightly more token plumbing.)
-2. **How fluid is spacing?** Fully fluid (`clamp`/`cqi`) gaps everywhere, or fluid
-   only at macro region level and stepped inside components? (I lean: stepped
-   inside components, fluid at regions — dense UIs read better on a fixed rhythm.)
-3. **Container breakpoint count** — 2 (sm/lg) or 3 (sm/md/lg) panel ranges?
-4. **Type role count** — adopt all 8 roles, or trim (e.g. drop `chrome`/`meta` if
-   `--text-2xs` already covers them)?
-5. **Migration** — introduce alongside `--text-*`/`--space-*` (additive, migrate
-   components gradually) vs a breaking re-base. I strongly recommend **additive**.
+1. **Density switch — per-container.** `data-density="compact"` may be set on any
+   container; its subtree remaps `--pad`/`--gap` via the CSS cascade (no per-
+   component branching).
+2. **Spacing fluidity — stepped inside components, fluid at regions.** Components
+   keep a fixed rhythm (`--pad`/`--gap` on the `--space-*` grid); only macro layout
+   regions use `clamp()`/`cqi` gaps.
+3. **Breakpoints — 3 panel ranges** (`--bp-panel-sm` 22rem · `-md` 34rem · `-lg`
+   52rem), room to add more.
+4. **Type roles — all 8** (`display`/`h1`/`h2` display-register on `vw`;
+   `body`/`data`/`label`/`meta`/`chrome` data-register, dense ones on `cqi`).
+5. **Migration — breaking big-bang.** The new roles/scales become the system; the
+   fixed `--text-*` scale is retired once every consumer is migrated. Executed in
+   internally-gated phases so each step stays reviewable, converging on the break.
+
+Directive: **prefer the most modern responsive option at each choice.**
+
+## Phase status
+
+- **Phase 1 — token foundation** ✅ (this commit): all 8 type roles + `--pad`/`--gap`
+  density aliases + `--control-h-*` + `--bp-panel-*` added to `tokens.json`
+  (typography + chassis), emitted to `dist/control-room.css`. New names only —
+  nothing consumes them yet, so it's pixel-neutral.
+- Phase 2 — migrate type consumers (`--text-*`/`--type-*` → roles) + `.cr-typo`
+  container primitive.
+- Phase 3 — density-aware spacing (`--pad`/`--gap`) across components + per-
+  container `data-density`.
+- Phase 4 — `--control-h-*` sizing + `.cr-tap` pointer floor.
+- Phase 5 — `@container` grid/breakpoints + exemplar components; retire `--text-*`.
+- Phase 6 — re-baseline visual snapshots; container-query visual test; docs page.
 
 ## Rollout (once direction is agreed)
 
