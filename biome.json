@@ -19,7 +19,8 @@
       "!coverage",
       "!examples",
       "!overrides",
-      "!components"
+      "!components",
+      "!lib/icons/pixel.ts"
     ]
   },
   "formatter": {
