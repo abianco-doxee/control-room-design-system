@@ -1,4 +1,5 @@
 import { useStore, For } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrSegmentedOption {
   value: string;
@@ -11,6 +12,11 @@ export interface CrSegmentedProps {
   value?: string;
   label?: string;
   onChange?: (value: string) => void;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" · "opt". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* Single-select segmented control — a connected button bar (role=radiogroup with
@@ -48,13 +54,16 @@ export default function CrSegmented(props: CrSegmentedProps) {
   });
 
   return (
-    <div class="cr-segmented" role="radiogroup" aria-label={props.label} onKeyDown={(event) => state.onKey(event)}>
+    <div {...ptAttrs(props.pt, "root")} data-part="root" class={ptClass(props.pt, props.unstyled, "cr-segmented", "root")} role="radiogroup" aria-label={props.label} style={ptStyle(props.pt, props.dt, "root")} onKeyDown={(event) => state.onKey(event)}>
       <For each={props.options}>
         {(opt: CrSegmentedOption, i: number) => (
           <button
+            {...ptAttrs(props.pt, "opt")}
             type="button"
             role="radio"
-            class="cr-segmented__opt"
+            data-part="opt"
+            data-state={props.value === opt.value ? "active" : "inactive"}
+            class={ptClass(props.pt, props.unstyled, "cr-segmented__opt", "opt")}
             data-value={opt.value}
             aria-checked={props.value === opt.value ? "true" : "false"}
             tabIndex={state.tabbable(i)}

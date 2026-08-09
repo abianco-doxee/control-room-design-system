@@ -1,7 +1,13 @@
 import { useStore } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrTelemetryProps {
   seed: string;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* A seeded FUI telemetry string — a NERV-style decorative readout (hex id, a
@@ -30,7 +36,7 @@ export default function CrTelemetry(props: CrTelemetryProps) {
   });
 
   return (
-    <span class="cr-telemetry" role="presentation" aria-hidden="true">
+    <span {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-telemetry", "root")} data-part="root" role="presentation" aria-hidden="true" style={ptStyle(props.pt, props.dt, "root")}>
       {state.line}
     </span>
   );

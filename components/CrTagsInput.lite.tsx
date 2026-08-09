@@ -1,4 +1,5 @@
 import { useStore, For } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrTagsInputProps {
   /** Seed tags. */
@@ -7,6 +8,11 @@ export interface CrTagsInputProps {
   /** Accessible name for the group + entry field. */
   label?: string;
   onChange?: (tags: string[]) => void;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root" · "list" · "tag" · "label" · "remove" · "input". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* TagsInput — enter a set of short tokens. Type and press Enter or "," to add a
@@ -47,13 +53,20 @@ export default function CrTagsInput(props: CrTagsInputProps) {
   });
 
   return (
-    <div class="cr-tags" role="group" aria-label={props.label || "Tags"}>
-      <ul class="cr-tags__list">
+    <div
+      {...ptAttrs(props.pt, "root")}
+      class={ptClass(props.pt, props.unstyled, "cr-tags", "root")}
+      data-part="root"
+      style={ptStyle(props.pt, props.dt, "root")}
+      role="group"
+      aria-label={props.label || "Tags"}
+    >
+      <ul {...ptAttrs(props.pt, "list")} class={ptClass(props.pt, props.unstyled, "cr-tags__list", "list")} data-part="list">
         <For each={state.tags}>
           {(tag: string, i: number) => (
-            <li class="cr-tags__tag">
-              <span class="cr-tags__label">{tag}</span>
-              <button type="button" class="cr-tags__remove" aria-label={"Remove " + tag} onClick={() => state.removeAt(i)}>
+            <li {...ptAttrs(props.pt, "tag")} class={ptClass(props.pt, props.unstyled, "cr-tags__tag", "tag")} data-part="tag">
+              <span {...ptAttrs(props.pt, "label")} class={ptClass(props.pt, props.unstyled, "cr-tags__label", "label")} data-part="label">{tag}</span>
+              <button {...ptAttrs(props.pt, "remove")} type="button" class={ptClass(props.pt, props.unstyled, "cr-tags__remove", "remove")} data-part="remove" aria-label={"Remove " + tag} onClick={() => state.removeAt(i)}>
                 ✕
               </button>
             </li>
@@ -61,7 +74,9 @@ export default function CrTagsInput(props: CrTagsInputProps) {
         </For>
       </ul>
       <input
-        class="cr-tags__input"
+        {...ptAttrs(props.pt, "input")}
+        class={ptClass(props.pt, props.unstyled, "cr-tags__input", "input")}
+        data-part="input"
         type="text"
         value={state.draft}
         placeholder={props.placeholder}

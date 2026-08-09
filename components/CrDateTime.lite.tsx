@@ -1,3 +1,5 @@
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+
 export interface CrDateTimeProps {
   value?: string;
   /** input type — datetime-local (default), date, or time. */
@@ -7,6 +9,11 @@ export interface CrDateTimeProps {
   max?: string;
   disabled?: boolean;
   onChange?: (value: string) => void;
+  /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root". */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* A styled native date/time input — the browser owns the picker, keyboard, and
@@ -14,8 +21,11 @@ export interface CrDateTimeProps {
 export default function CrDateTime(props: CrDateTimeProps) {
   return (
     <input
+      {...ptAttrs(props.pt, "root")}
       type={props.kind || "datetime-local"}
-      class="cr-datetime"
+      class={ptClass(props.pt, props.unstyled, "cr-datetime", "root")}
+      data-part="root"
+      style={ptStyle(props.pt, props.dt, "root")}
       value={props.value}
       min={props.min}
       max={props.max}

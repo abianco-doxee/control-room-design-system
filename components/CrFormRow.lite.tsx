@@ -1,4 +1,5 @@
 import { Show, For, onUpdate } from "@builder.io/mitosis";
+import { ptClass, ptAttrs } from "../lib/pt.ts";
 
 export interface CrFormRowProps {
   /** "group" · "array" · "item" · "field" — the render-list row kind. */
@@ -34,6 +35,12 @@ export interface CrFormRowProps {
   acLoading?: boolean;
   acItems?: { value: string; label: string }[];
   acActiveIdx?: number;
+  /* ── styling contract (portable pt/dt subset). Single wired part: "root" (the
+   * row wrapper). This is CrForm's internal presentational row, so pt/unstyled
+   * apply at the row level; the row keeps its computed paddingLeft style. */
+  unstyled?: boolean;
+  pt?: any;
+  dt?: any;
 }
 
 /* CrFormRow — the presentational half of CrForm. One render-list row (a field, a
@@ -69,7 +76,9 @@ export default function CrFormRow(props: CrFormRowProps) {
 
   return (
     <div
-      class={"cr-form__row cr-form__row--" + props.rowType + (props.rowType === "field" && props.error ? " cr-field--error" : "")}
+      {...ptAttrs(props.pt, "root")}
+      class={ptClass(props.pt, props.unstyled, "cr-form__row cr-form__row--" + props.rowType + (props.rowType === "field" && props.error ? " cr-field--error" : ""), "root")}
+      data-part="root"
       style={{ paddingLeft: props.padLeft }}
     >
       {/* group header */}
