@@ -1,4 +1,5 @@
 import { useStore } from "@builder.io/mitosis";
+import { PIXEL_ICONS } from "../lib/icons/pixel.ts";
 import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 /* Control Room icon set — the house operational glyphs.
@@ -9,11 +10,19 @@ import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
  * (aria-hidden); pass `label` to expose it as an image with an accessible name.
  *
  * Add an icon = add one entry to the path map below (keep it a single `d`, square
- * geometry). The map lives in a useStore getter so the Mitosis codegen keeps it. */
+ * geometry). The map lives in a useStore getter so the Mitosis codegen keeps it.
+ *
+ * `set` picks the pack: "cr" (default — the hand-authored geometric identity set,
+ * stroked) or "pixel" (the softer pixel-art escape hatch built from Iconify's
+ * pixelarticons, filled). Both are single-<path> on a 24×24 grid, so they render
+ * portably on all six targets. A theme/app opts a subtree into the soft style with
+ * <CrIcon set="pixel" />. Pixel falls back to the house glyph if a name is absent. */
 export interface CrIconProps {
   name: string;
   size?: number;
   label?: string;
+  /** Icon pack: "cr" (geometric, default) · "pixel" (soft pixel-art escape hatch). */
+  set?: "cr" | "pixel";
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root". */
   unstyled?: boolean;
@@ -49,7 +58,11 @@ export default function CrIcon(props: CrIconProps) {
         session: "M12 5 A3 3 0 1 0 12 11 A3 3 0 1 0 12 5 M6 20 V18 A6 6 0 0 1 18 18 V20",
         menu: "M4 7 H20 M4 12 H20 M4 17 H20",
       };
+      if (props.set === "pixel") return PIXEL_ICONS[props.name] || paths[props.name] || "";
       return paths[props.name] || "";
+    },
+    get pixel(): boolean {
+      return props.set === "pixel" && !!PIXEL_ICONS[props.name];
     },
   });
 
@@ -62,8 +75,9 @@ export default function CrIcon(props: CrIconProps) {
       width={props.size || 20}
       height={props.size || 20}
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
+      data-set={state.pixel ? "pixel" : "cr"}
+      fill={state.pixel ? "currentColor" : "none"}
+      stroke={state.pixel ? "none" : "currentColor"}
       stroke-width="2"
       stroke-linecap="square"
       stroke-linejoin="miter"

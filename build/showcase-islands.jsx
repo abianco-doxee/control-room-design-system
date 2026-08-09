@@ -1227,6 +1227,7 @@ const DEMOS = {
     tag: "CrIcon",
     defs: [
       T("enum", "name", "deploy", { options: ICON_NAMES }),
+      T("enum", "set", "cr", { options: ["cr", "pixel"] }),
       T("number", "size", 24, { min: 12, max: 48 }),
       T("text", "label", "deploy"),
     ],
@@ -1237,7 +1238,7 @@ const DEMOS = {
         h(
           "div",
           { style: { display: "flex", alignItems: "center", gap: "10px" } },
-          h(CrIcon, { name: s.name, size: s.size, label: s.label }),
+          h(CrIcon, { name: s.name, size: s.size, label: s.label, set: s.set }),
           h(
             "code",
             { style: { fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--muted)" } },
@@ -1271,7 +1272,7 @@ const DEMOS = {
                   color: "var(--ink)",
                 },
               },
-              h(CrIcon, { name: n, size: 22 }),
+              h(CrIcon, { name: n, size: 22, set: s.set }),
               h(
                 "span",
                 {
