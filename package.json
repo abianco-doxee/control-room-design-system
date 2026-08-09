@@ -223,6 +223,9 @@
   "dependencies": {
     "@control-room/components": "workspace:*",
     "@control-room/icons": "workspace:*",
+    "@control-room/mcp": "workspace:*",
+    "@control-room/skill": "workspace:*",
+    "@control-room/utils": "workspace:*",
     "@fontsource/archivo": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
     "arktype": "^2.2.3",
