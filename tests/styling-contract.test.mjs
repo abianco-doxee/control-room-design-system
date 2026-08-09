@@ -40,12 +40,31 @@ test("Tabs/Menu/Modal expose finer component tokens (dt is surgical)", () => {
   const root = readFileSync(join(ROOT, "dist", "control-room.css"), "utf8");
   const comp = readFileSync(join(ROOT, "styles", "components.css"), "utf8");
   const tokens = [
+    // spike three
     "--cr-tabs-indicator",
     "--cr-tabs-tab-active-fg",
     "--cr-menu-item-hover-bg",
     "--cr-menu-panel-bg",
     "--cr-modal-bg",
     "--cr-modal-backdrop",
+    // rollout: form controls (shared field group + per-control)
+    "--cr-field-bg",
+    "--cr-field-focus",
+    "--cr-switch-track-on",
+    "--cr-slider-thumb",
+    // rollout: overlays
+    "--cr-popover-bg",
+    "--cr-drawer-backdrop",
+    "--cr-tooltip-bg",
+    // rollout: data display (accent knobs)
+    "--cr-table-accent",
+    "--cr-segmented-accent-bg",
+    "--cr-stepper-accent-bg",
+    "--cr-avatar-bg",
+    // rollout: feedback + nav
+    "--cr-nav-active-bg",
+    "--cr-spinner-accent",
+    "--cr-skeleton-bg",
   ];
   for (const v of tokens) {
     assert.match(root, new RegExp(`${v}\\s*:`), `control-room.css defines ${v}`);

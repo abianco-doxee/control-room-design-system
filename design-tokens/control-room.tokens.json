@@ -599,6 +599,36 @@
         "com.doxee.cssVar": "--cr-nav-w"
       }
     },
+    "cr-nav-bg": {
+      "$value": "var(--rail)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-nav-bg"
+      }
+    },
+    "cr-nav-fg": {
+      "$value": "var(--rail-ink)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-nav-fg"
+      }
+    },
+    "cr-nav-border": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-nav-border"
+      }
+    },
+    "cr-nav-active-bg": {
+      "$value": "var(--sig-accent)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-nav-active-bg"
+      }
+    },
+    "cr-nav-active-fg": {
+      "$value": "var(--on-accent)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-nav-active-fg"
+      }
+    },
     "cr-tabs-border": {
       "$value": "var(--border)",
       "$extensions": {
@@ -1095,6 +1125,54 @@
       "$value": "var(--border)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-datagrid-border"
+      }
+    },
+    "cr-masthead-bg": {
+      "$value": "var(--panel)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-masthead-bg"
+      }
+    },
+    "cr-masthead-border": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-masthead-border"
+      }
+    },
+    "cr-masthead-accent": {
+      "$value": "var(--sig-accent)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-masthead-accent"
+      }
+    },
+    "cr-alert-bg": {
+      "$value": "var(--panel)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-alert-bg"
+      }
+    },
+    "cr-alert-border": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-alert-border"
+      }
+    },
+    "cr-spinner-track": {
+      "$value": "var(--panel-2)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-spinner-track"
+      }
+    },
+    "cr-spinner-accent": {
+      "$value": "var(--sig-work)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-spinner-accent"
+      }
+    },
+    "cr-skeleton-bg": {
+      "$value": "var(--panel-2)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-skeleton-bg"
       }
     }
   },
