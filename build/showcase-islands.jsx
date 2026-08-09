@@ -749,12 +749,15 @@ const DEMOS = {
   },
   toolbar: {
     tag: "CrToolbar",
-    defs: [T("enum", "orientation", "horizontal", { options: ["horizontal", "vertical"] })],
-    render: (s) => h(CrToolbar, { label: "editor actions", orientation: s.orientation },
-      h("button", { type: "button", className: "cr-btn cr-btn--outline cr-btn--sm" }, "bold"),
-      h("button", { type: "button", className: "cr-btn cr-btn--outline cr-btn--sm" }, "italic"),
-      h("button", { type: "button", className: "cr-btn cr-btn--outline cr-btn--sm" }, "link"),
-      h("button", { type: "button", className: "cr-btn cr-btn--outline cr-btn--sm" }, "code")),
+    defs: [T("boolean", "overflow", true), T("number", "width", 320, { min: 160, max: 640 })],
+    render: (s) => {
+      const acts = ["bold", "italic", "underline", "link", "code", "quote", "list", "image", "table"];
+      const items = acts.map((a) => ({ id: a, label: a, onSelect: () => {} }));
+      // A resizable frame proves the priority+ measure: shrink `width` and the
+      // buttons that no longer fit collapse into the "⋯ more" menu (ResizeObserver).
+      return h("div", { style: { width: (s.width || 320) + "px", maxWidth: "100%" } },
+        h(CrToolbar, { label: "editor actions", overflow: s.overflow, items }));
+    },
   },
   "file-upload": {
     tag: "CrFileUpload",
