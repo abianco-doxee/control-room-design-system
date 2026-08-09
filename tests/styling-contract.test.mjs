@@ -92,6 +92,13 @@ test("Tabs/Menu/Modal expose finer component tokens (dt is surgical)", () => {
     "--cr-nav-active-bg",
     "--cr-spinner-accent",
     "--cr-skeleton-bg",
+    // component-coverage additions (Rating/Timeline/Toolbar/FileUpload/Carousel/Calendar)
+    "--cr-rating-on",
+    "--cr-timeline-rail",
+    "--cr-toolbar-bg",
+    "--cr-fileupload-active-border",
+    "--cr-carousel-dot-active",
+    "--cr-calendar-selected-bg",
   ];
   for (const v of tokens) {
     assert.match(root, new RegExp(`${v}\\s*:`), `control-room.css defines ${v}`);

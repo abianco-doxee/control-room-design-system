@@ -39,6 +39,31 @@ for (const [target, spec] of Object.entries(TARGETS)) {
   });
 }
 
+// CrRating is the other keyboard-heavy pattern shipped in the component-coverage
+// batch — a roving-tabindex radiogroup. Assert the same contract in every target.
+const RATING = {
+  react:   { file: "react/components/CrRating.tsx",     keydown: /onKeyDown=/ },
+  vue:     { file: "vue/components/CrRating.vue",        keydown: /@keydown|onKeydown|v-on:keydown/i },
+  svelte:  { file: "svelte/components/CrRating.svelte",  keydown: /on:keydown/ },
+  solid:   { file: "solid/components/CrRating.jsx",      keydown: /onKeyDown=/ },
+  qwik:    { file: "qwik/components/CrRating.tsx",       keydown: /onKeyDown\$?=/ },
+  angular: { file: "angular/components/CrRating.js",     keydown: /\(keydown\)/ },
+};
+
+for (const [target, spec] of Object.entries(RATING)) {
+  test(`${target}: CrRating carries the radiogroup/roving contract`, () => {
+    const src = fw(spec.file);
+    // role is a dynamic expression here (readonly ⇒ img), so match the quoted
+    // literal (single- or double-quoted per target) rather than a `role=` prefix.
+    assert.match(src, /["']radiogroup["']/, `${target}: radiogroup role`);
+    assert.match(src, /["']radio["']/, `${target}: radio role`);
+    assert.match(src, /aria-checked/, `${target}: aria-checked state`);
+    assert.match(src, /tab-?index/i, `${target}: roving tabindex`);
+    assert.match(src, /data-part/, `${target}: data-part hook`);
+    assert.match(src, spec.keydown, `${target}: keydown handler wired (${spec.keydown})`);
+  });
+}
+
 test("angular: dt is applied via [ngStyle] (custom props reach setProperty)", () => {
   const src = fw("angular/components/CrTabs.js");
   // NgStyle._setStyle flags any key containing '-' as DashCase → renderer uses
