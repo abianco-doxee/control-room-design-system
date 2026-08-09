@@ -110,11 +110,17 @@ which is what let the earlier `{...(state.pta())}` post-processor patch be remov
   `setAttributes(...)` lines, leaving template HTML untouched. Surfacing the
   contract library-wide is what first exercised this (only Button had an
   esbuild-compiled Angular test before).
-- **`dt` custom-properties in a `style` object** survive on React/Vue/Svelte
-  (Svelte's `stringifyStyles` only kebab-cases uppercase, so `--sig-work` passes
-  through). **Angular** applies `style` via `setAttribute` and does **not** take a
-  CSS-variable style object — `dt` on Angular needs the scoped-`<style>` runtime
-  approach (see residue).
+- **`dt` custom-properties in a `style` object** survive on **all six targets**,
+  including Angular. Earlier notes flagged Angular as unable to take a CSS-variable
+  style object — that is **stale for the supported Angular (≥17)**. Verified from
+  the framework source: Mitosis binds `dt` as `[ngStyle]='ptStyle(pt, dt, "root")'`;
+  `NgStyle._setStyle` sets `RendererStyleFlags2.DashCase` whenever the key contains
+  a `-` (every `--cr-*` does), and the DOM renderer's `setStyle` then applies it via
+  `el.style.setProperty(name, value)` — the correct path for custom properties. No
+  scoped-`<style>` workaround is needed. (React uses the `style` object directly;
+  Vue/Svelte/Solid/Qwik pass custom props through their style bindings; Svelte's
+  `stringifyStyles` only kebab-cases uppercase, so `--sig-work` survives.) Guard:
+  `tests/cross-fw-contract.test.mjs` asserts the `[ngStyle]` dt binding on Angular.
 
 ## The escape hatch: per-target overrides
 
