@@ -39,23 +39,42 @@ emits (`data-pc-section`). Three props drive the rest:
 The token system has a **component tier** (`tokens/tokens.json → "component"`,
 emitted into `dist/control-room.css` as `--cr-<comp>-*`, each defaulting to a
 semantic/primitive token). `styles/components.css` consumes those vars, so `dt`
-can override one part/state without disturbing the global palette. Covered here
-(spike three); the pattern matches the pre-existing `--cr-btn-*` / `--cr-panel-*`
-/ `--cr-chip-*` groups and extends the same way to any component.
+can override one part/state without disturbing the global palette. The pattern
+matches the pre-existing `--cr-btn-*` / `--cr-panel-*` / `--cr-chip-*` groups and
+is now rolled out **library-wide** across the functional components.
 
-| Component | Tokens |
+Two conventions keep the token count small:
+
+- **Shared `field` group** — the text-control family (Input, Textarea, Select,
+  Combobox, NumberField, DateTime, Cron, Pin, TagsInput) reads one surface:
+  `--cr-field-bg/fg/border/placeholder/focus/error`. Retheme the whole form layer
+  once (mirrors PrimeVue's `form.field.*`).
+- **Single `accent` knob** — where a component's active/selected/indicator colour
+  came from a signal, one token drives every derived shade (e.g.
+  `--cr-table-accent` = sort indicator **and** selected-row tint). Same shape on
+  `--cr-tree-accent`, `--cr-accordion-accent`, `--cr-segmented-accent-bg`,
+  `--cr-stepper-accent-bg`, `--cr-pager-accent-bg`, `--cr-nav-active-bg`, …
+
+| Group | Representative tokens |
 | --- | --- |
-| Tabs | `--cr-tabs-border` · `--cr-tabs-tab-fg` · `--cr-tabs-tab-hover-fg` · `--cr-tabs-tab-active-fg` · `--cr-tabs-indicator` · `--cr-tabs-tab-pad-x/y` |
-| Menu | `--cr-menu-panel-bg` · `--cr-menu-panel-border` · `--cr-menu-item-fg` · `--cr-menu-item-hover-bg` · `--cr-menu-item-danger-fg` · `--cr-menu-item-pad-x/y` |
-| Modal | `--cr-modal-bg` · `--cr-modal-border` · `--cr-modal-backdrop`¹ · `--cr-modal-head-pad-x/y` · `--cr-modal-body-pad` |
+| Tabs / Menu / Modal | `--cr-tabs-indicator` · `--cr-menu-item-hover-bg` · `--cr-modal-backdrop`¹ |
+| Form field (shared) | `--cr-field-bg` · `--cr-field-fg` · `--cr-field-border` · `--cr-field-focus` · `--cr-field-error` |
+| Check / Switch / Radio / Slider | `--cr-check-checked` · `--cr-switch-track-on` · `--cr-radio-dot` · `--cr-slider-thumb` |
+| Popover / Drawer / Tooltip / HoverCard | `--cr-popover-bg` · `--cr-drawer-backdrop` · `--cr-tooltip-bg` · `--cr-hovercard-bg` |
+| Table / Tree / Accordion / Segmented | `--cr-table-accent` · `--cr-tree-accent` · `--cr-accordion-accent` · `--cr-segmented-accent-bg` |
+| Pager / Stepper / Avatar / Kbd / Breadcrumb / DataGrid | `--cr-pager-accent-bg` · `--cr-stepper-accent-bg` · `--cr-avatar-bg` · `--cr-kbd-bg` · `--cr-breadcrumb-current-fg` · `--cr-datagrid-bg` |
+| Nav / Masthead / Spinner / Skeleton / Alert | `--cr-nav-active-bg` · `--cr-masthead-accent` · `--cr-spinner-accent` · `--cr-skeleton-bg` · `--cr-alert-bg` (+ per-variant `--cr-alert-key`) |
 
-¹ `--cr-modal-backdrop`'s default lives in `:root` so the look is preserved
-everywhere; a per-instance `dt` override of the backdrop is best-effort — it
-relies on `::backdrop` inheriting from its `<dialog>`, which only modern browsers
-do.
+¹ `--cr-modal-backdrop` (and `--cr-drawer-backdrop`) default in `:root` so the look
+is preserved; a per-instance `dt` override of the backdrop is best-effort — it
+relies on `::backdrop` inheriting from its `<dialog>`, modern browsers only.
 
-Two guards in `tests/styling-contract.test.mjs` keep this honest: the token must
-be **defined** in `control-room.css` *and* **consumed** in `components.css` — if
+**Signal-driven components** (Tag, Tile, Meter, Progress, Toast) intentionally get
+no per-component tokens — their colour *is* the semantic signal, so retheme them
+through the signal tokens (`--sig-work`, `--sig-done`, …).
+
+Guards in `tests/styling-contract.test.mjs` keep this honest: each token must be
+**defined** in `control-room.css` *and* **consumed** in `components.css` — if
 either half reverts to a coarse global, surgical `dt` silently breaks and the test
 fails.
 

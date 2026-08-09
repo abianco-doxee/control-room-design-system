@@ -65,6 +65,25 @@ as PrimeVue's `dt` — e.g. Tabs: `--cr-tabs-indicator` (active underline),
 `--cr-modal-backdrop`. A component's `dt` prop sets exactly these on that one
 instance, so an override stays surgical (see `references/styling-contract.md`).
 
+Coverage is library-wide. Two conventions keep the surface small:
+
+- **Shared `field` group** — the text-control family (Input, Textarea, Select,
+  Combobox, NumberField, DateTime, Cron, Pin, TagsInput) reads one surface:
+  `--cr-field-bg`, `--cr-field-fg`, `--cr-field-border`, `--cr-field-placeholder`,
+  `--cr-field-focus`, `--cr-field-error`. Retheme the whole form layer in one place
+  (mirrors PrimeVue's `form.field.*`).
+- **Single `accent` knob** — where a component's active/selected/indicator colour
+  came from a signal, it's one token that drives every derived shade: e.g.
+  `--cr-table-accent` colours both the sort indicator and the selected-row tint;
+  `--cr-tree-accent`, `--cr-accordion-accent`, `--cr-segmented-accent-bg`,
+  `--cr-stepper-accent-bg`, `--cr-pager-accent-bg`, `--cr-nav-active-bg` follow the
+  same shape.
+
+Signal-driven components (Tag, Tile, Meter, Progress, Toast) intentionally have no
+per-component tokens — their colour *is* the semantic signal, so retheme them via
+the signal tokens (`--sig-work`, `--sig-done`, …). Alert is the hybrid: a base
+surface (`--cr-alert-bg`/`--cr-alert-border`) plus a per-variant `--cr-alert-key`.
+
 ## How theming works
 
 Themes are selected by `html[data-theme]`:
