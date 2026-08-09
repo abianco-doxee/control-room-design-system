@@ -251,7 +251,16 @@ ${componentsCss}
 .bar{position:sticky;top:0;z-index:10;display:flex;flex-wrap:wrap;gap:12px;align-items:center;
   background:var(--ground);padding:14px 0;border-bottom:var(--brd) solid var(--border);margin-bottom:8px;}
 .bar h1{font-weight:900;font-size:clamp(20px,3vw,30px);text-transform:uppercase;letter-spacing:-.038em;
-  line-height:.9;margin:0;flex:1;}
+  line-height:.9;margin:0;}
+.bar .brand{display:flex;flex-direction:column;gap:2px;}
+.bar a.home{font-family:var(--font-mono);font-size:11px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--muted);text-decoration:none;}
+.bar a.home:hover{color:var(--sig-accent);}
+.jump{display:flex;flex-wrap:wrap;gap:14px;align-items:center;flex:1;}
+.jump a{font-family:var(--font-mono);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--ink);text-decoration:none;border-bottom:2px dotted transparent;}
+.jump a:hover{border-bottom-color:var(--muted);color:var(--sig-accent);}
+.jump a.xlink{margin-left:auto;color:var(--muted);}
 .switch{display:inline-flex;border:var(--brd-heavy) solid var(--border);
   box-shadow:var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);}
 .switch button{font-family:var(--font-mono);font-weight:800;font-size:11px;text-transform:uppercase;
@@ -281,23 +290,32 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
 <div class="cr-scrollbar" aria-hidden="true"></div>
 <div class="wrap">
   <div class="bar">
-    <h1>Control Room · Living Gallery</h1>
+    <div class="brand">
+      <a class="home" href="./">◂ Control Room</a>
+      <h1>Living Gallery</h1>
+    </div>
+    <nav class="jump" aria-label="Sections">
+      <a href="#tokens">Tokens</a>
+      <a href="#type">Type</a>
+      <a href="#components">Components</a>
+      <a class="xlink" href="./components.html">Component Browser ↗</a>
+    </nav>
     <div class="switch" role="group" aria-label="Theme">
       ${THEMES.map((t, i) => `<button type="button" data-set="${t}" aria-pressed="${i === 0}">${t}</button>`).join("\n      ")}
     </div>
   </div>
-  <p class="note">Everything below is built from the generated token layer + the shipped <code>styles/components.css</code>. Flip the theme — nothing has per-theme code. <a class="back" href="./">◂ docs</a></p>
+  <p class="note">Everything below is built from the generated token layer + the shipped <code>styles/components.css</code>. Flip the theme — nothing has per-theme code.</p>
 
-  <h2>01 · Color tokens</h2>
+  <h2 id="tokens">01 · Color tokens</h2>
   ${swatchGroups}
 
-  <h2>02 · Typography — two registers, nothing between</h2>
+  <h2 id="type">02 · Typography — two registers, nothing between</h2>
   <div class="specimen">
     <div class="disp">14 sessions<br>2 need you</div>
     <div class="data">rev 2.6 // unit/cr-01 // up 4h12m // ◍ sync</div>
   </div>
 
-  <h2>03 · Components</h2>
+  <h2 id="components">03 · Components</h2>
   <div class="demogrid">
     <div style="grid-column:1/-1">
       <h3>Composed — an operator's screen (the whole vocabulary in one)</h3>

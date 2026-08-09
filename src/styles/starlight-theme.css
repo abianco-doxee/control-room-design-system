@@ -28,10 +28,12 @@
   --sl-color-accent-high: var(--sig-accent);
   --sl-color-text-accent: var(--sig-accent);
 
-  /* surfaces */
+  /* surfaces — all theme-flipping. NB: do NOT use --rail here; it's the app's
+   * intentionally-dark navigation rail (dark in every theme), which would leave
+   * the docs sidebar dark under the light theme. The docs chrome tracks the theme. */
   --sl-color-bg: var(--ground);
   --sl-color-bg-nav: var(--board);
-  --sl-color-bg-sidebar: var(--rail);
+  --sl-color-bg-sidebar: var(--board);
   --sl-color-bg-inline-code: var(--panel-2);
   --sl-color-bg-gutter: var(--board);
 

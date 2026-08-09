@@ -333,12 +333,19 @@ const islandsBundle = esbuild.buildSync({
 const entries = catalog.entries;
 const byCat = {};
 for (const e of entries) (byCat[e.category] ??= []).push(e);
-const cats = Object.keys(byCat).sort();
+// Deliberate reading order (primitives → actions → inputs → nav → surfaces →
+// feedback → data-viz → identity), not alphabetical; any unlisted category falls
+// to the end alphabetically so a new one still shows up.
+const CAT_ORDER = ["primitives", "action", "forms", "navigation", "overlay", "layout", "state", "media", "chart", "identity", "behavior"];
+const catRank = (c) => { const i = CAT_ORDER.indexOf(c); return i === -1 ? CAT_ORDER.length : i; };
+const cats = Object.keys(byCat).sort((a, b) => catRank(a) - catRank(b) || a.localeCompare(b));
+// entries within a category read alphabetically by name
+for (const c of cats) byCat[c].sort((a, b) => a.name.localeCompare(b.name));
 
 const indexHtml = cats
   .map(
     (c) =>
-      `<div class="idx__group"><div class="idx__cat">${c}</div>${byCat[c]
+      `<div class="idx__group"><div class="idx__cat">${c}<span class="idx__count">${byCat[c].length}</span></div>${byCat[c]
         .map((e) => `<a class="idx__link" href="#c-${e.id}">${e.name}</a>`)
         .join("")}</div>`,
   )
@@ -381,17 +388,22 @@ body { margin: 0; }
   padding: 12px 20px; background: var(--board); border-bottom: var(--brd-heavy) solid var(--border); }
 .top h1 { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; font-size: 20px; margin: 0; letter-spacing: -0.02em; }
 .top .sub { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.top a.home { font-family: var(--font-mono); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+.top a.home:hover { color: var(--sig-accent); }
+.top .brand { display: flex; flex-direction: column; gap: 2px; }
 .switch { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
 .switch button { font-family: var(--font-mono); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em;
   padding: 5px 10px; background: var(--panel); color: var(--muted); border: var(--brd) solid var(--border); cursor: pointer; }
 .switch button[aria-pressed="true"] { background: var(--sig-accent); color: var(--on-accent); }
 .top a.gallery { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--ink); text-decoration: none; border-bottom: 2px dotted var(--muted); }
 .wrap { display: grid; grid-template-columns: 220px 1fr; gap: 0; align-items: start; }
+/* chrome surfaces track the theme — use --board/--ink (not the app's always-dark --rail). */
 .idx { position: sticky; top: 61px; align-self: start; max-height: calc(100vh - 61px); overflow: auto;
-  padding: 16px; border-right: var(--brd) solid var(--border); background: var(--rail); }
+  padding: 16px; border-right: var(--brd) solid var(--border); background: var(--board); }
 .idx__group { margin-bottom: 14px; }
-.idx__cat { font-family: var(--font-mono); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 4px; }
-.idx__link { display: block; font-family: var(--font-mono); font-size: 12px; color: var(--rail-ink); text-decoration: none; padding: 2px 0; }
+.idx__cat { font-family: var(--font-mono); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 4px; display: flex; justify-content: space-between; gap: 8px; }
+.idx__count { color: var(--muted); font-weight: 700; }
+.idx__link { display: block; font-family: var(--font-mono); font-size: 12px; color: var(--ink); text-decoration: none; padding: 2px 0; }
 .idx__link:hover { color: var(--sig-accent); }
 main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
 .card { border: var(--brd) solid var(--border); background: var(--panel); padding: 16px; box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col); scroll-margin-top: 72px; }
@@ -449,7 +461,10 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
 </head>
 <body>
 <div class="top">
-  <h1>Component Browser</h1>
+  <div class="brand">
+    <a class="home" href="./">◂ Control Room</a>
+    <h1>Component Browser</h1>
+  </div>
   <span class="sub">${entries.length} components · exercised in all states</span>
   <a class="gallery" href="./gallery.html">Live Gallery ↗</a>
   <div class="switch" role="group" aria-label="Theme">
