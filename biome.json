@@ -20,7 +20,7 @@
       "!examples",
       "!overrides",
       "!components",
-      "!lib/icons/pixel.ts"
+      "!packages/icons/pixel.ts"
     ]
   },
   "formatter": {
