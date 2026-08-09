@@ -5,22 +5,22 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 74,
+    "count": 77,
     "categories": {
       "action": 1,
       "behavior": 1,
       "chart": 4,
-      "forms": 16,
+      "forms": 17,
       "identity": 3,
       "layout": 10,
       "media": 8,
-      "navigation": 7,
+      "navigation": 8,
       "overlay": 9,
       "primitives": 2,
-      "state": 13
+      "state": 14
     },
     "lifecycles": {
-      "stable": 73,
+      "stable": 76,
       "experimental": 1
     }
   },
@@ -914,6 +914,29 @@
         "multiline",
         "form"
       ]
+    },
+    {
+      "id": "toggle-chip",
+      "name": "ToggleChip",
+      "kind": "component",
+      "category": "forms",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Interactive multi-select filter pill (role=checkbox). Distinct from the static Chip and single-select Segmented; several toggle independently. On/off announced via aria-checked + data-state.",
+      "spec": "references/components.md#togglechip",
+      "variants": {
+        "state": [
+          "off",
+          "on"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-togglechip-on-bg",
+          "description": "ON-state fill (a state, not a per-option identity hue — Law 2)"
+        }
+      ],
+      "keywords": []
     },
     {
       "id": "avatar",
@@ -1850,6 +1873,24 @@
         "hierarchy",
         "ascii"
       ]
+    },
+    {
+      "id": "overflow",
+      "name": "Overflow",
+      "kind": "component",
+      "category": "navigation",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "An a11y-correct \"+N more\" disclosure for truncated lists; a button (aria-expanded) with onToggle, or an inert count. The accessible name always includes the noun.",
+      "spec": "references/components.md#overflow",
+      "variants": {
+        "mode": [
+          "toggle",
+          "static"
+        ]
+      },
+      "tokens": [],
+      "keywords": []
     },
     {
       "id": "pagination",
@@ -2807,6 +2848,19 @@
         "indeterminate",
         "bar"
       ]
+    },
+    {
+      "id": "relative-time",
+      "name": "RelativeTime",
+      "kind": "component",
+      "category": "state",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Relative-time display (\"5m ago\") as a semantic <time>; the clock is injected as a prop so SSR and client agree (no hydration flicker).",
+      "spec": "references/components.md#relative-time",
+      "variants": {},
+      "tokens": [],
+      "keywords": []
     },
     {
       "id": "session-row",
