@@ -1436,3 +1436,16 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-type-label  { font-family: var(--font-mono); font-size: var(--type-label-size); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); text-transform: uppercase; }
 .cr-type-meta   { font-family: var(--font-mono); font-size: var(--type-meta-size); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); }
 .cr-type-chrome { font-family: var(--font-mono); font-size: var(--type-chrome-size); font-weight: var(--type-chrome-weight); line-height: var(--type-chrome-leading); letter-spacing: var(--type-chrome-tracking); text-transform: uppercase; }
+
+/* ── Density (per-container) ──────────────────────────────────────────────
+ * Comfortable is the default (:root, from the token layer). Set
+ * data-density="compact" on ANY container and its subtree tightens — the
+ * component pad/gap tokens resolve through these aliases, so no component
+ * branches on density. Cascades, so it nests per-region. */
+[data-density="compact"] {
+  --pad: var(--space-2);
+  --pad-tight: var(--space-1);
+  --pad-loose: var(--space-3);
+  --gap: var(--space-2);
+  --gap-tight: var(--space-1);
+}
