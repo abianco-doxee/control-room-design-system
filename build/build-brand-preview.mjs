@@ -19,10 +19,13 @@ import { fileURLToPath } from "node:url";
 import { contrastRatio } from "@control-room/utils/theme";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const THEMES = join(ROOT, "dist", "themes");
-const BRANDS = join(ROOT, "brands");
+const THEMES = join(ROOT, "packages", "tokens", "dist", "themes");
+const BRANDS = join(ROOT, "packages", "tokens", "brands");
 
-const structureCss = readFileSync(join(ROOT, "dist", "structure.css"), "utf8");
+const structureCss = readFileSync(
+  join(ROOT, "packages", "tokens", "dist", "structure.css"),
+  "utf8"
+);
 const componentsCss = readFileSync(join(ROOT, "styles", "components.css"), "utf8");
 
 const BUILTIN = ["dark", "light", "extreme", "phosphor"];

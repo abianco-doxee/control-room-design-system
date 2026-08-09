@@ -13,4 +13,4 @@
  * Tailwind scans YOUR content for used utilities. For a ready-made utility file
  * without a build, use dist/utilities.css (npm run build:tw). */
 @import "tailwindcss";
-@import "../dist/tw-theme.css";
+@import "../packages/tokens/dist/tw-theme.css";

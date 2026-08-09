@@ -1,6 +1,32 @@
 {
   "name": "@control-room/tokens",
   "version": "1.0.0",
-  "private": true,
-  "type": "module"
+  "license": "UNLICENSED",
+  "type": "module",
+  "description": "Control Room design tokens — the single source of truth (tokens.json) for the CSS custom-property bundle, per-theme appearance layers, the structure layer, the Tailwind v4 @theme, the flat resolved map, the DTCG export, and the theme contract. Author brands without forking via brands/*.json.",
+  "files": ["tokens", "brands", "dist", "design-tokens"],
+  "exports": {
+    "./tokens.json": "./tokens/tokens.json",
+    "./css": "./dist/control-room.css",
+    "./structure.css": "./dist/structure.css",
+    "./themes/*": "./dist/themes/*",
+    "./theme-contract": "./dist/theme-contract.json",
+    "./tw-theme.css": "./dist/tw-theme.css",
+    "./flat": "./dist/tokens.flat.json",
+    "./dtcg": "./design-tokens/control-room.tokens.json"
+  },
+  "scripts": {
+    "build": "node build/build-tokens.mjs && node build/build-theme.mjs",
+    "build:tokens": "node build/build-tokens.mjs",
+    "build:theme": "node build/build-theme.mjs",
+    "build:palette": "node build/build-palette.mjs",
+    "verify": "node build/build-tokens.mjs --check && node build/build-theme.mjs --check && node build/build-palette.mjs --check",
+    "test": "node --test tests/theme.test.mjs"
+  },
+  "dependencies": {
+    "@control-room/utils": "1.0.0"
+  },
+  "devDependencies": {
+    "culori": "^4.0.2"
+  }
 }
