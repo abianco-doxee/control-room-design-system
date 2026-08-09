@@ -18,7 +18,8 @@ export interface CrTabsProps {
   unstyled?: boolean;
   /** Pass-through per part: `{ tab: { class, "data-testid", onMouseEnter, … } }`. */
   pt?: any;
-  /** Per-instance design tokens applied to the root: `{ "--sig-work": "#f0f" }`. */
+  /** Per-instance design tokens applied to the root, e.g.
+   *  `{ "--cr-tabs-indicator": "var(--sig-accent)" }`. */
   dt?: any;
 }
 
