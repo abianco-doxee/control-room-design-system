@@ -40,6 +40,8 @@ jobs:
         run: npm run test:pkg
       - name: Cross-framework runtime gate (Vue/Svelte/Solid SSR-render the output)
         run: npm run test:frameworks
+      - name: Styling-contract gate (pt/dt/unstyled coverage + finer tokens + util ports + responsive tokens)
+        run: npm run test:contract
       - name: Forms core gate (ArkType ⇄ JSON Schema + validation)
         run: npm run test:forms
       - name: Theme core gate (contract + brand validation + contrast)
