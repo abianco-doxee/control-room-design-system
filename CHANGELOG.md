@@ -8,75 +8,63 @@ the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Framework components (Mitosis)** — interactive components authored once as
+  `.lite.tsx` and compiled to six targets (React, Vue, Svelte, Angular, Solid,
+  Qwik), shipped as per-framework package exports with typed props. Guarded by
+  `verify:types`, `test:frameworks`, and `test:pkg`.
+- **Interactive component browser** — `public/components.html`: every component
+  mounted as a live React island and exercised across states, with a category
+  index and a live theme switch.
+- **Forms** — `CrForm`, a schema-driven form with ArkType ⇄ JSON-Schema
+  validation and per-field re-render isolation (`references/forms.md`).
+- **pt / dt / unstyled styling contract** — a PrimeVue-shaped styling API across
+  the functional component library (61 of 71): `unstyled` opt-out, `pt`
+  pass-through, and per-instance `dt` design tokens, with `data-part` /
+  `data-state` hooks. Backed by a shared `lib/pt.ts` and finer per-component
+  `--cr-<comp>-*` tokens (`references/styling-contract.md`).
+- **Theming & branding** — per-brand `data-theme` layers over the four base
+  themes (`references/theming.md`).
 - **Accessibility gate + visual regression (Playwright + axe-core)** —
   `test:a11y` fails CI on any serious/critical WCAG 2.1 A/AA violation across all
   four themes (hard gate, blocks deploy); `test:visual` snapshots the gallery per
   theme (informational; baselines in `tests/*-snapshots/`). Wired into
   `.github/workflows/deploy.yml`.
-- **`--on-err` token** — contrast-safe foreground for error (`--sig-err`) fills
-  (white in light, dark elsewhere).
-
-### Fixed
-
-- **Contrast (WCAG AA) across all four themes**, found by the new a11y gate:
-  light `--on-sig` corrected from white to dark (black passes on light signals);
-  phosphor `--muted` brightened (`#1f8c42` → `#2fac55`) to clear AA on panels;
-  the drip/error surfaces now use `--on-err` instead of hardcoded `#fff`; removed
-  contrast-eroding opacity on hero/drip sub-text.
-
 - **Shipped component layer** — `styles/components.css`: consumable `cr-`prefixed
-  component classes (`.cr-panel`, `.cr-btn`, `.cr-chip`, `.cr-tag`, `.cr-dot`,
-  `.cr-row`, `.cr-hero`, `.cr-bezel`, `.cr-rail`, `.cr-drip`) built entirely on
-  the token layer. Exposed via the `./components` package export; the living
-  gallery now consumes this exact file (single source — no separate demo CSS).
-
-### Changed
-
-- **Docs re-platformed to Astro + Starlight** (from VitePress) to match the Doxee
-  `Design-System-Hub` stack, enabling eventual fold-in. Reference Markdown is
-  generated into Starlight content by `build:content` (source of truth stays in
-  `references/`); a neon-noir skin maps `--sl-*` onto the Control Room tokens.
-  Astro output goes to `site-dist/`; Pages workflow updated accordingly.
-
-### Added
-
-- **Figma kit build guide** — `references/figma-kit-build.md`: create the Figma
-  file from scratch, near-automatic token import (DTCG → Figma Variables via
-  Tokens Studio), the neobrutalist component recipe, worked examples, and the
-  loop back to the catalog `figma` map.
-- **Figma token check in CI** — `.github/workflows/figma.yml` (manual
-  `workflow_dispatch`) validates `FIGMA_TOKEN` (a repo Actions secret) and can
-  list a file's top-level nodes, plus `scripts/figma-pull.mjs` / `npm run
-  figma:pull` for the same locally or in the Claude Code environment. No laptop
-  required — the token lives in the Claude Code env settings and/or an Actions
-  secret.
-- **Figma bridge (optional, free)** — `references/figma-bridge.md` + a `.mcp.json`
-  wiring the open-source Framelink Figma MCP (reads a read-only `FIGMA_TOKEN` from
-  env), an optional `figma` map on catalog entries (passed through by
-  `build:catalog`), and the node → component agent workflow. Reproduces Figma
-  Code Connect's result without a paid seat; secrets stay in env, never committed
-  (`.gitignore` blocks `.env*`/`*.pat`/`*.secret`; `.env.example` documents it).
+  component classes built entirely on the token layer, exposed via the
+  `./components` package export; the living gallery consumes this exact file.
 - **Component catalog** — `catalog/registry.json` (source) → `catalog/catalog.json`
   (generated, deterministic, drift-gated via `verify:catalog`), plus a rendered
-  catalog page. Mirrors the hub's registry → catalog model.
-- Brand fonts (Archivo, JetBrains Mono) bundled for the docs site.
-
-
+  catalog page.
 - **DTCG token export** — `design-tokens/control-room.tokens.json` in the Design
-  Tokens Community Group format with the `com.doxee.cssVar` extension, mirroring
-  the Doxee `Design-System-Hub` convention. Emitted by `build:tokens` and covered
-  by the `verify:tokens` drift gate.
+  Tokens Community Group format with the `com.doxee.cssVar` extension. Emitted by
+  `build:tokens` and covered by the `verify:tokens` drift gate.
 - **Multi-provider skill install** — `skills/manifest.json` +
   `scripts/skills-sync.mjs` (`skills:sync` / `skills:check`) install the skill
   into `.claude` / `.cursor` / `.opencode` from a single source, with a
   validity/drift gate wired into CI.
-- `metadata` (version / license / bundle) on the SKILL.md frontmatter.
+- **`--on-err` token** — contrast-safe foreground for error (`--sig-err`) fills.
+- Brand fonts (Archivo, JetBrains Mono) bundled for the docs site; `metadata`
+  (version / license / bundle) on the SKILL.md frontmatter.
+
+### Fixed
+
+- **Contrast (WCAG AA) across all four themes**, found by the a11y gate: light
+  `--on-sig` corrected from white to dark; phosphor `--muted` brightened
+  (`#1f8c42` → `#2fac55`); drip/error surfaces use `--on-err` instead of a
+  hardcoded `#fff`; removed contrast-eroding opacity on hero/drip sub-text.
+- **Docs chrome now tracks the theme** — the Starlight sidebar and the component-
+  browser index no longer use the always-dark `--rail`, so the menu is no longer
+  dark under the light theme.
 
 ### Changed
 
+- **Docs re-platformed to Astro + Starlight** (from VitePress) to match the Doxee
+  `Design-System-Hub` stack. Reference Markdown is generated into Starlight
+  content by `build:content` (source of truth stays in `references/`); a neon-noir
+  skin maps `--sl-*` onto the Control Room tokens. Astro output goes to
+  `site-dist/`; Pages workflow updated accordingly.
 - `dist/control-room.css` is now the generated runtime stylesheet; the
   hand-written `tokens/control-room.css` was removed to keep one source of truth.
-  Consumers now load `dist/control-room.css`.
 
 ## [1.0.0] — 2026-08-03
 

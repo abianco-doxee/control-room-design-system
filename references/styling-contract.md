@@ -139,7 +139,7 @@ hand-maintained and no longer tracks `CrTabs.lite.tsx`. Budget it for the few
 components/targets where native reactivity is worth it; it's the PrimeTek
 three-codebases cost, scoped.
 
-## Coverage vs PrimeVue — what this spike proves reachable
+## Coverage vs PrimeVue — what the portable layer reaches
 
 | Capability | Portable (one source) | Notes |
 | --- | --- | --- |

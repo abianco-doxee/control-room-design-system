@@ -248,7 +248,7 @@ defineForm({
 Cyclic `$ref` (a definition that references itself) is not expanded — the walker
 builds a finite Form Model, so model a recursive shape as a bounded nesting instead.
 
-### Autocomplete — searchable / async select
+### Autocomplete — searchable / async select {#autocomplete}
 
 A select can draw its options from a **source** instead of a fixed list — give a
 field `kind: "autocomplete"` and it renders a searchable combobox. The source is:

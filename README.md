@@ -19,13 +19,16 @@ control-room-design-system/
 ├── references/
 │   ├── design-language.md         # the NINE LAWS — the why + do/don't for every decision
 │   ├── tokens.md                  # token reference + OKLCH generation + how to consume
+│   ├── theming.md                 # theming & branding
 │   ├── components.md              # component library — spec + copy-ready markup per component
+│   ├── forms.md                   # forms — validation
 │   ├── motion.md                  # motion tiers, glitch/CRT vocabulary, scroll-bound, reduced-motion
 │   ├── accessibility.md           # WCAG 2.1 AA contract for the aesthetic
 │   ├── seeded-cat.md              # the identity+state pixel-cat generator (paint() contract)
 │   ├── seeded-sigil.md            # the seeded cyber-sigil pixel glyph
 │   ├── decoration.md             # ASCII/pixel decoration for dead space (the decorative-only contract)
 │   ├── frameworks.md             # Mitosis compile-to-many + the cn() helper
+│   ├── styling-contract.md        # pt / dt / unstyled styling contract
 │   └── tailwind.md               # Tailwind-first authoring (v4 @theme)
 ├── components/                    # Mitosis .lite.tsx SOURCES (author interactive components here)
 ├── tokens/
@@ -41,7 +44,7 @@ control-room-design-system/
 │   ├── control-room.css           # ready-to-use CSS custom properties, all 4 themes
 │   ├── tw-theme.css               # Tailwind v4 @theme (colors resolve to CSS vars)
 │   ├── tokens.flat.json           # resolved cssVar → value, per theme
-│   └── frameworks/                # compiled React/Vue/Svelte/Angular/Solid components
+│   └── frameworks/                # compiled React/Vue/Svelte/Angular/Solid/Qwik components
 ├── styles/
 │   ├── components.css             # the shipped component layer (.cr-* classes)
 │   └── tailwind.css               # Tailwind v4 entry (Tailwind-first authoring)
