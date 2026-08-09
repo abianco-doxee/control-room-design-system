@@ -1,6 +1,6 @@
 /* Control Room theme: light (GENERATED). Appearance layer only — pair with
  * dist/structure.css. Source: tokens/tokens.json → npm run build:tokens. */
-:root[data-theme="light"] {
+[data-theme="light"] {
   color-scheme: light;
   --ground: #eaeaf2;
   --board: #e2e2e9;

@@ -1,6 +1,6 @@
 /* Control Room theme: dark (GENERATED). Appearance layer only — pair with
  * dist/structure.css. Source: tokens/tokens.json → npm run build:tokens. */
-:root, :root[data-theme="dark"] {
+:root, [data-theme="dark"] {
   color-scheme: dark;
   --ground: #0f0327;
   --board: #15092f;

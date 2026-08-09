@@ -4,7 +4,7 @@
  * Themes select via html[data-theme]: dark (default) | light | extreme | phosphor
  * ==========================================================================*/
 
-:root, :root[data-theme="dark"] {
+:root, [data-theme="dark"] {
   color-scheme: dark;
   --space-0: 0;
   --space-1: 4px;
@@ -283,7 +283,7 @@
   --field: repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
 }
 
-:root[data-theme="light"] {
+[data-theme="light"] {
   color-scheme: light;
   --ground: #eaeaf2;
   --board: #e2e2e9;
@@ -318,7 +318,7 @@
   --field: repeating-conic-gradient(rgba(0,0,0,0.045) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
 }
 
-:root[data-theme="extreme"] {
+[data-theme="extreme"] {
   color-scheme: dark;
   --ground: #150021;
   --board: #20012e;
@@ -362,7 +362,7 @@
   --shadow-off-lg: 9px;
 }
 
-:root[data-theme="phosphor"] {
+[data-theme="phosphor"] {
   color-scheme: dark;
   --ground: #020a04;
   --board: #041207;

@@ -1,6 +1,6 @@
 /* Control Room theme: extreme (GENERATED). Appearance layer only — pair with
  * dist/structure.css. Source: tokens/tokens.json → npm run build:tokens. */
-:root[data-theme="extreme"] {
+[data-theme="extreme"] {
   color-scheme: dark;
   --ground: #150021;
   --board: #20012e;
