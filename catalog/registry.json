@@ -2955,6 +2955,54 @@
         "resize",
         "panels"
       ]
+    },
+    {
+      "id": "toggle-chip",
+      "name": "ToggleChip",
+      "category": "forms",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Interactive multi-select filter pill (role=checkbox). Distinct from the static Chip and single-select Segmented; several toggle independently. On/off announced via aria-checked + data-state.",
+      "spec": "references/components.md#togglechip",
+      "variants": {
+        "state": [
+          "off",
+          "on"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-togglechip-on-bg",
+          "description": "ON-state fill (a state, not a per-option identity hue — Law 2)"
+        }
+      ]
+    },
+    {
+      "id": "overflow",
+      "name": "Overflow",
+      "category": "navigation",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "An a11y-correct \"+N more\" disclosure for truncated lists; a button (aria-expanded) with onToggle, or an inert count. The accessible name always includes the noun.",
+      "spec": "references/components.md#overflow",
+      "variants": {
+        "mode": [
+          "toggle",
+          "static"
+        ]
+      },
+      "tokens": []
+    },
+    {
+      "id": "relative-time",
+      "name": "RelativeTime",
+      "category": "state",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Relative-time display (\"5m ago\") as a semantic <time>; the clock is injected as a prop so SSR and client agree (no hydration flicker).",
+      "spec": "references/components.md#relative-time",
+      "variants": {},
+      "tokens": []
     }
   ]
 }
