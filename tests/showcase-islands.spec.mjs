@@ -576,4 +576,28 @@ test.describe("component browser — live islands", () => {
     const spinner = page.locator('[data-island="spinner"]').getByRole("status");
     await expect(spinner).toHaveAttribute("aria-label", /Provisioning/);
   });
+
+  test("resizable: separator exposes its value and resizes with the keyboard", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const sep = page.locator('[data-island="resizable"]').getByRole("separator");
+    await expect(sep).toHaveAttribute("aria-orientation", "vertical"); // horizontal split
+    const before = Number(await sep.getAttribute("aria-valuenow"));
+    await sep.focus();
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    const after = Number(await sep.getAttribute("aria-valuenow"));
+    expect(after).toBeGreaterThan(before); // grew ~4% and stayed within clamps
+    expect(after).toBeLessThanOrEqual(90);
+  });
+
+  test("scroll-area: a labelled region that actually scrolls", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const sa = page.locator('[data-island="scroll-area"] .cr-scroll');
+    await expect(sa).toHaveAttribute("role", "group");
+    await expect(sa).toHaveAttribute("aria-label", /Log output/);
+    const overflows = await sa.evaluate((el) => el.scrollHeight > el.clientHeight + 1);
+    expect(overflows, "content exceeds the capped height → scrolls").toBe(true);
+  });
 });

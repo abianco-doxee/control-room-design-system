@@ -5,14 +5,14 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 72,
+    "count": 74,
     "categories": {
       "action": 1,
       "behavior": 1,
       "chart": 4,
       "forms": 16,
       "identity": 3,
-      "layout": 8,
+      "layout": 10,
       "media": 8,
       "navigation": 7,
       "overlay": 9,
@@ -20,7 +20,7 @@
       "state": 13
     },
     "lifecycles": {
-      "stable": 71,
+      "stable": 73,
       "experimental": 1
     }
   },
@@ -1349,6 +1349,74 @@
         "container",
         "surface",
         "box"
+      ]
+    },
+    {
+      "id": "resizable",
+      "name": "Resizable",
+      "kind": "component",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Two panes with a draggable divider. Panes are children (CSS-grid sized); the handle is a WAI-ARIA window splitter (role=separator, focusable, aria-valuenow, arrow/Home/End keys). Pointer-capture drag.",
+      "spec": "references/components.md#resizable",
+      "variants": {
+        "orientation": [
+          "horizontal",
+          "vertical"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--border",
+          "description": "divider + frame"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "active divider"
+        }
+      ],
+      "keywords": [
+        "resizable",
+        "splitter",
+        "split pane",
+        "divider",
+        "resize",
+        "panels"
+      ]
+    },
+    {
+      "id": "scroll-area",
+      "name": "ScrollArea",
+      "kind": "component",
+      "category": "layout",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "A container with cross-browser styled scrollbars (thin, inked, neon thumb) that keep the Control Room look. Keyboard-scrollable; with a label it's a named role=group.",
+      "spec": "references/components.md#scroll-area",
+      "variants": {
+        "axis": [
+          "y",
+          "x",
+          "both"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--sig-work",
+          "description": "scrollbar thumb"
+        },
+        {
+          "cssVar": "--panel-2",
+          "description": "scrollbar track"
+        }
+      ],
+      "keywords": [
+        "scroll area",
+        "scrollbar",
+        "overflow",
+        "scroll",
+        "viewport"
       ]
     },
     {
