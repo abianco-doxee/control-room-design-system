@@ -1,0 +1,86 @@
+# Styling contract — pt / dt / unstyled (spike)
+
+A PrimeVue-shaped styling API on the Mitosis single-source model, prototyped on
+**Tabs, Menu, Modal**. Everything here is verified against the compiled output of
+all six targets (`npm run build:components`) and SSR/e2e tests.
+
+## The portable layer (one `.lite` source → all six targets)
+
+Every styled part carries a stable **`data-part`** (and, where it has state, a
+**`data-state`**) so you can target internals from CSS without depending on our
+`cr-*` class names — the Ark/Radix-style hook, and exactly what PrimeVue's base
+emits (`data-pc-section`). Three props drive the rest:
+
+- **`unstyled`** — drop the `cr-*` classes on this instance (behavior + a11y +
+  `data-part` stay). Global unstyled = just don't import `styles/components.css`.
+- **`pt`** (pass-through) — per part: `pt={{ tab: { class, style, "data-testid", … } }}`.
+  `class` is **merged** with the base class; `style` is applied to the part; every
+  other key (attributes, and handlers for events the component doesn't own) is
+  **spread** onto the part. Parts are documented per component (e.g. Tabs:
+  `root` · `tab`).
+- **`dt`** (design tokens) — a map of CSS custom properties applied to the root and
+  inherited by the parts: `dt={{ "--sig-work": "#f0f" }}`. Instance-scoped token
+  override, same idea as PrimeVue's `dt`, at the granularity our tokens expose.
+
+```tsx
+<CrTabs
+  tabs={["A","B"]} active={1}
+  unstyled                                   // no cr-* on this instance
+  pt={{ tab: { class: "px-3", "data-testid": "tab" } }}
+  dt={{ "--sig-work": "oklch(0.7 0.2 320)" }}
+/>
+```
+
+Implementation is three tiny store helpers per component — `cls()` (unstyled +
+class-merge), `pta()` (spread the bag minus class/style), `partStyle()` (dt + pt
+style). In production these would be one shared helper.
+
+### Two Mitosis codegen quirks this required (both patched, not worked around in userland)
+
+- **React doesn't state-process a store call inside a JSX spread** — it emits
+  `{...(state.pta(...))}` where `state` doesn't exist. `build/build-fix-react.mjs`
+  strips the `state.` (the React post-processor already fixes similar quirks).
+- **`dt` custom-properties in a `style` object** survive on React/Vue/Svelte
+  (Svelte's `stringifyStyles` only kebab-cases uppercase, so `--sig-work` passes
+  through). **Angular** applies `style` via `setAttribute` and does **not** take a
+  CSS-variable style object — `dt` on Angular needs the scoped-`<style>` runtime
+  approach (see residue).
+
+## The escape hatch: per-target overrides
+
+Where the portable layer can't reach full native fidelity, Mitosis lets you
+hand-write a whole file for one target that **replaces** the generated output:
+drop it at `overrides/<target>/components/<Name>.<ext>` and `build:components` uses
+it verbatim for that target only.
+
+`overrides/vue/components/CrTabs.vue` demonstrates the corners the single source
+can't do, using Vue's own primitives:
+
+- **function-form pt** reactive to internal state: `pt.tab = ({ active }) => ({...})`
+- **listener chaining** via Vue `mergeProps` (consumer `onClick` runs *and*
+  selection still fires)
+- **global pt** via `inject('crGlobalPT', …)` (app-level defaults)
+
+Verified: after one build, Vue's `CrTabs` is the override; React/Svelte/Solid/Qwik/
+Angular are generated from `CrTabs.lite.tsx` (see `tests/styling-contract.test.mjs`).
+
+**Cost:** an override is a full replacement, not a patch — that file is now
+hand-maintained and no longer tracks `CrTabs.lite.tsx`. Budget it for the few
+components/targets where native reactivity is worth it; it's the PrimeTek
+three-codebases cost, scoped.
+
+## Coverage vs PrimeVue — what this spike proves reachable
+
+| Capability | Portable (one source) | Notes |
+| --- | --- | --- |
+| `data-part` / `data-state` hooks | ✅ | every part, every target |
+| `unstyled` (global + per-instance) | ✅ | |
+| `pt`: merge class, set style, inject attrs | ✅ | class merged; attrs spread |
+| `pt`: inject handlers | ⚠️ | works, but key casing isn't uniform (React `onClick` vs Svelte `onclick`); no chaining |
+| `dt`: instance token override | ✅ (React/Vue/Svelte/Solid/Qwik) | Angular needs scoped-`<style>` runtime |
+| `pt` function-form (state-reactive attrs) | ❌ portable → ✅ via override | Qwik async blocks it from one source |
+| listener **chaining** / global pt | ❌ portable → ✅ via override | native framework primitives |
+
+Net: the ~90%-by-usage (hooks, unstyled, class/style/attr merge, instance tokens)
+is one portable source; the reactive/native corners are a budgeted per-target
+override.

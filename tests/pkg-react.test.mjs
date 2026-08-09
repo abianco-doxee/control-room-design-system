@@ -72,3 +72,23 @@ test("CrFormRow ships wrapped in React.memo (per-field render isolation guard)",
   assert.match(formJs, /from "\.\/CrFormRow\.js"/, "CrForm imports the compiled CrFormRow");
   assert.match(formJs, /onFormInput|onInput/, "CrForm attaches a delegated input listener");
 });
+
+test("pt / dt / unstyled styling contract (portable subset) on CrTabs", () => {
+  // unstyled drops cr-* but keeps data-part; pt merges a class + injects an attr;
+  // dt sets a CSS custom property on the root; data-state reflects the active tab.
+  const html = renderToStaticMarkup(
+    createElement(CR.CrTabs, {
+      tabs: ["A", "B"],
+      active: 1,
+      unstyled: true,
+      pt: { tab: { class: "mine", "data-testid": "tab" } },
+      dt: { "--sig-work": "#ff00ff" },
+    }),
+  );
+  assert.doesNotMatch(html, /cr-tab\b/, "unstyled drops the cr-* class");
+  assert.match(html, /data-part="root"/, "parts expose data-part");
+  assert.match(html, /class="mine"/, "pt class is applied (merged onto the bare base)");
+  assert.match(html, /data-testid="tab"/, "pt injects arbitrary attributes into the part");
+  assert.match(html, /--sig-work:\s*#ff00ff/, "dt sets a scoped CSS custom property on the root");
+  assert.match(html, /data-state="active"/, "active tab reflects data-state");
+});
