@@ -76,6 +76,7 @@ export default defineConfig({
             { label: "Design Language — the 9 laws", link: "/reference/design-language/" },
             { label: "Tokens", link: "/reference/tokens/" },
             { label: "Theming & Branding", link: "/reference/theming/" },
+            { label: "Responsive Architecture", link: "/reference/responsive/" },
             { label: "Tailwind-first", link: "/reference/tailwind/" },
             { label: "Motion", link: "/reference/motion/" },
             { label: "Accessibility", link: "/reference/accessibility/" },
