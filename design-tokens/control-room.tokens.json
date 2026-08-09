@@ -838,6 +838,78 @@
       "$extensions": {
         "com.doxee.cssVar": "--cr-combobox-opt-active-fg"
       }
+    },
+    "cr-popover-bg": {
+      "$value": "var(--panel)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-popover-bg"
+      }
+    },
+    "cr-popover-fg": {
+      "$value": "var(--ink)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-popover-fg"
+      }
+    },
+    "cr-popover-border": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-popover-border"
+      }
+    },
+    "cr-drawer-bg": {
+      "$value": "var(--panel)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-drawer-bg"
+      }
+    },
+    "cr-drawer-border": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-drawer-border"
+      }
+    },
+    "cr-drawer-backdrop": {
+      "$value": "color-mix(in srgb, var(--mass) 72%, transparent)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-drawer-backdrop"
+      }
+    },
+    "cr-tooltip-bg": {
+      "$value": "var(--panel-2)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-tooltip-bg"
+      }
+    },
+    "cr-tooltip-fg": {
+      "$value": "var(--ink)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-tooltip-fg"
+      }
+    },
+    "cr-tooltip-border": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-tooltip-border"
+      }
+    },
+    "cr-hovercard-bg": {
+      "$value": "var(--panel)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-hovercard-bg"
+      }
+    },
+    "cr-hovercard-fg": {
+      "$value": "var(--ink)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-hovercard-fg"
+      }
+    },
+    "cr-hovercard-border": {
+      "$value": "var(--border)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-hovercard-border"
+      }
     }
   },
   "theme": {
