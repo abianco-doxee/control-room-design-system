@@ -53,20 +53,40 @@ All six workspaces are extracted and independently publishable under `@control-r
 the packages, so existing `@control-room/design-system/*` consumers are unchanged. Cross-
 package references use `@control-room/<pkg>` specifiers throughout.
 
-### Release-readiness & scope decisions
+## Publishing
 
-Blocking a real release (deferred by the team — see the release checklist):
+The publish model is **GitHub Packages** (`npm.pkg.github.com`), wired end-to-end:
 
-- **Publish story.** The install docs (`npm i @control-room/*`, `npx @control-room/mcp`,
-  `npx @control-room/skill`, `/plugin install`) all assume a registry, but the repo is
-  configured **private / no-publish** (`.changeset` `access: restricted`, `release.yml` has
-  no publish step, `license: UNLICENSED`). Decision needed: publish to public npm, a private
-  registry (GitHub Packages), or keep private and reframe the install docs.
-- **Pre-split changeset queue.** The ~85 changesets predating the split all name
-  `@control-room/design-system` (now the private workspace root Changesets no longer tracks),
-  so `changeset status` / the Version Packages PR error. Their content is preserved in this
-  CHANGELOG's `[Unreleased]` section and in git. Reconcile at release time — remove the
-  vestigial pre-1.0 queue (recommended) or re-point them — once the publish model is chosen.
+- **Package manager: pnpm** (`pnpm-workspace.yaml`, `packageManager: pnpm@…`). This is
+  what makes the `workspace:*` cross-package specifiers resolve — npm rejects that
+  protocol. `.npmrc` sets `node-linker=hoisted` (so the build's `require.resolve` /
+  bare-import assumptions keep working over a flat layout), `enable-pre-post-scripts`,
+  and `link-workspace-packages`.
+- **Registry.** `.npmrc` maps `@control-room:registry=https://npm.pkg.github.com`, and
+  each publishable package carries `publishConfig.registry`. Because internal deps are
+  `workspace:*`, install always links locally and never fetches the scope from the
+  registry — the mapping only takes effect at publish time.
+- **Changesets.** `changeset version` bumps versions + writes each package's CHANGELOG;
+  `changeset publish` (root `release` script) publishes the bumped, non-private packages.
+  `.github/workflows/release.yml` runs both through `changesets/action`: a push to `main`
+  with pending changesets opens/updates the **Version Packages** PR; merging it publishes.
+  CI injects the token via `setup-node` (`registry-url` + `NODE_AUTH_TOKEN`), and the job
+  holds `packages: write`.
+- **Pre-split changeset queue — resolved.** The ~85 changesets predating the split named
+  `@control-room/design-system` (the private workspace root, which is not a workspace
+  member, so Changesets errored on it). Their content is preserved in this CHANGELOG's
+  `[Unreleased]` section and in git history; the vestigial queue has been removed. The
+  three post-split changesets that target real packages remain, so `changeset status` is
+  green and the first Version Packages PR bumps the seven publishable packages.
+
+**One prerequisite before the first publish succeeds.** GitHub Packages ties an npm scope
+to a GitHub org/user of the *same name*, so `@control-room/*` can only be published under a
+`control-room` org. This repo's owner is the user `alebianco`, so publishing under
+`@control-room` needs a (free) `control-room` GitHub org to own the repo — or the scope to
+be renamed to match the owner. This is an infra/ownership step, not a code change: until
+it's done, the Version Packages PR still opens and versions still bump correctly; only the
+publish-on-merge step needs the scope. The scope was **not** renamed unilaterally because
+it is the product's identity and pervades the docs, MCP data, and skill bundle.
 
 Deliberate scope (not defects):
 
