@@ -96,9 +96,14 @@
       "category": "action",
       "lifecycle": "stable",
       "origin": "control-room",
-      "description": "WAI-ARIA toolbar — a labelled group of the operator's own controls with a single tab stop and roving-tabindex arrow navigation (horizontal or vertical).",
+      "description": "WAI-ARIA toolbar — a labelled group of controls with a single tab stop and roving-tabindex arrows. Two modes: wrap your own controls as children, or pass items[] and (with overflow) collapse the buttons that don't fit into a “⋯ more” menu (priority+, measured via ResizeObserver).",
       "spec": "references/components.md#toolbar",
       "variants": {
+        "mode": [
+          "children",
+          "items",
+          "items + overflow"
+        ],
         "orientation": [
           "horizontal",
           "vertical"
