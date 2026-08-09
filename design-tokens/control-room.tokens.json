@@ -732,19 +732,19 @@
   },
   "component": {
     "cr-btn-pad-x": {
-      "$value": "var(--space-4)",
+      "$value": "var(--pad-loose)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-btn-pad-x"
       }
     },
     "cr-btn-pad-y": {
-      "$value": "var(--space-2)",
+      "$value": "var(--pad-tight)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-btn-pad-y"
       }
     },
     "cr-btn-gap": {
-      "$value": "var(--space-2)",
+      "$value": "var(--gap-tight)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-btn-gap"
       }
@@ -768,7 +768,7 @@
       }
     },
     "cr-panel-pad": {
-      "$value": "var(--space-3)",
+      "$value": "var(--pad)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-panel-pad"
       }
@@ -780,13 +780,13 @@
       }
     },
     "cr-panel-gap": {
-      "$value": "var(--space-3)",
+      "$value": "var(--gap)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-panel-gap"
       }
     },
     "cr-chip-pad-x": {
-      "$value": "var(--space-2)",
+      "$value": "var(--pad-tight)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-chip-pad-x"
       }
@@ -810,19 +810,19 @@
       }
     },
     "cr-row-pad-y": {
-      "$value": "var(--space-2)",
+      "$value": "var(--pad-tight)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-row-pad-y"
       }
     },
     "cr-row-gap": {
-      "$value": "var(--space-3)",
+      "$value": "var(--gap)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-row-gap"
       }
     },
     "cr-hero-pad": {
-      "$value": "var(--space-4)",
+      "$value": "var(--pad-loose)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-hero-pad"
       }
@@ -913,13 +913,13 @@
       }
     },
     "cr-tabs-tab-pad-x": {
-      "$value": "var(--space-4)",
+      "$value": "var(--pad-loose)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-tabs-tab-pad-x"
       }
     },
     "cr-tabs-tab-pad-y": {
-      "$value": "var(--space-2)",
+      "$value": "var(--pad-tight)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-tabs-tab-pad-y"
       }
@@ -955,7 +955,7 @@
       }
     },
     "cr-menu-item-pad-x": {
-      "$value": "var(--space-2)",
+      "$value": "var(--pad-tight)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-menu-item-pad-x"
       }
@@ -985,19 +985,19 @@
       }
     },
     "cr-modal-head-pad-x": {
-      "$value": "var(--space-4)",
+      "$value": "var(--pad-loose)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-modal-head-pad-x"
       }
     },
     "cr-modal-head-pad-y": {
-      "$value": "var(--space-3)",
+      "$value": "var(--pad)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-modal-head-pad-y"
       }
     },
     "cr-modal-body-pad": {
-      "$value": "var(--space-4)",
+      "$value": "var(--pad-loose)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-modal-body-pad"
       }
