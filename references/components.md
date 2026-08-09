@@ -1699,3 +1699,104 @@ name). The set: `play · pause · stop · retry · deploy · scan · search · a
 error · done · clock · cpu · logs · filter · sliders · close · chevron · plus ·
 minus · trash · external · copy · session · menu`. Add one by adding a single-`d`,
 square-geometry path to the map in `components/CrIcon.lite.tsx`.
+
+## Stepper {#stepper}
+
+**Purpose** — show progress through a multi-step flow (the shape the forms
+guidance points to when a long form is split into steps).
+
+**Anatomy** — an ordered list (`<ol>`); each item has a numbered/checked **dot**
+and a **label** (optional hint). Steps are `upcoming` · `active` · `done` by index
+vs `active`; the current item carries `aria-current="step"` and done items show a
+check. Pass `onStep` to make each step a `<button>` (a navigable stepper); omit it
+for a read-only indicator.
+
+```tsx
+<CrStepper steps={[{ label: "Source" }, { label: "Limits" }, { label: "Review" }]} active={1} />
+<CrStepper steps={steps} active={i} onStep={(n) => goTo(n)} />
+```
+
+**Tokens** — `--sig-work` (active dot), `--sig-done` (done dot), `--muted`
+(upcoming), `--border` (connector). **A11y** — ordered list; `aria-current="step"`
+on the active step; navigable variant uses real buttons (native focus/activation).
+
+## Pin input {#pin-input}
+
+**Purpose** — enter a one-time code / PIN as a row of single-digit cells that
+behave as one field.
+
+**Behaviour** — typing a digit advances focus; Backspace on an empty cell steps
+back; `←`/`→` move; a paste distributes across cells. `length` sets the cell count
+(default 6). `onChange` fires with the partial code, `onComplete` when full.
+
+```tsx
+<CrPinInput length={6} onComplete={(code) => verify(code)} />
+```
+
+**Tokens** — `--panel-2` (cell fill), `--border`, `--sig-work` (focused cell).
+**A11y** — `role="group"` with a label ("Verification code"); each cell is a
+numeric input with its own "Digit N" label; the first opts into
+`autocomplete="one-time-code"` so platforms can offer the SMS code.
+
+## Tags input {#tags-input}
+
+**Purpose** — build a set of short tokens (labels, regions, emails).
+
+**Behaviour** — type then **Enter** or **comma** to add; **Backspace** on an empty
+field removes the last tag; each tag has its own remove button. Duplicates are
+ignored. `value` seeds the tags; `onChange` reports the array.
+
+```tsx
+<CrTagsInput label="Regions" value={["eu-west"]} onChange={(tags) => setRegions(tags)} />
+```
+
+**Tokens** — `--panel` (tag fill), `--border`, `--sig-err` (remove hover).
+**A11y** — `role="group"` with a label; the entry is a labelled input; every
+remove button names its tag (`Remove <tag>`).
+
+## Input group {#input-group}
+
+**Purpose** — an input flanked by decorative **prefix / suffix** addons (a
+protocol, a currency, a unit).
+
+**Notes** — addons are `aria-hidden` so they don't muddy the accessible name; give
+the field a `label` (rendered as `aria-label`). For a validated field with its own
+label/hint/error, use **Field** or **Form** instead.
+
+```tsx
+<CrInputGroup label="Endpoint" prefix="https://" placeholder="eu.example.com" />
+<CrInputGroup label="Memory" suffix="GB" type="number" />
+```
+
+**Tokens** — `--panel-2` (addon fill), `--border`, `--muted` (addon text).
+
+## Avatar {#avatar}
+
+**Purpose** — represent a person or entity with an image, falling back to initials.
+
+**Anatomy** — with a `src` it renders `<img alt={name}>`; without one the wrapper
+becomes `role="img"` with `aria-label={name}` over the derived initials (which are
+`aria-hidden`, so the name isn't announced twice). An optional presence **status**
+dot is a labelled `role="img"`. `size` is `sm` · `md` · `lg`.
+
+```tsx
+<CrAvatar name="Ada Lovelace" src="/ada.png" status="online" />
+<CrAvatar name="Grace Hopper" status="idle" size="lg" />
+```
+
+**Tokens** — `--panel-2` (fallback fill), `--border` (ring), `--sig-done`/`--sig-wait`/`--sig-err`/`--muted` (status).
+
+## Spinner {#spinner}
+
+**Purpose** — signal an indeterminate wait (unknown duration). For a known
+fraction use **Progress**; for a static capacity reading use **Meter**.
+
+**Notes** — the wrapper is `role="status"` with an accessible `label` (default
+"Loading") so assistive tech announces the wait; the ring is `aria-hidden` and its
+spin honours `prefers-reduced-motion`. `size` is `sm` · `md` · `lg`.
+
+```tsx
+<CrSpinner label="Provisioning session" />
+```
+
+**Tokens** — `--sig-work` (ring sweep), `--panel-2` (ring track).

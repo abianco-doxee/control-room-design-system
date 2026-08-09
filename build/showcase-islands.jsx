@@ -23,6 +23,7 @@ import {
   CrKbd, CrAlert, CrChip, CrEmptyState, CrMeter, CrProgress, CrStatusDot,
   CrTag, CrSessionRow, CrPanel, CrIcon,
   CrSparkline, CrLineChart, CrBarChart, CrStackedBar, CrForm, CrDataGrid,
+  CrStepper, CrPinInput, CrTagsInput, CrInputGroup, CrAvatar, CrSpinner,
 } from "../dist/frameworks/react/index.ts";
 import { defineForm, type as ark } from "../lib/forms/index.js";
 
@@ -674,6 +675,44 @@ const DEMOS = {
         },
           h(CrIcon, { name: n, size: 22 }),
           h("span", { style: { fontFamily: "var(--font-mono)", fontSize: "9px", color: "var(--muted)" } }, n))))),
+  },
+  stepper: {
+    tag: "CrStepper",
+    defs: [T("number", "active", 1, { min: 0, max: 2 })],
+    render: (s, set) => h(CrStepper, {
+      steps: [{ label: "Source" }, { label: "Limits" }, { label: "Review" }],
+      active: s.active,
+      onStep: (i) => set("active", i),
+    }),
+  },
+  "pin-input": {
+    tag: "CrPinInput",
+    defs: [T("number", "length", 6, { min: 4, max: 8 })],
+    render: (s) => h(CrPinInput, { length: s.length }),
+  },
+  "tags-input": {
+    tag: "CrTagsInput",
+    defs: [T("text", "label", "Regions")],
+    render: (s) => h(CrTagsInput, { label: s.label, value: ["eu-west", "us-east"], placeholder: "add a tag…" }),
+  },
+  "input-group": {
+    tag: "CrInputGroup",
+    defs: [T("text", "label", "Endpoint"), T("text", "prefix", "https://"), T("text", "suffix", "")],
+    render: (s) => h(CrInputGroup, { label: s.label, prefix: s.prefix, suffix: s.suffix, placeholder: "eu.example.com" }),
+  },
+  avatar: {
+    tag: "CrAvatar",
+    defs: [
+      T("text", "name", "Ada Lovelace"),
+      T("enum", "status", "online", { options: ["online", "idle", "busy", "offline"] }),
+      T("enum", "size", "md", { options: ["sm", "md", "lg"] }),
+    ],
+    render: (s) => h(CrAvatar, { name: s.name, status: s.status, size: s.size }),
+  },
+  spinner: {
+    tag: "CrSpinner",
+    defs: [T("text", "label", "Provisioning"), T("enum", "size", "md", { options: ["sm", "md", "lg"] })],
+    render: (s) => h(CrSpinner, { label: s.label, size: s.size }),
   },
 };
 
