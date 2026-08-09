@@ -93,43 +93,37 @@
       }
     },
     "text-2xs": {
-      "$type": "dimension",
-      "$value": "10px",
+      "$value": "clamp(10px, 1.15cqi, 11px)",
       "$extensions": {
         "com.doxee.cssVar": "--text-2xs"
       }
     },
     "text-xs": {
-      "$type": "dimension",
-      "$value": "11px",
+      "$value": "clamp(11px, 1.3cqi, 12px)",
       "$extensions": {
         "com.doxee.cssVar": "--text-xs"
       }
     },
     "text-sm": {
-      "$type": "dimension",
-      "$value": "12px",
+      "$value": "clamp(12px, 1.5cqi, 14px)",
       "$extensions": {
         "com.doxee.cssVar": "--text-sm"
       }
     },
     "text-base": {
-      "$type": "dimension",
-      "$value": "13px",
+      "$value": "clamp(13px, 1.7cqi, 15px)",
       "$extensions": {
         "com.doxee.cssVar": "--text-base"
       }
     },
     "text-md": {
-      "$type": "dimension",
-      "$value": "15px",
+      "$value": "clamp(15px, 2.0cqi, 17px)",
       "$extensions": {
         "com.doxee.cssVar": "--text-md"
       }
     },
     "text-lg": {
-      "$type": "dimension",
-      "$value": "19px",
+      "$value": "clamp(19px, 2.6cqi, 23px)",
       "$extensions": {
         "com.doxee.cssVar": "--text-lg"
       }

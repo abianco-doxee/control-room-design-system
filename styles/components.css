@@ -1418,3 +1418,21 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 
 /* ── RelativeTime (semantic <time> display) ──────────────────────────────── */
 .cr-reltime { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* ── Responsive type architecture (see references/responsive.md) ─────────────
+ * The --text-* scale is now container-relative (cqi clamps, floored at the
+ * legacy px so it never shrinks below legible). Panel surfaces declare a query
+ * container so their dense text sizes to the *panel*, not the viewport. Only
+ * surfaces with no escaping fixed/absolute descendants are safe containers
+ * (container-type establishes a containing block — menus/popovers/grids opt out). */
+.cr-panel, .cr-hero, .cr-masthead { container-type: inline-size; }
+
+/* Explicit type-role utilities (opt-in), within the two registers (Law 5). */
+.cr-type-display { font-family: var(--font-display); font-size: var(--type-display-size); font-weight: var(--type-display-weight); line-height: var(--type-display-leading); letter-spacing: var(--type-display-tracking); text-transform: uppercase; }
+.cr-type-h1     { font-family: var(--font-display); font-size: var(--type-h1-size); font-weight: var(--type-h1-weight); line-height: var(--type-h1-leading); letter-spacing: var(--type-h1-tracking); }
+.cr-type-h2     { font-family: var(--font-display); font-size: var(--type-h2-size); font-weight: var(--type-h2-weight); line-height: var(--type-h2-leading); letter-spacing: var(--type-h2-tracking); }
+.cr-type-body   { font-family: var(--font-mono); font-size: var(--type-body-size); font-weight: var(--type-body-weight); line-height: var(--type-body-leading); }
+.cr-type-data   { font-family: var(--font-mono); font-size: var(--type-data-size-fluid); font-weight: var(--type-data-weight); line-height: var(--type-data-leading); }
+.cr-type-label  { font-family: var(--font-mono); font-size: var(--type-label-size); font-weight: var(--type-label-weight); line-height: var(--type-label-leading); letter-spacing: var(--type-label-tracking); text-transform: uppercase; }
+.cr-type-meta   { font-family: var(--font-mono); font-size: var(--type-meta-size); font-weight: var(--type-meta-weight); line-height: var(--type-meta-leading); letter-spacing: var(--type-meta-tracking); }
+.cr-type-chrome { font-family: var(--font-mono); font-size: var(--type-chrome-size); font-weight: var(--type-chrome-weight); line-height: var(--type-chrome-leading); letter-spacing: var(--type-chrome-tracking); text-transform: uppercase; }
