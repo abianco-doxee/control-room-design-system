@@ -28,6 +28,7 @@ const PAGES = [
   ["references/design-language.md", "reference", "design-language", "Design Language — the Nine Laws"],
   ["references/tokens.md", "reference", "tokens", "Tokens"],
   ["references/theming.md", "reference", "theming", "Theming & Branding"],
+  ["references/responsive.md", "reference", "responsive", "Responsive Architecture"],
   ["references/tailwind.md", "reference", "tailwind", "Tailwind-first"],
   ["references/components.md", "reference", "components", "Component Library"],
   ["references/styling-contract.md", "reference", "styling-contract", "Styling Contract — pt / dt / unstyled"],
