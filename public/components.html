@@ -2147,6 +2147,19 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
   --gap-tight: var(--space-1);
 }
 
+/* ── Sizing & touch targets (see references/responsive.md) ───────────────────
+ * Shared control heights so inputs/buttons share a baseline, plus a pointer-
+ * aware tap floor: on COARSE pointers (touch) interactive controls meet the
+ * 44px WCAG 2.5.5 target — keyed to pointer type, not viewport width, so the
+ * dense desktop layout (fine pointer) is unchanged. */
+.cr-input, .cr-textarea, .cr-select, .cr-datetime, .cr-cron__input, .cr-numberfield, .cr-btn { min-height: var(--control-h-md); }
+.cr-btn--sm { min-height: var(--control-h-sm); }
+.cr-tap { display: inline-flex; align-items: center; justify-content: center; }
+@media (pointer: coarse) {
+  .cr-btn, .cr-input, .cr-select, .cr-textarea, .cr-datetime, .cr-tab, .cr-segmented__opt,
+  .cr-togglechip, .cr-menu__item, .cr-pager__btn, .cr-overflow, .cr-tap { min-height: 44px; }
+}
+
 /* browser chrome (not part of the shipped system) */
 * { box-sizing: border-box; }
 body { margin: 0; }
