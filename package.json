@@ -95,13 +95,14 @@
     "build:pkg": "node packages/components/build/build-pkg.mjs",
     "build:catalog": "node build/build-catalog.mjs",
     "build:mcp": "npm run build -w @control-room/mcp",
+    "build:skill": "npm run build -w @control-room/skill",
     "build:gallery": "npm run build:gallery -w @control-room/docs",
     "build:showcase": "npm run build:showcase -w @control-room/docs",
     "build:brand-preview": "npm run build:brand-preview -w @control-room/docs",
     "build:llms": "npm run build:llms -w @control-room/docs",
     "build:content": "npm run build:content -w @control-room/docs",
     "build:site": "npm run build:site -w @control-room/docs",
-    "build": "npm run build:tokens && npm run build:theme && npm run build:brand-preview && npm run build:tw && npm run build:styles && npm run build:icons && npm run build:catalog && npm run build:gallery && npm run build:components && npm run build:pkg && npm run build:showcase && npm run build:mcp && npm run build:llms && npm run build:content && npm run build:site",
+    "build": "npm run build:tokens && npm run build:theme && npm run build:brand-preview && npm run build:tw && npm run build:styles && npm run build:icons && npm run build:catalog && npm run build:gallery && npm run build:components && npm run build:pkg && npm run build:showcase && npm run build:mcp && npm run build:skill && npm run build:llms && npm run build:content && npm run build:site",
     "prepack": "npm run build:components && npm run build:pkg",
     "dev": "npm run dev -w @control-room/docs",
     "preview": "npm run preview -w @control-room/docs",
@@ -116,6 +117,7 @@
     "verify:icons": "node packages/icons/build/build-icons.mjs --check",
     "verify:llms": "npm run verify:llms -w @control-room/docs",
     "verify:mcp": "npm run verify -w @control-room/mcp",
+    "verify:skill": "npm run verify -w @control-room/skill",
     "skills:sync": "node scripts/skills-sync.mjs",
     "skills:check": "node scripts/skills-sync.mjs --check",
     "lint": "biome check",
@@ -141,7 +143,7 @@
     "test:contract": "node --test tests/styling-contract.test.mjs tests/responsive.test.mjs tests/utils-ports.test.mjs",
     "changeset": "changeset",
     "version": "changeset version",
-    "verify": "npm run verify:tokens && npm run verify:theme && npm run verify:palette && npm run verify:styles && npm run verify:icons && npm run verify:catalog && npm run verify:llms && npm run verify:mcp && npm run skills:check"
+    "verify": "npm run verify:tokens && npm run verify:theme && npm run verify:palette && npm run verify:styles && npm run verify:icons && npm run verify:catalog && npm run verify:llms && npm run verify:mcp && npm run verify:skill && npm run skills:check"
   },
   "devDependencies": {
     "@angular/common": "^21.2.19",
