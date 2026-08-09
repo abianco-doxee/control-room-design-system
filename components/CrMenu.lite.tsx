@@ -1,4 +1,5 @@
 import { useStore, useRef, Show, For } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrMenuItem {
   label: string;
@@ -32,24 +33,6 @@ export default function CrMenu(props: CrMenuProps) {
     /* typeahead buffer: printable keys accumulate for a short window, then reset */
     buffer: "",
     bufferAt: 0,
-    /* ── styling helpers (see CrTabs for the shared contract) ── */
-    cls(base: string, part: string): string {
-      const p = props.pt && props.pt[part];
-      return ((props.unstyled ? "" : base) + (p && p.class ? " " + p.class : "")).trim();
-    },
-    pta(part: string): any {
-      const p = props.pt && props.pt[part];
-      if (!p) return {};
-      const out: any = { ...p };
-      delete out.class;
-      delete out.style;
-      return out;
-    },
-    partStyle(part: string): any {
-      const p = props.pt && props.pt[part];
-      const base = part === "root" ? props.dt || {} : {};
-      return { ...base, ...(p && p.style ? p.style : {}) };
-    },
     toggle() {
       state.open = !state.open;
     },
@@ -126,12 +109,12 @@ export default function CrMenu(props: CrMenuProps) {
   });
 
   return (
-    <div {...state.pta("root")} class={state.cls("cr-menu", "root")} data-part="root" data-state={state.open ? "open" : "closed"} style={state.partStyle("root")} ref={rootRef}>
+    <div {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-menu", "root")} data-part="root" data-state={state.open ? "open" : "closed"} style={ptStyle(props.pt, props.dt, "root")} ref={rootRef}>
       <button
-        {...state.pta("trigger")}
+        {...ptAttrs(props.pt, "trigger")}
         type="button"
         data-part="trigger"
-        class={state.cls("cr-btn cr-btn--outline cr-btn--sm", "trigger")}
+        class={ptClass(props.pt, props.unstyled, "cr-btn cr-btn--outline cr-btn--sm", "trigger")}
         aria-haspopup="menu"
         aria-expanded={state.open ? "true" : "false"}
         onClick={() => state.toggle()}
@@ -148,20 +131,20 @@ export default function CrMenu(props: CrMenuProps) {
           onClick={() => state.close()}
         ></button>
         <div
-          {...state.pta("panel")}
+          {...ptAttrs(props.pt, "panel")}
           data-part="panel"
-          class={state.cls("cr-menu__panel" + (props.align === "right" ? " cr-menu__panel--right" : ""), "panel")}
+          class={ptClass(props.pt, props.unstyled, "cr-menu__panel" + (props.align === "right" ? " cr-menu__panel--right" : ""), "panel")}
           role="menu"
           onKeyDown={(event) => state.onPanelKey(event)}
         >
           <For each={props.items}>
             {(item: CrMenuItem, i: number) => (
               <button
-                {...state.pta("item")}
+                {...ptAttrs(props.pt, "item")}
                 type="button"
                 role="menuitem"
                 data-part="item"
-                class={state.cls("cr-menu__item" + (item.danger ? " cr-menu__item--danger" : ""), "item")}
+                class={ptClass(props.pt, props.unstyled, "cr-menu__item" + (item.danger ? " cr-menu__item--danger" : ""), "item")}
                 onClick={() => state.pick(i)}
               >
                 {item.label}
