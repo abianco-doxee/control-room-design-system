@@ -19,13 +19,23 @@ export const SHAPES = {
 
 export const WEIGHTS = {
   hairline: {
-    "brd-hair": "1px", "brd": "1.5px", "brd-heavy": "2px", "brd-brush": "3px",
-    "shadow-off-sm": "1px", "shadow-off": "2px", "shadow-off-lg": "3px",
+    "brd-hair": "1px",
+    brd: "1.5px",
+    "brd-heavy": "2px",
+    "brd-brush": "3px",
+    "shadow-off-sm": "1px",
+    "shadow-off": "2px",
+    "shadow-off-lg": "3px",
   },
   regular: {}, // the system default (identity)
   heavy: {
-    "brd-hair": "2px", "brd": "3px", "brd-heavy": "4px", "brd-brush": "6px",
-    "shadow-off-sm": "3px", "shadow-off": "6px", "shadow-off-lg": "9px",
+    "brd-hair": "2px",
+    brd: "3px",
+    "brd-heavy": "4px",
+    "brd-brush": "6px",
+    "shadow-off-sm": "3px",
+    "shadow-off": "6px",
+    "shadow-off-lg": "9px",
   },
 };
 

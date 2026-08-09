@@ -9,9 +9,9 @@
  *   node build/build-catalog.mjs           write catalog.json
  *   node build/build-catalog.mjs --check   fail if catalog.json is stale
  */
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CHECK = process.argv.includes("--check");

@@ -2,16 +2,19 @@
 // (dist/frameworks/react), mounted client-side. This gate proves they actually
 // mount, error-free, and stay interactive — so the browser can't silently
 // regress to dead markup.
-import { test, expect } from "@playwright/test";
-import { pathToFileURL } from "node:url";
+
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
+import { expect, test } from "@playwright/test";
 
 const SHOWCASE = pathToFileURL(join(process.cwd(), "public", "components.html")).href;
 
 test.describe("component browser — live islands", () => {
   test("every island mounts the real component with no errors", async ({ page }) => {
     const errors = [];
-    page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
+    page.on("console", (m) => {
+      if (m.type() === "error") errors.push(m.text());
+    });
     page.on("pageerror", (e) => errors.push("pageerror: " + e.message));
 
     await page.goto(SHOWCASE);
@@ -21,14 +24,16 @@ test.describe("component browser — live islands", () => {
     // this is the drift guard between build-showcase.mjs's ISLAND_IDS and the entry.
     const registry = await page.evaluate(() => window.__CR_ISLANDS__.slice().sort());
     const mounts = await page.$$eval("[data-island]", (els) =>
-      els.map((e) => e.getAttribute("data-island")).sort());
+      els.map((e) => e.getAttribute("data-island")).sort()
+    );
     expect(mounts).toEqual(registry);
     expect(mounts.length).toBeGreaterThanOrEqual(22);
 
     // each mount hydrated (ready flag set, no error flag)
     await expect(page.locator("[data-island]:not([data-island-ready])")).toHaveCount(0);
     const failed = await page.$$eval("[data-island][data-island-error]", (els) =>
-      els.map((e) => `${e.getAttribute("data-island")}: ${e.getAttribute("data-island-error")}`));
+      els.map((e) => `${e.getAttribute("data-island")}: ${e.getAttribute("data-island-error")}`)
+    );
     expect(failed, failed.join(", ") || "none").toEqual([]);
 
     expect(errors, errors.join("\n") || "none").toEqual([]);
@@ -197,7 +202,9 @@ test.describe("component browser — live islands", () => {
     await expect(reset).toHaveCount(0); // pristine again
   });
 
-  test("per-field re-render isolation: typing one field doesn't re-render its siblings", async ({ page }) => {
+  test("per-field re-render isolation: typing one field doesn't re-render its siblings", async ({
+    page,
+  }) => {
     // CrForm delegates input to listeners on the <form> and renders each row as a
     // React.memo'd CrFormRow taking only data props — so a keystroke re-renders
     // only the edited field, not the whole form. CrFormRow ticks a per-path counter
@@ -209,7 +216,9 @@ test.describe("component browser — live islands", () => {
     await expect(form.locator("#cr-form-name")).toBeVisible();
 
     // arm the probe AFTER mount (initial mounts, with the global unset, don't count)
-    await page.evaluate(() => { window.__CR_ROW_RENDERS__ = {}; });
+    await page.evaluate(() => {
+      window.__CR_ROW_RENDERS__ = {};
+    });
 
     // type into `name` only
     await form.locator("#cr-form-name").pressSequentially("nova", { delay: 15 });
@@ -220,8 +229,12 @@ test.describe("component browser — live islands", () => {
     expect(renders["name"] || 0).toBeGreaterThanOrEqual(1);
     // …and NO other field did. A non-isolated form (single component, no memo)
     // would tick every visible row on each of the four keystrokes.
-    const ticked = Object.keys(renders).filter((k) => renders[k] > 0).sort();
-    expect(ticked, `only "name" should have re-rendered; got: ${JSON.stringify(renders)}`).toEqual(["name"]);
+    const ticked = Object.keys(renders)
+      .filter((k) => renders[k] > 0)
+      .sort();
+    expect(ticked, `only "name" should have re-rendered; got: ${JSON.stringify(renders)}`).toEqual([
+      "name",
+    ]);
   });
 
   test("editing a control prop re-renders the live component", async ({ page }) => {
@@ -242,13 +255,19 @@ test.describe("component browser — live islands", () => {
     await expect(slider.locator(".pg__code")).toContainText("disabled");
   });
 
-  test("an external brand (slate) reskins the whole browser from one theme file", async ({ page }) => {
+  test("an external brand (slate) reskins the whole browser from one theme file", async ({
+    page,
+  }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
-    const groundOf = () => page.evaluate(() =>
-      getComputedStyle(document.documentElement).getPropertyValue("--ground").trim());
-    const accentOf = () => page.evaluate(() =>
-      getComputedStyle(document.documentElement).getPropertyValue("--sig-accent").trim());
+    const groundOf = () =>
+      page.evaluate(() =>
+        getComputedStyle(document.documentElement).getPropertyValue("--ground").trim()
+      );
+    const accentOf = () =>
+      page.evaluate(() =>
+        getComputedStyle(document.documentElement).getPropertyValue("--sig-accent").trim()
+      );
 
     // default (dark) brand values
     expect(await groundOf()).toBe("#0f0327");
@@ -306,7 +325,9 @@ test.describe("component browser — live islands", () => {
     await page.waitForTimeout(60);
 
     // rows now have differing heights (prefix-sum layout), and it's still windowed
-    const heights = await rows.evaluateAll((els) => els.slice(0, 12).map((e) => Math.round(e.getBoundingClientRect().height)));
+    const heights = await rows.evaluateAll((els) =>
+      els.slice(0, 12).map((e) => Math.round(e.getBoundingClientRect().height))
+    );
     expect(new Set(heights).size, `varied row heights: ${heights.join(",")}`).toBeGreaterThan(1);
     expect(await rows.count(), "still virtualized, not all 2000").toBeLessThan(60);
   });
@@ -398,7 +419,10 @@ test.describe("component browser — live islands", () => {
     const clocks = labels.filter((t) => /^\d{2}:\d{2}(:\d{2})?$/.test(t.trim()));
     expect(clocks.length, `clock-formatted x-ticks: ${labels.join("|")}`).toBeGreaterThan(1);
     // continuous mode draws vertical gridlines at the ticks
-    expect(await island.locator(".cr-chart__grid--v").count(), "vertical gridlines").toBeGreaterThan(0);
+    expect(
+      await island.locator(".cr-chart__grid--v").count(),
+      "vertical gridlines"
+    ).toBeGreaterThan(0);
   });
 
   test("line chart calendar axis labels multi-month ticks with month names", async ({ page }) => {
@@ -428,7 +452,20 @@ test.describe("component browser — live islands", () => {
     await page.waitForTimeout(40);
 
     const labels = (await island.locator(".cr-chart__tick").allTextContents()).map((t) => t.trim());
-    const itMonths = ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
+    const itMonths = [
+      "gen",
+      "feb",
+      "mar",
+      "apr",
+      "mag",
+      "giu",
+      "lug",
+      "ago",
+      "set",
+      "ott",
+      "nov",
+      "dic",
+    ];
     const hit = labels.filter((t) => itMonths.includes(t.replace(/ '\d\d/, "")));
     expect(hit.length, `italian month ticks: ${labels.join("|")}`).toBeGreaterThan(2);
   });
@@ -441,10 +478,18 @@ test.describe("component browser — live islands", () => {
     await pick(island, "log").selectOption("log");
     await page.waitForTimeout(40);
 
-    const labels = (await island.locator(".cr-chart__ytick").allTextContents()).map((t) => t.trim());
+    const labels = (await island.locator(".cr-chart__ytick").allTextContents()).map((t) =>
+      t.trim()
+    );
     // wide-range series → the axis should reach from tens to thousands
-    expect(labels.some((t) => /^\d+$/.test(t) && Number(t) <= 10), `low decade: ${labels.join("|")}`).toBeTruthy();
-    expect(labels.some((t) => /k$/.test(t)), `high decade (k): ${labels.join("|")}`).toBeTruthy();
+    expect(
+      labels.some((t) => /^\d+$/.test(t) && Number(t) <= 10),
+      `low decade: ${labels.join("|")}`
+    ).toBeTruthy();
+    expect(
+      labels.some((t) => /k$/.test(t)),
+      `high decade (k): ${labels.join("|")}`
+    ).toBeTruthy();
     expect(labels.length, "several log ticks").toBeGreaterThan(2);
   });
 
@@ -457,9 +502,14 @@ test.describe("component browser — live islands", () => {
     await page.waitForTimeout(40);
 
     // overnight + weekend gaps are collapsed → dashed break markers appear
-    expect(await island.locator(".cr-chart__break").count(), "collapsed-gap markers").toBeGreaterThan(1);
+    expect(
+      await island.locator(".cr-chart__break").count(),
+      "collapsed-gap markers"
+    ).toBeGreaterThan(1);
     // one tick per session day (Thu/Fri/Mon → 3), not a tick per hour
-    const dayTicks = (await island.locator(".cr-chart__tick").allTextContents()).map((t) => t.trim()).filter(Boolean);
+    const dayTicks = (await island.locator(".cr-chart__tick").allTextContents())
+      .map((t) => t.trim())
+      .filter(Boolean);
     expect(dayTicks.length, `day ticks: ${dayTicks.join("|")}`).toBeLessThanOrEqual(4);
   });
 
@@ -507,7 +557,11 @@ test.describe("component browser — live islands", () => {
     const ring = await page.evaluate(() => {
       const el = document.activeElement;
       const s = getComputedStyle(el);
-      return { tag: el && el.tagName, style: s.outlineStyle, width: parseFloat(s.outlineWidth) || 0 };
+      return {
+        tag: el && el.tagName,
+        style: s.outlineStyle,
+        width: parseFloat(s.outlineWidth) || 0,
+      };
     });
     expect(ring.tag, "something is focused").toBeTruthy();
     expect(ring.style, "outline style").not.toBe("none");

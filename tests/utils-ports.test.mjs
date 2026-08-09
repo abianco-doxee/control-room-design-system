@@ -1,8 +1,9 @@
 // Unit tests for the ported utilities (href, duration). Pure functions, no DOM.
-import { test } from "node:test";
+
 import assert from "node:assert/strict";
-import { isExternalHref, externalAttrs } from "../utils/href.js";
-import { humanDuration, relativeTime, refreshCadence } from "../utils/duration.js";
+import { test } from "node:test";
+import { humanDuration, refreshCadence, relativeTime } from "../utils/duration.js";
+import { externalAttrs, isExternalHref } from "../utils/href.js";
 
 test("isExternalHref: relative/in-page/scheme links are not external", () => {
   for (const h of ["#top", "/dashboard", "./x", "../y", "?q=1", "mailto:a@b.co", "tel:+1", ""]) {
@@ -20,7 +21,10 @@ test("isExternalHref: absolute off-origin http(s) links are external (SSR-safe)"
 });
 
 test("externalAttrs opens off-site links safely", () => {
-  assert.deepEqual(externalAttrs("https://example.com"), { target: "_blank", rel: "noopener noreferrer" });
+  assert.deepEqual(externalAttrs("https://example.com"), {
+    target: "_blank",
+    rel: "noopener noreferrer",
+  });
   assert.deepEqual(externalAttrs("/local"), {});
 });
 

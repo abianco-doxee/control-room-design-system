@@ -7,11 +7,12 @@
 // virtual module that only the Qwik/Vite optimizer provides at build time — the
 // consumer's Qwik build supplies it. The React package gate covers rendered
 // markup, and both come from the same Mitosis source.)
-import { test } from "node:test";
+
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import * as CR from "../dist/pkg/qwik/index.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");

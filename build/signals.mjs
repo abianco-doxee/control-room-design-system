@@ -12,11 +12,13 @@
  * build-theme.mjs and references/theming.md). Explicitly-set signal roles are left
  * alone — the brand meant those exactly.
  */
-import { oklch, formatHex, clampChroma } from "culori";
-import { THEME_ROLES, contrastRatio } from "../lib/theme/index.js";
+import { clampChroma, formatHex, oklch } from "culori";
+import { contrastRatio, THEME_ROLES } from "../lib/theme/index.js";
 
 /** The signal role keys (bare, no leading --), from the contract. */
-export const SIGNAL_KEYS = THEME_ROLES.filter((r) => r.group === "signal").map((r) => r.cssVar.replace(/^--/, ""));
+export const SIGNAL_KEYS = THEME_ROLES.filter((r) => r.group === "signal").map((r) =>
+  r.cssVar.replace(/^--/, "")
+);
 
 const TONES = {
   neon: { cMul: 1, lAdd: 0, lMin: 0 }, // the loud default (identity)
@@ -71,14 +73,25 @@ export function fitSignals(vars, opts = {}) {
     const col = oklch(vars[k]);
     if (!col) continue;
     const origL = col.l ?? 0;
-    let best = null, bestC = -1, chosen = null, chosenDelta = Infinity;
+    let best = null,
+      bestC = -1,
+      chosen = null,
+      chosenDelta = Infinity;
     for (let l = 0.12; l <= 0.96; l += 0.02) {
-      const hex = formatHex(clampChroma({ mode: "oklch", l, c: col.c || 0, h: col.h || 0 }, "oklch"));
+      const hex = formatHex(
+        clampChroma({ mode: "oklch", l, c: col.c || 0, h: col.h || 0 }, "oklch")
+      );
       const c = contrastRatio(hex, against) || 0;
-      if (c > bestC) { bestC = c; best = hex; }
+      if (c > bestC) {
+        bestC = c;
+        best = hex;
+      }
       if (c >= min) {
         const d = Math.abs(l - origL);
-        if (d < chosenDelta) { chosenDelta = d; chosen = hex; }
+        if (d < chosenDelta) {
+          chosenDelta = d;
+          chosen = hex;
+        }
       }
     }
     out[k] = chosen || best;

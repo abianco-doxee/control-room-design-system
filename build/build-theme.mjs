@@ -17,13 +17,19 @@
  *        node build/build-theme.mjs slate      (one brand)
  * Check: node build/build-theme.mjs --check    (fails if any dist/themes/*.css is stale)
  */
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { dirname, join, basename } from "node:path";
-import { themeCss, mergeTheme, validateTheme, checkThemeContrast, deriveOnColors } from "../lib/theme/index.js";
-import { surfaceRamp } from "./ramp.mjs";
-import { toneSignals, fitSignals } from "./signals.mjs";
+import {
+  checkThemeContrast,
+  deriveOnColors,
+  mergeTheme,
+  themeCss,
+  validateTheme,
+} from "../lib/theme/index.js";
 import { chassisFrom } from "./chassis.mjs";
+import { surfaceRamp } from "./ramp.mjs";
+import { fitSignals, toneSignals } from "./signals.mjs";
 import { typeFrom } from "./type.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -97,7 +103,7 @@ function resolveBrand(brand, seen = new Set()) {
   const changed = [...Object.keys(overrides), ...Object.keys(signals)];
   const merged = mergeTheme(
     mergeTheme(mergeTheme(mergeTheme(mergeTheme(base, surfaces), chassis), type), signals),
-    overrides,
+    overrides
   );
   const vars = deriveOnColors(merged, { changed });
   return { vars, meta: brand };
@@ -105,7 +111,9 @@ function resolveBrand(brand, seen = new Set()) {
 
 function brandFiles() {
   const all = existsSync(BRANDS)
-    ? readdirSync(BRANDS).filter((f) => f.endsWith(".json")).map((f) => basename(f, ".json"))
+    ? readdirSync(BRANDS)
+        .filter((f) => f.endsWith(".json"))
+        .map((f) => basename(f, ".json"))
     : [];
   return only.length ? all.filter((n) => only.includes(n)) : all;
 }
@@ -133,17 +141,21 @@ function render(name) {
     const banner = `/* Control Room brand: ${themeName}${brand.$label ? ` — ${brand.$label}` : ""} (GENERATED
  * from brands/${name}.json). Appearance layer only — pair with dist/structure.css.
  * Regenerate: npm run build:theme. */\n`;
-    const css = banner + themeCss(themeName, vars, {
-      selector: brand.$selector || `[data-theme="${themeName}"]`,
-      scheme: brand.$scheme || "dark",
-    });
+    const css =
+      banner +
+      themeCss(themeName, vars, {
+        selector: brand.$selector || `[data-theme="${themeName}"]`,
+        scheme: brand.$scheme || "dark",
+      });
     return { themeName, css, contrast: checkThemeContrast(vars), unknown: v.unknown };
   });
 }
 
 const names = brandFiles();
 if (!names.length) {
-  console.log(only.length ? `No matching brand for: ${only.join(", ")}` : "No brands/*.json to build.");
+  console.log(
+    only.length ? `No matching brand for: ${only.join(", ")}` : "No brands/*.json to build."
+  );
   process.exit(0);
 }
 
@@ -154,7 +166,10 @@ for (const name of names) {
     const p = join(DIST, `${themeName}.css`);
     if (CHECK) {
       const cur = existsSync(p) ? readFileSync(p, "utf8") : "";
-      if (cur !== css) { stale = true; console.error(`✗ ${rel} is out of date`); }
+      if (cur !== css) {
+        stale = true;
+        console.error(`✗ ${rel} is out of date`);
+      }
       continue;
     }
     mkdirSync(DIST, { recursive: true });
@@ -169,6 +184,9 @@ for (const name of names) {
 }
 
 if (CHECK) {
-  if (stale) { console.error("\nRun: npm run build:theme, then commit dist/themes/*.css."); process.exit(1); }
+  if (stale) {
+    console.error("\nRun: npm run build:theme, then commit dist/themes/*.css.");
+    process.exit(1);
+  }
   console.log("✓ brand theme CSS is up to date with brands/*.json");
 }
