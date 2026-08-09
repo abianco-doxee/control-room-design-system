@@ -20,7 +20,7 @@ test("the other targets are generated from the single .lite source (portable pt)
   const react = fw("react", "CrTabs.tsx");
   assert.doesNotMatch(react, /crGlobalPT/, "override did NOT leak into React");
   assert.match(react, /data-part/, "generated output exposes data-part hooks");
-  assert.match(react, /\.\.\.pta\(/, "generated output has the portable pt spread");
+  assert.match(react, /\.\.\.ptAttrs\(/, "generated output has the portable pt spread (shared lib/pt helper)");
 });
 
 test("every target exposes the data-part styling hook on CrTabs", () => {

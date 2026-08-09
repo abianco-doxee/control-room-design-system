@@ -31,15 +31,18 @@ emits (`data-pc-section`). Three props drive the rest:
 />
 ```
 
-Implementation is three tiny store helpers per component — `cls()` (unstyled +
-class-merge), `pta()` (spread the bag minus class/style), `partStyle()` (dt + pt
-style). In production these would be one shared helper.
+Implementation is one shared, framework-agnostic module — **`lib/pt.ts`** — with
+three pure functions: `ptClass()` (unstyled + class-merge), `ptAttrs()` (spread the
+bag minus class/style), `ptStyle()` (dt + pt style). Components import it as
+`../lib/pt.ts` (the explicit `.ts` lets the package build rewrite the specifier to
+`.js`); `build/build-barrels.mjs` copies the source into each target's output tree
+so the relative import resolves for the bundler, the type-check, and the shipped
+package. Because these are plain functions of `props.pt`/`props.dt` (no `state.`
+receiver), Mitosis state-processes the arguments correctly inside a JSX spread —
+which is what let the earlier `{...(state.pta())}` post-processor patch be removed.
 
-### Two Mitosis codegen quirks this required (both patched, not worked around in userland)
+### One Mitosis codegen quirk this still requires (patched, not worked around in userland)
 
-- **React doesn't state-process a store call inside a JSX spread** — it emits
-  `{...(state.pta(...))}` where `state` doesn't exist. `build/build-fix-react.mjs`
-  strips the `state.` (the React post-processor already fixes similar quirks).
 - **`dt` custom-properties in a `style` object** survive on React/Vue/Svelte
   (Svelte's `stringifyStyles` only kebab-cases uppercase, so `--sig-work` passes
   through). **Angular** applies `style` via `setAttribute` and does **not** take a
