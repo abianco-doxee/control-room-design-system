@@ -1800,3 +1800,45 @@ spin honours `prefers-reduced-motion`. `size` is `sm` · `md` · `lg`.
 ```
 
 **Tokens** — `--sig-work` (ring sweep), `--panel-2` (ring track).
+
+## Scroll area {#scroll-area}
+
+**Purpose** — a scroll container that keeps the Control Room look instead of the
+OS default scrollbars (thin, inked track, neon thumb).
+
+**Notes** — the styling is pure CSS (`scrollbar-width` + `::-webkit-scrollbar`);
+content scrolls natively. The container is `tabindex=0` so it's keyboard-scrollable,
+and when you pass a `label` it becomes a named `role="group"` so assistive tech
+announces it. `axis` is `y` (default) · `x` · `both`; `maxHeight` caps the scroll
+axis.
+
+```tsx
+<CrScrollArea label="Log output" maxHeight="16rem">{lines}</CrScrollArea>
+```
+
+**Tokens** — `--sig-work` (thumb), `--panel-2` (track).
+
+## Resizable {#resizable}
+
+**Purpose** — split a region into two panes with a divider the operator can drag
+(log + detail, tree + editor).
+
+**Anatomy** — pass the **two panes as children**; a CSS grid sizes the first to
+the current split and the second fills the rest. The **handle** is overlaid at the
+split line (no markup injected between your panes) and is a WAI-ARIA window
+**splitter**: `role="separator"`, focusable, `aria-orientation` + `aria-valuenow`/
+`min`/`max` for the leading pane's percent. `←`/`→` (or `↑`/`↓` when vertical)
+resize by 2%, Home/End jump to the clamps. Dragging uses **pointer capture**, so
+there are no global listeners and it can't get stuck. `orientation` is
+`horizontal` (default) · `vertical`; `defaultSize` / `min` / `max` are percents.
+
+```tsx
+<CrResizable label="Resize log vs detail" defaultSize={40}>
+  <div>log</div>
+  <div>detail</div>
+</CrResizable>
+```
+
+**Tokens** — `--border` (divider + frame), `--sig-work` (active divider).
+**A11y** — the handle is a labelled, focusable `role="separator"` with live
+`aria-valuenow`; full keyboard resize.
