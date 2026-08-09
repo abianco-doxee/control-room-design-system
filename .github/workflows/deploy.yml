@@ -69,7 +69,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v3
         with:
-          path: site-dist
+          path: packages/docs/site-dist
 
   # Deploy to GitHub Pages only from main.
   deploy:

@@ -78,7 +78,7 @@ import {
   CrToolbar,
   CrTooltip,
   CrTree,
-} from "../packages/components/dist/frameworks/react/index.ts";
+} from "../../../packages/components/dist/frameworks/react/index.ts";
 
 // A big, deterministic dataset to exercise the data grid's virtualization.
 const GRID_REGIONS = ["eu-west", "us-east", "ap-south", "sa-east"];

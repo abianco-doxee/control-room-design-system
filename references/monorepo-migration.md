@@ -35,8 +35,29 @@ Progress:
       Mitosis version via require.resolve (hoist-safe); build:components:cli runs the CLI
       oracle in-package via workspace delegation. Green: build:components (driver + CLI),
       verify:types, pkg (17/17), frameworks (24/24), contract (16/16), separation, biome.
-- [ ] Extract `@control-room/docs` (astro/starlight + gallery/showcase/docs-content
-      builders; the last, dev-only leaf).
+- [x] Extract `@control-room/docs` (private, dev-only leaf): astro/starlight site (src,
+      astro.config, public), the gallery/showcase/docs-content/brand-preview builders +
+      showcase-islands + gallery-scripts, and the Playwright a11y/islands/responsive/visual
+      suites (+ visual snapshot baselines). Consumes the sibling packages via `@control-room/*`
+      specifiers (starlight-theme.css imports `@control-room/tokens/css`) and repo-root reads
+      via `../..`. Root delegates build:content/gallery/showcase/brand-preview/site + dev/
+      preview + the playwright test:* scripts to the docs workspace (so astro/playwright run
+      with CWD=packages/docs); the Pages deploy uploads `packages/docs/site-dist`. Validated:
+      astro build (22 pages), all generators, verify, biome. Playwright runs in CI (browser).
+
+## Status: complete
+
+All six workspaces are extracted and independently publishable under `@control-room/*`
+(`utils`, `tokens`, `styles`, `icons`, `components`) plus the private `docs` site. The root
+`@control-room/design-system` remains a convenience umbrella re-exporting every subpath into
+the packages, so existing `@control-room/design-system/*` consumers are unchanged. Cross-
+package references use `@control-room/<pkg>` specifiers throughout.
+
+Follow-ups (optional, not blocking): the shared build toolchain (Mitosis, framework
+compilers, astro/playwright) still lives in the root devDependencies and is hoisted to every
+workspace; moving each package's build-only devDeps into its own manifest would make each
+package independently installable outside the monorepo. And `build:tw` still emits
+`dist/utilities.css` at the repo root — a candidate to fold into `@control-room/styles`.
 
 ## Why this is staged, not done in one commit
 

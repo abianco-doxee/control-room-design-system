@@ -17,15 +17,15 @@ import { browserScript } from "./gallery-scripts.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const tokensCss = readFileSync(
-  join(ROOT, "packages", "tokens", "dist", "control-room.css"),
+  join(ROOT, "..", "..", "packages", "tokens", "dist", "control-room.css"),
   "utf8"
 );
 const componentsCss = readFileSync(
-  join(ROOT, "packages", "styles", "styles", "components.css"),
+  join(ROOT, "..", "..", "packages", "styles", "styles", "components.css"),
   "utf8"
 );
 const flat = JSON.parse(
-  readFileSync(join(ROOT, "packages", "tokens", "dist", "tokens.flat.json"), "utf8")
+  readFileSync(join(ROOT, "..", "..", "packages", "tokens", "dist", "tokens.flat.json"), "utf8")
 );
 const dark = flat.themes.dark;
 
@@ -37,6 +37,8 @@ try {
   const woff2 = readFileSync(
     join(
       ROOT,
+      "..",
+      "..",
       "node_modules",
       "@fontsource",
       "saira-condensed",
