@@ -3,7 +3,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { timeTicks } from "../utils/time-scale.js";
+import { timeTicks } from "@control-room/utils/time-scale";
 
 const DAY = 24 * 3600 * 1000;
 // Read an instant's wall-clock parts in a zone (mirrors the module's helper).

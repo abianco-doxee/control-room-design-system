@@ -22,7 +22,7 @@ import {
   THEME_ROLES,
   TYPE_OVERRIDABLE,
   themeCss,
-} from "../lib/theme/index.js";
+} from "@control-room/utils/theme";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = join(ROOT, "tokens", "tokens.json");

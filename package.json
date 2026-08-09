@@ -17,7 +17,7 @@
     "checklists",
     "SKILL.md",
     "README.md",
-    "utils",
+    "packages",
     "lib",
     "brands"
   ],
@@ -27,7 +27,7 @@
     "./structure.css": "./dist/structure.css",
     "./themes/*": "./dist/themes/*",
     "./theme-contract": "./dist/theme-contract.json",
-    "./theme": "./lib/theme/index.js",
+    "./theme": "./packages/utils/theme/index.js",
     "./components": "./styles/components.css",
     "./base": "./styles/base.css",
     "./styles/*": "./styles/parts/*",
@@ -36,7 +36,7 @@
     "./flat": "./dist/tokens.flat.json",
     "./dtcg": "./design-tokens/control-room.tokens.json",
     "./catalog": "./catalog/catalog.json",
-    "./forms": "./lib/forms/index.js",
+    "./forms": "./packages/utils/forms/index.js",
     "./react": {
       "types": "./dist/pkg/react/index.d.ts",
       "import": "./dist/pkg/react/index.js",
@@ -72,19 +72,19 @@
     },
     "./frameworks/*": "./dist/frameworks/*",
     "./cn": {
-      "types": "./utils/cn.d.ts",
-      "default": "./utils/cn.js"
+      "types": "./packages/utils/cn.d.ts",
+      "default": "./packages/utils/cn.js"
     },
     "./href": {
-      "types": "./utils/href.d.ts",
-      "default": "./utils/href.js"
+      "types": "./packages/utils/href.d.ts",
+      "default": "./packages/utils/href.js"
     },
     "./duration": {
-      "types": "./utils/duration.d.ts",
-      "default": "./utils/duration.js"
+      "types": "./packages/utils/duration.d.ts",
+      "default": "./packages/utils/duration.js"
     },
-    "./position": "./utils/position.js",
-    "./time-scale": "./utils/time-scale.js"
+    "./position": "./packages/utils/position.js",
+    "./time-scale": "./packages/utils/time-scale.js"
   },
   "scripts": {
     "build:tokens": "node build/build-tokens.mjs",
