@@ -275,7 +275,7 @@ function variantsHtml(e) {
 }
 function tokensHtml(e) {
   if (!e.tokens || !e.tokens.length) return "";
-  const rows = e.tokens.map((t) => `<div class="vrow"><code>${t.cssVar}</code><span>${t.description || ""}</span></div>`).join("");
+  const rows = e.tokens.map((t) => `<div class="vrow"><code>${escT(t.cssVar)}</code><span>${escT(t.description || "")}</span></div>`).join("");
   return `<div class="vbox"><h4>tokens</h4>${rows}</div>`;
 }
 // Catalog ids that get a LIVE island — the real compiled React component,
@@ -363,7 +363,7 @@ const cardsHtml = cats
       <h2 class="card__name">${e.name}</h2>
       ${kbdBadge(e.category)}${kbdBadge(e.kind)}${kbdBadge(e.lifecycle)}
     </header>
-    <p class="card__desc">${e.description}</p>
+    <p class="card__desc">${escT(e.description)}</p>
     ${stageHtml(e.id)}
     <div class="card__meta">${propsHtml(e)}${variantsHtml(e)}${tokensHtml(e)}</div>
   </article>`,
