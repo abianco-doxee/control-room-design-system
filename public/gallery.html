@@ -12,7 +12,7 @@
  * Themes select via html[data-theme]: dark (default) | light | extreme | phosphor
  * ==========================================================================*/
 
-:root, :root[data-theme="dark"] {
+:root, [data-theme="dark"] {
   color-scheme: dark;
   --space-0: 0;
   --space-1: 4px;
@@ -291,7 +291,7 @@
   --field: repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
 }
 
-:root[data-theme="light"] {
+[data-theme="light"] {
   color-scheme: light;
   --ground: #eaeaf2;
   --board: #e2e2e9;
@@ -326,7 +326,7 @@
   --field: repeating-conic-gradient(rgba(0,0,0,0.045) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;
 }
 
-:root[data-theme="extreme"] {
+[data-theme="extreme"] {
   color-scheme: dark;
   --ground: #150021;
   --board: #20012e;
@@ -370,7 +370,7 @@
   --shadow-off-lg: 9px;
 }
 
-:root[data-theme="phosphor"] {
+[data-theme="phosphor"] {
   color-scheme: dark;
   --ground: #020a04;
   --board: #041207;
@@ -1862,8 +1862,13 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
  * legacy px so it never shrinks below legible). Panel surfaces declare a query
  * container so their dense text sizes to the *panel*, not the viewport. Only
  * surfaces with no escaping fixed/absolute descendants are safe containers
- * (container-type establishes a containing block — menus/popovers/grids opt out). */
-.cr-panel, .cr-hero, .cr-masthead { container-type: inline-size; }
+ * (container-type establishes a containing block — menus/popovers/grids opt out).
+ * Scoped to .cr-panel: it is the surface with real @container consumers (the
+ * stacking .cr-dl). Hero/masthead are keyed signal banners with dark-text-on-bright
+ * fills; container-type there defeats axe's getBackgroundColor (it can't resolve a
+ * descendant's background through a container, yielding a false low-contrast
+ * reading) for no responsive gain, so they stay plain surfaces. */
+.cr-panel { container-type: inline-size; }
 
 /* Explicit type-role utilities (opt-in), within the two registers (Law 5). */
 .cr-type-display { font-family: var(--font-display); font-size: var(--type-display-size); font-weight: var(--type-display-weight); line-height: var(--type-display-leading); letter-spacing: var(--type-display-tracking); text-transform: uppercase; }
@@ -1946,8 +1951,20 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 /* ── Toolbar ─────────────────────────────────────────────────────────────────
  * A labelled row/column of the operator's own controls; a single tab stop with
  * roving-tabindex arrows. */
-.cr-toolbar { display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-1); background: var(--cr-toolbar-bg); border: var(--brd) solid var(--cr-toolbar-border); }
+.cr-toolbar { display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-1); background: var(--cr-toolbar-bg); border: var(--brd) solid var(--cr-toolbar-border); max-width: 100%; }
 .cr-toolbar[aria-orientation="vertical"] { flex-direction: column; align-items: stretch; }
+/* Overflow (priority+) mode: the bar never wraps — items that don't fit are moved
+   to the "⋯ more" menu by the measure pass (hidden = display:none, out of layout). */
+/* .cr-btn sets display:inline-flex, which out-specifies the UA [hidden] rule —
+   re-assert display:none for collapsed items so the measure pass truly removes them. */
+/* Overflow mode fills its container (block flex, not shrink-to-content inline-flex)
+   so the measured width is STABLE — an inline-flex bar would shrink as items
+   collapse and spiral the measure down to zero. */
+.cr-toolbar--overflow { display: flex; width: 100%; }
+.cr-toolbar__item[hidden] { display: none; }
+.cr-toolbar__more-wrap { position: relative; display: inline-flex; margin-inline-start: auto; }
+.cr-toolbar__more { min-width: var(--control-h-sm); }
+.cr-toolbar[aria-orientation="vertical"] .cr-toolbar__more-wrap { margin-inline-start: 0; margin-block-start: auto; }
 
 /* ── FileUpload ──────────────────────────────────────────────────────────────
  * A dropzone wrapping a real, visually-hidden native <input type=file>; the
@@ -1987,8 +2004,9 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-calendar__nav { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: var(--panel-2); border: var(--brd) solid var(--border); color: var(--ink); cursor: pointer; }
 .cr-calendar__nav:hover { background: var(--panel); }
 .cr-calendar__nav:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
-.cr-calendar__row--head { display: grid; grid-template-columns: repeat(7, 1fr); }
-.cr-calendar__body { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--space-px); }
+.cr-calendar__row { display: grid; grid-template-columns: repeat(7, 1fr); }
+.cr-calendar__body { display: flex; flex-direction: column; gap: var(--space-px); }
+.cr-calendar__body .cr-calendar__row { gap: var(--space-px); }
 .cr-calendar__weekday { display: inline-flex; align-items: center; justify-content: center; padding: var(--space-1) 0; font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); text-transform: uppercase; }
 .cr-calendar__day { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; background: none; border: var(--brd-hair) solid transparent; color: var(--ink); font-family: var(--font-mono); font-size: var(--text-xs); cursor: pointer; }
 .cr-calendar__day:hover { background: var(--panel-2); }
