@@ -65,7 +65,7 @@ export function computePosition(anchor, floating, viewport, opts = {}) {
   return {
     x: Math.round(x),
     y: Math.round(y),
-    placement: vertical ? `${side}-${align}` : `${side}-${align}`,
+    placement: `${side}-${align}`,
   };
 }
 

@@ -3,7 +3,7 @@
  * In your app's Tailwind build:
  *   @import "@control-room/design-system/tailwind.css";
  * then load the runtime token layer once so utilities follow the theme:
- *   <link rel="stylesheet" href="@control-room/design-system/css">   (dist/control-room.css)
+ *   <link rel="stylesheet" href="@control-room/design-system/css">   (@control-room/tokens/css)
  *   <html data-theme="dark|light|extreme|phosphor">
  *
  * Now author with token-driven utilities: bg-panel, text-ink, bg-work,
