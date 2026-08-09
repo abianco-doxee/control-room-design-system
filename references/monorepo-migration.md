@@ -22,8 +22,12 @@ Progress:
 - [x] Extract `@control-room/styles` (components.css authored bundle · base.css + parts/*
       partials · tailwind.css entry · build-styles). Depends on `@control-room/tokens`
       (tailwind.css imports `@control-room/tokens/tw-theme.css`). Green.
-- [ ] Extract `@control-room/icons`, `@control-room/components`, `@control-room/docs`
-      (in that dependency order).
+- [x] Extract `@control-room/icons` (Iconify build tooling + path-data packs; ships the
+      pixel pack, exports `./pixel`). Bake-in model: `build-barrels` vendors the pack from
+      `@control-room/icons` into every target so `CrIcon`'s relative import resolves and the
+      compiled bundles stay self-contained + byte-identical. `CrIcon` also gained a raw-path
+      escape hatch (`path`/`filled`) so any glyph/family can be injected per-use. Green.
+- [ ] Extract `@control-room/components`, `@control-room/docs` (in that dependency order).
 
 ## Why this is staged, not done in one commit
 

@@ -23,6 +23,13 @@ export interface CrIconProps {
   label?: string;
   /** Icon pack: "cr" (geometric, default) · "pixel" (soft pixel-art escape hatch). */
   set?: "cr" | "pixel";
+  /** Escape hatch: a raw single-`<path>` `d` string. When set it renders as-is,
+   * overriding `name`/`set` — feed any glyph from any Iconify family (import a map
+   * from @control-room/icons and pass map[name]) or a hand-drawn 24×24 path,
+   * with no rebuild of this package. Stroked like the house set unless `filled`. */
+  path?: string;
+  /** With `path`: render it filled (fill=currentColor, no stroke), like the pixel pack. */
+  filled?: boolean;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root". */
   unstyled?: boolean;
@@ -58,10 +65,12 @@ export default function CrIcon(props: CrIconProps) {
         session: "M12 5 A3 3 0 1 0 12 11 A3 3 0 1 0 12 5 M6 20 V18 A6 6 0 0 1 18 18 V20",
         menu: "M4 7 H20 M4 12 H20 M4 17 H20",
       };
+      if (props.path) return props.path;
       if (props.set === "pixel") return PIXEL_ICONS[props.name] || paths[props.name] || "";
       return paths[props.name] || "";
     },
     get pixel(): boolean {
+      if (props.path) return !!props.filled;
       return props.set === "pixel" && !!PIXEL_ICONS[props.name];
     },
   });
