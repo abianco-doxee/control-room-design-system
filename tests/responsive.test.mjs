@@ -31,6 +31,11 @@ test("all 8 type roles are emitted", () => {
   }
 });
 
+test("container-query layout: an @container rule + a responsive grid exist", () => {
+  assert.match(comp, /@container\s*\([^)]*max-width:\s*22rem\)/, "a panel-width @container rule exists");
+  assert.match(comp, /\.cr-grid-auto[^{]*\{[^}]*repeat\(auto-fill/s, "container-reflowing grid utility");
+});
+
 test("density is per-container: compact remaps the spacing aliases", () => {
   assert.match(comp, /\[data-density="compact"\]\s*\{[^}]*--pad:/s, "compact remaps --pad");
   assert.match(comp, /\[data-density="compact"\]\s*\{[^}]*--gap:/s, "compact remaps --gap");
