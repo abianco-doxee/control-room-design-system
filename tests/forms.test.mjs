@@ -2,7 +2,6 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { type } from "arktype";
 import {
   createValidator,
   defineForm,
@@ -10,7 +9,8 @@ import {
   toArkType,
   toFormModel,
   toJsonSchema,
-} from "../lib/forms/index.js";
+} from "@control-room/utils/forms";
+import { type } from "arktype";
 
 // A representative "new session" schema authored in ArkType.
 const ArkSchema = type({

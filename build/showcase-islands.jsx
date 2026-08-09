@@ -11,6 +11,8 @@
  * entry here falls back to its static state snippets — markup is never
  * hand-written for a live component, so it can't drift from the real thing.
  */
+
+import { type as ark, defineForm } from "@control-room/utils/forms";
 import * as React from "react";
 import { useState } from "react";
 import { flushSync } from "react-dom";
@@ -77,7 +79,6 @@ import {
   CrTooltip,
   CrTree,
 } from "../dist/frameworks/react/index.ts";
-import { type as ark, defineForm } from "../lib/forms/index.js";
 
 // A big, deterministic dataset to exercise the data grid's virtualization.
 const GRID_REGIONS = ["eu-west", "us-east", "ap-south", "sa-east"];

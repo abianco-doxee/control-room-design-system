@@ -16,7 +16,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { contrastRatio } from "../lib/theme/index.js";
+import { contrastRatio } from "@control-room/utils/theme";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const THEMES = join(ROOT, "dist", "themes");

@@ -26,7 +26,7 @@ import {
   mergeTheme,
   themeCss,
   validateTheme,
-} from "../lib/theme/index.js";
+} from "@control-room/utils/theme";
 import { chassisFrom } from "./chassis.mjs";
 import { surfaceRamp } from "./ramp.mjs";
 import { fitSignals, toneSignals } from "./signals.mjs";
