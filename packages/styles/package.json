@@ -12,15 +12,17 @@
   },
   "homepage": "https://github.com/alebianco/control-room-design-system#readme",
   "sideEffects": ["*.css"],
-  "files": ["styles"],
+  "files": ["styles", "dist"],
   "exports": {
     "./components": "./styles/components.css",
     "./base": "./styles/base.css",
     "./parts/*": "./styles/parts/*",
-    "./tailwind.css": "./styles/tailwind.css"
+    "./tailwind.css": "./styles/tailwind.css",
+    "./utilities.css": "./dist/utilities.css"
   },
   "scripts": {
     "build": "node build/build-styles.mjs",
+    "build:utilities": "tailwindcss -i tailwind-input.css -o dist/utilities.css",
     "verify": "node build/build-styles.mjs --check"
   },
   "dependencies": {

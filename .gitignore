@@ -5,7 +5,8 @@ node_modules/
 dist/.sd/
 
 # Prebuilt Tailwind utilities — build artifact (npm run build:tw); not committed
-dist/utilities.css
+# (lives under packages/styles/dist since the workspace split)
+**/dist/utilities.css
 
 # Mitosis framework output — build artifact (npm run build:components)
 # (lives under packages/components/dist since the workspace split)
