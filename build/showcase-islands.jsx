@@ -267,8 +267,14 @@ const DEMOS = {
   tabs: {
     tag: "CrTabs", defs: [T("number", "active", 0, { min: 0, max: 2 })],
     render: (s, set) => h("div", null,
-      h(CrTabs, { tabs: TABS, active: s.active, onChange: (i) => set("active", i) }),
-      h("p", { className: "pg__note" }, `panel ${s.active + 1} selected`)),
+      h(CrTabs, { id: "demo-tabs", tabs: TABS, active: s.active, onChange: (i) => set("active", i) }),
+      // Panels wired to the strip per the WAI-ARIA tabs pattern: role=tabpanel,
+      // id/aria-labelledby paired with the tab, focusable, only the active shown.
+      ...TABS.map((_t, i) => h("div", {
+        key: i, role: "tabpanel", id: "demo-tabs-panel-" + i,
+        "aria-labelledby": "demo-tabs-tab-" + i, tabIndex: 0,
+        hidden: s.active !== i, className: "pg__note",
+      }, `panel ${i + 1} selected`))),
   },
   menu: {
     tag: "CrMenu",

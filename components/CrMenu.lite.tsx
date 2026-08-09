@@ -24,6 +24,9 @@ export default function CrMenu(props: CrMenuProps) {
 
   const state = useStore({
     open: false,
+    /* typeahead buffer: printable keys accumulate for a short window, then reset */
+    buffer: "",
+    bufferAt: 0,
     toggle() {
       state.open = !state.open;
     },
@@ -80,6 +83,21 @@ export default function CrMenu(props: CrMenuProps) {
         e.preventDefault();
         state.open = false;
         state.focusTrigger();
+      } else if (e.key && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        /* typeahead: focus the next item whose label starts with what was typed.
+           Keys within ~600ms accumulate ("de" → "Delete"); a repeated single key
+           cycles matches. */
+        const now = Date.now();
+        state.buffer = (now - state.bufferAt < 600 ? state.buffer : "") + e.key.toLowerCase();
+        state.bufferAt = now;
+        const labels = props.items.map((it: CrMenuItem) => (it.label || "").toLowerCase());
+        for (let k = 1; k <= items.length; k++) {
+          const idx = (i + k) % items.length; // start after the focused item (i = -1 → from 0)
+          if (labels[idx].indexOf(state.buffer) === 0) {
+            (items[idx] as HTMLElement).focus();
+            break;
+          }
+        }
       }
     },
   });

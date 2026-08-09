@@ -4,12 +4,19 @@ export interface CrTabsProps {
   tabs: string[];
   /** Initially-active tab index. */
   active?: number;
+  /** Base id for tab↔panel wiring. When set, each tab gets `id="{id}-tab-{i}"`
+   *  and `aria-controls="{id}-panel-{i}"`; render each panel as the matching
+   *  `<div role="tabpanel" id="{id}-panel-{i}" aria-labelledby="{id}-tab-{i}"
+   *  tabindex="0" hidden={i !== active}>` so screen readers get the relationship
+   *  and the panel is reachable by keyboard. Omit it for a decorative strip. */
+  id?: string;
   onChange?: (index: number) => void;
 }
 
 /* Tab strip (role=tablist) with roving-tabindex keyboard nav: ←/→ (and ↑/↓)
  * move between tabs, Home/End jump to ends; only the active tab is in the tab
- * order. Scalar active-index state; styling via .cr-tabs. */
+ * order. Pass `id` to wire the WAI-ARIA tab↔panel association (see the prop doc).
+ * Scalar active-index state; styling via .cr-tabs. */
 export default function CrTabs(props: CrTabsProps) {
   const state = useStore({
     active: props.active || 0,
@@ -45,6 +52,8 @@ export default function CrTabs(props: CrTabsProps) {
           <button
             type="button"
             role="tab"
+            id={props.id ? props.id + "-tab-" + i : undefined}
+            aria-controls={props.id ? props.id + "-panel-" + i : undefined}
             class={"cr-tab" + (state.active === i ? " cr-tab--on" : "")}
             aria-selected={state.active === i ? "true" : "false"}
             tabIndex={state.active === i ? 0 : -1}
