@@ -83,17 +83,17 @@ function llmsIndex() {
 
 > ${SUMMARY}
 
-Control Room is both a published component library (\`@control-room/*\` on npm) and a
+Control Room is both a published component library (\`@abianco-doxee/cr-*\` on npm) and a
 Claude Code skill. Install one framework build plus the token + style layers:
 
 \`\`\`
-npm i @control-room/components @control-room/tokens @control-room/styles
+npm i @abianco-doxee/cr-components @abianco-doxee/cr-tokens @abianco-doxee/cr-styles
 \`\`\`
 
 \`\`\`
-import { CrButton } from "@control-room/components/react";  // or /vue /svelte /angular /solid /qwik
-import "@control-room/tokens/css";                          // token layer, all four themes
-import "@control-room/styles/components";                   // component styles (or per-part parts/*)
+import { CrButton } from "@abianco-doxee/cr-components/react";  // or /vue /svelte /angular /solid /qwik
+import "@abianco-doxee/cr-tokens/css";                          // token layer, all four themes
+import "@abianco-doxee/cr-styles/components";                   // component styles (or per-part parts/*)
 \`\`\`
 
 Set the theme on the root: \`<html data-theme="dark|light|extreme|phosphor">\`.
@@ -116,7 +116,7 @@ ${componentsSection()}
 - [theme-contract.json](${site("theme-contract.json")}): the required theme roles a valid theme/brand must define
 - [tokens.json](${blob("packages/tokens/tokens/tokens.json")}): the token source of truth (all themes)
 - [llms-full.txt](${site("llms-full.txt")}): this index followed by the full text of every reference doc
-- MCP server: \`npx @control-room/mcp\` — exposes the catalog, tokens, theme contract and design laws as tools an agent can query ([docs](${blob("packages/mcp/README.md")}))
+- MCP server: \`npx @abianco-doxee/cr-mcp\` — exposes the catalog, tokens, theme contract and design laws as tools an agent can query ([docs](${blob("packages/mcp/README.md")}))
 
 ## Optional
 ${OPTIONAL.map(link).join("\n")}

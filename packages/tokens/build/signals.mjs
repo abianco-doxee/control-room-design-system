@@ -13,7 +13,7 @@
  * alone — the brand meant those exactly.
  */
 
-import { contrastRatio, THEME_ROLES } from "@control-room/utils/theme";
+import { contrastRatio, THEME_ROLES } from "@abianco-doxee/cr-utils/theme";
 import { clampChroma, formatHex, oklch } from "culori";
 
 /** The signal role keys (bare, no leading --), from the contract. */

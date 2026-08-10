@@ -1,9 +1,9 @@
 {
-  "name": "@control-room/docs",
+  "name": "@abianco-doxee/cr-docs",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Control Room documentation site (Astro + Starlight) — the dev-only leaf. Builds the reference docs, the live gallery, the component browser (React islands from @control-room/components), and the brand preview from the sibling packages; plus the Playwright a11y / islands / responsive / visual suites.",
+  "description": "Control Room documentation site (Astro + Starlight) — the dev-only leaf. Builds the reference docs, the live gallery, the component browser (React islands from @abianco-doxee/cr-components), and the brand preview from the sibling packages; plus the Playwright a11y / islands / responsive / visual suites.",
   "scripts": {
     "build:content": "node build/build-docs-content.mjs",
     "build:gallery": "node build/build-gallery.mjs",
@@ -23,11 +23,11 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@control-room/components": "workspace:*",
-    "@control-room/icons": "workspace:*",
-    "@control-room/styles": "workspace:*",
-    "@control-room/tokens": "workspace:*",
-    "@control-room/utils": "workspace:*"
+    "@abianco-doxee/cr-components": "workspace:*",
+    "@abianco-doxee/cr-icons": "workspace:*",
+    "@abianco-doxee/cr-styles": "workspace:*",
+    "@abianco-doxee/cr-tokens": "workspace:*",
+    "@abianco-doxee/cr-utils": "workspace:*"
   },
   "devDependencies": {
     "@astrojs/starlight": "^0.41.7",

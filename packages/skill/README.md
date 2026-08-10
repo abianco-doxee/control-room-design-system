@@ -1,9 +1,9 @@
-# @control-room/skill
+# @abianco-doxee/cr-skill
 
 One-command install of the [Control Room design system](https://github.com/abianco-doxee/control-room-design-system)
 as an **agent skill** — plus the Claude Code **plugin** bundle. Both carry the same
 skill content (SKILL.md, the reference docs, and the machine-readable token /
-catalog artifacts) and wire up the `@control-room/mcp` server.
+catalog artifacts) and wire up the `@abianco-doxee/cr-mcp` server.
 
 ## Claude Code — plugin (recommended)
 
@@ -17,16 +17,16 @@ Installs the skill and registers the `control-room` MCP server in one step.
 ## Any project — npx installer
 
 ```bash
-npx @control-room/skill              # → ./.claude/skills/control-room-design-system (this project)
-npx @control-room/skill --global     # → ~/.claude/skills/control-room-design-system (all projects)
-npx @control-room/skill --provider=cursor    # or opencode
-npx @control-room/skill --dir=path/to/skills
+npx @abianco-doxee/cr-skill              # → ./.claude/skills/control-room-design-system (this project)
+npx @abianco-doxee/cr-skill --global     # → ~/.claude/skills/control-room-design-system (all projects)
+npx @abianco-doxee/cr-skill --provider=cursor    # or opencode
+npx @abianco-doxee/cr-skill --dir=path/to/skills
 ```
 
 Then add the MCP server to your agent config for live component/token lookup:
 
 ```jsonc
-{ "mcpServers": { "control-room": { "command": "npx", "args": ["-y", "@control-room/mcp"] } } }
+{ "mcpServers": { "control-room": { "command": "npx", "args": ["-y", "@abianco-doxee/cr-mcp"] } } }
 ```
 
 ## Repo contributors
@@ -34,4 +34,4 @@ Then add the MCP server to your agent config for live component/token lookup:
 Working inside the monorepo, `npm run skills:sync` installs the skill into the
 repo's own `.claude` / `.cursor` / `.opencode` for local development. The bundle
 this package ships is generated from the same `skills/manifest.json` and
-drift-gated (`npm run verify -w @control-room/skill`).
+drift-gated (`npm run verify -w @abianco-doxee/cr-skill`).

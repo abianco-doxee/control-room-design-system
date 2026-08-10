@@ -2,7 +2,7 @@
  * Live playgrounds for the Component Browser.
  *
  * Every entry mounts the ACTUAL compiled React component from
- * @control-room/components (the shipped output) inside a Playground harness: a
+ * @abianco-doxee/cr-components (the shipped output) inside a Playground harness: a
  * typed controls panel edits the component's props and re-renders it live, and a
  * code snippet reflects the current props — the Doxee-hub playground model.
  *
@@ -73,8 +73,8 @@ import {
   CrToolbar,
   CrTooltip,
   CrTree,
-} from "@control-room/components/frameworks/react/index.ts";
-import { type as ark, defineForm } from "@control-room/utils/forms";
+} from "@abianco-doxee/cr-components/frameworks/react/index.ts";
+import { type as ark, defineForm } from "@abianco-doxee/cr-utils/forms";
 import * as React from "react";
 import { useState } from "react";
 import { flushSync } from "react-dom";

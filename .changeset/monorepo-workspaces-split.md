@@ -1,15 +1,15 @@
 ---
-"@control-room/tokens": minor
-"@control-room/styles": minor
-"@control-room/utils": minor
-"@control-room/icons": minor
-"@control-room/components": minor
+"@abianco-doxee/cr-tokens": minor
+"@abianco-doxee/cr-styles": minor
+"@abianco-doxee/cr-utils": minor
+"@abianco-doxee/cr-icons": minor
+"@abianco-doxee/cr-components": minor
 ---
 
 Restructure into npm workspaces: each layer is now an independently-publishable
-`@control-room/*` package (tokens, styles, utils, icons, components) with its own
-`dist` and `exports`. The root `@control-room/design-system` becomes a convenience
-umbrella that re-exports every subpath, so existing `@control-room/design-system/*`
-imports are unchanged. Cross-package references use `@control-room/*` specifiers.
+`@abianco-doxee/cr-*` package (tokens, styles, utils, icons, components) with its own
+`dist` and `exports`. The root `@abianco-doxee/cr-design-system` becomes a convenience
+umbrella that re-exports every subpath, so existing `@abianco-doxee/cr-design-system/*`
+imports are unchanged. Cross-package references use `@abianco-doxee/cr-*` specifiers.
 Packaging polish: correct `sideEffects` (CSS packages vs pure modules), `keywords`,
 `repository`+`directory`, `homepage`, and full `types` on every `utils` entrypoint.

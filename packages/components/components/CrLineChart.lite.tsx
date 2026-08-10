@@ -144,7 +144,7 @@ export default function CrLineChart(props: CrLineChartProps) {
       }
       return m.T + (1 - (v - m.min) / m.range) * m.plotH;
     },
-    /* ── Timezone-aware time axis. Same algorithm as @control-room/utils/time-scale (mirrored
+    /* ── Timezone-aware time axis. Same algorithm as @abianco-doxee/cr-utils/time-scale (mirrored
      * inline because Mitosis doesn't import runtime helpers into each target).
      * Day/week/month/year ticks land on real calendar boundaries in `zone`
      * (DST included) via the built-in Intl zone database; small spans fall back

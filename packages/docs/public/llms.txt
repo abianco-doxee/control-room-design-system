@@ -2,17 +2,17 @@
 
 > A neon-noir, neobrutalist design system for dense operational dashboards — authored once as Mitosis components and compiled to React, Vue, Svelte, Angular, Solid and Qwik, on a four-theme OKLCH token layer with a documented accessibility contract.
 
-Control Room is both a published component library (`@control-room/*` on npm) and a
+Control Room is both a published component library (`@abianco-doxee/cr-*` on npm) and a
 Claude Code skill. Install one framework build plus the token + style layers:
 
 ```
-npm i @control-room/components @control-room/tokens @control-room/styles
+npm i @abianco-doxee/cr-components @abianco-doxee/cr-tokens @abianco-doxee/cr-styles
 ```
 
 ```
-import { CrButton } from "@control-room/components/react";  // or /vue /svelte /angular /solid /qwik
-import "@control-room/tokens/css";                          // token layer, all four themes
-import "@control-room/styles/components";                   // component styles (or per-part parts/*)
+import { CrButton } from "@abianco-doxee/cr-components/react";  // or /vue /svelte /angular /solid /qwik
+import "@abianco-doxee/cr-tokens/css";                          // token layer, all four themes
+import "@abianco-doxee/cr-styles/components";                   // component styles (or per-part parts/*)
 ```
 
 Set the theme on the root: `<html data-theme="dark|light|extreme|phosphor">`.
@@ -148,7 +148,7 @@ live in the [Gallery](https://abianco-doxee.github.io/control-room-design-system
 - [theme-contract.json](https://abianco-doxee.github.io/control-room-design-system/theme-contract.json): the required theme roles a valid theme/brand must define
 - [tokens.json](https://github.com/abianco-doxee/control-room-design-system/blob/main/packages/tokens/tokens/tokens.json): the token source of truth (all themes)
 - [llms-full.txt](https://abianco-doxee.github.io/control-room-design-system/llms-full.txt): this index followed by the full text of every reference doc
-- MCP server: `npx @control-room/mcp` — exposes the catalog, tokens, theme contract and design laws as tools an agent can query ([docs](https://github.com/abianco-doxee/control-room-design-system/blob/main/packages/mcp/README.md))
+- MCP server: `npx @abianco-doxee/cr-mcp` — exposes the catalog, tokens, theme contract and design laws as tools an agent can query ([docs](https://github.com/abianco-doxee/control-room-design-system/blob/main/packages/mcp/README.md))
 
 ## Optional
 - [Seeded Pixel-Cat](https://abianco-doxee.github.io/control-room-design-system/reference/seeded-cat/): the identity+state pixel-cat generator

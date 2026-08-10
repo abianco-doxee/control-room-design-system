@@ -38,7 +38,7 @@ export interface CrFormProps {
   values?: Record<string, any>;
   /** `(values) => errors | Promise<errors>` where errors is `{ [dottedPath]: msg }`
    *  ({} = valid). May be **async** (return a Promise) for server-side checks.
-   *  Wire @control-room/utils/forms here in targets where a function prop can return a value
+   *  Wire @abianco-doxee/cr-utils/forms here in targets where a function prop can return a value
    *  (React/Vue/Svelte/Solid/Angular). */
   validate?: (values: Record<string, any>) => Record<string, string> | Promise<Record<string, string>>;
   /** Controlled errors keyed by dotted path — always shown, merged over the

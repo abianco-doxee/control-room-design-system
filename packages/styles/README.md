@@ -1,24 +1,24 @@
-# @control-room/styles
+# @abianco-doxee/cr-styles
 
 The component style layer of the [Control Room design system](https://github.com/abianco-doxee/control-room-design-system) —
-the `cr-*` classes every component renders. Pairs with `@control-room/tokens`.
+the `cr-*` classes every component renders. Pairs with `@abianco-doxee/cr-tokens`.
 
 ```bash
-npm i @control-room/styles @control-room/tokens
+npm i @abianco-doxee/cr-styles @abianco-doxee/cr-tokens
 ```
 
 ```js
-import "@control-room/tokens/css";        // the token layer first
-import "@control-room/styles/components";  // the whole component layer (all cr-* classes)
+import "@abianco-doxee/cr-tokens/css";        // the token layer first
+import "@abianco-doxee/cr-styles/components";  // the whole component layer (all cr-* classes)
 ```
 
 Prefer PrimeVue-style import-on-use? Load the thin base once, then only the parts
 you render:
 
 ```js
-import "@control-room/styles/base";            // reset + chassis + shared primitives
-import "@control-room/styles/parts/button.css"; // just the button
-import "@control-room/styles/parts/panel.css";
+import "@abianco-doxee/cr-styles/base";            // reset + chassis + shared primitives
+import "@abianco-doxee/cr-styles/parts/button.css"; // just the button
+import "@abianco-doxee/cr-styles/parts/panel.css";
 ```
 
 ## Exports

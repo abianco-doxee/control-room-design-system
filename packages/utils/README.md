@@ -1,4 +1,4 @@
-# @control-room/utils
+# @abianco-doxee/cr-utils
 
 Framework-agnostic utilities for the [Control Room design system](https://github.com/abianco-doxee/control-room-design-system) —
 pure, dependency-light helpers used by apps, the docs, and the tooling. (The
@@ -6,7 +6,7 @@ Mitosis components deliberately inline the small ones so each compiled target
 stays self-contained; these are the runtime/host-side copies.)
 
 ```bash
-npm i @control-room/utils
+npm i @abianco-doxee/cr-utils
 ```
 
 ## Exports

@@ -11,7 +11,7 @@
  *
  * Every brand is validated against the theme contract (all required roles present
  * once merged) and contrast-checked before it's written. Rendering goes through
- * @control-room/utils/theme's themeCss — the SAME renderer the built-in themes use.
+ * @abianco-doxee/cr-utils/theme's themeCss — the SAME renderer the built-in themes use.
  *
  * Run:   node build/build-theme.mjs            (all brands/*.json)
  *        node build/build-theme.mjs slate      (one brand)
@@ -26,7 +26,7 @@ import {
   mergeTheme,
   themeCss,
   validateTheme,
-} from "@control-room/utils/theme";
+} from "@abianco-doxee/cr-utils/theme";
 import { chassisFrom } from "./chassis.mjs";
 import { surfaceRamp } from "./ramp.mjs";
 import { fitSignals, toneSignals } from "./signals.mjs";

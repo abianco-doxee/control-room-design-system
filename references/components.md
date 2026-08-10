@@ -1063,7 +1063,7 @@ in local time, a multi-week chart on local Mondays, a multi-year chart on Jan 1.
 Labels format to the unit (`09:30`, `3 Mar`, `Mar`, `Jan '25`, `2025`); the hover
 tooltip shows a fuller stamp (`3 Mar 09:15`). This uses the built-in `Intl` zone
 database (no date library, no bundle cost) and is shared with the static gallery via
-`@control-room/design-system/time-scale` (`timeTicks(lo, hi, { zone, target, locale,
+`@abianco-doxee/cr-design-system/time-scale` (`timeTicks(lo, hi, { zone, target, locale,
 week, fiscalStart })`), so hand-rendered and live charts agree.
 
 The calendar can be expressed the way a team reads it, via three more props (all
@@ -1282,7 +1282,7 @@ closes and returns focus to the trigger. Use **Menu** for a list of actions.
 trigger, **flips** above when there's no room below, and **shifts** horizontally to
 stay in the viewport (never clipping off-screen), tagging itself with
 `data-placement`. The algorithm is exported for your own overlays as
-`@control-room/design-system/position` — `computePosition` (pure geometry, unit-
+`@abianco-doxee/cr-design-system/position` — `computePosition` (pure geometry, unit-
 tested), `place(anchor, floating, opts)`, and `autoPlace(...)` (keeps it pinned on
 scroll/resize). No dependency on Floating UI.
 
@@ -1560,7 +1560,7 @@ A retro-futuristic **cyber-sigil** generated from a seed — a per-entity identi
 mark that pairs with the pixel-cat. Full contract in `references/seeded-sigil.md`.
 
 ```tsx
-import { CrSigil } from "@control-room/design-system/react";
+import { CrSigil } from "@abianco-doxee/cr-design-system/react";
 <CrSigil seed="nova-01" state="working" />
 ```
 
@@ -1584,7 +1584,7 @@ operators — it **is** the non-colour backup the a11y contract requires.
 <span class="cr-sev cr-sev--idle" role="img" aria-label="idle"></span>      <!-- ● ∞ -->
 ```
 ```tsx
-import { CrShape } from "@control-room/design-system/react";
+import { CrShape } from "@abianco-doxee/cr-design-system/react";
 <CrShape severity="crit" label="build failing" />
 ```
 
@@ -1623,7 +1623,7 @@ screws), panel seams, wear scratches, and one indicator LED. Same seed → same
 strip, so a rack/unit gets a stable, distinct face (like the seeded cat/sigil).
 
 ```tsx
-import { CrChrome } from "@control-room/design-system/react";
+import { CrChrome } from "@abianco-doxee/cr-design-system/react";
 <CrChrome seed="nova-rack" width={440} />
 ```
 
@@ -1661,7 +1661,7 @@ screen.**
 <span class="cr-blob" aria-hidden="true"></span>  <!-- standalone soft accent -->
 ```
 ```tsx
-import { CrBreach } from "@control-room/design-system/react";
+import { CrBreach } from "@abianco-doxee/cr-design-system/react";
 <CrBreach signal="done" wash alive>…the one exceptional thing…</CrBreach>
 ```
 

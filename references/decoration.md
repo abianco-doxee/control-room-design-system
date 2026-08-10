@@ -38,7 +38,7 @@ sets: `braille` (finest), `block` (`░▒▓█`), `ramp` (`.:-=+*#%@`).
 </div>
 ```
 ```tsx
-import { CrAscii } from "@control-room/design-system/react";
+import { CrAscii } from "@abianco-doxee/cr-design-system/react";
 <div class="cr-ascii cr-ascii--mask-l" aria-hidden="true">
   <CrAscii seed="nova-01" variant="braille" />
 </div>
@@ -57,7 +57,7 @@ modifier fades it off the content edge (`-l` toward left-aligned text, `-r`,
   (`SEED 2E7A · 0x4F · 12ms ▮▮▮▯▯`) for a frame corner. **Decoration, not data.**
 
 ```tsx
-import { CrTelemetry } from "@control-room/design-system/react";
+import { CrTelemetry } from "@abianco-doxee/cr-design-system/react";
 <CrTelemetry seed="cr-1130" />
 ```
 

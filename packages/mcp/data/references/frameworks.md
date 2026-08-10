@@ -13,9 +13,9 @@ Each framework has a subpath export with named components (and, where the target
 is typed, prop-type exports):
 
 ```ts
-import { CrButton, type CrButtonProps } from "@control-room/design-system/react";
-import { CrButton } from "@control-room/design-system/qwik";
-import { CrButton } from "@control-room/design-system/vue";
+import { CrButton, type CrButtonProps } from "@abianco-doxee/cr-design-system/react";
+import { CrButton } from "@abianco-doxee/cr-design-system/qwik";
+import { CrButton } from "@abianco-doxee/cr-design-system/vue";
 ```
 
 How each entry is distributed reflects what that framework needs — the package is
@@ -128,25 +128,25 @@ Load the token + component CSS once (any framework), then import the compiled
 component for your framework:
 
 ```html
-<link rel="stylesheet" href="@control-room/design-system/css" />        <!-- tokens -->
-<link rel="stylesheet" href="@control-room/design-system/components" />  <!-- cr- classes -->
+<link rel="stylesheet" href="@abianco-doxee/cr-design-system/css" />        <!-- tokens -->
+<link rel="stylesheet" href="@abianco-doxee/cr-design-system/components" />  <!-- cr- classes -->
 ```
 Each framework has a **barrel entry** — import any component by name from one
 subpath (`/react`, `/vue`, `/svelte`, `/angular`, `/solid`, `/qwik`):
 
 ```tsx
 // React
-import { CrSwitch, CrModal } from "@control-room/design-system/react";
+import { CrSwitch, CrModal } from "@abianco-doxee/cr-design-system/react";
 <CrSwitch checked={on} label="Live" onChange={setOn} />
 ```
 ```vue
 <!-- Vue -->
-<script setup> import { CrSwitch } from "@control-room/design-system/vue"; </script>
+<script setup> import { CrSwitch } from "@abianco-doxee/cr-design-system/vue"; </script>
 <CrSwitch :checked="on" label="Live" @change="on = $event" />
 ```
 ```tsx
 // Qwik
-import { CrSwitch } from "@control-room/design-system/qwik";
+import { CrSwitch } from "@abianco-doxee/cr-design-system/qwik";
 <CrSwitch checked={on.value} label="Live" onChange$={(v) => (on.value = v)} />
 ```
 
@@ -154,7 +154,7 @@ The **`examples/console/`** app is a real Qwik dashboard built on this barrel �
 see it for a full composition (nav rail, masthead, session panels, breach).
 
 Need just one component? The deep path still works (extension required):
-`import CrSwitch from "@control-room/design-system/frameworks/react/components/CrSwitch.tsx"`.
+`import CrSwitch from "@abianco-doxee/cr-design-system/frameworks/react/components/CrSwitch.tsx"`.
 
 The barrels re-export the **default** of every compiled component (Angular also
 re-exports each `<Name>Module`). They ship as **source** — your app's bundler
@@ -170,7 +170,7 @@ utility on a `cr-` element. Use the `cn()` helper (clsx + tailwind-merge) so
 conflicting utilities resolve last-wins instead of both shipping:
 
 ```tsx
-import { cn } from "@control-room/design-system/cn";
+import { cn } from "@abianco-doxee/cr-design-system/cn";
 <button class={cn("cr-btn", primary && "cr-btn--accent", "px-4", className)} />
 ```
 

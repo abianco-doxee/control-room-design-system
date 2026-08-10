@@ -3,7 +3,7 @@ import type { DocumentHead } from "@builder.io/qwik-city";
 import { describeCron } from "../cron";
 
 /* Consume the Mitosis-compiled Qwik components straight from the built barrel.
- * (In a downstream app this is `@control-room/design-system/qwik`.)
+ * (In a downstream app this is `@abianco-doxee/cr-design-system/qwik`.)
  *
  * Note: the compiled components expose plain prop names (`onClick`, `onChange`,
  * `onClose`) — NOT the `$`-suffixed DOM form. Pass a QRL under the plain name:

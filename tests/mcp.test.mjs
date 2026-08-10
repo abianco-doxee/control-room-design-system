@@ -1,4 +1,4 @@
-// Smoke test for @control-room/mcp — spins up the stdio server via an MCP client
+// Smoke test for @abianco-doxee/cr-mcp — spins up the stdio server via an MCP client
 // and asserts the tools, resources, and a few representative calls work against
 // the bundled data. Guards against a broken data bundle or a tool regression.
 import assert from "node:assert/strict";
