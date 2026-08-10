@@ -66,6 +66,7 @@ export default defineConfig({
           label: "Overview",
           items: [
             { label: "What is Control Room", link: "/guide/skill/" },
+            { label: "Getting Started", link: "/guide/getting-started/" },
             { label: "Live Gallery ↗", link: galleryHref, attrs: { target: "_self" } },
             { label: "Component Browser ↗", link: browserHref, attrs: { target: "_self" } },
           ],
@@ -96,16 +97,20 @@ export default defineConfig({
             { label: "Seeded Pixel-Sigil", link: "/reference/seeded-sigil/" },
             { label: "Decoration — ASCII/Pixel", link: "/reference/decoration/" },
             { label: "Framework Components", link: "/reference/frameworks/" },
+          ],
+        },
+        {
+          label: "Extending the system",
+          collapsed: true,
+          items: [
+            { label: "Extending Control Room", link: "/guide/contributing/" },
             { label: "Component Template", link: "/build/component-template/" },
             { label: "Ship Checklist", link: "/build/component-checklist/" },
           ],
         },
         {
-          label: "Contributing",
-          items: [
-            { label: "How to contribute", link: "/guide/contributing/" },
-            { label: "Changelog", link: "/guide/changelog/" },
-          ],
+          label: "Releases",
+          items: [{ label: "Changelog", link: "/guide/changelog/" }],
         },
       ],
     }),

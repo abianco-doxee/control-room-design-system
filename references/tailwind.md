@@ -20,7 +20,7 @@ convenience compositions on top.
 ```
 
 Tailwind scans **your** markup and emits only the utilities you use. No build of
-your own? Use the prebuilt file: `npm run build:tw` → `dist/utilities.css` (a
+your own? Use the prebuilt file: `pnpm run build:tw` → `dist/utilities.css` (a
 bounded, token-driven utility set).
 
 ## What you get (utilities → tokens)

@@ -1704,7 +1704,7 @@ Add one by adding a single-`d`, square-geometry path to the map in
 **Packs (`set`) — the soft escape hatch.** `set="cr"` (default) is the hand-authored
 stroked geometric set above. `set="pixel"` swaps in a **pixel-art pack** built
 offline from Iconify's *pixelarticons* (`build/build-icons.mjs` → `lib/icons/pixel.ts`,
-guarded by `npm run verify:icons`) — filled instead of stroked, same 24×24 grid, same
+guarded by `pnpm run verify:icons`) — filled instead of stroked, same 24×24 grid, same
 names, still a single `<path>` so it ports to all six targets (no icon font, no
 runtime fetch). Use it to give one theme or subtree a softer register:
 ```tsx

@@ -69,19 +69,19 @@ Corruption is decorative; it must never reach assistive tech.
 
 ## Automated gate
 
-Accessibility is enforced by CI, not just documented. `npm run test:a11y`
+Accessibility is enforced by CI, not just documented. `pnpm run test:a11y`
 (Playwright + axe-core) loads the living gallery in **all four themes** and fails
 on any **serious/critical** WCAG 2.1 A/AA violation (scoped to the component
 region). It runs on every push (`.github/workflows/deploy.yml`) and blocks the
-deploy. A companion visual-regression check (`npm run test:visual`) snapshots the
-gallery per theme; run `npm run test:visual:update` after intentional changes.
+deploy. A companion visual-regression check (`pnpm run test:visual`) snapshots the
+gallery per theme; run `pnpm run test:visual:update` after intentional changes.
 
 ## Direction (RTL)
 
 Layout is **direction-agnostic**: the component CSS uses logical properties
 (`margin-inline-*`, `padding-inline-*`, `border-inline-*`, `text-align: start/end`)
 rather than physical `left`/`right`, so the whole system mirrors under
-`dir="rtl"`. A guard (`npm run test:rtl`) fails the build if a physical flow
+`dir="rtl"`. A guard (`pnpm run test:rtl`) fails the build if a physical flow
 property creeps back in, and the responsive gate checks there's no horizontal
 overflow under RTL. (Fixed/absolute overlay positioning and gradient/clip-path
 angles are direction-neutral and out of scope.)

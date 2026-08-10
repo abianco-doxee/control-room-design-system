@@ -37,7 +37,7 @@ Solid render fn, Svelte component constructor, Angular class). Peer deps cover a
 six frameworks, each marked `optional` so installing for one target doesn't pull
 the rest. Guarded by `verify:pkg-types` (drift) and `tests/pkg-exports.test.mjs`.
 
-The build compiles the typed packages with `npm run build:pkg` (relative import
+The build compiles the typed packages with `pnpm run build:pkg` (relative import
 extensions rewritten `.tsx → .js` so the emit resolves in Node ESM and bundlers);
 `prepack` runs it so `npm pack` ships usable packages. The `test:pkg` gate imports
 each entry as a consumer would — React renders through `react-dom/server`, Qwik
@@ -114,7 +114,7 @@ export default function CrSwitch(props: CrSwitchProps) {
 ## Build
 
 ```bash
-npm run build:components     # → dist/frameworks/{react,vue,svelte,angular,solid,qwik}/
+pnpm run build:components     # → dist/frameworks/{react,vue,svelte,angular,solid,qwik}/
 ```
 
 Output is a build artifact (git-ignored); CI compiles it on every push so the

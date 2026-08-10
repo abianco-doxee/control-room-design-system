@@ -46,6 +46,7 @@ Detail lives in `references/`. Load only what the task needs.
 
 | File | Read it when you need… |
 | --- | --- |
+| `references/getting-started.md` | **Installing and wiring it up** — the `@alebianco/cr-*` packages, GitHub Packages auth, CSS import order, theme selection, and per-framework imports. |
 | `references/design-language.md` | The **nine laws** — the *why* and the do/don't for every visual decision. Read this first for any new component. |
 | `references/tokens.md` | The full token reference — every variable, every theme, and how to consume them. |
 | `references/theming.md` | **Theming & branding** — the feature ⇄ appearance split, the theme contract, authoring a brand (`brands/*.json` + `@alebianco/cr-design-system/theme`), contrast, and the appearance-separation guard. |
