@@ -59,6 +59,30 @@ starlight-tabs,
   box-shadow: var(--shadow-off, 4px) var(--shadow-off, 4px) 0 var(--shadow-col, #000);
 }
 
+/* Tables become bordered boxes above, so their content needs to clear that border.
+   Starlight zeroes the outer padding of the first/last cell (`padding-inline-start:
+   0` / `-end: 0`) so borderless tables align to the prose margin — correct for its
+   default, but flush against our border. Its markdown stylesheet loads after this
+   file, so these need `!important` to win (same reason the border rule above does). */
+.sl-markdown-content :is(th, td) {
+  padding-inline: 1rem !important;
+}
+.sl-markdown-content table {
+  padding-block: 0.25rem !important;
+}
+/* the last row's cell border would otherwise double up with the table border */
+.sl-markdown-content tbody tr:last-child :is(th, td) {
+  border-bottom: 0 !important;
+}
+/* Inline code in a table cell is usually an identifier (a package name, a token, a
+   prop). Starlight's `overflow-wrap: break-word` snaps those mid-token —
+   `@alebianco/cr-` / `tokens` — so keep them whole and let the column size to
+   them. The table already scrolls horizontally if the content demands it. */
+.sl-markdown-content table :is(th, td) code {
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+
 /* headings in the display register */
 .sl-markdown-content :is(h1, h2) {
   font-weight: 900;
