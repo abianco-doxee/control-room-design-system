@@ -1,6 +1,6 @@
 {
   "name": "@alebianco/cr-skill",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "license": "UNLICENSED",
   "type": "module",
   "description": "Install the Control Room design-system skill into any agent — a one-command npx installer (Claude/Cursor/opencode) and the Claude Code plugin bundle. Ships SKILL.md, the reference docs, and the machine-readable token/catalog artifacts.",

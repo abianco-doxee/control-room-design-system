@@ -6,26 +6,21 @@ the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Changed
-
-- **Packages now publish privately under `@alebianco`.** The npm scope moved
-  from `@control-room` to `@alebianco`, and each package folds the old scope
-  name in: `@control-room/tokens` → `@alebianco/cr-tokens`, and likewise for
-  `styles`, `components`, `icons`, `utils`, `mcp`, and `skill`. Update imports and
-  `dependencies` entries; class names (`cr-*`), CSS custom properties (`--cr-*`),
-  and component names (`Cr*`) are **unchanged**. Install requires a GitHub
-  Packages token with `read:packages` — see
-  [Getting Started](references/getting-started.md).
-
 ### Added
 
+- **First release — published privately to GitHub Packages** under the
+  `@alebianco` scope: `cr-tokens`, `cr-styles`, `cr-components`, `cr-icons`,
+  `cr-utils`, `cr-mcp`, and `cr-skill`. Nothing was published before this, so
+  these are the initial package coordinates rather than a rename. Packages are
+  `access: "restricted"`; installing needs a GitHub token with `read:packages` —
+  see [Getting Started](references/getting-started.md).
 - **Getting Started guide.** Install, authentication, the package map, CSS wiring,
   theme selection, framework imports, and the agent-facing surfaces, in one page.
-- **Monorepo — independently-publishable `@alebianco/cr-*` packages.** Split into
-  npm workspaces: `@alebianco/cr-tokens`, `styles`, `utils`, `icons`, `components`,
-  plus a private `docs` site — each with its own `dist` and `exports`. The root
-  `@alebianco/cr-design-system` stays a convenience umbrella re-exporting every
-  subpath, so existing `@alebianco/cr-design-system/*` imports are unchanged.
+- **Independently-publishable packages.** The system is split into pnpm workspaces —
+  `cr-tokens`, `cr-styles`, `cr-utils`, `cr-icons`, `cr-components`, plus a private
+  `docs` site — each with its own `dist` and `exports`, so you can adopt just the
+  layer you need. The private root `@alebianco/cr-design-system` remains a
+  convenience umbrella re-exporting every subpath.
 - **AI-native surfaces.** `@alebianco/cr-mcp` — a Model Context Protocol server
   (`npx @alebianco/cr-mcp`) exposing the catalog, theme contract, and reference
   docs as tools/resources; `llms.txt` + `llms-full.txt` and `catalog.json` /

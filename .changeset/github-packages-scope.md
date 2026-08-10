@@ -8,13 +8,19 @@
 "@alebianco/cr-skill": major
 ---
 
-Move the npm scope to `@alebianco` and publish privately to GitHub Packages.
+First release — `1.0.0`, published privately to GitHub Packages under the
+`@alebianco` scope.
 
-**This is a packaging change only.** The product is still **Control Room**, and the `Cr` /
-`cr-` / `--cr-` code prefixes, every token value, component API, and all visual design are
-unchanged. Only the package coordinates moved.
+Nothing was ever published under the earlier `@control-room` scope, so this is the initial
+public surface rather than a migration. GitHub Packages ties an npm scope to a GitHub
+org/user of the same name, and `@control-room` had no matching org, so it could never have
+published from this repository; `@alebianco` matches the owner.
 
-| Before | After |
+The product is **Control Room**. The `Cr` / `cr-` / `--cr-` code prefixes, the token values,
+the component APIs, and the visual design are unchanged from the pre-release repo — only the
+package coordinates differ:
+
+| Pre-release name | Published as |
 | --- | --- |
 | `@control-room/tokens` | `@alebianco/cr-tokens` |
 | `@control-room/styles` | `@alebianco/cr-styles` |
@@ -24,11 +30,6 @@ unchanged. Only the package coordinates moved.
 | `@control-room/mcp` | `@alebianco/cr-mcp` |
 | `@control-room/skill` | `@alebianco/cr-skill` |
 
-Update imports and `dependencies` entries to the new names. Class names, CSS custom
-properties, and component names need no changes.
-
-**Why the scope moved.** GitHub Packages ties an npm scope to a GitHub org/user of the same
-name, so `@control-room/*` could never publish from a repository owned by the user
-`alebianco`. Using `@alebianco` makes the scope match the owner, which unblocks
-releasing without creating an org. Packages publish with `access: "restricted"` — private,
-visible only to accounts granted access.
+Packages publish with `access: "restricted"` — private, visible only to accounts granted
+access. Installing needs a GitHub token with `read:packages`; see
+[Getting Started](../references/getting-started.md).
