@@ -1,6 +1,6 @@
 {
   "name": "@abianco-doxee/cr-styles",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "license": "UNLICENSED",
   "type": "module",
   "description": "Control Room component styles — the authored all-in-one bundle (components.css), the thin global/base layer (base.css) and the per-component partials (parts/*.css) for PrimeVue-style import-on-use, plus the Tailwind v4 entry. Pairs with @abianco-doxee/cr-tokens.",

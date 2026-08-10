@@ -1,6 +1,6 @@
 {
   "name": "@abianco-doxee/cr-tokens",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "license": "UNLICENSED",
   "type": "module",
   "description": "Control Room design tokens — the single source of truth (tokens.json) for the CSS custom-property bundle, per-theme appearance layers, the structure layer, the Tailwind v4 @theme, the flat resolved map, the DTCG export, and the theme contract. Author brands without forking via brands/*.json.",
