@@ -108,9 +108,9 @@ Build it — validated against the contract and contrast-checked, then emitted t
 `dist/themes/acme.css` through the same renderer the built-in themes use:
 
 ```
-npm run build:theme            # all brands/*.json
-npm run build:theme acme       # just one
-npm run build:theme --check    # CI: fail if any dist/themes/*.css is stale
+pnpm run build:theme            # all brands/*.json
+pnpm run build:theme acme       # just one
+pnpm run build:theme --check    # CI: fail if any dist/themes/*.css is stale
 ```
 
 Two worked examples reskin the entire component browser (try the **slate ▸** and
@@ -309,7 +309,7 @@ applyTheme(acmeVars, { name: "acme" });   // adds <style> + sets data-theme="acm
 
 ## Preview (proof sheet)
 
-`npm run build:brand-preview` → `public/brands.html`: every theme (built-in +
+`pnpm run build:brand-preview` → `public/brands.html`: every theme (built-in +
 brand, including `$modes` variants) rendered from its shipped appearance file — the
 surface ladder, the signal ramp with its on-colour text and **measured WCAG
 contrast** (green = ok, red = below target), and live components. Use it to eyeball

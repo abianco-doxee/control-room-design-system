@@ -183,7 +183,7 @@ packs; the house geometric glyph map (the identity set) stays inline in `CrIcon`
 
 1. **Scaffold workspaces.** Add root `"workspaces": ["packages/*"]`; create empty
    `packages/*/package.json` with names + the dependency edges above. No files move
-   yet. `npm install` links them. Green by construction.
+   yet. `pnpm install` links them. Green by construction.
 2. **Extract `docs` first** (highest value, lowest risk — it's leaf, dev-only).
    Move `src/`, `astro.config.mjs`, the gallery/showcase/docs-content build scripts,
    `public/`. Rewire their `ROOT` joins to the package root; docs reads the built

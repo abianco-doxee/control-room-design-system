@@ -9,10 +9,15 @@ hero:
 import { Card, CardGrid, LinkButton } from '@astrojs/starlight/components';
 
 <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin:0 0 1.5rem">
-  <LinkButton href={`${import.meta.env.BASE_URL}reference/design-language/`} variant="primary" icon="right-arrow">The nine laws</LinkButton>
+  <LinkButton href={`${import.meta.env.BASE_URL}guide/getting-started/`} variant="primary" icon="right-arrow">Get started</LinkButton>
+  <LinkButton href={`${import.meta.env.BASE_URL}reference/design-language/`} variant="minimal">The nine laws</LinkButton>
   <LinkButton href={`${import.meta.env.BASE_URL}reference/components/`} variant="minimal">Component library</LinkButton>
-  <LinkButton href={`${import.meta.env.BASE_URL}gallery.html`} target="_self" variant="secondary" icon="external">Live gallery — all four themes</LinkButton>
+  <LinkButton href={`${import.meta.env.BASE_URL}gallery.html`} target="_self" variant="secondary" icon="external">Live gallery ↗</LinkButton>
 </div>
+
+```bash
+pnpm add @abianco-doxee/cr-tokens @abianco-doxee/cr-styles
+```
 
 <CardGrid>
   <Card title="Design language, not vibes">

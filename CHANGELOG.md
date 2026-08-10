@@ -6,8 +6,21 @@ the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **Packages now publish privately under `@abianco-doxee`.** The npm scope moved
+  from `@control-room` to `@abianco-doxee`, and each package folds the old scope
+  name in: `@control-room/tokens` → `@abianco-doxee/cr-tokens`, and likewise for
+  `styles`, `components`, `icons`, `utils`, `mcp`, and `skill`. Update imports and
+  `dependencies` entries; class names (`cr-*`), CSS custom properties (`--cr-*`),
+  and component names (`Cr*`) are **unchanged**. Install requires a GitHub
+  Packages token with `read:packages` — see
+  [Getting Started](references/getting-started.md).
+
 ### Added
 
+- **Getting Started guide.** Install, authentication, the package map, CSS wiring,
+  theme selection, framework imports, and the agent-facing surfaces, in one page.
 - **Monorepo — independently-publishable `@abianco-doxee/cr-*` packages.** Split into
   npm workspaces: `@abianco-doxee/cr-tokens`, `styles`, `utils`, `icons`, `components`,
   plus a private `docs` site — each with its own `dist` and `exports`. The root

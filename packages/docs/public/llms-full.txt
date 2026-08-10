@@ -643,13 +643,13 @@ raw hex or a `border-radius: 4px` is, by definition, a defect, because it will
 not survive a theme flip and it breaks the single source of truth.
 
 - **Author** here: `tokens/tokens.json` — the hand-edited source of truth.
-- **Generated** by `npm run build:tokens`, committed:
+- **Generated** by `pnpm run build:tokens`, committed:
   - `dist/control-room.css` — runtime CSS custom properties, all four themes
   - `dist/tw-theme.css` — Tailwind v4 `@theme` (colors resolve to the CSS vars)
   - `dist/tokens.flat.json` — resolved `cssVar → value`, per theme
   - `design-tokens/control-room.tokens.json` — **DTCG** format (see below)
 
-Never hand-edit the generated files. `npm run verify:tokens` fails CI if any of
+Never hand-edit the generated files. `pnpm run verify:tokens` fails CI if any of
 them drift from `tokens.json`.
 
 ## DTCG interop
@@ -951,7 +951,7 @@ dead background space (see `references/components.md` and `references/decoration
 
 1. Add it to `tokens.json` under the right group, with a `cssVar`, a `role`, and
    a value for **all four themes**.
-2. Run `npm run build:tokens` to regenerate dist/ and design-tokens/ (DTCG).
+2. Run `pnpm run build:tokens` to regenerate dist/ and design-tokens/ (DTCG).
 3. If it is a new signal hue, verify `--on-sig` contrast against it in every
    theme (`references/accessibility.md`) — or add it to `build/build-palette.mjs`
    and let the generator pick + check the on-colour for you.
@@ -1069,9 +1069,9 @@ Build it — validated against the contract and contrast-checked, then emitted t
 `dist/themes/acme.css` through the same renderer the built-in themes use:
 
 ```
-npm run build:theme            # all brands/*.json
-npm run build:theme acme       # just one
-npm run build:theme --check    # CI: fail if any dist/themes/*.css is stale
+pnpm run build:theme            # all brands/*.json
+pnpm run build:theme acme       # just one
+pnpm run build:theme --check    # CI: fail if any dist/themes/*.css is stale
 ```
 
 Two worked examples reskin the entire component browser (try the **slate ▸** and
@@ -1270,7 +1270,7 @@ applyTheme(acmeVars, { name: "acme" });   // adds <style> + sets data-theme="acm
 
 ## Preview (proof sheet)
 
-`npm run build:brand-preview` → `public/brands.html`: every theme (built-in +
+`pnpm run build:brand-preview` → `public/brands.html`: every theme (built-in +
 brand, including `$modes` variants) rendered from its shipped appearance file — the
 surface ladder, the signal ramp with its on-colour text and **measured WCAG
 contrast** (green = ok, red = below target), and live components. Use it to eyeball
@@ -1489,7 +1489,7 @@ convenience compositions on top.
 ```
 
 Tailwind scans **your** markup and emits only the utilities you use. No build of
-your own? Use the prebuilt file: `npm run build:tw` → `dist/utilities.css` (a
+your own? Use the prebuilt file: `pnpm run build:tw` → `dist/utilities.css` (a
 bounded, token-driven utility set).
 
 ## What you get (utilities → tokens)
@@ -1861,19 +1861,19 @@ Corruption is decorative; it must never reach assistive tech.
 
 ## Automated gate
 
-Accessibility is enforced by CI, not just documented. `npm run test:a11y`
+Accessibility is enforced by CI, not just documented. `pnpm run test:a11y`
 (Playwright + axe-core) loads the living gallery in **all four themes** and fails
 on any **serious/critical** WCAG 2.1 A/AA violation (scoped to the component
 region). It runs on every push (`.github/workflows/deploy.yml`) and blocks the
-deploy. A companion visual-regression check (`npm run test:visual`) snapshots the
-gallery per theme; run `npm run test:visual:update` after intentional changes.
+deploy. A companion visual-regression check (`pnpm run test:visual`) snapshots the
+gallery per theme; run `pnpm run test:visual:update` after intentional changes.
 
 ## Direction (RTL)
 
 Layout is **direction-agnostic**: the component CSS uses logical properties
 (`margin-inline-*`, `padding-inline-*`, `border-inline-*`, `text-align: start/end`)
 rather than physical `left`/`right`, so the whole system mirrors under
-`dir="rtl"`. A guard (`npm run test:rtl`) fails the build if a physical flow
+`dir="rtl"`. A guard (`pnpm run test:rtl`) fails the build if a physical flow
 property creeps back in, and the responsive gate checks there's no horizontal
 overflow under RTL. (Fixed/absolute overlay positioning and gradient/clip-path
 angles are direction-neutral and out of scope.)
@@ -3615,7 +3615,7 @@ Add one by adding a single-`d`, square-geometry path to the map in
 **Packs (`set`) — the soft escape hatch.** `set="cr"` (default) is the hand-authored
 stroked geometric set above. `set="pixel"` swaps in a **pixel-art pack** built
 offline from Iconify's *pixelarticons* (`build/build-icons.mjs` → `lib/icons/pixel.ts`,
-guarded by `npm run verify:icons`) — filled instead of stroked, same 24×24 grid, same
+guarded by `pnpm run verify:icons`) — filled instead of stroked, same 24×24 grid, same
 names, still a single `<path>` so it ports to all six targets (no icon font, no
 runtime fetch). Use it to give one theme or subtree a softer register:
 ```tsx
@@ -3952,7 +3952,7 @@ their look *is* the identity, not something consumers retheme. A guard test
 (`tests/styling-contract.test.mjs`) enforces this split in both directions.
 
 Everything here is verified against the compiled output of all six targets
-(`npm run build:components`), the type-check, and the SSR/e2e/framework tests.
+(`pnpm run build:components`), the type-check, and the SSR/e2e/framework tests.
 
 ## The portable layer (one `.lite` source → all six targets)
 
@@ -3986,7 +3986,7 @@ The stylesheet ships three ways, so a consumer pays only for what they render
 
 The parts are a **lossless projection** of the bundle — generated by
 `build/build-styles.mjs` (every rule lands in exactly one of `base.css` or a
-`parts/*.css`, guarded by `npm run verify:styles`), so the split can never drift
+`parts/*.css`, guarded by `pnpm run verify:styles`), so the split can never drift
 from the authored `styles/components.css`. Tailwind consumers get a fourth path:
 the `@theme` layer purges to just the utilities in use.
 - **`pt`** (pass-through) — per part: `pt={{ tab: { class, style, "data-testid", … } }}`.
@@ -4512,7 +4512,7 @@ Solid render fn, Svelte component constructor, Angular class). Peer deps cover a
 six frameworks, each marked `optional` so installing for one target doesn't pull
 the rest. Guarded by `verify:pkg-types` (drift) and `tests/pkg-exports.test.mjs`.
 
-The build compiles the typed packages with `npm run build:pkg` (relative import
+The build compiles the typed packages with `pnpm run build:pkg` (relative import
 extensions rewritten `.tsx → .js` so the emit resolves in Node ESM and bundlers);
 `prepack` runs it so `npm pack` ships usable packages. The `test:pkg` gate imports
 each entry as a consumer would — React renders through `react-dom/server`, Qwik
@@ -4589,7 +4589,7 @@ export default function CrSwitch(props: CrSwitchProps) {
 ## Build
 
 ```bash
-npm run build:components     # → dist/frameworks/{react,vue,svelte,angular,solid,qwik}/
+pnpm run build:components     # → dist/frameworks/{react,vue,svelte,angular,solid,qwik}/
 ```
 
 Output is a build artifact (git-ignored); CI compiles it on every push so the

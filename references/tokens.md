@@ -6,13 +6,13 @@ raw hex or a `border-radius: 4px` is, by definition, a defect, because it will
 not survive a theme flip and it breaks the single source of truth.
 
 - **Author** here: `tokens/tokens.json` — the hand-edited source of truth.
-- **Generated** by `npm run build:tokens`, committed:
+- **Generated** by `pnpm run build:tokens`, committed:
   - `dist/control-room.css` — runtime CSS custom properties, all four themes
   - `dist/tw-theme.css` — Tailwind v4 `@theme` (colors resolve to the CSS vars)
   - `dist/tokens.flat.json` — resolved `cssVar → value`, per theme
   - `design-tokens/control-room.tokens.json` — **DTCG** format (see below)
 
-Never hand-edit the generated files. `npm run verify:tokens` fails CI if any of
+Never hand-edit the generated files. `pnpm run verify:tokens` fails CI if any of
 them drift from `tokens.json`.
 
 ## DTCG interop
@@ -314,7 +314,7 @@ dead background space (see `references/components.md` and `references/decoration
 
 1. Add it to `tokens.json` under the right group, with a `cssVar`, a `role`, and
    a value for **all four themes**.
-2. Run `npm run build:tokens` to regenerate dist/ and design-tokens/ (DTCG).
+2. Run `pnpm run build:tokens` to regenerate dist/ and design-tokens/ (DTCG).
 3. If it is a new signal hue, verify `--on-sig` contrast against it in every
    theme (`references/accessibility.md`) — or add it to `build/build-palette.mjs`
    and let the generator pick + check the on-colour for you.
