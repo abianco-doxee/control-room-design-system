@@ -23,7 +23,8 @@ const BASE = process.env.BASE_PATH || "/control-room-design-system/";
 // source file → { section, slug, title }
 const PAGES = [
   ["SKILL.md", "guide", "skill", "What is Control Room"],
-  ["CONTRIBUTING.md", "guide", "contributing", "Contributing"],
+  ["references/getting-started.md", "guide", "getting-started", "Getting Started"],
+  ["CONTRIBUTING.md", "guide", "contributing", "Extending Control Room"],
   ["CHANGELOG.md", "guide", "changelog", "Changelog"],
   [
     "references/design-language.md",
