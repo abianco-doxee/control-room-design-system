@@ -1,6 +1,6 @@
 {
   "name": "@abianco-doxee/cr-components",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "license": "UNLICENSED",
   "type": "module",
   "description": "Control Room components — authored once as Mitosis .lite.tsx, compiled to idiomatic React/Vue/Svelte/Angular/Solid/Qwik. Structure + props + a11y + state only; styling lives in @abianco-doxee/cr-styles, tokens in @abianco-doxee/cr-tokens, icon packs in @abianco-doxee/cr-icons.",
