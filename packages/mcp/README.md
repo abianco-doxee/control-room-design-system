@@ -1,4 +1,4 @@
-# @control-room/mcp
+# @alebianco/cr-mcp
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server that exposes the
 **Control Room** design system to a coding agent — so it can look up components,
@@ -6,7 +6,7 @@ tokens, the theme contract, and the design rules while building UI, instead of
 guessing.
 
 It's self-contained: the catalog, theme contract, and reference docs are bundled
-under `data/`, so `npx @control-room/mcp` runs with no repo checkout.
+under `data/`, so `npx @alebianco/cr-mcp` runs with no repo checkout.
 
 ## Run it
 
@@ -14,12 +14,12 @@ under `data/`, so `npx @control-room/mcp` runs with no repo checkout.
 // Claude Code / any MCP client — mcp config
 {
   "mcpServers": {
-    "control-room": { "command": "npx", "args": ["-y", "@control-room/mcp"] }
+    "control-room": { "command": "npx", "args": ["-y", "@alebianco/cr-mcp"] }
   }
 }
 ```
 
-Or directly: `npx @control-room/mcp` (stdio).
+Or directly: `npx @alebianco/cr-mcp` (stdio).
 
 ## Tools
 
@@ -45,4 +45,4 @@ Or directly: `npx @control-room/mcp` (stdio).
 4. `get_reference(doc: "styling-contract")` — use the `pt` / `dt` / `unstyled` hooks correctly.
 
 Regenerate the bundled data after changing the catalog, tokens, or docs:
-`npm run build -w @control-room/mcp` (guarded by `npm run verify -w @control-room/mcp`).
+`npm run build -w @alebianco/cr-mcp` (guarded by `npm run verify -w @alebianco/cr-mcp`).

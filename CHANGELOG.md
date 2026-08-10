@@ -8,23 +8,23 @@ the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- **Monorepo — independently-publishable `@control-room/*` packages.** Split into
-  npm workspaces: `@control-room/tokens`, `styles`, `utils`, `icons`, `components`,
+- **Monorepo — independently-publishable `@alebianco/cr-*` packages.** Split into
+  npm workspaces: `@alebianco/cr-tokens`, `styles`, `utils`, `icons`, `components`,
   plus a private `docs` site — each with its own `dist` and `exports`. The root
-  `@control-room/design-system` stays a convenience umbrella re-exporting every
-  subpath, so existing `@control-room/design-system/*` imports are unchanged.
-- **AI-native surfaces.** `@control-room/mcp` — a Model Context Protocol server
-  (`npx @control-room/mcp`) exposing the catalog, theme contract, and reference
+  `@alebianco/cr-design-system` stays a convenience umbrella re-exporting every
+  subpath, so existing `@alebianco/cr-design-system/*` imports are unchanged.
+- **AI-native surfaces.** `@alebianco/cr-mcp` — a Model Context Protocol server
+  (`npx @alebianco/cr-mcp`) exposing the catalog, theme contract, and reference
   docs as tools/resources; `llms.txt` + `llms-full.txt` and `catalog.json` /
   `theme-contract.json` served at the docs site root. Guarded by `test:tooling`.
-- **One-command skill install.** `@control-room/skill` — a Claude Code plugin
+- **One-command skill install.** `@alebianco/cr-skill` — a Claude Code plugin
   (`/plugin marketplace add …` + `/plugin install`, which also wires the MCP
-  server) and an npx installer (`npx @control-room/skill`, `--global` /
+  server) and an npx installer (`npx @alebianco/cr-skill`, `--global` /
   `--provider` / `--dir`) for Claude / Cursor / opencode.
 - **`CrIcon` raw-path escape hatch** (`path` / `filled`) — inject any Iconify
-  family or hand-drawn 24×24 glyph per-use without a rebuild; `@control-room/icons`
+  family or hand-drawn 24×24 glyph per-use without a rebuild; `@alebianco/cr-icons`
   ships importable per-family path-data packs (`./pixel`).
-- **Prebuilt Tailwind utilities** — `@control-room/styles/utilities.css`.
+- **Prebuilt Tailwind utilities** — `@alebianco/cr-styles/utilities.css`.
 - **Framework components (Mitosis)** — interactive components authored once as
   `.lite.tsx` and compiled to six targets (React, Vue, Svelte, Angular, Solid,
   Qwik), shipped as per-framework package exports with typed props. Guarded by

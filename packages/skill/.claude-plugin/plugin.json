@@ -1,7 +1,7 @@
 {
   "name": "control-room-design-system",
   "version": "1.0.0",
-  "description": "Control Room design system — the neon-noir, neobrutalist instrument style for dense operational dashboards. Bundles the skill (the nine laws, tokens, component library, styling contract, accessibility contract) and the @control-room/mcp server (component/token/reference lookup tools).",
+  "description": "Control Room design system — the neon-noir, neobrutalist instrument style for dense operational dashboards. Bundles the skill (the nine laws, tokens, component library, styling contract, accessibility contract) and the @alebianco/cr-mcp server (component/token/reference lookup tools).",
   "author": {
     "name": "Doxee",
     "url": "https://github.com/alebianco"
@@ -10,7 +10,7 @@
   "mcpServers": {
     "control-room": {
       "command": "npx",
-      "args": ["-y", "@control-room/mcp"]
+      "args": ["-y", "@alebianco/cr-mcp"]
     }
   }
 }

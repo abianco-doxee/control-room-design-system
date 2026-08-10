@@ -1,9 +1,9 @@
 {
-  "name": "@control-room/mcp",
+  "name": "@alebianco/cr-mcp",
   "version": "1.0.0",
   "license": "UNLICENSED",
   "type": "module",
-  "description": "Model Context Protocol server for the Control Room design system — exposes the component catalog, the token/theme contract, and the reference docs (the nine design laws, styling contract, forms, theming…) as tools and resources a coding agent can query while building UI. Run: npx @control-room/mcp.",
+  "description": "Model Context Protocol server for the Control Room design system — exposes the component catalog, the token/theme contract, and the reference docs (the nine design laws, styling contract, forms, theming…) as tools and resources a coding agent can query while building UI. Run: npx @alebianco/cr-mcp.",
   "keywords": [
     "mcp",
     "model-context-protocol",
@@ -38,6 +38,7 @@
     "zod": "^3.25.76"
   },
   "publishConfig": {
+    "access": "restricted",
     "registry": "https://npm.pkg.github.com"
   }
 }

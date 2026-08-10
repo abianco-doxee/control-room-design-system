@@ -5,11 +5,11 @@
  * Exposes the design system to a coding agent as Model Context Protocol tools +
  * resources, so it can look up components, tokens, the theme contract, and the
  * design rules while building UI — instead of guessing. Data is bundled under
- * ./data (see build/build-mcp-data.mjs), so `npx @control-room/mcp` is
+ * ./data (see build/build-mcp-data.mjs), so `npx @alebianco/cr-mcp` is
  * self-contained.
  *
  * Register in an MCP client, e.g. Claude Code:
- *   { "mcpServers": { "control-room": { "command": "npx", "args": ["-y", "@control-room/mcp"] } } }
+ *   { "mcpServers": { "control-room": { "command": "npx", "args": ["-y", "@alebianco/cr-mcp"] } } }
  */
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";

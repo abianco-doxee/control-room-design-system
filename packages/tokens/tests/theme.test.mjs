@@ -17,7 +17,7 @@ import {
   THEME_ROLES,
   themeCss,
   validateTheme,
-} from "@control-room/utils/theme";
+} from "@alebianco/cr-utils/theme";
 import { oklch } from "culori";
 import { chassisFrom } from "../build/chassis.mjs";
 import { surfaceRamp } from "../build/ramp.mjs";
@@ -30,7 +30,7 @@ const tokens = read("tokens/tokens.json");
 const contract = read("dist/theme-contract.json");
 
 // The appearance surface, three ways: it must be identical across tokens.json's
-// semantic tier, @control-room/utils/theme's runtime copy, and the generated contract — or a
+// semantic tier, @alebianco/cr-utils/theme's runtime copy, and the generated contract — or a
 // brand written to one wouldn't match the others.
 test("theme contract is in lock-step (tokens.json ≡ lib ≡ dist/theme-contract.json)", () => {
   const GROUPS = ["surface", "text", "line", "signal", "keyed", "texture"];

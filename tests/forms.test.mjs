@@ -9,7 +9,7 @@ import {
   toArkType,
   toFormModel,
   toJsonSchema,
-} from "@control-room/utils/forms";
+} from "@alebianco/cr-utils/forms";
 import { type } from "arktype";
 
 // A representative "new session" schema authored in ArkType.

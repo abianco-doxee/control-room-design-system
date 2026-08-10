@@ -1,10 +1,10 @@
 ---
-"@control-room/mcp": minor
-"@control-room/components": minor
+"@alebianco/cr-mcp": minor
+"@alebianco/cr-components": minor
 ---
 
-AI-native surfaces for agentic development. New `@control-room/mcp` — a Model
-Context Protocol server (`npx @control-room/mcp`) exposing the catalog, theme
+AI-native surfaces for agentic development. New `@alebianco/cr-mcp` — a Model
+Context Protocol server (`npx @alebianco/cr-mcp`) exposing the catalog, theme
 contract, and reference docs as tools/resources. The docs site now emits
 `llms.txt` + `llms-full.txt` (llmstxt.org) and serves `catalog.json` /
 `theme-contract.json` at the site root. `CrIcon` gains a raw-path escape hatch

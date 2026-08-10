@@ -13,11 +13,11 @@
  *
  * This module is the framework-agnostic core for authoring, validating and
  * emitting themes. It has no fs / DOM dependency at import time (applyTheme is the
- * one browser-only helper, guarded). @control-room/tokens's token build and brand
+ * one browser-only helper, guarded). @alebianco/cr-tokens's token build and brand
  * build both render through `themeCss` here, so built-in themes and external
  * brands are produced by exactly one code path.
  *
- * `THEME_ROLES` is the runtime copy of the theme contract. @control-room/tokens's
+ * `THEME_ROLES` is the runtime copy of the theme contract. @alebianco/cr-tokens's
  * theme test asserts it stays identical to that package's tokens.json semantic
  * tier and its generated theme-contract.json, so the three can never drift.
  * See references/theming.md.

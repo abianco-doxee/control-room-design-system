@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
  * Bundle the data the MCP server serves into packages/mcp/data/ so `npx
- * @control-room/mcp` is self-contained (no repo checkout needed):
+ * @alebianco/cr-mcp` is self-contained (no repo checkout needed):
  *
  *   data/catalog.json          the component catalog (from catalog/catalog.json)
- *   data/theme-contract.json   the required theme roles (from @control-room/tokens)
+ *   data/theme-contract.json   the required theme roles (from @alebianco/cr-tokens)
  *   data/references/*.md       the reference docs the server exposes
  *
  * The copies are committed and guarded by `--check` (verify:mcp), so drift from
- * the sources fails CI. Regenerate: pnpm --filter @control-room/mcp run build.
+ * the sources fails CI. Regenerate: pnpm --filter @alebianco/cr-mcp run build.
  */
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -70,7 +70,7 @@ if (CHECK) {
     console.error("✗ data/docs.json is out of date");
   }
   if (stale) {
-    console.error("\nRun: pnpm --filter @control-room/mcp run build");
+    console.error("\nRun: pnpm --filter @alebianco/cr-mcp run build");
     process.exit(1);
   }
   console.log("✓ MCP data is up to date");

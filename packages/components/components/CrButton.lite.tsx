@@ -8,9 +8,9 @@ import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
  *  A destructive secondary is `emphasis="outline" signal="err"`.
  *  When `href` is set the control renders as a real `<a>` (so middle-click,
  *  copy-link, and status-bar preview work) and an off-site href automatically
- *  gets `target="_blank" rel="noopener noreferrer"`. See @control-room/utils/href for the same
+ *  gets `target="_blank" rel="noopener noreferrer"`. See @alebianco/cr-utils/href for the same
  *  detection outside a component.
- *  Styling: @control-room/styles (components.css) (.cr-btn); `unstyled` drops the classes,
+ *  Styling: @alebianco/cr-styles (components.css) (.cr-btn); `unstyled` drops the classes,
  *  `pt`/`dt` retarget it, the root exposes data-part. */
 export interface CrButtonProps {
   emphasis?: "solid" | "outline" | "ghost" | "link";
@@ -41,7 +41,7 @@ export default function CrButton(props: CrButtonProps) {
       if (props.size === "sm") c += " cr-btn--sm";
       return c;
     },
-    /* off-site link → new tab. Same logic as @control-room/utils/href.isExternalHref, inlined
+    /* off-site link → new tab. Same logic as @alebianco/cr-utils/href.isExternalHref, inlined
        because a .lite component can't import a package util through the compile. */
     get external(): boolean {
       const h = props.href;

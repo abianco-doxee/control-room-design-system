@@ -15,7 +15,7 @@
 //                                     positions; wins over locale/week/fiscal.
 // Defaults ("en" / "date" / 1, no format) reproduce a plain Gregorian axis.
 //
-// The SAME algorithm is mirrored inline in @control-room/components'
+// The SAME algorithm is mirrored inline in @alebianco/cr-components'
 // CrLineChart.lite.tsx (Mitosis compiles to six targets and doesn't import runtime
 // helpers into each), exactly like this package's position.js ↔ CrPopover. Keep the
 // two in sync; tests/time-scale.test.mjs guards this module.

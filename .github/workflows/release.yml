@@ -4,16 +4,16 @@ name: Release
 # each package's version and writes its CHANGELOG. Merging that PR publishes the
 # bumped packages to GitHub Packages (npm.pkg.github.com) via `changeset publish`.
 #
+# Packages publish PRIVATELY (`access: restricted`) under the `@alebianco` scope,
+# which matches this repo's owner — GitHub Packages ties a scope to a GitHub org/user
+# of the same name, so no org move or scope rename is needed.
+#
 # DORMANT until opted in: the job is gated on the `RELEASE_ENABLED` repo variable
 # so CI stays green until the repo is configured for releasing. To turn it on:
-#   1. Own the `@control-room` npm scope. GitHub Packages ties a scope to a GitHub
-#      org/user of the same name, so `@control-room/*` publishes only under a
-#      `control-room` org (this repo's owner is the user `alebianco`). Create a
-#      free `control-room` org and move the repo there, or rename the scope.
-#   2. Settings → Actions → General → Workflow permissions → enable
+#   1. Settings → Actions → General → Workflow permissions → enable
 #      "Allow GitHub Actions to create and approve pull requests" (needed for the
 #      Version Packages PR; the default GITHUB_TOKEN cannot create PRs otherwise).
-#   3. Set repo variable RELEASE_ENABLED=true (Settings → Secrets and variables →
+#   2. Set repo variable RELEASE_ENABLED=true (Settings → Secrets and variables →
 #      Actions → Variables).
 # See references/monorepo-migration.md ("Publishing").
 on:

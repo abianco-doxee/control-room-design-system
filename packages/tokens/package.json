@@ -1,5 +1,5 @@
 {
-  "name": "@control-room/tokens",
+  "name": "@alebianco/cr-tokens",
   "version": "1.0.0",
   "license": "UNLICENSED",
   "type": "module",
@@ -47,12 +47,13 @@
     "test": "node --test tests/theme.test.mjs"
   },
   "dependencies": {
-    "@control-room/utils": "workspace:*"
+    "@alebianco/cr-utils": "workspace:*"
   },
   "devDependencies": {
     "culori": "^4.0.2"
   },
   "publishConfig": {
+    "access": "restricted",
     "registry": "https://npm.pkg.github.com"
   }
 }

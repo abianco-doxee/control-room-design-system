@@ -12,7 +12,7 @@
     {
       "name": "control-room-design-system",
       "source": "./packages/skill",
-      "description": "Neon-noir, neobrutalist design system for dense operational dashboards. Installs the skill (the nine laws, tokens, 83-component library, styling + accessibility contracts) and the @control-room/mcp server.",
+      "description": "Neon-noir, neobrutalist design system for dense operational dashboards. Installs the skill (the nine laws, tokens, 83-component library, styling + accessibility contracts) and the @alebianco/cr-mcp server.",
       "version": "1.0.0",
       "category": "design"
     }

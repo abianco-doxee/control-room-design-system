@@ -4,7 +4,7 @@ A formal, AI-native definition of the **Control Room** design language and
 component library — the neon-noir, neobrutalist instrument style for dense
 operational dashboards (session monitors, sprint boards, agent control rooms).
 
-It is three things at once: a **published component library** (`@control-room/*`
+It is three things at once: a **published component library** (`@alebianco/cr-*`
 scoped packages, authored once and compiled to six frameworks), **documentation
 for humans** (an Astro + Starlight site), and a **Claude Code skill + MCP server**
 an agent loads to produce work that reads as part of the system.
@@ -12,25 +12,25 @@ an agent loads to produce work that reads as part of the system.
 ## Packages
 
 An npm-workspaces monorepo. Each layer is its own independently-publishable
-package under the `@control-room/*` scope; the root `@control-room/design-system`
+package under the `@alebianco/cr-*` scope; the root `@alebianco/cr-design-system`
 is a convenience umbrella that re-exports every subpath, so existing
-`@control-room/design-system/<subpath>` imports keep working unchanged.
+`@alebianco/cr-design-system/<subpath>` imports keep working unchanged.
 
 ```
 control-room-design-system/
 ├── packages/
-│   ├── tokens/        # @control-room/tokens   — tokens.json (source of truth) → CSS bundle,
+│   ├── tokens/        # @alebianco/cr-tokens   — tokens.json (source of truth) → CSS bundle,
 │   │                  #   per-theme layers, structure layer, Tailwind @theme, DTCG, theme contract;
 │   │                  #   author brands without forking via brands/*.json
-│   ├── styles/        # @control-room/styles   — components.css bundle + base + per-component
+│   ├── styles/        # @alebianco/cr-styles   — components.css bundle + base + per-component
 │   │                  #   parts/*.css (import-on-use) + the Tailwind v4 entry   (depends on tokens)
-│   ├── utils/         # @control-room/utils    — cn · href · duration · position · time-scale ·
+│   ├── utils/         # @alebianco/cr-utils    — cn · href · duration · position · time-scale ·
 │   │                  #   forms (ArkType ⇄ JSON Schema) · theme runtime  (framework-agnostic)
-│   ├── icons/         # @control-room/icons    — Iconify build tooling + path-data packs (./pixel)
-│   ├── components/    # @control-room/components — 80 Mitosis .lite.tsx → React/Vue/Svelte/Angular/
+│   ├── icons/         # @alebianco/cr-icons    — Iconify build tooling + path-data packs (./pixel)
+│   ├── components/    # @alebianco/cr-components — 80 Mitosis .lite.tsx → React/Vue/Svelte/Angular/
 │   │                  #   Solid/Qwik; per-framework exports (./react …)  (depends on icons)
-│   ├── mcp/           # @control-room/mcp      — Model Context Protocol server (npx-runnable)
-│   └── docs/          # @control-room/docs     — Astro + Starlight site, gallery, component browser,
+│   ├── mcp/           # @alebianco/cr-mcp      — Model Context Protocol server (npx-runnable)
+│   └── docs/          # @alebianco/cr-docs     — Astro + Starlight site, gallery, component browser,
 │                      #   llms.txt, Playwright a11y/visual suites  (private, dev-only)
 ├── references/        # the authored reference Markdown — SINGLE SOURCE OF TRUTH for the docs
 │   ├── design-language.md   # the NINE LAWS — the why + do/don't for every decision
@@ -52,13 +52,13 @@ Dependency edges: `tokens ← styles`, `tokens ← components`, `utils ← compo
 Install one framework build plus the token and style layers:
 
 ```bash
-npm i @control-room/components @control-room/tokens @control-room/styles
+npm i @alebianco/cr-components @alebianco/cr-tokens @alebianco/cr-styles
 ```
 
 ```js
-import { CrButton } from "@control-room/components/react"; // or /vue /svelte /angular /solid /qwik
-import "@control-room/tokens/css";        // the token layer (all four themes)
-import "@control-room/styles/components"; // the component styles (or import parts/<name>.css on use)
+import { CrButton } from "@alebianco/cr-components/react"; // or /vue /svelte /angular /solid /qwik
+import "@alebianco/cr-tokens/css";        // the token layer (all four themes)
+import "@alebianco/cr-styles/components"; // the component styles (or import parts/<name>.css on use)
 ```
 
 ```html
@@ -69,8 +69,8 @@ Prefer plain CSS + classes (no framework)? Load the two stylesheets and use the
 `cr-*` classes directly:
 
 ```html
-<link rel="stylesheet" href="@control-room/design-system/css" />        <!-- tokens (first) -->
-<link rel="stylesheet" href="@control-room/design-system/components" />  <!-- components -->
+<link rel="stylesheet" href="@alebianco/cr-design-system/css" />        <!-- tokens (first) -->
+<link rel="stylesheet" href="@alebianco/cr-design-system/components" />  <!-- components -->
 <button class="cr-btn">RUN SCAN</button>
 ```
 
@@ -86,7 +86,7 @@ has four machine surfaces:
   summary, install, every reference doc, all 83 components grouped and linked, and
   the machine-readable surfaces. `llms-full.txt` inlines the full text of every
   reference doc for one-shot ingestion.
-- **`@control-room/mcp`** — a Model Context Protocol server: `npx @control-room/mcp`.
+- **`@alebianco/cr-mcp`** — a Model Context Protocol server: `npx @alebianco/cr-mcp`.
   Tools: `list_components`, `search_components`, `get_component` (variants + tokens +
   spec), `list_theme_roles` (the theme contract), `list_references` / `get_reference`
   (the nine laws, styling contract, forms…). Resources: `control-room://catalog`,
@@ -99,7 +99,7 @@ has four machine surfaces:
 Register the MCP server in an agent, e.g. Claude Code:
 
 ```jsonc
-{ "mcpServers": { "control-room": { "command": "npx", "args": ["-y", "@control-room/mcp"] } } }
+{ "mcpServers": { "control-room": { "command": "npx", "args": ["-y", "@alebianco/cr-mcp"] } } }
 ```
 
 ## Design approach
@@ -112,7 +112,7 @@ optimized to be *generable*, not just *readable*:
 - **Research-grounded language.** The nine laws cite what real productions are
   *documented* to do (Redline, Dandadan, Fallout's Pip-Boy, Evangelion/Khara,
   Edgerunners, neobrutalism) — decisions, not vibes.
-- **Token-first.** A single token layer (`@control-room/tokens`) drives four themes
+- **Token-first.** A single token layer (`@alebianco/cr-tokens`) drives four themes
   on an intensity dial; any component built from tokens survives a theme flip with
   zero per-theme code.
 - **Author once, ship six.** Components are one Mitosis `.lite.tsx` source compiled
@@ -128,7 +128,7 @@ The build fans out across the workspaces from the repo root:
 ```bash
 npm install
 npm run build            # full build — every package, in dependency order, then the docs site
-npm run build:tokens     # @control-room/tokens → CSS + tw-theme + flat + DTCG + theme-contract
+npm run build:tokens     # @alebianco/cr-tokens → CSS + tw-theme + flat + DTCG + theme-contract
 npm run build:components  # Mitosis .lite → six frameworks (incremental) + typed packages
 npm run build:mcp        # bundle catalog + contract + docs into the MCP server
 npm run build:llms       # → llms.txt / llms-full.txt (+ machine-readable copies)
@@ -148,7 +148,7 @@ regenerated at deploy. The docs site (Astro + Starlight, `packages/docs`, output
 ## Install as an agent skill
 
 Control Room ships as a skill you can install in one command — via
-[`@control-room/skill`](packages/skill).
+[`@alebianco/cr-skill`](packages/skill).
 
 **Claude Code — plugin (recommended):** installs the skill *and* the MCP server.
 
@@ -160,9 +160,9 @@ Control Room ships as a skill you can install in one command — via
 **Any project — npx installer** (Claude / Cursor / opencode):
 
 ```bash
-npx @control-room/skill            # → ./.claude/skills (this project)
-npx @control-room/skill --global   # → ~/.claude/skills (all projects)
-npx @control-room/skill --provider=cursor   # or opencode
+npx @alebianco/cr-skill            # → ./.claude/skills (this project)
+npx @alebianco/cr-skill --global   # → ~/.claude/skills (all projects)
+npx @alebianco/cr-skill --provider=cursor   # or opencode
 ```
 
 **Repo contributors:** `npm run skills:sync` installs into the repo's own provider
@@ -174,7 +174,7 @@ plugin, and the npx installer alike.
 
 This package mirrors the conventions of `Doxee-Product-Management/Design-System-Hub`
 so the two can converge: **Astro + Starlight** docs, **DTCG tokens**
-(`@control-room/tokens`'s `design-tokens/control-room.tokens.json`, with the same
+(`@alebianco/cr-tokens`'s `design-tokens/control-room.tokens.json`, with the same
 `com.doxee.cssVar` extension), a **generated JSON catalog** (`catalog/registry.json`
 → `catalog/catalog.json`), **generated-and-committed + drift gates**, a
 **single-source skill with multi-provider fan-out**, and **GitHub Pages via Actions**.
@@ -186,6 +186,6 @@ signal ramp): a separate operator surface, not the general Doxee UI kit.
 ## Provenance & scope
 
 - **Source of truth:** the reference Markdown in `references/` and the token source in
-  `@control-room/tokens` (`packages/tokens/tokens/tokens.json`).
+  `@alebianco/cr-tokens` (`packages/tokens/tokens/tokens.json`).
 - **Themes:** `dark` is authoritative; `light`, `extreme`, and `phosphor` carry the
   full token set. `phosphor` is the extended monochrome CRT theme.

@@ -1,17 +1,17 @@
-# @control-room/tokens
+# @alebianco/cr-tokens
 
 The design-token layer of the [Control Room design system](https://github.com/alebianco/control-room-design-system) —
 the single source of truth (`tokens/tokens.json`) for four themes on an intensity
 dial, plus every generated form of them.
 
 ```bash
-npm i @control-room/tokens
+npm i @alebianco/cr-tokens
 ```
 
 ```js
-import "@control-room/tokens/css";        // all four themes as CSS custom properties
-import "@control-room/tokens/structure.css"; // brand-agnostic structure layer (pair with one theme)
-import contract from "@control-room/tokens/theme-contract" assert { type: "json" };
+import "@alebianco/cr-tokens/css";        // all four themes as CSS custom properties
+import "@alebianco/cr-tokens/structure.css"; // brand-agnostic structure layer (pair with one theme)
+import contract from "@alebianco/cr-tokens/theme-contract" assert { type: "json" };
 ```
 
 ```html

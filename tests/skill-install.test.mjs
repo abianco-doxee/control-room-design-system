@@ -1,4 +1,4 @@
-// Test the @control-room/skill npx installer: running the bin against a target
+// Test the @alebianco/cr-skill npx installer: running the bin against a target
 // dir must lay down a usable skill (SKILL.md + references + the machine artifacts).
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -31,5 +31,5 @@ test("installer lays down a usable skill into --dir", () => {
 
 test("installer prints the MCP config hint", () => {
   const out = execFileSync("node", [BIN, `--dir=${DEST}`], { encoding: "utf8" });
-  assert.match(out, /@control-room\/mcp/);
+  assert.match(out, /@alebianco\/cr-mcp/);
 });

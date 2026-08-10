@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 /**
  * Build the living gallery — a self-contained page that inlines the generated
- * tokens AND the shipped component layer (@control-room/styles), then demoes
+ * tokens AND the shipped component layer (@alebianco/cr-styles), then demoes
  * them live across all four themes. It doubles as the visual quality gate
  * (see checklists/component-checklist.md) and consumes the SAME CSS a real
  * consumer would — no separate demo styles to drift.
  *
  * Output: public/gallery.html   (served by the site at /gallery.html)
- * Depends on: @control-room/tokens (css + tokens.flat.json) and @control-room/styles (components.css)
+ * Depends on: @alebianco/cr-tokens (css + tokens.flat.json) and @alebianco/cr-styles (components.css)
  */
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { timeTicks } from "@control-room/utils/time-scale";
+import { timeTicks } from "@alebianco/cr-utils/time-scale";
 import { browserScript } from "./gallery-scripts.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -481,7 +481,7 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
       ${THEMES.map((t, i) => `<button type="button" data-set="${t}" aria-pressed="${i === 0}">${t}</button>`).join("\n      ")}
     </div>
   </div>
-  <p class="note">Everything below is built from the generated token layer + the shipped <code>@control-room/styles</code>. Flip the theme — nothing has per-theme code.</p>
+  <p class="note">Everything below is built from the generated token layer + the shipped <code>@alebianco/cr-styles</code>. Flip the theme — nothing has per-theme code.</p>
 
   <h2 id="tokens">01 · Color tokens</h2>
   ${swatchGroups}
@@ -1067,4 +1067,4 @@ a.back{font-family:var(--font-mono);font-size:11px;color:var(--sig-work);text-de
 
 mkdirSync(join(ROOT, "public"), { recursive: true });
 writeFileSync(join(ROOT, "public", "gallery.html"), html);
-console.log(`wrote public/gallery.html  (${html.length} bytes, consumes @control-room/styles)`);
+console.log(`wrote public/gallery.html  (${html.length} bytes, consumes @alebianco/cr-styles)`);

@@ -27,14 +27,14 @@ emits (`data-pc-section`). Three props drive the rest:
 The stylesheet ships three ways, so a consumer pays only for what they render
 (PrimeVue-style), without giving up the one-import option:
 
-- **Everything** — `@control-room/design-system/components` (the full
+- **Everything** — `@alebianco/cr-design-system/components` (the full
   `styles/components.css` bundle). Simplest; one import.
 - **Base + per-component** — import the thin chassis once, then one file per
   component you actually use:
   ```js
-  import "@control-room/design-system/base";          // resets, chassis, responsive, shared primitives
-  import "@control-room/design-system/styles/button.css";
-  import "@control-room/design-system/styles/calendar.css";
+  import "@alebianco/cr-design-system/base";          // resets, chassis, responsive, shared primitives
+  import "@alebianco/cr-design-system/styles/button.css";
+  import "@alebianco/cr-design-system/styles/calendar.css";
   ```
   Slugs match the catalog ids (`button`, `calendar`, `toggle-chip`, …); the full
   list is `styles/parts/manifest.json`. **Import `base` first** — it carries the

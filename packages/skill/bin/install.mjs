@@ -2,10 +2,10 @@
 /**
  * control-room-skill — install the Control Room skill into an agent provider.
  *
- *   npx @control-room/skill                 → ./.claude/skills/control-room-design-system
- *   npx @control-room/skill --global        → ~/.claude/skills/control-room-design-system
- *   npx @control-room/skill --provider=cursor   (or opencode)  → .cursor/skills / .opencode/skills
- *   npx @control-room/skill --dir=path/to/skills
+ *   npx @alebianco/cr-skill                 → ./.claude/skills/control-room-design-system
+ *   npx @alebianco/cr-skill --global        → ~/.claude/skills/control-room-design-system
+ *   npx @alebianco/cr-skill --provider=cursor   (or opencode)  → .cursor/skills / .opencode/skills
+ *   npx @alebianco/cr-skill --dir=path/to/skills
  *
  * Copies the bundled skill (SKILL.md + references + templates + checklists + the
  * machine-readable token/catalog artifacts) into the target skills directory.
@@ -29,10 +29,10 @@ if (has("--help") || has("-h")) {
     [
       "Install the Control Room agent skill.",
       "",
-      "  npx @control-room/skill                install into ./.claude/skills (this project)",
-      "  npx @control-room/skill --global       install into ~/.claude/skills (all projects)",
-      "  npx @control-room/skill --provider=cursor|opencode",
-      "  npx @control-room/skill --dir=<path>   install into a custom skills dir",
+      "  npx @alebianco/cr-skill                install into ./.claude/skills (this project)",
+      "  npx @alebianco/cr-skill --global       install into ~/.claude/skills (all projects)",
+      "  npx @alebianco/cr-skill --provider=cursor|opencode",
+      "  npx @alebianco/cr-skill --dir=<path>   install into a custom skills dir",
       "",
       "Tip: Claude Code users can instead run  /plugin marketplace add alebianco/control-room-design-system",
     ].join("\n")
@@ -61,5 +61,5 @@ console.log(`✓ installed "${NAME}" → ${dest}`);
 console.log("\nStart your agent in this directory and the skill is available.");
 console.log("\nFor the live component/token tools, also add the MCP server:");
 console.log(
-  '  { "mcpServers": { "control-room": { "command": "npx", "args": ["-y", "@control-room/mcp"] } } }'
+  '  { "mcpServers": { "control-room": { "command": "npx", "args": ["-y", "@alebianco/cr-mcp"] } } }'
 );

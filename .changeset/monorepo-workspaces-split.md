@@ -1,15 +1,15 @@
 ---
-"@control-room/tokens": minor
-"@control-room/styles": minor
-"@control-room/utils": minor
-"@control-room/icons": minor
-"@control-room/components": minor
+"@alebianco/cr-tokens": minor
+"@alebianco/cr-styles": minor
+"@alebianco/cr-utils": minor
+"@alebianco/cr-icons": minor
+"@alebianco/cr-components": minor
 ---
 
 Restructure into npm workspaces: each layer is now an independently-publishable
-`@control-room/*` package (tokens, styles, utils, icons, components) with its own
-`dist` and `exports`. The root `@control-room/design-system` becomes a convenience
-umbrella that re-exports every subpath, so existing `@control-room/design-system/*`
-imports are unchanged. Cross-package references use `@control-room/*` specifiers.
+`@alebianco/cr-*` package (tokens, styles, utils, icons, components) with its own
+`dist` and `exports`. The root `@alebianco/cr-design-system` becomes a convenience
+umbrella that re-exports every subpath, so existing `@alebianco/cr-design-system/*`
+imports are unchanged. Cross-package references use `@alebianco/cr-*` specifiers.
 Packaging polish: correct `sideEffects` (CSS packages vs pure modules), `keywords`,
 `repository`+`directory`, `homepage`, and full `types` on every `utils` entrypoint.

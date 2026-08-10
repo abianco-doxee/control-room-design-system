@@ -22,7 +22,7 @@ import {
   THEME_ROLES,
   TYPE_OVERRIDABLE,
   themeCss,
-} from "@control-room/utils/theme";
+} from "@alebianco/cr-utils/theme";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = join(ROOT, "tokens", "tokens.json");
@@ -184,7 +184,7 @@ function splitThemeCss(theme) {
 /* ── 3c. the theme contract (machine-readable appearance surface) ─────────
  * Every semantic role a complete theme must fill — the boundary a brand author
  * writes to. Derived straight from tokens.json's semantic tier; a node test keeps
- * it in lock-step with @control-room/utils/theme's THEME_ROLES. */
+ * it in lock-step with @alebianco/cr-utils/theme's THEME_ROLES. */
 function themeContract() {
   const GROUPS = ["surface", "text", "line", "signal", "keyed", "texture"];
   const roles = [];
@@ -216,7 +216,7 @@ function themeContract() {
   );
 }
 
-/* Guard: the contract derived from tokens.json must match @control-room/utils/theme's runtime copy
+/* Guard: the contract derived from tokens.json must match @alebianco/cr-utils/theme's runtime copy
  * so the two never drift (also asserted from the test suite). */
 function assertContractInSync() {
   const fromTokens = JSON.parse(themeContract()).roles.map((r) => r.cssVar);
@@ -225,7 +225,7 @@ function assertContractInSync() {
   const b = JSON.stringify(fromLib);
   if (a !== b) {
     throw new Error(
-      "Theme contract drift: tokens.json semantic roles ≠ @control-room/utils/theme THEME_ROLES.\n" +
+      "Theme contract drift: tokens.json semantic roles ≠ @alebianco/cr-utils/theme THEME_ROLES.\n" +
         `  tokens: ${a}\n  lib:    ${b}`
     );
   }

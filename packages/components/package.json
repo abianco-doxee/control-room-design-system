@@ -1,9 +1,9 @@
 {
-  "name": "@control-room/components",
+  "name": "@alebianco/cr-components",
   "version": "1.0.0",
   "license": "UNLICENSED",
   "type": "module",
-  "description": "Control Room components — authored once as Mitosis .lite.tsx, compiled to idiomatic React/Vue/Svelte/Angular/Solid/Qwik. Structure + props + a11y + state only; styling lives in @control-room/styles, tokens in @control-room/tokens, icon packs in @control-room/icons.",
+  "description": "Control Room components — authored once as Mitosis .lite.tsx, compiled to idiomatic React/Vue/Svelte/Angular/Solid/Qwik. Structure + props + a11y + state only; styling lives in @alebianco/cr-styles, tokens in @alebianco/cr-tokens, icon packs in @alebianco/cr-icons.",
   "keywords": [
     "control-room",
     "design-system",
@@ -75,7 +75,7 @@
     "verify:types": "tsc -p build/tsconfig.frameworks.json"
   },
   "dependencies": {
-    "@control-room/icons": "workspace:*"
+    "@alebianco/cr-icons": "workspace:*"
   },
   "peerDependencies": {
     "@angular/core": ">=17",
@@ -110,6 +110,7 @@
     }
   },
   "publishConfig": {
+    "access": "restricted",
     "registry": "https://npm.pkg.github.com"
   }
 }

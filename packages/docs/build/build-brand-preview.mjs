@@ -2,7 +2,7 @@
 /**
  * Brand preview — a self-contained swatch page for every theme (built-in + brand).
  *
- * Reads the generated appearance files (@control-room/tokens themes/*.css), re-scopes each theme's
+ * Reads the generated appearance files (@alebianco/cr-tokens themes/*.css), re-scopes each theme's
  * role values to a container class, and renders — on one page — the surface ladder,
  * the signal ramp with its on-colour text and measured WCAG contrast, and a strip
  * of live components. It's the brand author's proof sheet: does this brand read
@@ -16,7 +16,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { contrastRatio } from "@control-room/utils/theme";
+import { contrastRatio } from "@alebianco/cr-utils/theme";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const THEMES = join(ROOT, "..", "..", "packages", "tokens", "dist", "themes");

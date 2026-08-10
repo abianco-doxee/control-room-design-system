@@ -1,9 +1,9 @@
 {
-  "name": "@control-room/styles",
+  "name": "@alebianco/cr-styles",
   "version": "1.0.0",
   "license": "UNLICENSED",
   "type": "module",
-  "description": "Control Room component styles — the authored all-in-one bundle (components.css), the thin global/base layer (base.css) and the per-component partials (parts/*.css) for PrimeVue-style import-on-use, plus the Tailwind v4 entry. Pairs with @control-room/tokens.",
+  "description": "Control Room component styles — the authored all-in-one bundle (components.css), the thin global/base layer (base.css) and the per-component partials (parts/*.css) for PrimeVue-style import-on-use, plus the Tailwind v4 entry. Pairs with @alebianco/cr-tokens.",
   "keywords": [
     "control-room",
     "design-system",
@@ -37,9 +37,10 @@
     "verify": "node build/build-styles.mjs --check"
   },
   "dependencies": {
-    "@control-room/tokens": "workspace:*"
+    "@alebianco/cr-tokens": "workspace:*"
   },
   "publishConfig": {
+    "access": "restricted",
     "registry": "https://npm.pkg.github.com"
   }
 }

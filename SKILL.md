@@ -48,7 +48,7 @@ Detail lives in `references/`. Load only what the task needs.
 | --- | --- |
 | `references/design-language.md` | The **nine laws** — the *why* and the do/don't for every visual decision. Read this first for any new component. |
 | `references/tokens.md` | The full token reference — every variable, every theme, and how to consume them. |
-| `references/theming.md` | **Theming & branding** — the feature ⇄ appearance split, the theme contract, authoring a brand (`brands/*.json` + `@control-room/design-system/theme`), contrast, and the appearance-separation guard. |
+| `references/theming.md` | **Theming & branding** — the feature ⇄ appearance split, the theme contract, authoring a brand (`brands/*.json` + `@alebianco/cr-design-system/theme`), contrast, and the appearance-separation guard. |
 | `references/components.md` | The **component library** — formal spec + API for each component (Panel, Button, Chip, StatusDot, SessionRow, Rail, Hero, Bezel, Table, Tag, diagonal primitives, keyed tiles, drip, form controls, instrument shell, and the overlays — Modal / Toast / Tooltip). |
 | `references/forms.md` | **Forms — ArkType/JSON-Schema validation** — declarative form controls and their validation contract. |
 | `references/motion.md` | The four motion tiers, the glitch/CRT vocabulary, and the reduced-motion contract. |
@@ -56,9 +56,9 @@ Detail lives in `references/`. Load only what the task needs.
 | `references/seeded-cat.md` | The seeded pixel-cat: identity-from-seed, pose-is-state, the `paint()` contract. |
 | `references/seeded-sigil.md` | The seeded cyber-sigil: identity-from-seed pixel glyph (cyber-sigilism), state-keyed hue, the drip vocabulary. |
 | `references/decoration.md` | ASCII/pixel decoration for **dead space** — seeded density fields (Braille/block), telemetry frame trim, drafting grids, empty-states; the decorative-only contract (aria-hidden, whisper, mask-faded). |
-| `packages/tokens/tokens/tokens.json` (`@control-room/tokens/tokens.json`) | Machine-readable token source (parse this to generate CSS/Tailwind/JSON). |
-| `@control-room/tokens/css` (`@control-room/design-system/css`) | Ready-to-use CSS custom properties for all four themes. Import first. |
-| `@control-room/styles/components` (`@control-room/design-system/components`) | The shipped component layer — `cr-`prefixed classes (`.cr-panel`, `.cr-btn`, …) built on the tokens. Import after the tokens. |
+| `packages/tokens/tokens/tokens.json` (`@alebianco/cr-tokens/tokens.json`) | Machine-readable token source (parse this to generate CSS/Tailwind/JSON). |
+| `@alebianco/cr-tokens/css` (`@alebianco/cr-design-system/css`) | Ready-to-use CSS custom properties for all four themes. Import first. |
+| `@alebianco/cr-styles/components` (`@alebianco/cr-design-system/components`) | The shipped component layer — `cr-`prefixed classes (`.cr-panel`, `.cr-btn`, …) built on the tokens. Import after the tokens. |
 | `references/tailwind.md` | Tailwind-first authoring — the token-driven Tailwind v4 `@theme`, utility→token map, and theme-reactive utilities. |
 | `references/frameworks.md` | Author-once interactive components (Mitosis) compiled to idiomatic React/Vue/Svelte/Angular/Solid/Qwik; styling stays in the `cr-` classes. |
 | `references/styling-contract.md` | **Styling contract — pt / dt / unstyled + finer tokens** — the PrimeVue-shaped API on the single-source model. |
@@ -80,7 +80,7 @@ system *generable* rather than merely described.
 
 The irreducible rules. Each expands in the references.
 
-- **MUST** build on the token layer (`@control-room/tokens/css`). Never hardcode a
+- **MUST** build on the token layer (`@alebianco/cr-tokens/css`). Never hardcode a
   hex, a border width, or a shadow that a token already names.
 - **MUST** keep every corner square. `--radius` is `0` and stays `0`. **NEVER**
   round a corner, blur a shadow, or add a gradient to a content surface — with
@@ -120,8 +120,8 @@ geometric-glyph icons (no icon font), the `.cr-mark` registration ticks, the dri
 
 ```html
 <!-- 1. Load the token layer, then the component layer (order matters). -->
-<link rel="stylesheet" href="@control-room/design-system/css" />
-<link rel="stylesheet" href="@control-room/design-system/components" />
+<link rel="stylesheet" href="@alebianco/cr-design-system/css" />
+<link rel="stylesheet" href="@alebianco/cr-design-system/components" />
 
 <!-- 2. Set a theme on <html>. Omit for dark. -->
 <html data-theme="dark">
@@ -138,5 +138,5 @@ geometric-glyph icons (no icon font), the `.cr-mark` registration ticks, the dri
 ```
 
 For the full anatomy, variants, and token bindings of every component, see
-`references/components.md`; the class list lives in `@control-room/styles`
+`references/components.md`; the class list lives in `@alebianco/cr-styles`
 (`components.css`).

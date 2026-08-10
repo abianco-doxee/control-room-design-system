@@ -3,7 +3,7 @@
 // cn() lets a consumer override a utility safely (last-wins on conflicts) instead
 // of shipping two competing classes. Standard clsx + tailwind-merge helper.
 //
-//   import { cn } from "@control-room/design-system/cn";
+//   import { cn } from "@alebianco/cr-design-system/cn";
 //   cn("cr-btn", isPrimary && "cr-btn--accent", "px-4", className)
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
