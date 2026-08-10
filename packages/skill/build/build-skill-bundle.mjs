@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Assemble the distributable skill bundle for @control-room/skill.
+ * Assemble the distributable skill bundle for @abianco-doxee/cr-skill.
  *
  * The skill's contents are defined once in skills/manifest.json (include[]). This
  * copies that set into packages/skill/skills/<installAs>/ — the committed bundle
@@ -10,7 +10,7 @@
  *
  * The bundle is committed and drift-gated by `--check` (verify:skill), so it can
  * never fall out of step with the source. Regenerate:
- *   pnpm --filter @control-room/skill run build
+ *   pnpm --filter @abianco-doxee/cr-skill run build
  */
 import {
   cpSync,
@@ -73,7 +73,7 @@ if (CHECK) {
       console.error(`✗ bundle has stray ${rel}`);
     }
   if (stale) {
-    console.error("\nRun: pnpm --filter @control-room/skill run build");
+    console.error("\nRun: pnpm --filter @abianco-doxee/cr-skill run build");
     process.exit(1);
   }
   console.log(`✓ skill bundle is in sync (${Object.keys(want).length} files)`);

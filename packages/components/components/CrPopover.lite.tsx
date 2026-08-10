@@ -53,7 +53,7 @@ export default function CrPopover(props: CrPopoverProps) {
     },
     /* Collision-aware placement: anchor the panel to the trigger, flip above when
      * there's no room below, and shift horizontally to stay in the viewport (so the
-     * panel never clips off-screen). Same algorithm as @control-room/utils/position (exported
+     * panel never clips off-screen). Same algorithm as @abianco-doxee/cr-utils/position (exported
      * for consumers); inlined here so the component carries no cross-target import.
      * Static on open — for scroll-pinned placement use autoPlace() from ./position. */
     place() {

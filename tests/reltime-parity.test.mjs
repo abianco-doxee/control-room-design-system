@@ -1,13 +1,13 @@
 // Drift guard: CrRelativeTime inlines its relative-time logic (a .lite component
 // can't import a runtime util and stay portable across six targets). This renders
 // the ACTUAL compiled React component and asserts its text matches the
-// @control-room/utils relativeTime port for a spread of deltas — so the inlined
+// @abianco-doxee/cr-utils relativeTime port for a spread of deltas — so the inlined
 // copy and the util can never silently diverge.
 //
 // Run via test:pkg (pretest:pkg builds dist/pkg/react first).
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { relativeTime } from "@control-room/utils/duration";
+import { relativeTime } from "@abianco-doxee/cr-utils/duration";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as CR from "../packages/components/dist/pkg/react/index.js";

@@ -1,9 +1,9 @@
 /* Control Room — Tailwind v4 entry (Tailwind-first authoring).
  *
  * In your app's Tailwind build:
- *   @import "@control-room/design-system/tailwind.css";
+ *   @import "@abianco-doxee/cr-design-system/tailwind.css";
  * then load the runtime token layer once so utilities follow the theme:
- *   <link rel="stylesheet" href="@control-room/design-system/css">   (@control-room/tokens/css)
+ *   <link rel="stylesheet" href="@abianco-doxee/cr-design-system/css">   (@abianco-doxee/cr-tokens/css)
  *   <html data-theme="dark|light|extreme|phosphor">
  *
  * Now author with token-driven utilities: bg-panel, text-ink, bg-work,
@@ -11,6 +11,6 @@
  * Control Room tokens and switch with the theme. See references/tailwind.md.
  *
  * Tailwind scans YOUR content for used utilities. For a ready-made utility file
- * without a build, use @control-room/styles/utilities.css (prebuilt). */
+ * without a build, use @abianco-doxee/cr-styles/utilities.css (prebuilt). */
 @import "tailwindcss";
-@import "@control-room/tokens/tw-theme.css";
+@import "@abianco-doxee/cr-tokens/tw-theme.css";

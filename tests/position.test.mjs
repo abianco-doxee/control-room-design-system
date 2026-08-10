@@ -3,7 +3,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { computePosition } from "@control-room/utils/position";
+import { computePosition } from "@abianco-doxee/cr-utils/position";
 
 const VP = { width: 1000, height: 800 };
 const anchor = (x, y, w = 80, h = 30) => ({ x, y, width: w, height: h });

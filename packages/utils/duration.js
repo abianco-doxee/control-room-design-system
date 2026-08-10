@@ -7,7 +7,7 @@
 // flicker on every SSR framework. The caller owns the clock (a prop, a store, a
 // tick), so the same inputs always render the same output.
 //
-//   import { humanDuration, relativeTime } from "@control-room/design-system/duration";
+//   import { humanDuration, relativeTime } from "@abianco-doxee/cr-design-system/duration";
 //   humanDuration(90_000)            // "1m 30s"
 //   relativeTime(then, Date.now())   // "5m ago" / "in 2h"
 

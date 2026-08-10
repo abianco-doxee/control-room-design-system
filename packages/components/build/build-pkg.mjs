@@ -9,7 +9,7 @@
  * extension rewriting covers the .js emit but not always the .d.ts re-exports).
  *
  * The output is a real named-export package — `import { CrButton, type
- * CrButtonProps } from "@control-room/design-system/react"` — with react/react-dom
+ * CrButtonProps } from "@abianco-doxee/cr-design-system/react"` — with react/react-dom
  * left external (peer deps). The package stays private; this just makes its
  * framework entry points genuinely consumable (npm pack / workspace linking).
  *

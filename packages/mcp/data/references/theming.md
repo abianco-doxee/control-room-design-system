@@ -26,11 +26,11 @@ Two ways to consume:
 
 ```html
 <!-- A. bundle: every built-in theme, pick with data-theme (simplest) -->
-<link rel="stylesheet" href="@control-room/design-system/css" />
+<link rel="stylesheet" href="@abianco-doxee/cr-design-system/css" />
 
 <!-- B. split: structure once + exactly the theme(s) you ship (leaner, brandable) -->
-<link rel="stylesheet" href="@control-room/design-system/structure.css" />
-<link rel="stylesheet" href="@control-room/design-system/themes/slate.css" />
+<link rel="stylesheet" href="@abianco-doxee/cr-design-system/structure.css" />
+<link rel="stylesheet" href="@abianco-doxee/cr-design-system/themes/slate.css" />
 ```
 
 Then select a theme on the root element:
@@ -68,10 +68,10 @@ Component Browser puts every card under one page theme while you flip it.)
 
 ## The theme contract
 
-`dist/theme-contract.json` (`@control-room/design-system/theme-contract`) is the
+`dist/theme-contract.json` (`@abianco-doxee/cr-design-system/theme-contract`) is the
 machine-readable list of every semantic role a complete theme must define — the
 exact surface a brand writes to. The same list is the runtime `THEME_ROLES` in
-`@control-room/design-system/theme`; a test keeps the two (and tokens.json) in
+`@abianco-doxee/cr-design-system/theme`; a test keeps the two (and tokens.json) in
 lock-step so they can't drift.
 
 Roles by group: **surface** (`--ground` `--board` `--panel` `--panel-2` `--rail`),
@@ -284,14 +284,14 @@ That's `brands/aurora.json`: the same indigo/cyan brand in both modes, the light
 mode auto-darkening the inherited neon signals to stay readable on its near-white
 surfaces. Select the light variant with `data-theme="aurora-light"`.
 
-### Programmatic authoring (`@control-room/design-system/theme`)
+### Programmatic authoring (`@abianco-doxee/cr-design-system/theme`)
 
 The build path is thin wrapping over a framework-agnostic core you can call
 directly — at build time, or in the browser for per-tenant / user-chosen themes:
 
 ```js
 import { defineTheme, applyTheme, validateTheme, checkThemeContrast }
-  from "@control-room/design-system/theme";
+  from "@abianco-doxee/cr-design-system/theme";
 
 // validate + render to a scoped CSS string
 const { css, validation, contrast } = defineTheme("acme", acmeBrand);

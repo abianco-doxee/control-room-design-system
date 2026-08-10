@@ -6,7 +6,7 @@
 // a `startsWith("http")` guess — the latter misfires on protocol-relative (`//x`),
 // mailto:, and same-origin absolute URLs. Ported from dp-tooling.
 //
-//   import { isExternalHref, externalAttrs } from "@control-room/design-system/href";
+//   import { isExternalHref, externalAttrs } from "@abianco-doxee/cr-design-system/href";
 
 export function isExternalHref(href) {
   if (!href || typeof href !== "string") return false;

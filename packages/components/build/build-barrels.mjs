@@ -1,5 +1,5 @@
 // Generate a per-framework barrel (index) that re-exports every compiled
-// component, so apps can `import { CrSwitch } from "@control-room/design-system/react"`
+// component, so apps can `import { CrSwitch } from "@abianco-doxee/cr-design-system/react"`
 // instead of reaching into .../components/CrSwitch. Runs after `mitosis build`;
 // the dist/frameworks/** tree is a git-ignored build artifact, so these barrels
 // are regenerated on every compile (CI included). --check fails on drift.
@@ -18,9 +18,9 @@ import { fileURLToPath } from "node:url";
 const require = createRequire(import.meta.url);
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const FRAMEWORKS = join(ROOT, "dist", "frameworks");
-// The pixel pack is owned by @control-room/icons; vendor its data into each
+// The pixel pack is owned by @abianco-doxee/cr-icons; vendor its data into each
 // target so CrIcon's `../lib/icons/pixel` relative import resolves (bake-in).
-const PIXEL_SRC = require.resolve("@control-room/icons/pixel");
+const PIXEL_SRC = require.resolve("@abianco-doxee/cr-icons/pixel");
 
 // target → { ext: component-file extension, index: barrel filename }
 const TARGETS = {
@@ -56,7 +56,7 @@ for (const [target, { ext, index }] of Object.entries(TARGETS)) {
     mkdirSync(libDir, { recursive: true });
     copyFileSync(join(ROOT, "lib", "pt.ts"), join(libDir, "pt.ts"));
     // CrIcon imports the pixel pack as `../lib/icons/pixel.ts` — vendor it from
-    // @control-room/icons so the relative import resolves in every target's output tree.
+    // @abianco-doxee/cr-icons so the relative import resolves in every target's output tree.
     const iconsDir = join(libDir, "icons");
     mkdirSync(iconsDir, { recursive: true });
     copyFileSync(PIXEL_SRC, join(iconsDir, "pixel.ts"));

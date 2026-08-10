@@ -25,7 +25,7 @@ export interface CrIconProps {
   set?: "cr" | "pixel";
   /** Escape hatch: a raw single-`<path>` `d` string. When set it renders as-is,
    * overriding `name`/`set` — feed any glyph from any Iconify family (import a map
-   * from @control-room/icons and pass map[name]) or a hand-drawn 24×24 path,
+   * from @abianco-doxee/cr-icons and pass map[name]) or a hand-drawn 24×24 path,
    * with no rebuild of this package. Stroked like the house set unless `filled`. */
   path?: string;
   /** With `path`: render it filled (fill=currentColor, no stroke), like the pixel pack. */

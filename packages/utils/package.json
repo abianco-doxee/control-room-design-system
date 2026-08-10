@@ -1,5 +1,5 @@
 {
-  "name": "@control-room/utils",
+  "name": "@abianco-doxee/cr-utils",
   "version": "1.0.0",
   "license": "UNLICENSED",
   "type": "module",
@@ -63,6 +63,7 @@
     "tailwind-merge": "^3.6.0"
   },
   "publishConfig": {
+    "access": "restricted",
     "registry": "https://npm.pkg.github.com"
   }
 }

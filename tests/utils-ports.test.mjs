@@ -2,8 +2,8 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { humanDuration, refreshCadence, relativeTime } from "@control-room/utils/duration";
-import { externalAttrs, isExternalHref } from "@control-room/utils/href";
+import { humanDuration, refreshCadence, relativeTime } from "@abianco-doxee/cr-utils/duration";
+import { externalAttrs, isExternalHref } from "@abianco-doxee/cr-utils/href";
 
 test("isExternalHref: relative/in-page/scheme links are not external", () => {
   for (const h of ["#top", "/dashboard", "./x", "../y", "?q=1", "mailto:a@b.co", "tel:+1", ""]) {

@@ -2,17 +2,17 @@
 
 > A neon-noir, neobrutalist design system for dense operational dashboards — authored once as Mitosis components and compiled to React, Vue, Svelte, Angular, Solid and Qwik, on a four-theme OKLCH token layer with a documented accessibility contract.
 
-Control Room is both a published component library (`@control-room/*` on npm) and a
+Control Room is both a published component library (`@abianco-doxee/cr-*` on npm) and a
 Claude Code skill. Install one framework build plus the token + style layers:
 
 ```
-npm i @control-room/components @control-room/tokens @control-room/styles
+npm i @abianco-doxee/cr-components @abianco-doxee/cr-tokens @abianco-doxee/cr-styles
 ```
 
 ```
-import { CrButton } from "@control-room/components/react";  // or /vue /svelte /angular /solid /qwik
-import "@control-room/tokens/css";                          // token layer, all four themes
-import "@control-room/styles/components";                   // component styles (or per-part parts/*)
+import { CrButton } from "@abianco-doxee/cr-components/react";  // or /vue /svelte /angular /solid /qwik
+import "@abianco-doxee/cr-tokens/css";                          // token layer, all four themes
+import "@abianco-doxee/cr-styles/components";                   // component styles (or per-part parts/*)
 ```
 
 Set the theme on the root: `<html data-theme="dark|light|extreme|phosphor">`.
@@ -148,7 +148,7 @@ live in the [Gallery](https://abianco-doxee.github.io/control-room-design-system
 - [theme-contract.json](https://abianco-doxee.github.io/control-room-design-system/theme-contract.json): the required theme roles a valid theme/brand must define
 - [tokens.json](https://github.com/abianco-doxee/control-room-design-system/blob/main/packages/tokens/tokens/tokens.json): the token source of truth (all themes)
 - [llms-full.txt](https://abianco-doxee.github.io/control-room-design-system/llms-full.txt): this index followed by the full text of every reference doc
-- MCP server: `npx @control-room/mcp` — exposes the catalog, tokens, theme contract and design laws as tools an agent can query ([docs](https://github.com/abianco-doxee/control-room-design-system/blob/main/packages/mcp/README.md))
+- MCP server: `npx @abianco-doxee/cr-mcp` — exposes the catalog, tokens, theme contract and design laws as tools an agent can query ([docs](https://github.com/abianco-doxee/control-room-design-system/blob/main/packages/mcp/README.md))
 
 ## Optional
 - [Seeded Pixel-Cat](https://abianco-doxee.github.io/control-room-design-system/reference/seeded-cat/): the identity+state pixel-cat generator
@@ -987,11 +987,11 @@ Two ways to consume:
 
 ```html
 <!-- A. bundle: every built-in theme, pick with data-theme (simplest) -->
-<link rel="stylesheet" href="@control-room/design-system/css" />
+<link rel="stylesheet" href="@abianco-doxee/cr-design-system/css" />
 
 <!-- B. split: structure once + exactly the theme(s) you ship (leaner, brandable) -->
-<link rel="stylesheet" href="@control-room/design-system/structure.css" />
-<link rel="stylesheet" href="@control-room/design-system/themes/slate.css" />
+<link rel="stylesheet" href="@abianco-doxee/cr-design-system/structure.css" />
+<link rel="stylesheet" href="@abianco-doxee/cr-design-system/themes/slate.css" />
 ```
 
 Then select a theme on the root element:
@@ -1029,10 +1029,10 @@ Component Browser puts every card under one page theme while you flip it.)
 
 ## The theme contract
 
-`dist/theme-contract.json` (`@control-room/design-system/theme-contract`) is the
+`dist/theme-contract.json` (`@abianco-doxee/cr-design-system/theme-contract`) is the
 machine-readable list of every semantic role a complete theme must define — the
 exact surface a brand writes to. The same list is the runtime `THEME_ROLES` in
-`@control-room/design-system/theme`; a test keeps the two (and tokens.json) in
+`@abianco-doxee/cr-design-system/theme`; a test keeps the two (and tokens.json) in
 lock-step so they can't drift.
 
 Roles by group: **surface** (`--ground` `--board` `--panel` `--panel-2` `--rail`),
@@ -1245,14 +1245,14 @@ That's `brands/aurora.json`: the same indigo/cyan brand in both modes, the light
 mode auto-darkening the inherited neon signals to stay readable on its near-white
 surfaces. Select the light variant with `data-theme="aurora-light"`.
 
-### Programmatic authoring (`@control-room/design-system/theme`)
+### Programmatic authoring (`@abianco-doxee/cr-design-system/theme`)
 
 The build path is thin wrapping over a framework-agnostic core you can call
 directly — at build time, or in the browser for per-tenant / user-chosen themes:
 
 ```js
 import { defineTheme, applyTheme, validateTheme, checkThemeContrast }
-  from "@control-room/design-system/theme";
+  from "@abianco-doxee/cr-design-system/theme";
 
 // validate + render to a scoped CSS string
 const { css, validation, contrast } = defineTheme("acme", acmeBrand);
@@ -1479,12 +1479,12 @@ convenience compositions on top.
 
 ```css
 /* your app's main CSS, processed by Tailwind v4 */
-@import "@control-room/design-system/tailwind.css";   /* Tailwind + the CR @theme */
+@import "@abianco-doxee/cr-design-system/tailwind.css";   /* Tailwind + the CR @theme */
 ```
 
 ```html
 <!-- load the runtime token layer once, and pick a theme -->
-<link rel="stylesheet" href="@control-room/design-system/css" />   <!-- dist/control-room.css -->
+<link rel="stylesheet" href="@abianco-doxee/cr-design-system/css" />   <!-- dist/control-room.css -->
 <html data-theme="dark">
 ```
 
@@ -2974,7 +2974,7 @@ in local time, a multi-week chart on local Mondays, a multi-year chart on Jan 1.
 Labels format to the unit (`09:30`, `3 Mar`, `Mar`, `Jan '25`, `2025`); the hover
 tooltip shows a fuller stamp (`3 Mar 09:15`). This uses the built-in `Intl` zone
 database (no date library, no bundle cost) and is shared with the static gallery via
-`@control-room/design-system/time-scale` (`timeTicks(lo, hi, { zone, target, locale,
+`@abianco-doxee/cr-design-system/time-scale` (`timeTicks(lo, hi, { zone, target, locale,
 week, fiscalStart })`), so hand-rendered and live charts agree.
 
 The calendar can be expressed the way a team reads it, via three more props (all
@@ -3193,7 +3193,7 @@ closes and returns focus to the trigger. Use **Menu** for a list of actions.
 trigger, **flips** above when there's no room below, and **shifts** horizontally to
 stay in the viewport (never clipping off-screen), tagging itself with
 `data-placement`. The algorithm is exported for your own overlays as
-`@control-room/design-system/position` — `computePosition` (pure geometry, unit-
+`@abianco-doxee/cr-design-system/position` — `computePosition` (pure geometry, unit-
 tested), `place(anchor, floating, opts)`, and `autoPlace(...)` (keeps it pinned on
 scroll/resize). No dependency on Floating UI.
 
@@ -3471,7 +3471,7 @@ A retro-futuristic **cyber-sigil** generated from a seed — a per-entity identi
 mark that pairs with the pixel-cat. Full contract in `references/seeded-sigil.md`.
 
 ```tsx
-import { CrSigil } from "@control-room/design-system/react";
+import { CrSigil } from "@abianco-doxee/cr-design-system/react";
 <CrSigil seed="nova-01" state="working" />
 ```
 
@@ -3495,7 +3495,7 @@ operators — it **is** the non-colour backup the a11y contract requires.
 <span class="cr-sev cr-sev--idle" role="img" aria-label="idle"></span>      <!-- ● ∞ -->
 ```
 ```tsx
-import { CrShape } from "@control-room/design-system/react";
+import { CrShape } from "@abianco-doxee/cr-design-system/react";
 <CrShape severity="crit" label="build failing" />
 ```
 
@@ -3534,7 +3534,7 @@ screws), panel seams, wear scratches, and one indicator LED. Same seed → same
 strip, so a rack/unit gets a stable, distinct face (like the seeded cat/sigil).
 
 ```tsx
-import { CrChrome } from "@control-room/design-system/react";
+import { CrChrome } from "@abianco-doxee/cr-design-system/react";
 <CrChrome seed="nova-rack" width={440} />
 ```
 
@@ -3572,7 +3572,7 @@ screen.**
 <span class="cr-blob" aria-hidden="true"></span>  <!-- standalone soft accent -->
 ```
 ```tsx
-import { CrBreach } from "@control-room/design-system/react";
+import { CrBreach } from "@abianco-doxee/cr-design-system/react";
 <CrBreach signal="done" wash alive>…the one exceptional thing…</CrBreach>
 ```
 
@@ -3969,14 +3969,14 @@ emits (`data-pc-section`). Three props drive the rest:
 The stylesheet ships three ways, so a consumer pays only for what they render
 (PrimeVue-style), without giving up the one-import option:
 
-- **Everything** — `@control-room/design-system/components` (the full
+- **Everything** — `@abianco-doxee/cr-design-system/components` (the full
   `styles/components.css` bundle). Simplest; one import.
 - **Base + per-component** — import the thin chassis once, then one file per
   component you actually use:
   ```js
-  import "@control-room/design-system/base";          // resets, chassis, responsive, shared primitives
-  import "@control-room/design-system/styles/button.css";
-  import "@control-room/design-system/styles/calendar.css";
+  import "@abianco-doxee/cr-design-system/base";          // resets, chassis, responsive, shared primitives
+  import "@abianco-doxee/cr-design-system/styles/button.css";
+  import "@abianco-doxee/cr-design-system/styles/calendar.css";
   ```
   Slugs match the catalog ids (`button`, `calendar`, `toggle-chip`, …); the full
   list is `styles/parts/manifest.json`. **Import `base` first** — it carries the
@@ -4170,7 +4170,7 @@ derived from the JSON Schema (the lingua franca), so the two sources produce the
 
 ```ts
 import { type } from "arktype";
-import { defineForm } from "@control-room/design-system/forms";
+import { defineForm } from "@abianco-doxee/cr-design-system/forms";
 
 // (a) ArkType
 const Session = type({
@@ -4488,9 +4488,9 @@ Each framework has a subpath export with named components (and, where the target
 is typed, prop-type exports):
 
 ```ts
-import { CrButton, type CrButtonProps } from "@control-room/design-system/react";
-import { CrButton } from "@control-room/design-system/qwik";
-import { CrButton } from "@control-room/design-system/vue";
+import { CrButton, type CrButtonProps } from "@abianco-doxee/cr-design-system/react";
+import { CrButton } from "@abianco-doxee/cr-design-system/qwik";
+import { CrButton } from "@abianco-doxee/cr-design-system/vue";
 ```
 
 How each entry is distributed reflects what that framework needs — the package is
@@ -4603,25 +4603,25 @@ Load the token + component CSS once (any framework), then import the compiled
 component for your framework:
 
 ```html
-<link rel="stylesheet" href="@control-room/design-system/css" />        <!-- tokens -->
-<link rel="stylesheet" href="@control-room/design-system/components" />  <!-- cr- classes -->
+<link rel="stylesheet" href="@abianco-doxee/cr-design-system/css" />        <!-- tokens -->
+<link rel="stylesheet" href="@abianco-doxee/cr-design-system/components" />  <!-- cr- classes -->
 ```
 Each framework has a **barrel entry** — import any component by name from one
 subpath (`/react`, `/vue`, `/svelte`, `/angular`, `/solid`, `/qwik`):
 
 ```tsx
 // React
-import { CrSwitch, CrModal } from "@control-room/design-system/react";
+import { CrSwitch, CrModal } from "@abianco-doxee/cr-design-system/react";
 <CrSwitch checked={on} label="Live" onChange={setOn} />
 ```
 ```vue
 <!-- Vue -->
-<script setup> import { CrSwitch } from "@control-room/design-system/vue"; </script>
+<script setup> import { CrSwitch } from "@abianco-doxee/cr-design-system/vue"; </script>
 <CrSwitch :checked="on" label="Live" @change="on = $event" />
 ```
 ```tsx
 // Qwik
-import { CrSwitch } from "@control-room/design-system/qwik";
+import { CrSwitch } from "@abianco-doxee/cr-design-system/qwik";
 <CrSwitch checked={on.value} label="Live" onChange$={(v) => (on.value = v)} />
 ```
 
@@ -4629,7 +4629,7 @@ The **`examples/console/`** app is a real Qwik dashboard built on this barrel �
 see it for a full composition (nav rail, masthead, session panels, breach).
 
 Need just one component? The deep path still works (extension required):
-`import CrSwitch from "@control-room/design-system/frameworks/react/components/CrSwitch.tsx"`.
+`import CrSwitch from "@abianco-doxee/cr-design-system/frameworks/react/components/CrSwitch.tsx"`.
 
 The barrels re-export the **default** of every compiled component (Angular also
 re-exports each `<Name>Module`). They ship as **source** — your app's bundler
@@ -4645,7 +4645,7 @@ utility on a `cr-` element. Use the `cn()` helper (clsx + tailwind-merge) so
 conflicting utilities resolve last-wins instead of both shipping:
 
 ```tsx
-import { cn } from "@control-room/design-system/cn";
+import { cn } from "@abianco-doxee/cr-design-system/cn";
 <button class={cn("cr-btn", primary && "cr-btn--accent", "px-4", className)} />
 ```
 
@@ -4844,7 +4844,7 @@ targets.
 ## Use it
 
 ```tsx
-import { CrSigil } from "@control-room/design-system/react";
+import { CrSigil } from "@abianco-doxee/cr-design-system/react";
 <CrSigil seed="nova-01" state="working" size={48} />
 <CrSigil seed="ptl-757" />           {/* no state → seed picks the hue */}
 ```
@@ -4908,7 +4908,7 @@ sets: `braille` (finest), `block` (`░▒▓█`), `ramp` (`.:-=+*#%@`).
 </div>
 ```
 ```tsx
-import { CrAscii } from "@control-room/design-system/react";
+import { CrAscii } from "@abianco-doxee/cr-design-system/react";
 <div class="cr-ascii cr-ascii--mask-l" aria-hidden="true">
   <CrAscii seed="nova-01" variant="braille" />
 </div>
@@ -4927,7 +4927,7 @@ modifier fades it off the content edge (`-l` toward left-aligned text, `-r`,
   (`SEED 2E7A · 0x4F · 12ms ▮▮▮▯▯`) for a frame corner. **Decoration, not data.**
 
 ```tsx
-import { CrTelemetry } from "@control-room/design-system/react";
+import { CrTelemetry } from "@abianco-doxee/cr-design-system/react";
 <CrTelemetry seed="cr-1130" />
 ```
 

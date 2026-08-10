@@ -37,7 +37,7 @@ derived from the JSON Schema (the lingua franca), so the two sources produce the
 
 ```ts
 import { type } from "arktype";
-import { defineForm } from "@control-room/design-system/forms";
+import { defineForm } from "@abianco-doxee/cr-design-system/forms";
 
 // (a) ArkType
 const Session = type({

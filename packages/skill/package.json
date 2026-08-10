@@ -1,5 +1,5 @@
 {
-  "name": "@control-room/skill",
+  "name": "@abianco-doxee/cr-skill",
   "version": "1.0.0",
   "license": "UNLICENSED",
   "type": "module",
@@ -35,6 +35,7 @@
     "verify": "node build/build-skill-bundle.mjs --check"
   },
   "publishConfig": {
+    "access": "restricted",
     "registry": "https://npm.pkg.github.com"
   }
 }

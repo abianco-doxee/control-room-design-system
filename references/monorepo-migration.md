@@ -4,42 +4,42 @@ Status: **in progress** (branch `claude/monorepo-workspaces`). This is the concr
 blueprint for splitting the single package into workspaces, and — later — into
 separate published repos.
 
-Decision (locked): **each package publishes independently** under the `@control-room/*`
+Decision (locked): **each package publishes independently** under the `@abianco-doxee/cr-*`
 scope, owning its own `dist/`, its own `exports`, deps and version. The root
-`@control-room/design-system` stays as a convenience umbrella that re-points its
+`@abianco-doxee/cr-design-system` stays as a convenience umbrella that re-points its
 subpath exports (`./css`, `./theme`, `./react`, …) into the sub-packages, so existing
-`@control-room/design-system/*` consumers keep working unchanged. Cross-package
-references use `@control-room/<pkg>` specifiers (resolved through the workspace
+`@abianco-doxee/cr-design-system/*` consumers keep working unchanged. Cross-package
+references use `@abianco-doxee/cr-<pkg>` specifiers (resolved through the workspace
 symlinks), never relative `../` hops across package boundaries.
 
 Progress:
 - [x] Stage 1 — scaffold workspaces (`workspaces: ["packages/*"]`, stub manifests).
-- [x] Extract `@control-room/utils` (cn · href · duration · position · time-scale ·
+- [x] Extract `@abianco-doxee/cr-utils` (cn · href · duration · position · time-scale ·
       forms · theme). Pure source move; green.
-- [x] Extract `@control-room/tokens` (tokens.json · brands · build-tokens/theme/palette
+- [x] Extract `@abianco-doxee/cr-tokens` (tokens.json · brands · build-tokens/theme/palette
       + chassis/ramp/signals/type helpers → dist/themes/*, control-room.css, structure.css,
       theme-contract, tw-theme, flat, dtcg). Owns its own dist + theme.test; green.
-- [x] Extract `@control-room/styles` (components.css authored bundle · base.css + parts/*
-      partials · tailwind.css entry · build-styles). Depends on `@control-room/tokens`
-      (tailwind.css imports `@control-room/tokens/tw-theme.css`). Green.
-- [x] Extract `@control-room/icons` (Iconify build tooling + path-data packs; ships the
+- [x] Extract `@abianco-doxee/cr-styles` (components.css authored bundle · base.css + parts/*
+      partials · tailwind.css entry · build-styles). Depends on `@abianco-doxee/cr-tokens`
+      (tailwind.css imports `@abianco-doxee/cr-tokens/tw-theme.css`). Green.
+- [x] Extract `@abianco-doxee/cr-icons` (Iconify build tooling + path-data packs; ships the
       pixel pack, exports `./pixel`). Bake-in model: `build-barrels` vendors the pack from
-      `@control-room/icons` into every target so `CrIcon`'s relative import resolves and the
+      `@abianco-doxee/cr-icons` into every target so `CrIcon`'s relative import resolves and the
       compiled bundles stay self-contained + byte-identical. `CrIcon` also gained a raw-path
       escape hatch (`path`/`filled`) so any glyph/family can be injected per-use. Green.
-- [x] Extract `@control-room/components` (all 80 `.lite.tsx` + overrides + `lib/pt.ts` +
+- [x] Extract `@abianco-doxee/cr-components` (all 80 `.lite.tsx` + overrides + `lib/pt.ts` +
       the full Mitosis pipeline: compile-mitosis, build-fix-*, build-barrels, build-pkg,
       build-pkg-types, render-fw, mitosis.config + tsconfigs). Owns its `dist/frameworks`
       + `dist/pkg` and the framework exports (./react ./vue ./svelte ./angular ./solid
-      ./qwik ./frameworks/*); depends on @control-room/icons. compile-mitosis resolves the
+      ./qwik ./frameworks/*); depends on @abianco-doxee/cr-icons. compile-mitosis resolves the
       Mitosis version via require.resolve (hoist-safe); build:components:cli runs the CLI
       oracle in-package via workspace delegation. Green: build:components (driver + CLI),
       verify:types, pkg (17/17), frameworks (24/24), contract (16/16), separation, biome.
-- [x] Extract `@control-room/docs` (private, dev-only leaf): astro/starlight site (src,
+- [x] Extract `@abianco-doxee/cr-docs` (private, dev-only leaf): astro/starlight site (src,
       astro.config, public), the gallery/showcase/docs-content/brand-preview builders +
       showcase-islands + gallery-scripts, and the Playwright a11y/islands/responsive/visual
-      suites (+ visual snapshot baselines). Consumes the sibling packages via `@control-room/*`
-      specifiers (starlight-theme.css imports `@control-room/tokens/css`) and repo-root reads
+      suites (+ visual snapshot baselines). Consumes the sibling packages via `@abianco-doxee/cr-*`
+      specifiers (starlight-theme.css imports `@abianco-doxee/cr-tokens/css`) and repo-root reads
       via `../..`. Root delegates build:content/gallery/showcase/brand-preview/site + dev/
       preview + the playwright test:* scripts to the docs workspace (so astro/playwright run
       with CWD=packages/docs); the Pages deploy uploads `packages/docs/site-dist`. Validated:
@@ -47,11 +47,11 @@ Progress:
 
 ## Status: complete
 
-All six workspaces are extracted and independently publishable under `@control-room/*`
+All six workspaces are extracted and independently publishable under `@abianco-doxee/cr-*`
 (`utils`, `tokens`, `styles`, `icons`, `components`) plus the private `docs` site. The root
-`@control-room/design-system` remains a convenience umbrella re-exporting every subpath into
-the packages, so existing `@control-room/design-system/*` consumers are unchanged. Cross-
-package references use `@control-room/<pkg>` specifiers throughout.
+`@abianco-doxee/cr-design-system` remains a convenience umbrella re-exporting every subpath into
+the packages, so existing `@abianco-doxee/cr-design-system/*` consumers are unchanged. Cross-
+package references use `@abianco-doxee/cr-<pkg>` specifiers throughout.
 
 ## Publishing
 
@@ -62,10 +62,11 @@ The publish model is **GitHub Packages** (`npm.pkg.github.com`), wired end-to-en
   protocol. `.npmrc` sets `node-linker=hoisted` (so the build's `require.resolve` /
   bare-import assumptions keep working over a flat layout), `enable-pre-post-scripts`,
   and `link-workspace-packages`.
-- **Registry.** `.npmrc` maps `@control-room:registry=https://npm.pkg.github.com`, and
-  each publishable package carries `publishConfig.registry`. Because internal deps are
-  `workspace:*`, install always links locally and never fetches the scope from the
-  registry — the mapping only takes effect at publish time.
+- **Registry.** `.npmrc` maps `@abianco-doxee:registry=https://npm.pkg.github.com`, and
+  each publishable package carries `publishConfig.registry` plus
+  `publishConfig.access: "restricted"` (private). Because internal deps are `workspace:*`,
+  install always links locally and never fetches the scope from the registry — the mapping
+  only takes effect at publish time.
 - **Changesets.** `changeset version` bumps versions + writes each package's CHANGELOG;
   `changeset publish` (root `release` script) publishes the bumped, non-private packages.
   `.github/workflows/release.yml` runs both through `changesets/action`: a push to `main`
@@ -74,39 +75,38 @@ The publish model is **GitHub Packages** (`npm.pkg.github.com`), wired end-to-en
   holds `packages: write`. The job is **dormant** (gated on the `RELEASE_ENABLED` repo
   variable) so CI stays green until the repo is deliberately configured for releasing.
 
-**Turning releasing on — three one-time repo/infra toggles (no code change):**
+**Scope ownership — resolved.** GitHub Packages ties an npm scope to a GitHub org/user of
+the same name. The original `@control-room` scope could never publish from this repo, whose
+owner is the user `abianco-doxee`. The scope is now `@abianco-doxee` (packages
+`@abianco-doxee/cr-*`), which matches the owner, so no org move is required. Packages
+publish with `access: "restricted"` — private by default, visible only to accounts granted
+access. The **product name is still Control Room**; only the npm scope and package names
+changed, and the `Cr` / `cr-` / `--cr-` code prefixes are untouched.
 
-1. **Own the `@control-room` scope.** GitHub Packages ties a scope to a GitHub org/user of
-   the same name, so `@control-room/*` publishes only under a `control-room` org. This repo's
-   owner is the user `abianco-doxee`; create a free `control-room` GitHub org and move the
-   repo there, or rename the scope to match the owner. The scope was **not** renamed
-   unilaterally because it is the product's identity and pervades the docs, MCP data, and
-   skill bundle.
-2. **Allow Actions to open PRs.** Settings → Actions → General → Workflow permissions →
+**Turning releasing on — two one-time repo toggles (no code change):**
+
+1. **Allow Actions to open PRs.** Settings → Actions → General → Workflow permissions →
    enable "Allow GitHub Actions to create and approve pull requests". The default
    `GITHUB_TOKEN` cannot open the Version Packages PR without it (this is the documented
    changesets prerequisite, not a defect).
-3. **Flip the gate.** Set the `RELEASE_ENABLED=true` repo variable (Settings → Secrets and
+2. **Flip the gate.** Set the `RELEASE_ENABLED=true` repo variable (Settings → Secrets and
    variables → Actions → Variables).
 
 Until then, everything is wired and verified locally (`changeset status` is green and
 `changeset version` produces correct per-package bumps + changelogs); only these external
 toggles gate the live release.
 - **Pre-split changeset queue — resolved.** The ~85 changesets predating the split named
-  `@control-room/design-system` (the private workspace root, which is not a workspace
+  `@abianco-doxee/cr-design-system` (the private workspace root, which is not a workspace
   member, so Changesets errored on it). Their content is preserved in this CHANGELOG's
   `[Unreleased]` section and in git history; the vestigial queue has been removed. The
   three post-split changesets that target real packages remain, so `changeset status` is
   green and the first Version Packages PR bumps the seven publishable packages.
 
-**One prerequisite before the first publish succeeds.** GitHub Packages ties an npm scope
-to a GitHub org/user of the *same name*, so `@control-room/*` can only be published under a
-`control-room` org. This repo's owner is the user `abianco-doxee`, so publishing under
-`@control-room` needs a (free) `control-room` GitHub org to own the repo — or the scope to
-be renamed to match the owner. This is an infra/ownership step, not a code change: until
-it's done, the Version Packages PR still opens and versions still bump correctly; only the
-publish-on-merge step needs the scope. The scope was **not** renamed unilaterally because
-it is the product's identity and pervades the docs, MCP data, and skill bundle.
+**The scope prerequisite is now satisfied.** GitHub Packages ties an npm scope to a GitHub
+org/user of the *same name*. The former `@control-room` scope had no matching org, so it
+could never publish from a repo owned by the user `abianco-doxee`. Renaming the scope to
+`@abianco-doxee` — rather than creating a `control-room` org — resolves this with no infra
+work, and keeps the Control Room product name and code prefixes exactly as they were.
 
 Deliberate scope (not defects):
 
@@ -121,11 +121,11 @@ Deliberate scope (not defects):
   get a precompiled JS `dist/pkg`. All six are consumable; the asymmetry is intentional.
 - **One baked icon family.** `CrIcon`'s portable single-`<path>` model (no `innerHTML`, so
   Vue/Solid-safe across six targets) rules out general multi-element families (Lucide/Tabler)
-  as *baked* sets. Multi-family is delivered two ways instead: `@control-room/icons` exposes
+  as *baked* sets. Multi-family is delivered two ways instead: `@abianco-doxee/cr-icons` exposes
   importable per-family path packs, and `CrIcon`'s `path` escape hatch renders any glyph
   per-use. A second baked set would need another single-`<path>` (pixel-style) source.
 
-Done since the split: `build:tw` now emits `@control-room/styles/utilities.css` (was an
+Done since the split: `build:tw` now emits `@abianco-doxee/cr-styles/utilities.css` (was an
 orphan at the repo root).
 
 ## Why this is staged, not done in one commit
@@ -148,20 +148,20 @@ not hold. The **in-repo workspaces** stage (below) is fully doable here; the
 control-room-design-system/
 ├─ package.json                 # workspaces: ["packages/*"], dev tooling, orchestration
 ├─ packages/
-│  ├─ tokens/                   # @control-room/tokens
+│  ├─ tokens/                   # @abianco-doxee/cr-tokens
 │  │   tokens/tokens.json · brands/ · build/build-tokens.mjs · build/build-theme.mjs
 │  │   → dist/control-room.css · themes/* · structure.css · dtcg · flat · theme-contract
-│  ├─ styles/                   # @control-room/styles  (depends on tokens)
+│  ├─ styles/                   # @abianco-doxee/cr-styles  (depends on tokens)
 │  │   styles/components.css (authored) · build/build-styles.mjs → base.css + parts/*
-│  ├─ utils/                    # @control-room/utils   (cn · href · duration · position · time-scale · forms · theme)
-│  ├─ icons/                    # @control-room/icons   (icon DATA + Iconify build tooling)
+│  ├─ utils/                    # @abianco-doxee/cr-utils   (cn · href · duration · position · time-scale · forms · theme)
+│  ├─ icons/                    # @abianco-doxee/cr-icons   (icon DATA + Iconify build tooling)
 │  │   lib/icons/*.ts (pixel + future families) · build/build-icons.mjs
 │  │   → per-pack path-data modules, one per Iconify set, keyed by name
-│  ├─ components/               # @control-room/components (depends on tokens, styles, utils, icons)
+│  ├─ components/               # @abianco-doxee/cr-components (depends on tokens, styles, utils, icons)
 │  │   components/*.lite.tsx · overrides/ · lib/pt.ts · build/compile-mitosis.mjs
 │  │   build/build-fix-*.mjs · build/build-barrels.mjs · build/build-pkg*.mjs
-│  │   → dist/frameworks/* · dist/pkg/*  (CrIcon renders; reads packs from @control-room/icons)
-│  └─ docs/                     # @control-room/docs (private) — astro/starlight
+│  │   → dist/frameworks/* · dist/pkg/*  (CrIcon renders; reads packs from @abianco-doxee/cr-icons)
+│  └─ docs/                     # @abianco-doxee/cr-docs (private) — astro/starlight
 │      src/ · build/build-docs-content.mjs · build/build-gallery.mjs · build/build-showcase.mjs
 │      astro.config.mjs · public/
 └─ catalog/                     # generated index (or packages/components/catalog)
@@ -174,9 +174,9 @@ Dependency edges: `tokens ← styles ← components`; `utils ← components`;
 Iconify build tooling are separable from component logic and are the thing most
 likely to grow — one pack per Iconify set (pixelarticons today; add a family = add
 one `@iconify-json/<set>` devDep + a name-map, run `build-icons`). Keeping them in
-`@control-room/icons` isolates that growth (and the Iconify devDeps) from the
+`@abianco-doxee/cr-icons` isolates that growth (and the Iconify devDeps) from the
 component runtime, and lets an app consume raw icon path data directly. `CrIcon`
-stays in `@control-room/components` and depends on `@control-room/icons` for the
+stays in `@abianco-doxee/cr-components` and depends on `@abianco-doxee/cr-icons` for the
 packs; the house geometric glyph map (the identity set) stays inline in `CrIcon`.
 
 ## Staged execution (each stage: move → rewire paths → `verify` + gates green → commit)
@@ -190,13 +190,13 @@ packs; the house geometric glyph map (the identity set) stays inline in `CrIcon`
    artifacts from the other packages via workspace deps. Deploy workflow points at
    `packages/docs`. Verify the site builds + a11y/islands/responsive gates.
 3. **Extract `tokens`.** Move token sources + `build-tokens`/`build-theme`/palette.
-   Re-point `verify:tokens/theme/palette`. Consumers import `@control-room/tokens/css`.
+   Re-point `verify:tokens/theme/palette`. Consumers import `@abianco-doxee/cr-tokens/css`.
 4. **Extract `utils`.** Move `utils/` + `lib/forms` + `lib/theme`; move their tests.
    Pure move; `utils-ports`/`forms`/`theme`/`position`/`time-scale` tests follow.
 5. **Extract `styles`** (depends on tokens). Move `styles/` + `build-styles`.
 6. **Extract `icons`** (leaf data + tooling). Move `lib/icons/` + `build-icons.mjs`;
    re-point `verify:icons`. `CrIcon` (still in `components`) imports the packs from
-   `@control-room/icons` instead of `../lib/icons/…`; `build-barrels` copies the pack
+   `@abianco-doxee/cr-icons` instead of `../lib/icons/…`; `build-barrels` copies the pack
    from the icons package into each target tree.
 7. **Extract `components`** (the big one). Move `components/`, `overrides/`, `lib/pt.ts`,
    the Mitosis compiler + fix + barrels + pkg builds, and the component/contract/
