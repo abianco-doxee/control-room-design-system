@@ -52,10 +52,13 @@ export interface CrToastRegionProps {
  * rather than remount — a remounted role=alert refires, and for `err` toasts
  * (assertive) that spams a screen reader. So the row's identity must be stable
  * while a run grows. That is why CrToastGroup carries TWO ids: `id` is the
- * OLDEST member's (stable identity, and the field Mitosis auto-keys React/Qwik
- * on), while `newestId` is the dismiss target. Never key this loop on
- * `newestId`, and never reassign `id` when a duplicate merges. Guarded by
- * tests/cross-fw-contract.test.mjs across all six targets. */
+ * OLDEST member's (stable identity), while `newestId` is the dismiss target.
+ * Mitosis emits no key for this loop today, so the targets reconcile
+ * positionally and the guarantee already holds — but the design deliberately
+ * does not RELY on that codegen detail: `id` is stable so that a reconciler
+ * which DOES key on it keys on something that never changes. Never key this
+ * loop on `newestId`, and never reassign `id` when a duplicate merges. Guarded
+ * by tests/cross-fw-contract.test.mjs across all six targets. */
 export default function CrToastRegion(props: CrToastRegionProps) {
   const state = useStore({
     /* Collapse runs of consecutive same-message/same-signal toasts. Only

@@ -26,7 +26,29 @@
 - **Mitosis `onUpdate` requires an explicit dependency array:** `onUpdate(() => { … }, [props.foo]);` — see `CrPalette.lite.tsx:89` and `CrModal.lite.tsx:29`.
 - **Never use `//` comments at the top level of a `.lite.tsx`** — file headers, doc comments above `export interface`, section markers. Use `/* */` blocks. The Mitosis codegen collapses newlines during normalisation; a `//` comment has no terminator, so everything after it on the reflowed line is commented out, swallowing imports, interfaces and the module's `export default`. Symptoms seen: a runtime `YT is not defined` (Task 31), and `',' expected` at a meaningless column on a multi-thousand-character generated line (Task 20, originally misattributed to an apostrophe — that fix worked by accident because it also deleted the `//` block). Task 31's reviewer reproduced it deliberately: a restored `//` doc comment produced a 1169-character collapsed line. Diagnose with `awk '{if(length($0)>m)m=length($0)}END{print m}'` over the generated file — a pathological line length is the tell.
 - **Any conditional rendering in a `.lite.tsx` must use `<Show>` branches, never an inline ternary in an attribute expression** — the generator emits silently invalid Qwik otherwise, and only `test:frameworks`/`test:pkg` would catch it.
-- **Runtime verification in ONE framework does not establish a cross-target invariant — read the generated output for all six.** Task 35 proved, three independent ways (DOM-node survival, byte-identical announced text, a MutationObserver showing zero `characterData` mutations), that a grouped toast row survives a count bump without re-announcing. All three probes ran against one runtime. The compiled output tells a different story: **Mitosis auto-generates React and Qwik keys from the item's `id` field**, so `key={g.id}` ships in both — and because that id is the newest group member's, it changes on every duplicate, remounting the row and refiring an assertive live region. Vue keys on `index` (positional, safe); Svelte, Solid and Angular emit no key. When an invariant depends on how a framework reconciles, diff the six `dist/frameworks/*` outputs; a behavioural probe cannot see codegen you did not run.
+- **Runtime verification in ONE framework does not establish a cross-target invariant — read the generated output for all six.** When an invariant depends on how a framework reconciles a list, diff the six `dist/frameworks/*` outputs; a behavioural probe cannot see codegen you did not run.
+
+> **Correction — a false alarm I raised, worth recording because the artefact will recur.**
+> I originally wrote here that Mitosis auto-derives React/Qwik keys from a field
+> named `id`, and that a keyed-on-unstable-id toast row was shipping. **That was
+> wrong.** Verified by rebuilding at the pre-fix commit `8ad4bf8`: `key={g.id}`
+> appears **zero** times in the generated output, the source carries no key
+> binding, and Mitosis's React `For` generator emits no key at all.
+>
+> What fooled me: my own commit `3732378` added a doc comment reading *"DO NOT add
+> `key={g.id}`"*. **Mitosis collapses block comments onto a single line**, so
+> `grep -n` reported the whole comment at one line number, rendered exactly like
+> code. I diagnosed my own documentation as the defect it warned against — the
+> same comment-collapsing artefact behind the earlier "apostrophe" mystery, in a
+> new disguise.
+>
+> The lesson stands, but with an extra clause: **when grepping generated output,
+> confirm the match is code and not a collapsed comment** (`sed -n 'Np' | cut -c1-80`
+> shows it immediately), and re-run the build before asserting — stale artefacts
+> outlive their source. The implementer hardened the design anyway, which was the
+> right call: the group now separates a stable `id` (oldest member) from
+> `newestId` (dismiss target), so the failure becomes impossible rather than
+> merely absent under the current codegen.
 - **A source comment cannot guard an invariant that lives in generated output.** Put it in `tests/cross-fw-contract.test.mjs`, which exists for exactly this and already pins per-target keyboard wiring. When writing such a gate, strip comments before asserting — a component's own warning comment quoting the forbidden pattern will otherwise flag the documentation instead of the code.
 - **Every component carries the styling contract**: `unstyled?: boolean`, `pt?: any`, `dt?: any`, with `ptClass`/`ptAttrs`/`ptStyle` from `../lib/pt.ts` and a `data-part` on each part. Match the surrounding file exactly.
 - **`ISLAND_IDS` in `packages/docs/build/build-showcase.mjs` must match the `DEMOS` keys in `packages/docs/build/showcase-islands.jsx`.** `packages/docs/tests/showcase-islands.spec.mjs` fails the build otherwise.
