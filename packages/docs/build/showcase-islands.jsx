@@ -573,12 +573,14 @@ const DEMOS = {
     defs: [
       T("text", "label", "Details"),
       T("text", "title", "Worker health"),
-      T("enum", "align", "left", { options: ["left", "right"] }),
+      T("enum", "placement", "bottom-start", {
+        options: ["bottom-start", "bottom-end", "top-start", "top-end", "left", "right"],
+      }),
     ],
     render: (s) =>
       h(
         CrPopover,
-        { label: s.label, title: s.title, align: s.align },
+        { label: s.label, title: s.title, placement: s.placement },
         h(
           "p",
           { style: { color: "var(--muted)", margin: 0 } },

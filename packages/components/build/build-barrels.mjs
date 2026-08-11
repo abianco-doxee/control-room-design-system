@@ -55,6 +55,10 @@ for (const [target, { ext, index }] of Object.entries(TARGETS)) {
     const libDir = join(dir, "lib");
     mkdirSync(libDir, { recursive: true });
     copyFileSync(join(ROOT, "lib", "pt.ts"), join(libDir, "pt.ts"));
+    // Same story for lib/position.ts (collision-aware placement, `../lib/position.ts`)
+    // — CrPopover is the first consumer; Tasks 13-15 (CrMenu, CrHoverCard, CrTooltip)
+    // will share this same vendored copy.
+    copyFileSync(join(ROOT, "lib", "position.ts"), join(libDir, "position.ts"));
     // CrIcon imports the pixel pack as `../lib/icons/pixel.ts` — vendor it from
     // @alebianco/cr-icons so the relative import resolves in every target's output tree.
     const iconsDir = join(libDir, "icons");
