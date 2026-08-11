@@ -922,23 +922,52 @@ body {
 .cr-hero__sub  { font-family: var(--font-mono); font-size: var(--text-sm); margin-top: var(--space-0-5); }
 
 /* ── Bezel + screen (the only texture host) ────────────────────────────── */
+/* The casing is milled metal, not a flat card: a hard two-tone bevel (lit top-left
+ * edge, dark bottom-right mass) reads as a machined lip. Same lit/unlit boundary
+ * CrChrome paints on its metal strip — hard 1px insets, never a gradient (Law 1).
+ * Mixed against #fff/#000 rather than --rail-ink, which INVERTS across themes
+ * (light in dark/light, near-black in extreme) and would flip the bevel wrong. */
 .cr-bezel {
+  --cr-bezel-lip: color-mix(in srgb, #fff 20%, transparent);
+  --cr-bezel-shade: color-mix(in srgb, #000 45%, transparent);
+  position: relative;
   border: var(--brd-brush) solid var(--border); background: var(--panel-2); padding: var(--space-3);
-  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  box-shadow:
+    inset 2px 2px 0 var(--cr-bezel-lip),
+    inset -2px -2px 0 var(--cr-bezel-shade),
+    var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
 }
+/* Fasteners: the four corner squares now read as seated bolts — same inset
+ * lit/shade pair as .cr-rivet, scaled to the bezel's own corner studs. */
 .cr-bezel__rivets { display: flex; justify-content: space-between; margin-bottom: var(--space-2); }
-.cr-bezel__rivets i { width: var(--space-2); height: var(--space-2); background: var(--border); display: block; }
+.cr-bezel__rivets i {
+  width: var(--space-2); height: var(--space-2); background: var(--rail-ink); display: block;
+  border: 1px solid var(--border);
+  box-shadow:
+    inset 1px 1px 0 color-mix(in srgb, #fff 30%, transparent),
+    inset -1px -1px 0 color-mix(in srgb, #000 50%, transparent);
+}
+/* The screen is recessed INTO the casing — its lit/shade pair runs the opposite
+ * way round from the outer bevel (dark top-left, lit bottom-right), which is what
+ * makes the glass read as sunk rather than raised. */
 .cr-bezel__screen {
   position: relative; isolation: isolate;
   background: var(--board); border: var(--brd) solid var(--border); padding: var(--space-4);
   font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink);
+  box-shadow:
+    inset 2px 2px 0 color-mix(in srgb, #000 42%, transparent),
+    inset -1px -1px 0 color-mix(in srgb, #fff 12%, transparent);
 }
-/* CRT halftone rides BEHIND the text (own layer, toned + dialable) so the readout
- * stays crisp — texture under body text is a readability tax, not a feature. */
-.cr-bezel__screen::before {
-  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+/* CRT halftone rides ON THE GLASS — above the readout, like grime on a real
+ * screen (Law 6: the texture is on the glass, and the glass is in front).
+ * MUST stay pointer-events:none or the pane eats every click inside the bezel.
+ * Toned well below the old under-text value: at 0.55 over the text it read as a
+ * scrim; on top, ~0.3 is the most that keeps the readout crisp in all four
+ * themes (light's halftone is dark dots on a light board — the worst case). */
+.cr-bezel__screen::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background-image: var(--halftone); background-size: var(--halftone-size) var(--halftone-size);
-  opacity: calc(0.55 * var(--decoration-intensity, 1));
+  opacity: calc(0.3 * var(--decoration-intensity, 1));
 }
 
 /* ── Diagonal primitives (Law 4 — shape carries meaning, never decoration) ──
