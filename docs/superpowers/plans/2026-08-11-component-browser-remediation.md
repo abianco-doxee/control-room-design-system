@@ -707,6 +707,21 @@ Current state differs per component, so the work is not uniform:
 | `CrHoverCard` | **no JS** — `align` is a CSS modifier | placement machinery from scratch |
 | `CrTooltip` | no placement prop at all | full placement surface |
 
+> **Plan gap found during Task 12 — applies to every task in this phase.**
+> Removing `align` from a component is not finished when the prop is gone. Each
+> task must ALSO clear the prop from **`catalog/registry.json`** (then
+> `pnpm run build:catalog`), because `build-showcase.mjs` renders
+> `entry.variants` verbatim — leaving it makes the Component Browser card
+> advertise a dead `align  left · right` row directly beneath the new
+> `placement` prop. On a project whose subject is dead props, that cannot ship.
+> Task 12's brief omitted this; Tasks 13/14 already list the CSS-rule removal
+> but not the catalog. Verified stale at the time of writing: `popover`, `menu`
+> and `hover-card` all still declare `"align": ["left", "right"]`.
+>
+> Likewise the dead `.cr-*__panel--right` CSS rule is removed by the SAME task
+> that removes the prop, in `packages/styles/styles/components.css` (the source
+> — `parts/*.css` are generated).
+
 ### Task 11: Port `computePosition` into `components/lib/`
 
 **Files:**
@@ -962,9 +977,11 @@ At line 136, drop the `+ (props.align === "right" ? " cr-menu__panel--right" : "
 
 Import `placeEl` from `../lib/position.ts` and add a `place()` action mirroring Task 12's, using `.cr-menu__panel` as the panel selector. Call it wherever the menu opens, and hide-then-show the panel exactly as in Task 12 step 4 so it never paints unplaced.
 
-- [ ] **Step 5: Delete the now-dead CSS modifier**
+- [ ] **Step 5: Delete the now-dead CSS modifier and the stale catalog entry**
 
 In `packages/styles/styles/components.css`, remove the `.cr-menu__panel--right` rule. Placement is now inline-styled by JS, so the modifier is unreachable.
+
+Then clear the dead prop from the catalog, or the browser card will advertise a prop that no longer exists: remove `"align": ["left", "right"]` from the `menu` entry's `variants` in **`catalog/registry.json`** and run `pnpm run build:catalog`. (`catalog/catalog.json` is generated — edit the registry, not the output.)
 
 - [ ] **Step 6: Rebuild and verify**
 
@@ -1026,9 +1043,11 @@ Import `placeEl` and add a `place()` action using `.cr-hovercard__panel`, called
 
 A hover card can be revealed by pointer *or* keyboard focus — make sure `place()` runs on both paths, or keyboard users get an unplaced panel.
 
-- [ ] **Step 5: Delete the dead CSS modifier**
+- [ ] **Step 5: Delete the dead CSS modifier and the stale catalog entry**
 
 Remove `.cr-hovercard__panel--right` from `packages/styles/styles/components.css` (the parts files are generated).
+
+Then clear the dead prop from the catalog, or the browser card will advertise a prop that no longer exists: remove `"align": ["left", "right"]` from the `hover-card` entry's `variants` in **`catalog/registry.json`** and run `pnpm run build:catalog`.
 
 - [ ] **Step 6: Rebuild and verify**
 
@@ -1088,6 +1107,8 @@ If the tooltip is purely CSS-driven with no JS state, adding a ref and a show ha
 - [ ] **Step 4: Remove any hardcoded CSS side**
 
 Delete the rule identified in step 1 so JS placement is authoritative.
+
+`CrTooltip` ADDS a prop rather than removing one, so its catalog entry needs the opposite treatment from Tasks 12-14: its `variants` currently reads `{"state": ["hidden", "shown"]}` and has no stale `align` to clear. If the new `placement` surface is worth advertising on the browser card, add it to the `tooltip` entry's `variants` in `catalog/registry.json` and run `pnpm run build:catalog`; if not, leave the entry alone. State which you chose and why.
 
 - [ ] **Step 5: Rebuild and verify**
 
