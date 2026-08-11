@@ -8,8 +8,35 @@
   background: var(--cr-togglechip-bg); color: var(--cr-togglechip-fg);
   border: var(--brd) solid var(--cr-togglechip-border); cursor: pointer;
 }
-.cr-togglechip:hover { color: var(--ink); }
+/* Hover on the OFF chip only. This used to be an unscoped `.cr-togglechip:hover`,
+ * which also repainted the ON chip's label to --ink and destroyed it: measured
+ * 1.45:1 (dark), 1.44:1 (extreme) and 1.00:1 (phosphor, --ink === --sig-work, so
+ * the text vanished outright), while doing nothing at all in light where --ink
+ * and --on-sig are the same colour. The ON chip keeps --cr-togglechip-on-fg. */
+.cr-togglechip:not(.cr-togglechip--on):hover { color: var(--ink); }
 .cr-togglechip--on { background: var(--cr-togglechip-on-bg); color: var(--cr-togglechip-on-fg); border-color: var(--cr-togglechip-on-bg); }
+/* ON + hover: darken the fill toward the on-ink (a second tone with a hard
+ * boundary — Law 1, no gradient) and raise the chip on the system's one hard
+ * offset shadow. The shadow is the load-bearing half in LIGHT, where the ON fill
+ * is --sig-work — a token already scheduled for a contrast fix — so the state
+ * stays legible there structurally rather than depending on that hue. */
+.cr-togglechip--on:hover:not([disabled]) {
+  background: color-mix(in srgb, var(--cr-togglechip-on-fg) 22%, var(--cr-togglechip-on-bg));
+  border-color: color-mix(in srgb, var(--cr-togglechip-on-fg) 22%, var(--cr-togglechip-on-bg));
+  box-shadow: var(--shadow-off-sm) var(--shadow-off-sm) 0 var(--shadow-col);
+}
+/* Pressing moves the chip into its own shadow (Law 1's raised/pressed pair). */
+.cr-togglechip--on:active:not([disabled]) {
+  transform: translate(var(--shadow-off-sm), var(--shadow-off-sm));
+  box-shadow: none;
+}
 .cr-togglechip[disabled] { opacity: var(--state-disabled-op); cursor: not-allowed; }
-.cr-togglechip__count { font-variant-numeric: tabular-nums; background: color-mix(in srgb, currentColor 16%, transparent); padding: 0 var(--space-1); }
+.cr-togglechip__badge { font-variant-numeric: tabular-nums; background: color-mix(in srgb, currentColor 16%, transparent); padding: 0 var(--space-1); }
+/* `badge={true}` — a bare "has matches" dot with no number. Square, not round
+ * (Law 1: --radius is 0). It paints in currentColor, so it inherits the chip's
+ * on/off foreground and stays legible in every theme by construction. */
+.cr-togglechip__badge--dot {
+  width: var(--space-2); height: var(--space-2); padding: 0;
+  background: currentColor;
+}
 

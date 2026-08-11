@@ -1671,14 +1671,14 @@ const DEMOS = {
     defs: [
       T("text", "label", "failing"),
       T("boolean", "pressed", true),
-      T("number", "count", 3, { min: 0, max: 99, step: 1 }),
+      T("text", "badge", "3"),
       T("boolean", "disabled", false),
     ],
     render: (s, set) =>
       h(CrToggleChip, {
         label: s.label,
         pressed: s.pressed,
-        count: s.count,
+        badge: s.badge,
         disabled: s.disabled,
         onToggle: () => set("pressed", !s.pressed),
       }),

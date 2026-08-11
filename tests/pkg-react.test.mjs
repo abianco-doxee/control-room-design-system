@@ -66,12 +66,27 @@ test("CrButton renders as an anchor when href is set (external → safe rel)", (
 
 test("ported components render with correct a11y (ToggleChip/Overflow/RelativeTime)", () => {
   const chip = renderToStaticMarkup(
-    createElement(CR.CrToggleChip, { label: "PRs", pressed: true, count: 3 })
+    createElement(CR.CrToggleChip, { label: "PRs", pressed: true, badge: 3 })
   );
   assert.match(chip, /role="checkbox"/, "toggle-chip is a checkbox");
   assert.match(chip, /aria-checked="true"/, "pressed → aria-checked");
   assert.match(chip, /data-state="on"/, "exposes data-state");
-  assert.match(chip, />3</, "renders the count");
+  assert.match(chip, />3</, "renders a numeric badge");
+
+  // badge is three-valued: nothing / bare dot / verbatim value.
+  const noBadge = renderToStaticMarkup(createElement(CR.CrToggleChip, { label: "PRs" }));
+  assert.doesNotMatch(noBadge, /cr-togglechip__badge/, "omitted badge renders nothing");
+  const falseBadge = renderToStaticMarkup(
+    createElement(CR.CrToggleChip, { label: "PRs", badge: false })
+  );
+  assert.doesNotMatch(falseBadge, /cr-togglechip__badge/, "badge={false} renders nothing");
+  const dot = renderToStaticMarkup(createElement(CR.CrToggleChip, { label: "PRs", badge: true }));
+  assert.match(dot, /cr-togglechip__badge--dot/, "badge={true} → bare dot");
+  assert.match(dot, /aria-hidden="true"/, "the dot is decorative");
+  const text = renderToStaticMarkup(createElement(CR.CrToggleChip, { label: "PRs", badge: "NEW" }));
+  assert.match(text, />NEW</, "string badge renders verbatim");
+  const zero = renderToStaticMarkup(createElement(CR.CrToggleChip, { label: "PRs", badge: 0 }));
+  assert.match(zero, />0</, "an explicit 0 still renders");
 
   const ov = renderToStaticMarkup(
     createElement(CR.CrOverflow, { count: 4, noun: "sessions", onToggle: () => {} })

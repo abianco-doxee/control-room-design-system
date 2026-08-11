@@ -3888,7 +3888,11 @@ there are no global listeners and it can't get stuck. `orientation` is
 An interactive **multi-select filter pill** — several toggle independently (unlike
 the single-select [Segmented](#segmented) or the static [Chip](#chip)). It is a
 `role="checkbox"` button; on/off is announced via `aria-checked` and exposed as
-`data-state`. Props: `label`, `pressed`, `count?`, `onToggle`, `disabled`.
+`data-state`. Props: `label`, `pressed`, `badge?`, `onToggle`, `disabled`.
+`badge` is generic: `false`/omitted renders nothing, `true` renders a bare
+(decorative, `aria-hidden`) dot for "has matches, count irrelevant", and any
+string or number renders verbatim — `0` and `""` still render, because an
+explicit zero is a meaningful filter result.
 **Tokens** — `--cr-togglechip-on-bg` / `--cr-togglechip-on-fg` (the ON state).
 Per Law 2 the ON colour is the accent (a *state*), **not** a per-option identity
 hue; override `--cr-togglechip-on-bg` via `dt` only when a facet genuinely needs
