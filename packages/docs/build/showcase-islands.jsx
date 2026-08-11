@@ -1536,13 +1536,17 @@ const DEMOS = {
   },
   calendar: {
     tag: "CrCalendar",
-    defs: [T("enum", "weekStart", "0", { options: ["0", "1"] })],
+    defs: [
+      T("enum", "weekStart", "sunday", { options: ["sunday", "monday"] }),
+      T("boolean", "switcher", true),
+    ],
     render: (s, set) =>
       h(CrCalendar, {
         month: s.month || "2026-08",
         value: s.value || "2026-08-09",
         today: "2026-08-09",
-        weekStart: s.weekStart === "1" ? 1 : 0,
+        weekStart: s.weekStart,
+        switcher: s.switcher,
         label: "run date",
         onSelect: (iso) => set("value", iso),
         onMonthChange: (m) => set("month", m),

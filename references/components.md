@@ -2157,16 +2157,28 @@ buttons, **roving tabindex** (←/→ ±1 day, ↑/↓ ±1 week, Home/End to the
 PageUp/PageDown step months, Enter/Space select). Fully **controlled and SSR-safe**:
 the displayed `month` and `today` are **injected props**, never read from the clock,
 so server and client render the same grid. Props: `month` (`YYYY-MM`), `value?`
-(`YYYY-MM-DD`), `today?`, `min?`/`max?`, `weekStart?` (0 Sun · 1 Mon), `label`,
+(`YYYY-MM-DD`), `today?`, `min?`/`max?`, `weekStart?` (`"sunday"` default ·
+`"monday"`), `switcher?` (default true), `yearSpan?` (default 8), `label`,
 `onSelect`, `onMonthChange`.
+
+The header carries a **month/year switcher** — a month dropdown and a year
+dropdown beside the prev/next steppers. Every one of the four controls emits
+`onMonthChange` with the new `YYYY-MM`; none of them reads the clock. The year
+list is derived from the **displayed** year (`yearSpan` either side, clamped to
+`min`/`max`), which is what keeps the switcher SSR-safe — there is no "now" in
+it. Pass `switcher={false}` for the bare prev/next header.
 
 ```tsx
 <CrCalendar month="2026-08" value="2026-08-09" today="2026-08-09"
-  onSelect={setDate} onMonthChange={setMonth} label="run date" />
+  weekStart="monday" onSelect={setDate} onMonthChange={setMonth} label="run date" />
 ```
 
 **Tokens** — `--cr-calendar-selected-bg` (selected-day fill, a *state*) ·
 `--cr-calendar-today-ring` · `--cr-calendar-muted` (adjacent-month days) ·
 `--cr-calendar-bg`. **A11y** — grid semantics with `aria-selected`, `aria-current="date"`
 for today, `aria-disabled` outside `min`/`max`; one tab stop with full keyboard
-traversal.
+traversal. The month label stays in the a11y tree as an `aria-live` region behind
+the switcher, and the two selects are named `Month` and `Year`. Hovering the
+**selected** day keeps the accent fill (sunk 15% toward `--cr-calendar-bg`)
+rather than falling back to the plain hover surface, which is what keeps the
+selected+hovered numeral above 4.5:1 in all four themes.

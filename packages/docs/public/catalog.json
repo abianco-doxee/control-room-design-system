@@ -328,8 +328,8 @@
       "spec": "references/components.md#calendar",
       "variants": {
         "weekStart": [
-          "0 (Sun)",
-          "1 (Mon)"
+          "sunday",
+          "monday"
         ]
       },
       "tokens": [

@@ -831,4 +831,101 @@ test.describe("component browser — live islands", () => {
       "checkboxes must not collapse onto one shared name"
     ).toBeFalsy();
   });
+
+  // The calendar's whole SSR contract is that `month`/`today` are injected and
+  // the component never reads the clock. The month/year switcher is the easiest
+  // place to break that (an "and jump to today" convenience would do it), so
+  // this drives the switcher and asserts it moves the grid by emitting
+  // onMonthChange rather than by consulting `new Date()`.
+  test("calendar: month/year switcher steps the grid via onMonthChange", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const cal = page.locator('[data-island="calendar"]');
+    const monthSel = cal.locator('[data-part="monthSelect"]');
+    const yearSel = cal.locator('[data-part="yearSelect"]');
+
+    // island seeds month="2026-08" → August 2026.
+    await expect(monthSel).toHaveValue("7"); // 0-based August
+    await expect(yearSel).toHaveValue("2026");
+
+    // pick a month → the grid re-renders on the new YYYY-MM.
+    await monthSel.selectOption("0"); // January
+    await expect(monthSel).toHaveValue("0");
+    await expect(cal.locator(".cr-calendar__month")).toHaveText(/Jan 2026/);
+
+    // pick a year → same path, month preserved.
+    await yearSel.selectOption("2028");
+    await expect(yearSel).toHaveValue("2028");
+    await expect(cal.locator(".cr-calendar__month")).toHaveText(/Jan 2028/);
+
+    // prev/next stepping still works alongside the switcher.
+    await cal.locator('[data-part="prev"]').click();
+    await expect(cal.locator(".cr-calendar__month")).toHaveText(/Dec 2027/);
+    await expect(monthSel).toHaveValue("11");
+    await expect(yearSel).toHaveValue("2027");
+
+    // the year list is derived from the DISPLAYED year, never "now": with the
+    // grid on 2027 the options must be centred on 2027, not on the real year.
+    const years = await yearSel.locator("option").evaluateAll((o) => o.map((e) => +e.value));
+    expect(Math.min(...years)).toBe(2027 - 8);
+    expect(Math.max(...years)).toBe(2027 + 8);
+  });
+
+  test("calendar: weekStart enum reorders the weekday header", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const cal = page.locator('[data-island="calendar"]');
+    const heads = cal.locator(".cr-calendar__weekday");
+    await expect(heads.first()).toHaveText("Su"); // default "sunday"
+    await cal.locator(".pg__controls select").first().selectOption("monday");
+    await expect(heads.first()).toHaveText("Mo");
+  });
+
+  // axe (test:a11y) evaluates RESTING states only and never enters :hover, so it
+  // structurally cannot catch the reported bug: hovering a SELECTED day fell
+  // back to the plain hover fill because `.cr-calendar__day:hover` (two classes)
+  // outranks the single-class `--selected`, leaving the near-black selected-fg
+  // on --panel-2 (1.30:1 dark / 1.19:1 phosphor). This measures the real
+  // composited pixels under a real :hover in all four themes.
+  for (const theme of ["dark", "light", "extreme", "phosphor"]) {
+    test(`calendar: selected+hovered day keeps AA text contrast — ${theme}`, async ({ page }) => {
+      await page.goto(SHOWCASE);
+      await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+      await page.evaluate((t) => document.documentElement.setAttribute("data-theme", t), theme);
+
+      const day = page.locator('[data-island="calendar"] .cr-calendar__day--selected').first();
+      await day.hover();
+
+      const ratio = await day.evaluate((el) => {
+        // color-mix() resolves to `color(srgb r g b)` with 0..1 channels, while
+        // plain colours come back as `rgb(r g b)` with 0..255 — parse both, or
+        // the measurement silently reads white and the assertion is worthless.
+        const parse = (c) => {
+          const n = (c.match(/[\d.]+/g) || []).map(Number);
+          if (/^color\(/.test(c)) return n.slice(0, 3).map((v) => v * 255);
+          return n.slice(0, 3);
+        };
+        const transparent = (c) => /rgba?\([^)]*,\s*0\s*\)$/.test(c) || c === "transparent";
+        const bgOf = (node) => {
+          for (let n = node; n; n = n.parentElement) {
+            const c = getComputedStyle(n).backgroundColor;
+            if (!transparent(c)) {
+              const p = parse(c);
+              if (p.length === 3) return p;
+            }
+          }
+          return [255, 255, 255];
+        };
+        const lin = (c) =>
+          c / 255 <= 0.04045 ? c / 255 / 12.92 : ((c / 255 + 0.055) / 1.055) ** 2.4;
+        const lum = ([r, g, b]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+        const L1 = lum(bgOf(el));
+        const L2 = lum(parse(getComputedStyle(el).color));
+        return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+      });
+
+      // Day numerals are small text (not >=18.66px bold), so 4.5:1 applies.
+      expect(ratio, `selected+hovered day in ${theme}`).toBeGreaterThanOrEqual(4.5);
+    });
+  }
 });
