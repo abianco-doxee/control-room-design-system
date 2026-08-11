@@ -1,0 +1,20 @@
+{
+  "$schema": "../dist/theme-contract.json",
+  "$label": "Control Room · the operator instrument, dark + light",
+  "$description": "The theme the Control Room dashboard app ships. One brand definition emitting BOTH schemes via `$modes`, so dark and light are the same theme rather than two separately-authored palettes. It inherits the built-in `dark` signal ramp UNCHANGED — the state ramp is the instrument's readout and is not a branding surface (Law 2) — and declares only the surface ramp and the per-scheme ink. The light mode turns on `$fitSignals` so the inherited signals stay legible on near-white surfaces. Build → dist/themes/control-room.css (dark) + dist/themes/control-room-light.css.",
+  "$extends": "dark",
+  "$scheme": "dark",
+  "$ramp": "#0b0b14",
+
+  "$modes": {
+    "dark": {},
+    "light": {
+      "$scheme": "light",
+      "$ramp": "#f4f5f8",
+      "$fitSignals": true,
+      "ink": "#14161f",
+      "muted": "#585e70",
+      "rail-ink": "#f4f5f8"
+    }
+  }
+}
