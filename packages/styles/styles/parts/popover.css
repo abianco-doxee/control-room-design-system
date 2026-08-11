@@ -9,6 +9,5 @@
   border: var(--brd) solid var(--cr-popover-border); box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
   padding: var(--space-3) var(--space-4);
 }
-.cr-popover__panel--right { left: auto; right: 0; }
 .cr-popover__panel:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
 

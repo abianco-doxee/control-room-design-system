@@ -2155,7 +2155,11 @@
       "description": "Generic anchored overlay for arbitrary content \u2014 a trigger toggles a floating panel; scrim closes on outside click, Esc closes and returns focus. Use Menu for a list of actions.",
       "spec": "references/components.md#popover",
       "variants": {
-        "align": [
+        "placement": [
+          "bottom-start",
+          "bottom-end",
+          "top-start",
+          "top-end",
           "left",
           "right"
         ]

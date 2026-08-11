@@ -57,13 +57,19 @@ export default function CrPopover(props: CrPopoverProps) {
       }
       if ((tries || 0) < 6) setTimeout(() => state.focusPanel((tries || 0) + 1), 16);
     },
+    /* Whatever hid the panel (focusPanel, above) is matched here: place() ALWAYS
+     * ends by revealing it, even when placement itself couldn't run (no window,
+     * no trigger). A panel that gets hidden but never shown again is a dead click
+     * behind a still-active scrim — worse than the pre-port fallback of showing
+     * it unplaced at its CSS position, which is what an early return now does. */
     place() {
       const root: any = rootRef;
-      if (!root || typeof window === "undefined") return;
-      const trigger = root.querySelector("[aria-haspopup]");
-      const panel = root.querySelector(".cr-popover__panel");
-      if (!trigger || !panel) return;
-      placeEl(trigger, panel, { placement: props.placement || "bottom-start" });
+      const panel = root ? root.querySelector(".cr-popover__panel") : null;
+      if (!panel) return;
+      if (root && typeof window !== "undefined") {
+        const trigger = root.querySelector("[aria-haspopup]");
+        if (trigger) placeEl(trigger, panel, { placement: props.placement || "bottom-start" });
+      }
       panel.style.visibility = "visible";
     },
     onKey(event: any) {
