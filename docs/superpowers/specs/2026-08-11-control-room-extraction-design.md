@@ -229,6 +229,58 @@ is its own. So this would be a real addition, not a wiring-up: a design-language
 about where Law 2's boundary sits, plus a contrast-safe hue generator. Out of scope here;
 noted for later.
 
+### Step 2.0b — the route-accent hue constraint (locally seeded, signal-safe)
+
+Because the section ramp stays local and gets re-seeded against the new palette, it
+must be generated under an explicit constraint: **a route accent must never be
+confusable with a state colour.** Otherwise the nav implies state it does not mean —
+Law 2, and the practical failure is a route accent that reads as an error.
+
+**This is not hypothetical: the app's current palette already violates it.** Measured
+OKLCH hue distance against DS dark signals:
+
+| Route | Hex | Nearest signal | Distance |
+|---|---|---|---|
+| contacts | `#a3e635` | `--sig-accent-2` | **1.0°** |
+| sessions | `#22d3ee` | `--sig-work` | **6.5°** |
+| attention | `#ff3b6b` | `--sig-err` | **9.2°** |
+| notes | `#5eead4` | `--sig-done` | **12.9°** |
+| catalogue | `#38bdf8` | `--sig-work` | **14.6°** |
+
+Five of eight collide; only sprint, jobs and settings clear 15°. Carrying these over
+would import the confusion, so they are re-seeded rather than re-used.
+
+**The rule.** A route accent MUST keep **≥15° OKLCH hue distance** from every signal
+hue in every *chromatic* theme, and from every other route accent. A maximin
+generator over a 1° grid gives 8 hues at **16.3° guaranteed separation**:
+
+| Route | Hue | Route | Hue |
+|---|---|---|---|
+| attention | 40° | notes | 241° |
+| sessions | 94° | catalogue | 261° |
+| sprint | 111° | contacts | 280° |
+| jobs | 201° | settings | 327° |
+
+**Three subtleties that are easy to get wrong:**
+
+1. **`--sig-idle` is excluded from the constraint.** At C≈0.03 it is near-achromatic,
+   so its hue angle carries no perceptual meaning and would forbid a 36° band for nothing.
+2. **`phosphor` is excluded from the *hue* constraint.** It is a deliberately
+   single-hue CRT theme — every signal falls within ~49° — so hue separation is
+   physically impossible there. Phosphor must carry wayfinding on **lightness**
+   (dim vs bright rail) with its own lightness-separation assertion. A hue-based
+   generator applied to phosphor would silently produce garbage.
+3. **Hue distance is the second line of defence, not the first.** The primary
+   separation is structural: route accents paint **only** `--cr-nav-accent` (the nav
+   rail, per `global.css:444-451`), while signals paint dots, chips, buttons and stage
+   fills in the content area. That invariant MUST hold — a route accent must never
+   fill a content-area element, regardless of how far its hue sits from the ramp.
+
+**Deliverable:** the generator ships as an app test asserting the ≥15° floor, so a
+future palette change on either side fails loudly instead of silently crowding a
+signal. A working implementation plus a negative test (which correctly rejects the
+current palette) already exist and port directly into the suite.
+
 **Net effect on Step 2.0:** delete 6 tokens, mechanically rename 31, keep 62 in a
 local layer, and adopt the DS palette for the 30 shared names.
 
