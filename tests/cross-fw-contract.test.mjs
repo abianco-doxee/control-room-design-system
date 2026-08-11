@@ -72,3 +72,44 @@ test("angular: dt is applied via [ngStyle] (custom props reach setProperty)", ()
   // el.style.setProperty(), which is the correct path for --custom properties.
   assert.match(src, /\[ngStyle\]='ptStyle\(pt, dt, "root"\)'/, "root binds dt through [ngStyle]");
 });
+
+// CrToastRegion packs consecutive same-message/same-signal toasts into one row
+// with an aria-hidden ×N counter. The no-re-announce guarantee depends on every
+// target reconciling that list POSITIONALLY, so the row's DOM node survives a
+// count bump instead of remounting and refiring its live region.
+//
+// The group's id is the NEWEST member's id, so it CHANGES on every duplicate.
+// Keying the loop on it — the obvious-looking fix for React's "unique key"
+// warning — would remount the row on each repeat, and for `err` toasts
+// (role=alert, assertive) that spams a screen reader. A source comment guards
+// the .lite.tsx, but the invariant lives in the compiled output of six targets
+// and a codegen upgrade could reintroduce keying without anyone touching it.
+// This is the gate for that.
+const TOAST_REGION = {
+  react: "react/components/CrToastRegion.tsx",
+  vue: "vue/components/CrToastRegion.vue",
+  svelte: "svelte/components/CrToastRegion.svelte",
+  solid: "solid/components/CrToastRegion.jsx",
+  qwik: "qwik/components/CrToastRegion.tsx",
+  angular: "angular/components/CrToastRegion.js",
+};
+
+for (const [target, file] of Object.entries(TOAST_REGION)) {
+  test(`${target}: CrToastRegion never keys the group loop on the group id`, () => {
+    // Strip comments first: the component's own doc comment WARNS against
+    // `key={g.id}` and propagates into every target's output, so matching raw
+    // source would flag the documentation instead of the code.
+    const src = fw(file)
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/^[ \t]*\/\/.*$/gm, "")
+      .replace(/\{\/\*[\s\S]*?\*\/\}/g, "");
+    // React/Solid/Qwik `key={…id}`, Vue `:key="…id"`, Svelte `(…id)` each-key,
+    // Angular `trackBy`. Any of these on the group row breaks the guarantee.
+    assert.doesNotMatch(src, /key=\{[^}]*\.id[^}]*\}/, `${target}: no key bound to a group id`);
+    assert.doesNotMatch(src, /:key\s*=\s*["'][^"']*\.id/, `${target}: no :key bound to a group id`);
+    assert.doesNotMatch(src, /trackBy/, `${target}: no trackBy on the group loop`);
+    // The counter must stay out of the accessibility tree — that is what makes
+    // its insertion at the 1→2 transition safe inside a live region.
+    assert.match(src, /aria-hidden/, `${target}: the ×N counter is aria-hidden`);
+  });
+}
