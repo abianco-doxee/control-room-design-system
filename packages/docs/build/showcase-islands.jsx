@@ -28,6 +28,7 @@ import {
   CrDataGrid,
   CrDateTime,
   CrDrawer,
+  CrDrip,
   CrEmptyState,
   CrField,
   CrFileUpload,
@@ -1209,10 +1210,20 @@ const DEMOS = {
     render: (s) =>
       h(CrSessionRow, { name: s.name, status: s.status, signal: s.signal, event: s.event }),
   },
+  // Two components in one card on purpose: Law 3 requires "nothing here yet"
+  // (calm) and "something failed" (error keying + drip) to look DIFFERENT, so the
+  // `kind` control switches between them rather than showing only the calm half.
   "empty-error-state": {
     tag: "CrEmptyState",
-    defs: [T("text", "message", "No sessions in this region yet.")],
-    render: (s) => h(CrEmptyState, { message: s.message }),
+    defs: [
+      T("enum", "kind", "empty", { options: ["empty", "error"] }),
+      T("text", "message", "No sessions in this region yet."),
+      T("text", "detail", "could not reach scheduler"),
+    ],
+    render: (s) =>
+      s.kind === "error"
+        ? h(CrDrip, { title: s.message, sub: s.detail })
+        : h(CrEmptyState, { message: s.message }),
   },
   panel: {
     tag: "CrPanel",

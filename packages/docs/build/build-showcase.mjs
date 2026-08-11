@@ -74,47 +74,6 @@ try {
 const sig = (seed, st, n) =>
   `<canvas class="crsig" width="${n || 40}" height="${n || 40}" data-seed="${seed}" data-state="${st}"></canvas>`;
 const EXAMPLES = {
-  button: [
-    { state: "primary", html: `<button class="cr-btn">run scan</button>` },
-    { state: "work", html: `<button class="cr-btn cr-btn--sig-work">deploy</button>` },
-    { state: "accent", html: `<button class="cr-btn cr-btn--sig-accent">commit</button>` },
-    { state: "err", html: `<button class="cr-btn cr-btn--sig-err">kill</button>` },
-    {
-      state: "outline · sm",
-      html: `<button class="cr-btn cr-btn--outline cr-btn--sm">controls</button>`,
-    },
-    { state: "disabled", html: `<button class="cr-btn" disabled>run scan</button>` },
-  ],
-  chip: [
-    { state: "default (done)", html: `<span class="cr-chip">PTL-757</span>` },
-    { state: "alt (work)", html: `<span class="cr-chip cr-chip--alt">ui-kit</span>` },
-  ],
-  tag: [
-    { state: "done", html: `<span class="cr-tag cr-tag--done">shipped</span>` },
-    { state: "work", html: `<span class="cr-tag cr-tag--work">running</span>` },
-    { state: "wait", html: `<span class="cr-tag cr-tag--wait">waiting</span>` },
-    { state: "err", html: `<span class="cr-tag cr-tag--err">failed</span>` },
-    { state: "idle", html: `<span class="cr-tag cr-tag--idle">parked</span>` },
-    { state: "accent", html: `<span class="cr-tag cr-tag--accent">pinned</span>` },
-  ],
-  "status-dot": [
-    {
-      state: "work",
-      html: `<span class="cr-dot" style="background:var(--sig-work)" role="img" aria-label="working"></span>`,
-    },
-    {
-      state: "wait",
-      html: `<span class="cr-dot" style="background:var(--sig-wait)" role="img" aria-label="waiting"></span>`,
-    },
-    {
-      state: "err",
-      html: `<span class="cr-dot" style="background:var(--sig-err)" role="img" aria-label="error"></span>`,
-    },
-    {
-      state: "done",
-      html: `<span class="cr-dot" style="background:var(--sig-done)" role="img" aria-label="done"></span>`,
-    },
-  ],
   shape: [
     {
       state: "crit (▲)",
@@ -132,20 +91,6 @@ const EXAMPLES = {
     {
       state: "idle (●)",
       html: `<span class="cr-sev cr-sev--idle" role="img" aria-label="idle"></span>`,
-    },
-  ],
-  panel: [
-    {
-      state: "panel",
-      html: `<div class="cr-panel" style="padding:12px;min-width:160px">panel surface</div>`,
-    },
-    {
-      state: "major",
-      html: `<div class="cr-panel cr-panel--major" style="padding:12px;min-width:160px">major panel</div>`,
-    },
-    {
-      state: "inset",
-      html: `<div class="cr-panel cr-panel--inset" style="padding:12px;min-width:160px">recessed</div>`,
     },
   ],
   hero: [
@@ -166,98 +111,6 @@ const EXAMPLES = {
     {
       state: "with marks",
       html: `<header class="cr-masthead cr-mark"><p class="cr-masthead__eyebrow">DP Control Room</p><h1 class="cr-masthead__title">14 sessions</h1></header>`,
-    },
-  ],
-  tabs: [
-    {
-      state: "tablist",
-      html: `<div class="cr-tabs" role="tablist"><button role="tab" class="cr-tab cr-tab--on" aria-selected="true">queue</button><button role="tab" class="cr-tab" aria-selected="false">workers</button><button role="tab" class="cr-tab" aria-selected="false">history</button></div>`,
-    },
-  ],
-  meter: [
-    {
-      state: "work 72%",
-      html: `<div class="cr-meter cr-meter--work" style="width:240px"><span class="cr-meter__label">cpu</span><span class="cr-meter__track"><span class="cr-meter__fill" style="width:72%"></span></span></div>`,
-    },
-    {
-      state: "wait 40%",
-      html: `<div class="cr-meter cr-meter--wait" style="width:240px"><span class="cr-meter__label">queue</span><span class="cr-meter__track"><span class="cr-meter__fill" style="width:40%"></span></span></div>`,
-    },
-    {
-      state: "err 12%",
-      html: `<div class="cr-meter cr-meter--err" style="width:240px"><span class="cr-meter__label">errors</span><span class="cr-meter__track"><span class="cr-meter__fill" style="width:12%"></span></span></div>`,
-    },
-  ],
-  progress: [
-    {
-      state: "determinate 64%",
-      html: `<div class="cr-progress" style="width:240px" role="progressbar" aria-valuenow="64" aria-valuemin="0" aria-valuemax="100" aria-label="indexing"><span class="cr-progress__fill" style="width:64%"></span></div>`,
-    },
-    {
-      state: "indeterminate",
-      html: `<div class="cr-progress cr-progress--indeterminate cr-progress--wait" style="width:240px" role="progressbar" aria-label="syncing"><span class="cr-progress__fill"></span></div>`,
-    },
-  ],
-  alert: [
-    {
-      state: "wait",
-      html: `<div class="cr-alert cr-alert--wait" role="status" style="max-width:360px"><span class="cr-alert__icon"></span><div class="cr-alert__body"><p class="cr-alert__title">maintenance</p><p class="cr-alert__msg">workers restart at 02:00 UTC.</p></div></div>`,
-    },
-    {
-      state: "err · dismissible",
-      html: `<div class="cr-alert cr-alert--err" role="alert" style="max-width:360px"><span class="cr-alert__icon"></span><div class="cr-alert__body"><p class="cr-alert__title">endpoint unreachable</p><p class="cr-alert__msg">SSE closed.</p></div><button class="cr-alert__close" aria-label="Dismiss">✕</button></div>`,
-    },
-  ],
-  "radio-group": [
-    {
-      state: "row",
-      html: `<div class="cr-radiogroup cr-radiogroup--row" role="radiogroup" aria-label="density"><button role="radio" class="cr-radio" aria-checked="false" tabindex="-1"><span class="cr-radio__box"></span>cozy</button><button role="radio" class="cr-radio" aria-checked="true" tabindex="0"><span class="cr-radio__box"></span>compact</button></div>`,
-    },
-  ],
-  slider: [
-    {
-      state: "range",
-      html: `<input type="range" class="cr-slider" value="64" min="0" max="100" aria-label="threshold" style="max-width:240px" />`,
-    },
-  ],
-  segmented: [
-    {
-      state: "single-select",
-      html: `<div class="cr-segmented" role="radiogroup" aria-label="scope"><button role="radio" class="cr-segmented__opt" aria-checked="true" tabindex="0">all</button><button role="radio" class="cr-segmented__opt" aria-checked="false" tabindex="-1">mine</button><button role="radio" class="cr-segmented__opt" aria-checked="false" tabindex="-1">failing</button></div>`,
-    },
-  ],
-  "number-field": [
-    {
-      state: "steppers",
-      html: `<div class="cr-numberfield"><button class="cr-numberfield__btn" aria-label="Decrease">−</button><input type="number" class="cr-numberfield__input" value="6" aria-label="max retries" /><button class="cr-numberfield__btn" aria-label="Increase">+</button></div>`,
-    },
-  ],
-  breadcrumb: [
-    {
-      state: "trail",
-      html: `<nav aria-label="Breadcrumb"><ol class="cr-breadcrumb"><li class="cr-breadcrumb__item"><a class="cr-breadcrumb__link" href="#">control room</a></li><li class="cr-breadcrumb__item"><a class="cr-breadcrumb__link" href="#">sessions</a></li><li class="cr-breadcrumb__item" aria-current="page">cr-1130</li></ol></nav>`,
-    },
-  ],
-  pagination: [
-    {
-      state: "windowed",
-      html: `<nav class="cr-pager" aria-label="Pagination"><button class="cr-pager__btn" aria-label="prev">‹</button><button class="cr-pager__btn">1</button><button class="cr-pager__btn cr-pager__btn--on" aria-current="page">2</button><button class="cr-pager__btn">3</button><span class="cr-pager__ellipsis">…</span><button class="cr-pager__btn">9</button><button class="cr-pager__btn" aria-label="next">›</button></nav>`,
-    },
-  ],
-  table: [
-    {
-      state: "sortable · selectable",
-      html: `<table class="cr-table"><thead><tr><th class="cr-table__sel"></th><th><button class="cr-table__sortable" type="button">job<span class="cr-table__ind">▲</span></button></th><th>worker</th><th>state</th></tr></thead><tbody><tr aria-selected="true"><td class="cr-table__sel"><input type="checkbox" class="cr-check" checked aria-label="select"/></td><td>cr-1130</td><td>nova-01</td><td>failing</td></tr><tr aria-selected="false"><td class="cr-table__sel"><input type="checkbox" class="cr-check" aria-label="select"/></td><td>ptl-757</td><td>ail-chat</td><td>waiting</td></tr></tbody></table>`,
-    },
-  ],
-  kbd: [
-    {
-      state: "keycap",
-      html: `<button class="cr-btn cr-btn--outline cr-btn--sm">save <kbd class="cr-kbd">⌘S</kbd></button>`,
-    },
-    {
-      state: "on fill",
-      html: `<button class="cr-btn cr-btn--sig-err">incident <kbd class="cr-kbd cr-kbd--on">I</kbd></button>`,
     },
   ],
   breach: [
@@ -309,128 +162,10 @@ const EXAMPLES = {
       html: `<div style="width:280px"><p class="cr-sep-label">recent events</p><ul class="cr-list cr-list--tick"><li class="cr-list__item">stream opened</li><li class="cr-list__item">SSE closed</li></ul><div class="cr-leader"><span class="cr-leader__k">uptime</span><span class="cr-leader__fill"></span><span class="cr-leader__v">41h</span></div></div>`,
     },
   ],
-  accordion: [
-    {
-      state: "one open",
-      html: `<div class="cr-accordion" style="min-width:280px"><div class="cr-accordion__item"><button class="cr-accordion__header" aria-expanded="true"><span>stack trace</span><span class="cr-accordion__chevron"></span></button><div class="cr-accordion__panel" role="region">SSEError: stream closed</div></div><div class="cr-accordion__item"><button class="cr-accordion__header" aria-expanded="false"><span>config</span><span class="cr-accordion__chevron"></span></button></div></div>`,
-    },
-  ],
-  switch: [
-    {
-      state: "off",
-      html: `<button class="cr-switch" role="switch" aria-checked="false"><span class="cr-switch__track"></span>live</button>`,
-    },
-    {
-      state: "on",
-      html: `<button class="cr-switch" role="switch" aria-checked="true"><span class="cr-switch__track"></span>live</button>`,
-    },
-  ],
-  checkbox: [
-    {
-      state: "unchecked",
-      html: `<label style="display:inline-flex;gap:8px;align-items:center;font-family:var(--font-mono);font-size:13px"><input type="checkbox" class="cr-check" aria-label="select"/> failing</label>`,
-    },
-    {
-      state: "checked",
-      html: `<label style="display:inline-flex;gap:8px;align-items:center;font-family:var(--font-mono);font-size:13px"><input type="checkbox" class="cr-check" checked aria-label="select"/> waiting</label>`,
-    },
-  ],
-  input: [
-    {
-      state: "text",
-      html: `<input class="cr-input" placeholder="nova-01" aria-label="session name" />`,
-    },
-  ],
-  textarea: [
-    {
-      state: "multi-line",
-      html: `<textarea class="cr-textarea" rows="2" aria-label="notes">stream stalled at turn 42</textarea>`,
-    },
-  ],
-  select: [
-    {
-      state: "native",
-      html: `<select class="cr-input" aria-label="region"><option>eu-west-1</option><option>us-east-1</option></select>`,
-    },
-  ],
-  "form-field": [
-    {
-      state: "with hint",
-      html: `<div class="cr-field" style="min-width:220px"><label class="cr-field__label" for="sx-1">Session name</label><input id="sx-1" class="cr-input" placeholder="nova-01" /><span class="cr-field__hint">lowercase, no spaces</span></div>`,
-    },
-    {
-      state: "error",
-      html: `<div class="cr-field cr-field--error" style="min-width:220px"><label class="cr-field__label" for="sx-2">Endpoint</label><input id="sx-2" class="cr-input" value="bad url" /><span class="cr-field__hint">must be a valid URL</span></div>`,
-    },
-  ],
-  tooltip: [
-    {
-      state: "hover / focus",
-      html: `<span class="cr-tooltip"><span class="cr-tooltip__trigger" tabindex="0">SLA</span><span class="cr-tooltip__bubble" role="tooltip">99.9% monthly uptime</span></span>`,
-    },
-  ],
-  toast: [
-    {
-      state: "done",
-      html: `<div class="cr-toast cr-toast--done" role="status"><span class="cr-toast__msg">queue drained</span><button class="cr-toast__close" aria-label="Dismiss">✕</button></div>`,
-    },
-    {
-      state: "err",
-      html: `<div class="cr-toast cr-toast--err" role="alert"><span class="cr-toast__msg">endpoint unreachable</span><button class="cr-toast__close" aria-label="Dismiss">✕</button></div>`,
-    },
-  ],
-  "toast-region": [
-    {
-      state: "stacked (br)",
-      html: `<div style="display:flex;flex-direction:column;gap:8px;max-width:320px"><div class="cr-toast cr-toast--done" role="status"><span class="cr-toast__msg">queue drained</span><button class="cr-toast__close" aria-label="Dismiss">✕</button></div><div class="cr-toast cr-toast--err" role="alert"><span class="cr-toast__msg">killed all workers</span><button class="cr-toast__close" aria-label="Dismiss">✕</button></div></div>`,
-    },
-  ],
-  menu: [
-    {
-      state: "open panel",
-      html: `<div class="cr-menu" style="position:relative;min-height:130px"><button class="cr-btn cr-btn--outline cr-btn--sm" aria-haspopup="menu" aria-expanded="true">actions ▾</button><div class="cr-menu__panel" role="menu"><button role="menuitem" class="cr-menu__item">pause all</button><button role="menuitem" class="cr-menu__item">restart failed</button><div class="cr-menu__sep"></div><button role="menuitem" class="cr-menu__item cr-menu__item--danger">kill all</button></div></div>`,
-    },
-  ],
-  combobox: [
-    {
-      state: "filtering",
-      html: `<div class="cr-combobox" style="min-width:220px;min-height:150px"><input class="cr-combobox__input" value="nova" role="combobox" aria-expanded="true" aria-controls="sx-cb" aria-label="worker" /><ul class="cr-combobox__list" id="sx-cb" role="listbox"><li class="cr-combobox__opt" role="option" aria-selected="false">nova-01</li><li class="cr-combobox__opt cr-combobox__opt--active" role="option" aria-selected="true">nova-02</li></ul></div>`,
-    },
-  ],
-  "cron-field": [
-    {
-      state: "with readout",
-      html: `<div class="cr-cron" style="max-width:280px"><input class="cr-cron__input" value="0 9 * * 1-5" aria-label="cron" /><div class="cr-cron__presets"><button class="cr-cron__preset">hourly</button><button class="cr-cron__preset">nightly 2am</button></div><p class="cr-cron__out">At 09:00 AM, Monday through Friday</p></div>`,
-    },
-  ],
-  datetime: [
-    {
-      state: "datetime-local",
-      html: `<input type="datetime-local" class="cr-datetime" value="2026-08-04T02:00" aria-label="first run" />`,
-    },
-  ],
-  "hover-card": [
-    {
-      state: "card",
-      html: `<span class="cr-hovercard"><span class="cr-hovercard__trigger" tabindex="0">health</span><span class="cr-hovercard__panel" role="group" aria-label="health" style="opacity:1;visibility:visible;position:static;margin-top:8px"><dl class="cr-dl"><dt class="cr-dl__k">workers</dt><dd class="cr-dl__v">4 online</dd><dt class="cr-dl__k">error rate</dt><dd class="cr-dl__v">1.2%</dd></dl></span></span>`,
-    },
-  ],
-  tree: [
-    {
-      state: "fleet",
-      html: `<ul class="cr-tree" role="tree" aria-label="fleet" style="min-width:220px"><li class="cr-tree__item" role="treeitem" aria-level="1" aria-expanded="true" tabindex="0" style="padding-left:calc(0 * var(--space-4) + var(--space-2))"><span class="cr-tree__twist"></span><span>nova (pool)</span></li><li class="cr-tree__item" role="treeitem" aria-level="2" tabindex="-1" style="padding-left:calc(1 * var(--space-4) + var(--space-2))"><span class="cr-tree__lead">·</span><span>nova-01 · streaming</span></li><li class="cr-tree__item" role="treeitem" aria-level="2" aria-selected="true" tabindex="-1" style="padding-left:calc(1 * var(--space-4) + var(--space-2))"><span class="cr-tree__lead">·</span><span>nova-02 · idle</span></li><li class="cr-tree__item" role="treeitem" aria-level="1" aria-expanded="false" tabindex="-1" style="padding-left:calc(0 * var(--space-4) + var(--space-2))"><span class="cr-tree__twist"></span><span>ail (pool)</span></li></ul>`,
-    },
-  ],
   "diagonal-primitives": [
     {
       state: "chev · notch · wedge",
       html: `<div style="display:flex;gap:16px;align-items:center"><span class="cr-chev" style="font-family:var(--font-mono);font-size:13px">route</span><span class="cr-notch" style="font-family:var(--font-mono);font-size:11px;font-weight:800;text-transform:uppercase">held</span><span class="cr-wedge cr-panel" style="padding:8px 20px 8px 12px;font-family:var(--font-mono);font-size:13px">active</span></div>`,
-    },
-  ],
-  "session-row": [
-    {
-      state: "row",
-      html: `<div style="min-width:280px"><div class="cr-row"><span class="cr-sev cr-sev--work" role="img" aria-label="working"></span>${sig("ptl-757", "working", 20)}<span class="cr-row__name">PTL-757 chat-turn</span><span class="cr-row__status">streaming</span></div><div class="cr-row"><span class="cr-sev cr-sev--crit" role="img" aria-label="critical"></span>${sig("cr-1130", "error", 20)}<span class="cr-row__name">CR-1130 build</span><span class="cr-row__status">failing</span></div></div>`,
     },
   ],
   bezel: [
@@ -443,16 +178,6 @@ const EXAMPLES = {
     {
       state: "seeded string",
       html: `<span class="cr-telemetry">SYS 0x7F · 41ms · ▁▂▃▅▇▅▃▂</span>`,
-    },
-  ],
-  "empty-error-state": [
-    {
-      state: "empty (calm)",
-      html: `<div class="cr-panel" style="padding:20px;text-align:center;font-family:var(--font-mono);font-size:13px;color:var(--muted);min-width:220px">no sessions in queue</div>`,
-    },
-    {
-      state: "error",
-      html: `<div class="cr-drip" style="max-width:260px"><div class="cr-drip__title">load failed</div><div class="cr-drip__sub">could not reach scheduler</div></div>`,
     },
   ],
 };
