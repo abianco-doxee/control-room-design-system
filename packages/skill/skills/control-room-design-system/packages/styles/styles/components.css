@@ -380,6 +380,43 @@
 .cr-table tbody tr:hover td { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
 .cr-table tbody tr[aria-selected="true"] td { background: color-mix(in srgb, var(--cr-table-accent) 18%, transparent); }
 .cr-table__sel { width: var(--space-8); text-align: center; }
+/* Selection checkbox — the system box treatment, reached by ELEMENT not class.
+ * CrTable renders `<input type="checkbox" class="cr-check">`, i.e. .cr-check on
+ * the INPUT. The shared rule is `.cr-check input` (a descendant selector naming
+ * the wrapper <label>), so it never matched here and the control shipped as a
+ * raw native checkbox. Selecting on `.cr-table__sel input` fixes it without
+ * touching the Mitosis source (which would rebuild six framework targets) and
+ * without depending on a class the markup gets wrong.
+ *
+ * `currentColor` for the border, not --cr-field-border (= --border, black): the
+ * cell sits on --panel, where black measures 20.34:1 in light but 1.21 / 1.21 /
+ * 1.01 in dark / extreme / phosphor — invisible in three themes. This is the
+ * same defect and the same fix as the shared dismiss control above. Inheriting
+ * from the cell gives 14.06 / 19.00 / 15.75 / 13.85 against the effective
+ * painted background (measured in-browser, dark/light/extreme/phosphor), and
+ * computes to 9.89 / 15.38 / 10.96 / 8.73 on a selected row.
+ *
+ * The fill stays transparent so the row's own state colour (hover / selected)
+ * reads through the box; the border is what asserts the control's presence. */
+.cr-table__sel input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none; margin: 0; vertical-align: middle;
+  width: var(--space-4); height: var(--space-4); flex-shrink: 0;
+  border: var(--brd) solid currentColor; background: transparent;
+  display: inline-grid; place-content: center; cursor: pointer;
+}
+/* Checked: flood to the accent (Law 2 — selection is a real state) and stamp the
+ * mark in --on-sig, which is AA against its own fill by construction
+ * (5.33 / 5.33 / 12.80 / 15.10). In phosphor --ink and --sig-work are the same
+ * hue, so the border melts into the fill (1.00:1) — harmless, because a solid
+ * filled block still reads at 14.45:1 against the field and the inner mark
+ * carries the state. Nothing here depends on the border to say "checked". */
+.cr-table__sel input[type="checkbox"]:checked {
+  background: var(--cr-check-checked); border-color: var(--cr-check-checked);
+}
+.cr-table__sel input[type="checkbox"]:checked::after {
+  content: ""; width: var(--space-2); height: var(--space-2); background: var(--cr-check-mark);
+}
+.cr-table__sel input[type="checkbox"]:disabled { opacity: var(--state-disabled-op); cursor: not-allowed; }
 
 /* ── Tabs ──────────────────────────────────────────────────────────────── */
 .cr-tabs { display: flex; gap: 0; border-bottom: var(--brd) solid var(--cr-tabs-border); }
@@ -1443,8 +1480,27 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 @media (prefers-reduced-motion: reduce) { .cr-breach--alive { animation: none; } }
 
 /* ── Data grid (virtualized) — dense table for large datasets ─────────────── */
-.cr-grid { border: var(--brd) solid var(--cr-datagrid-border); background: var(--cr-datagrid-bg); font-family: var(--font-mono); display: flex; flex-direction: column; overflow: hidden; }
-.cr-grid__head { display: grid; align-items: center; position: sticky; top: 0; z-index: var(--z-raised); background: var(--panel); border-bottom: var(--brd-heavy) solid var(--cr-datagrid-border); }
+/* Chrome (the review: "has no chrome style at all"). The grid read as a bare
+ * table because it carried a --brd hairline frame and no shadow, while every
+ * other framed surface in the system is Panel-weight + the hard offset shadow.
+ * Three changes, all borrowed from Panel/Bezel rather than invented:
+ *   1. --brd-heavy frame + the ONE shadow in the system (Signature 1), so the
+ *      grid sits on the board as an instrument instead of floating flat. Note
+ *      the frame itself is --border (black) and measures 1.11 / 16.29 / 1.11 /
+ *      1.06 against the field, i.e. it only reads in light — that is the
+ *      system-wide convention for a black mass on a dark ground (Law 1: black
+ *      is a MASS, and the surrounding --bg is what it separates from), and the
+ *      offset shadow is what gives the edge its weight in the dark themes. It
+ *      is deliberately NOT recoloured here: a signal-hued frame would fake a
+ *      state (Law 2), and every other framed surface shares this treatment.
+ *   2. The head keeps its --brd-heavy rule but gains the --panel-2 inset fill,
+ *      matching .cr-panel--inset — a recessed readout strip, not a zebra band.
+ *   3. Column separators (below) to make it gridded rather than a list.
+ * Law 6 holds: NO texture is added. A data grid is a flat content field, so it
+ * gets structure and weight — never halftone/scanlines, which belong to a bezel.
+ * Law 1 holds: the frame is a hard boundary, no gradient/blur/soft shadow. */
+.cr-grid { border: var(--brd-heavy) solid var(--cr-datagrid-border); background: var(--cr-datagrid-bg); box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col); font-family: var(--font-mono); display: flex; flex-direction: column; overflow: hidden; }
+.cr-grid__head { display: grid; align-items: center; position: sticky; top: 0; z-index: var(--z-raised); background: var(--panel-2); border-bottom: var(--brd-heavy) solid var(--cr-datagrid-border); }
 .cr-grid__viewport { overflow-y: auto; overflow-x: hidden; position: relative; }
 .cr-grid__sizer { position: relative; width: 100%; }
 .cr-grid__rows { position: absolute; inset-inline: 0; top: 0; }
@@ -1457,13 +1513,57 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-grid__cell--end { justify-content: flex-end; text-align: end; font-variant-numeric: tabular-nums; }
 .cr-grid__cell--center { justify-content: center; text-align: center; }
 .cr-grid__cell--check { justify-content: center; padding: 0; }
+/* Column separators — what makes it read as a GRID and not a list of rows. A
+ * hairline on the inline-start edge of every cell but the first. Ruling the
+ * CELL (not the row) is what survives horizontal scrolling: the line travels
+ * with its column instead of being painted at a fixed offset.
+ *
+ * Keyed to --muted, NOT to the --cr-datagrid-border mix the row rule uses.
+ * --cr-datagrid-border is --border (black), so that mix measures 1.07 / 4.46 /
+ * 1.07 / 1.03 against the field — a separator that only exists in the light
+ * theme. --muted is the one token that brackets between surface and ink in
+ * every theme by construction; at 75% it measures 3.65 / 3.34 / 5.00 / 4.14 on
+ * the body field and 3.23 / 3.67 / 4.34 / 3.82 on the head, clearing 3:1 for a
+ * non-text graphical object in all four themes without shouting. */
+.cr-grid__row > .cr-grid__cell + .cr-grid__cell,
+.cr-grid__head > .cr-grid__cell + .cr-grid__cell {
+  border-inline-start: var(--brd-hair) solid color-mix(in srgb, var(--muted) 75%, transparent);
+}
 .cr-grid__head .cr-grid__cell { font-size: var(--text-2xs); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); height: var(--row-h); }
+/* Selection checkbox — same treatment and same reasoning as .cr-table__sel
+ * above. CrDataGrid renders a BARE `<input type="checkbox">` with no class at
+ * all, so there is no class to hook and the element selector is the only
+ * correct reach. Border is currentColor: measured in-browser against the
+ * effective painted background it gives 15.58 / 18.98 / 15.32 / 16.81 on a body
+ * row, and the head's select-all reads 8.69 / 3.33 / 9.66 / 12.67 — visible in
+ * all four themes, where the inherited --border black measured 1.11 / 16.29 /
+ * 1.11 / 1.06 and the --cr-check-bg fill was 1.00:1 against the grid's own
+ * board (the unchecked control was literally invisible in three themes). */
+.cr-grid__cell--check input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none; margin: 0;
+  width: var(--space-4); height: var(--space-4); flex-shrink: 0;
+  border: var(--brd) solid currentColor; background: transparent;
+  display: inline-grid; place-content: center; cursor: pointer;
+}
+.cr-grid__cell--check input[type="checkbox"]:checked {
+  background: var(--cr-check-checked); border-color: var(--cr-check-checked);
+}
+.cr-grid__cell--check input[type="checkbox"]:checked::after {
+  content: ""; width: var(--space-2); height: var(--space-2); background: var(--cr-check-mark);
+}
+.cr-grid__cell--check input[type="checkbox"]:disabled { opacity: var(--state-disabled-op); cursor: not-allowed; }
 .cr-grid__sort { font: inherit; font-size: var(--text-2xs); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; align-items: center; gap: var(--space-1); }
 .cr-grid__sort:hover { color: var(--ink); }
 .cr-grid__glyph { color: var(--sig-work); font-size: var(--text-2xs); }
 .cr-grid__empty { padding: var(--space-4); color: var(--muted); text-align: center; font-size: var(--text-sm); }
 .cr-grid:focus { outline: none; }
-.cr-grid:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -1px; }
+/* The ring is drawn INBOARD by its own width, not -1px. .cr-grid sets
+ * `overflow: hidden` and the frame is now --brd-heavy (3px), so a -1px offset
+ * put the ring underneath the border and it read as a slightly recoloured edge.
+ * Offsetting by --focus-w lands it fully inside the frame, which also keeps it
+ * clear of the showcase's `.cell--scroll > .cell__demo { overflow-x: auto }`
+ * clip — an OUTWARD ring on a scroll-container child is what gets cut off. */
+.cr-grid:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: calc(-1 * var(--focus-w)); }
 .cr-grid__cell--active { outline: var(--focus-w) solid var(--sig-work); outline-offset: calc(-1 * var(--focus-w)); position: relative; z-index: 1; }
 
 /* ── Stepper ─────────────────────────────────────────────────────────────── */

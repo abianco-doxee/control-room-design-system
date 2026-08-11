@@ -31,4 +31,41 @@
 .cr-table tbody tr:hover td { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
 .cr-table tbody tr[aria-selected="true"] td { background: color-mix(in srgb, var(--cr-table-accent) 18%, transparent); }
 .cr-table__sel { width: var(--space-8); text-align: center; }
+/* Selection checkbox — the system box treatment, reached by ELEMENT not class.
+ * CrTable renders `<input type="checkbox" class="cr-check">`, i.e. .cr-check on
+ * the INPUT. The shared rule is `.cr-check input` (a descendant selector naming
+ * the wrapper <label>), so it never matched here and the control shipped as a
+ * raw native checkbox. Selecting on `.cr-table__sel input` fixes it without
+ * touching the Mitosis source (which would rebuild six framework targets) and
+ * without depending on a class the markup gets wrong.
+ *
+ * `currentColor` for the border, not --cr-field-border (= --border, black): the
+ * cell sits on --panel, where black measures 20.34:1 in light but 1.21 / 1.21 /
+ * 1.01 in dark / extreme / phosphor — invisible in three themes. This is the
+ * same defect and the same fix as the shared dismiss control above. Inheriting
+ * from the cell gives 14.06 / 19.00 / 15.75 / 13.85 against the effective
+ * painted background (measured in-browser, dark/light/extreme/phosphor), and
+ * computes to 9.89 / 15.38 / 10.96 / 8.73 on a selected row.
+ *
+ * The fill stays transparent so the row's own state colour (hover / selected)
+ * reads through the box; the border is what asserts the control's presence. */
+.cr-table__sel input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none; margin: 0; vertical-align: middle;
+  width: var(--space-4); height: var(--space-4); flex-shrink: 0;
+  border: var(--brd) solid currentColor; background: transparent;
+  display: inline-grid; place-content: center; cursor: pointer;
+}
+/* Checked: flood to the accent (Law 2 — selection is a real state) and stamp the
+ * mark in --on-sig, which is AA against its own fill by construction
+ * (5.33 / 5.33 / 12.80 / 15.10). In phosphor --ink and --sig-work are the same
+ * hue, so the border melts into the fill (1.00:1) — harmless, because a solid
+ * filled block still reads at 14.45:1 against the field and the inner mark
+ * carries the state. Nothing here depends on the border to say "checked". */
+.cr-table__sel input[type="checkbox"]:checked {
+  background: var(--cr-check-checked); border-color: var(--cr-check-checked);
+}
+.cr-table__sel input[type="checkbox"]:checked::after {
+  content: ""; width: var(--space-2); height: var(--space-2); background: var(--cr-check-mark);
+}
+.cr-table__sel input[type="checkbox"]:disabled { opacity: var(--state-disabled-op); cursor: not-allowed; }
 
