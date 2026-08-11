@@ -994,8 +994,13 @@ body {
 .cr-check input:disabled { opacity: 0.5; cursor: not-allowed; }
 /* Error state, derived from the wrapper (Law: the field owns the error, the
  * control only reflects it) — no per-control prop needed. .cr-check has no
- * __box element; the visible border is on the native input. */
-.cr-field--error .cr-check input { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
+ * __box element; the visible border is on the native input.
+ * COLOUR ONLY, deliberately: this used to also force --brd-heavy, which erased
+ * the checkbox/radio distinction above (frame weight IS the type signal) and
+ * made two UNCHECKED controls in an errored field indistinguishable again —
+ * the exact defect that rule was added to fix. Error is already carried by the
+ * hue plus the field's own message; it does not need the width channel too. */
+.cr-field--error .cr-check input { border-color: var(--cr-field-error); }
 
 /* ── Switch (button[role=switch]) ──────────────────────────────────────── */
 .cr-switch {
