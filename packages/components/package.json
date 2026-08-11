@@ -62,9 +62,10 @@
       "default": "./dist/frameworks/solid/index.jsx"
     },
     "./qwik": {
-      "types": "./dist/pkg/qwik/index.d.ts",
-      "import": "./dist/pkg/qwik/index.js",
-      "default": "./dist/pkg/qwik/index.js"
+      "types": "./dist/frameworks/qwik/index.d.ts",
+      "qwik": "./dist/frameworks/qwik/index.ts",
+      "import": "./dist/frameworks/qwik/index.ts",
+      "default": "./dist/frameworks/qwik/index.ts"
     },
     "./frameworks/*": "./dist/frameworks/*"
   },

@@ -44,6 +44,11 @@ const TARGETS = {
     // (consumers use it via the selector in templates) and re-export the module.
     value: (n) => `export declare class ${n} {}\nexport declare class ${n}Module {}`,
   },
+  qwik: {
+    ext: "tsx",
+    value: (n, hasProps) =>
+      `export declare const ${n}: import("@builder.io/qwik").Component<${hasProps ? n + "Props" : "Record<string, any>"}>;`,
+  },
 };
 
 // Pull every top-level `export interface X {…}` / `export type X = …;` block out of
