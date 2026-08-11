@@ -182,8 +182,41 @@ per-signal split therefore solves a problem the DS palette no longer has.
 
 ### Decisions (settled)
 
-**Palette: accept the design system's colours.** No brand file. The dashboard's
-appearance changes; that is the intended consequence of adopting the system.
+**Theme: one theme in two schemes, via a dedicated brand.** Shipped as
+`packages/tokens/brands/control-room.json` (commit `2338fa0`), emitting
+`control-room.css` (dark) + `control-room-light.css` via the DS's `$modes`
+mechanism — the same pattern `aurora` demonstrates.
+
+This is a correction to an earlier assumption in this spec: **the built-in `dark`
+and `light` are not one theme in two schemes**, they are two independently authored
+base palettes. `$modes` is the mechanism that actually expresses "one theme, both
+schemes", so the app uses it.
+
+The brand **inherits the built-in `dark` signal ramp unchanged** — the state ramp is
+the instrument's readout, not a branding surface (Law 2) — and declares only the
+surface ramp plus per-scheme ink. Light mode sets `$fitSignals` so the inherited
+signals stay legible on near-white surfaces.
+
+Verified across both schemes:
+
+| Check | Result |
+|---|---|
+| ink on ground | 15.50:1 (dark) · 15.55:1 (light) |
+| muted on ground | 5.72:1 (dark) · 5.57:1 (light) |
+| every signal↔foreground pairing | ≥4.5:1 in both schemes |
+| 8 route accents | fit at **22.0°** min hue separation |
+
+22.0° is more headroom than `aurora` (21.5°) or the built-in `dark`+`light` pair
+(16.3°). The dark `--ground` resolves to `#0e0e18`, close to the app's original
+`#0a0a12`, so the dark scheme will not read as a foreign restyle.
+
+**`extreme` and `phosphor` are out of scope.** The app ships only the chosen pair
+via the split consumption path (`structure.css` + the two theme files), so the
+theme switcher offers exactly dark and light. This removes the phosphor
+monochrome special case entirely — see Step 2.0b.
+
+**Palette: accept the design system's colours.** The dashboard's appearance
+changes; that is the intended consequence of adopting the system.
 
 **The 68 domain tokens: stay app-local.** They live in a thin app layer that
 *derives* from DS signals rather than redefining them.
@@ -251,35 +284,53 @@ Five of eight collide; only sprint, jobs and settings clear 15°. Carrying these
 would import the confusion, so they are re-seeded rather than re-used.
 
 **The rule.** A route accent MUST keep **≥15° OKLCH hue distance** from every signal
-hue in every *chromatic* theme, and from every other route accent. A maximin
-generator over a 1° grid gives 8 hues at **16.3° guaranteed separation**:
+hue in **both shipped schemes**, and from every other route accent. Constrained
+against `control-room` + `control-room-light`, a maximin generator over a 1° grid
+gives 8 hues at **22.0° guaranteed separation**:
 
 | Route | Hue | Route | Hue |
 |---|---|---|---|
-| attention | 40° | notes | 241° |
-| sessions | 94° | catalogue | 261° |
-| sprint | 111° | contacts | 280° |
-| jobs | 201° | settings | 327° |
+| attention | 49° | notes | 263° |
+| sessions | 102° | catalogue | 286° |
+| sprint | 193° | contacts | 309° |
+| jobs | 241° | settings | 332° |
 
-**Three subtleties that are easy to get wrong:**
+**Two subtleties that are easy to get wrong:**
 
 1. **`--sig-idle` is excluded from the constraint.** At C≈0.03 it is near-achromatic,
    so its hue angle carries no perceptual meaning and would forbid a 36° band for nothing.
-2. **`phosphor` is excluded from the *hue* constraint.** It is a deliberately
-   single-hue CRT theme — every signal falls within ~49° — so hue separation is
-   physically impossible there. Phosphor must carry wayfinding on **lightness**
-   (dim vs bright rail) with its own lightness-separation assertion. A hue-based
-   generator applied to phosphor would silently produce garbage.
-3. **Hue distance is the second line of defence, not the first.** The primary
+2. **Hue distance is the second line of defence, not the first.** The primary
    separation is structural: route accents paint **only** `--cr-nav-accent` (the nav
    rail, per `global.css:444-451`), while signals paint dots, chips, buttons and stage
    fills in the content area. That invariant MUST hold — a route accent must never
    fill a content-area element, regardless of how far its hue sits from the ramp.
 
-**Deliverable:** the generator ships as an app test asserting the ≥15° floor, so a
-future palette change on either side fails loudly instead of silently crowding a
-signal. A working implementation plus a negative test (which correctly rejects the
-current palette) already exist and port directly into the suite.
+*Previously this section carried a third subtlety — that `phosphor` had to be
+excluded from the hue rule because it is a single-hue CRT theme where hue separation
+is impossible, and would need lightness separation instead. Narrowing the app to one
+theme in two schemes removes that case entirely. Noted here because the constraint
+generator is written to take a theme list: **if phosphor or extreme is ever added
+back, that special case returns.***
+
+**Deliverable:** the generator ships as an app test asserting the ≥15° floor **in both
+schemes**, so a future palette change on either side fails loudly instead of silently
+crowding a signal. A working implementation plus a negative test (which correctly
+rejects the current palette) already exist at
+`docs/superpowers/specs/assets/` and port directly into the suite.
+
+### Theme tests after the switch
+
+The app's existing `tests/ui/tokenContract.test.ts` and
+`tests/styles/theme-bridge.test.ts` encode the *local* theme contract and are
+rewritten to assert, **for both schemes**:
+
+1. every signal↔foreground pairing clears AA (4.5:1), plus ink and muted on ground;
+2. every route accent keeps ≥15° hue distance from every signal hue and from every
+   other accent.
+
+These are the two failure modes actually identified during design — a silent contrast
+regression and the nav/error confusion — so they are ongoing gates, not one-time
+reviews. Both checks exist and run green today against the shipped brand.
 
 **Net effect on Step 2.0:** delete 6 tokens, mechanically rename 31, keep 62 in a
 local layer, and adopt the DS palette for the 30 shared names.
