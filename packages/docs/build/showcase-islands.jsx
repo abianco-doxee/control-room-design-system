@@ -288,11 +288,13 @@ function snippet(tag, defs, state) {
 }
 
 function Playground({ tag, defs, render, extra }) {
-  const [state, setState] = useState(() => ({
+  const initial = () => ({
     ...Object.fromEntries(defs.map((d) => [d.prop, d.default])),
     ...(extra || {}),
-  }));
+  });
+  const [state, setState] = useState(initial);
   const set = (k, v) => setState((s) => ({ ...s, [k]: v }));
+  const dirty = defs.some((d) => state[d.prop] !== d.default);
   return h(
     "div",
     { className: "pg" },
@@ -303,7 +305,17 @@ function Playground({ tag, defs, render, extra }) {
       h(
         "div",
         { className: "pg__controls" },
-        defs.map((d) => h(Field, { key: d.prop, def: d, value: state[d.prop], set }))
+        defs.map((d) => h(Field, { key: d.prop, def: d, value: state[d.prop], set })),
+        h(
+          "button",
+          {
+            type: "button",
+            className: "pg__reset",
+            disabled: !dirty,
+            onClick: () => setState(initial()),
+          },
+          "reset"
+        )
       ),
       h("pre", { className: "pg__code" }, snippet(tag, defs, state))
     )

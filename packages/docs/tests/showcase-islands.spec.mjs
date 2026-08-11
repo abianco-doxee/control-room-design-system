@@ -181,7 +181,11 @@ test.describe("component browser — live islands", () => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
     const form = page.locator('[data-island="form"]');
-    const reset = form.locator('button[type="button"]', { hasText: "Reset" });
+    // Scoped to .pg__live (the real rendered CrForm) — the harness itself now
+    // renders an unrelated always-present "reset" control in .pg__panel, and
+    // Playwright's hasText match is case-insensitive, so an unscoped locator
+    // would pick up both buttons.
+    const reset = form.locator(".pg__live").locator('button[type="button"]', { hasText: "Reset" });
     const endpoint = form.locator("#cr-form-endpoint");
 
     // default mode is "blur": typing an invalid value into a pristine field does

@@ -537,6 +537,12 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
   font-family: var(--font-mono); font-size: 12px; color: var(--ink); background: var(--panel);
   border: var(--brd-hair) solid var(--border); padding: 4px 6px; width: 100%; }
 .pg__ctl--bool input { width: 15px; height: 15px; accent-color: var(--sig-work); }
+.pg__reset { align-self: flex-start; margin-top: 2px; font-family: var(--font-mono); font-size: 10px;
+  font-weight: 800; text-transform: uppercase; letter-spacing: .06em; padding: 4px 9px;
+  background: var(--panel); color: var(--ink); border: var(--brd-hair) solid var(--border); cursor: pointer; }
+.pg__reset:disabled { opacity: .45; cursor: default; }
+.pg__reset:not(:disabled):hover { border-color: var(--sig-accent); color: var(--sig-accent); }
+.pg__reset:focus-visible { outline: var(--focus-w, 2px) solid var(--sig-work); outline-offset: 2px; }
 .pg__code { font-family: var(--font-mono); font-size: 11px; color: var(--ink); background: var(--board);
   border: var(--brd-hair) solid var(--border); padding: 8px 10px; margin: 0; white-space: pre-wrap; word-break: break-word; }
 .pg__note { font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin: 8px 0 0; }
