@@ -1478,7 +1478,7 @@
       "category": "media",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Seeded hardware chrome strip \u2014 a pixel-art metal bar with deterministically varied fasteners, panel seams, wear scratches, and an indicator LED.",
+      "description": "Seeded instrument chrome strip \u2014 a pixel-art metal bar with a deterministically varied graduated scale, panel seams, registration mark, wear scratches, and an indicator LED.",
       "spec": "references/components.md#seeded-chrome",
       "variants": {
         "prop": [

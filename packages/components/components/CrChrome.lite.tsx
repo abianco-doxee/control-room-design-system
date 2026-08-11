@@ -7,11 +7,16 @@ export interface CrChromeProps {
   width?: number;
 }
 
-/** Seeded hardware chrome strip — a pixel-art metal bar with deterministically
- * varied fasteners (rivets / hex bolts / slot + phillips screws), panel seams,
- * wear scratches, and one indicator LED. Decorative hardware detail (Law 6);
- * aria-hidden. Imperative canvas repainted on mount and whenever seed/width
- * change; Mitosis resolves the ref per target.
+/** Seeded chrome strip — a pixel-art instrument bar with a deterministically
+ * varied graduated scale (index ticks + taller major graduations), panel seams,
+ * registration marks, wear scratches, and one indicator LED. Decorative hardware
+ * detail (Law 6); aria-hidden. Imperative canvas repainted on mount and whenever
+ * seed/width change; Mitosis resolves the ref per target.
+ *
+ * Deliberately NOT nuts-and-bolts: this used to paint literal rivets, hex bolts
+ * and slot/phillips screw heads, which read as a novelty machine-panel skin
+ * rather than as an instrument. The vocabulary is now measurement marks — the
+ * face of a gauge, not its fixings. Keep it that way: no screw heads, no bolts.
  * See references/components.md#seeded-chrome. */
 export default function CrChrome(props: CrChromeProps) {
   const canvasRef = useRef(null);
@@ -61,38 +66,38 @@ export default function CrChrome(props: CrChromeProps) {
       }
       ctx.globalAlpha = 1;
 
-      // a fastener with a lit top-left + shadowed bottom-right (reads as raised)
-      const fastener = (cx: number, cy: number, kind: number) => {
-        const r = 4;
-        const disc = () => { ctx.fillStyle = EDGE; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = HI; ctx.beginPath(); ctx.arc(cx, cy, r - 1, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = MID; ctx.beginPath(); ctx.arc(cx + 0.6, cy + 0.6, r - 1.6, 0, Math.PI * 2); ctx.fill(); };
-        if (kind === 0) { disc(); } // round rivet
-        else if (kind === 1) { // hex bolt
-          ctx.fillStyle = EDGE; ctx.beginPath();
-          for (let a = 0; a < 6; a++) { const ang = (Math.PI / 3) * a; const px = cx + Math.cos(ang) * r, py = cy + Math.sin(ang) * r; a ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
-          ctx.closePath(); ctx.fill();
-          ctx.fillStyle = HI; ctx.beginPath();
-          for (let a = 0; a < 6; a++) { const ang = (Math.PI / 3) * a; const px = cx + Math.cos(ang) * (r - 1.4), py = cy + Math.sin(ang) * (r - 1.4); a ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
-          ctx.closePath(); ctx.fill();
-        } else if (kind === 2) { disc(); ctx.fillStyle = EDGE; ctx.fillRect(cx - r + 1, cy - 0.5, (r - 1) * 2, 1); } // slot screw
-        else { disc(); ctx.fillStyle = EDGE; ctx.fillRect(cx - r + 1, cy - 0.5, (r - 1) * 2, 1); ctx.fillRect(cx - 0.5, cy - r + 1, 1, (r - 1) * 2); } // phillips
+      // a graduation: a 1px etched tick, lit on its left edge so it reads as cut in
+      const tick = (x: number, h: number) => {
+        const y = Math.round((H - h) / 2);
+        ctx.fillStyle = EDGE; ctx.fillRect(x, y, 1, h);
+        ctx.fillStyle = HI; ctx.globalAlpha = 0.5; ctx.fillRect(x + 1, y, 1, h); ctx.globalAlpha = 1;
       };
 
-      // seeded row of fasteners across the strip
-      const n = Math.max(3, Math.round(W / (34 + rng() * 20)));
+      // graduated scale — evenly pitched minor ticks with a seeded major interval.
+      // Even pitch is correct HERE (unlike the drip): a measuring scale is regular
+      // by definition; the seeded variance is in the pitch, the major interval and
+      // the major tick height, not in jitter.
       const pad = 12;
-      for (let i = 0; i < n; i++) {
-        const cx = Math.round(pad + (i * (W - pad * 2)) / (n - 1));
-        fastener(cx, Math.round(H / 2), Math.floor(rng() * 4));
+      const pitch = 6 + Math.floor(rng() * 4);        // 6–9px between minor ticks
+      const major = 4 + Math.floor(rng() * 3);        // every 4th–6th tick is major
+      const majorH = 11 + Math.floor(rng() * 5);      // 11–15px
+      const phase = Math.floor(rng() * major);
+      for (let x = pad, i = 0; x <= W - pad; x += pitch, i++) {
+        tick(Math.round(x), (i + phase) % major === 0 ? majorH : 4);
       }
 
-      // 0–2 panel seams (vertical grooves)
-      const seams = Math.floor(rng() * 3);
+      // 1–2 panel seams (vertical grooves) — the one structural mark that stays
+      const seams = 1 + Math.floor(rng() * 2);
       for (let i = 0; i < seams; i++) {
         const x = Math.round(pad + rng() * (W - pad * 2));
         ctx.fillStyle = EDGE; ctx.fillRect(x, 2, 1, H - 4); ctx.fillStyle = HI; ctx.fillRect(x + 1, 2, 1, H - 4);
       }
+
+      // one registration mark (Signature 7: an L-shaped crop tick, ink weight only,
+      // never a signal hue — a signal hue here would fake a machine state)
+      const rx = Math.round(pad + rng() * (W - pad * 2 - 8));
+      ctx.fillStyle = EDGE;
+      ctx.fillRect(rx, 4, 5, 1); ctx.fillRect(rx, 4, 1, 5);
 
       // one indicator LED near an end (seeded colour)
       const led = LED[Math.floor(rng() * LED.length)];

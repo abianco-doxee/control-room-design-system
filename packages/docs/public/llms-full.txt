@@ -94,7 +94,7 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 - [Ascii](https://alebianco.github.io/control-room-design-system/components.html#c-ascii): Seeded ASCII/Unicode density field (braille/block/ramp) for dead space — whisper contrast, aria-hidden, mask-faded off content.
 - [ASCII separators & lists](https://alebianco.github.io/control-room-design-system/components.html#c-ascii-detail): Character-flavored detail utilities: .cr-sep / .cr-sep-label box-rule separators (dashed/dotted, labeled), .cr-list ascii-marker lists (▸ · » +), and .cr-leader dot-leader rows (label ····· value).
 - [Carousel](https://alebianco.github.io/control-room-design-system/components.html#c-carousel): Slide carousel with the WAI-ARIA carousel pattern — labelled region, prev/next, dot indicators, aria-live viewport, ←/→ navigation. Controlled via index/onIndex.
-- [Chrome](https://alebianco.github.io/control-room-design-system/components.html#c-chrome): Seeded hardware chrome strip — a pixel-art metal bar with deterministically varied fasteners, panel seams, wear scratches, and an indicator LED.
+- [Chrome](https://alebianco.github.io/control-room-design-system/components.html#c-chrome): Seeded instrument chrome strip — a pixel-art metal bar with a deterministically varied graduated scale, panel seams, registration mark, wear scratches, and an indicator LED.
 - [Decoration utilities](https://alebianco.github.io/control-room-design-system/components.html#c-decoration-utilities): The FUI/decoration utility layer for dead space and chassis edges: styled scrollbar, tick-ruler edge, whisper drafting field, hazard stripe, and the Breach blur-blob. All aria-hidden, non-interactive, whisper contrast — never on a content field.
 - [Icon](https://alebianco.github.io/control-room-design-system/components.html#c-icon): The house operational glyph set — 24×24, currentColor, single 2px stroke, square caps to match the neobrutalist geometry. Decorative by default; pass a label to name it.
 - [Seeded pixel-cat](https://alebianco.github.io/control-room-design-system/components.html#c-seeded-cat): Identity+state sprite: fur/markings from the session id, pose from state; deterministic paint() to canvas.
@@ -3638,9 +3638,14 @@ rail, or masthead, **never** on a flat data field, and keep it `aria-hidden`
 ### Seeded chrome strip {#seeded-chrome}
 
 For a whole varied hardware bar, `CrChrome` paints a **seeded** pixel-art metal
-strip — a deterministic mix of fasteners (rivets / hex bolts / slot + phillips
-screws), panel seams, wear scratches, and one indicator LED. Same seed → same
-strip, so a rack/unit gets a stable, distinct face (like the seeded cat/sigil).
+strip — a deterministic graduated scale (minor index ticks with taller major
+graduations), panel seams, a registration mark, wear scratches, and one indicator
+LED. Same seed → same strip, so a rack/unit gets a stable, distinct face (like
+the seeded cat/sigil).
+
+The vocabulary is **measurement marks, not fixings**: it deliberately does not
+paint rivets, hex bolts or screw heads, which read as a novelty machine-panel
+skin rather than as an instrument face.
 
 ```tsx
 import { CrChrome } from "@alebianco/cr-design-system/react";

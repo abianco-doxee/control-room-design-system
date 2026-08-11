@@ -253,17 +253,49 @@
  * running down a wall, which is why it is scanlines in --drip rather than blobs
  * of the fill bleeding past the bottom edge.
  * repeating-linear-gradient + mask rather than canvas, so it costs nothing and
- * needs no script. */
+ * needs no script. Do NOT reimplement this as a seeded canvas painter: the
+ * no-script, SSR-identical rendering is the point, and a canvas is the direction
+ * the earlier wrong-glitch drift came from.
+ *
+ * IRREGULARITY. A single repeating gradient reads as a machine-even comb — the
+ * bleed looked "regularly spaced/sized". Three layers fix that WITHOUT any RNG:
+ *
+ *   - Periods 27px / 41px / 58px are pairwise co-prime, so the combined pattern
+ *     only repeats after LCM(27,41,58) = 64206px — orders of magnitude past any
+ *     real drip width, so no repeating cadence is ever visible on screen.
+ *   - Each layer carries different bar WIDTHS (1px hairlines up to a 3px bar),
+ *     so the corruption varies in weight as well as position.
+ *   - Each layer gets its own mask stop (44% / 70% / 100%), so the bars
+ *     terminate at visibly different depths — that is the "sized" half of the
+ *     review, and what makes the bleed read as ragged rather than as one comb
+ *     fading out uniformly.
+ *
+ * Determinism is true BY CONSTRUCTION here — this is static CSS with no random
+ * source at all, which is a stronger guarantee than "same seed, same output".
+ * CrDrip has no seed prop and must not grow one for this. */
 .cr-drip { position: relative; overflow: hidden; border: var(--brd) solid var(--border); background: var(--sig-err); color: var(--on-err); padding: var(--space-4); }
 .cr-drip::before {
   content: ""; position: absolute; left: 0; right: 0; top: 0; height: 62%;
   pointer-events: none;
   opacity: calc(0.55 * var(--decoration-intensity, 1));
-  background: repeating-linear-gradient(90deg,
-    transparent 0 5px, var(--drip) 5px 6px, transparent 6px 13px,
-    var(--drip) 13px 14px, transparent 14px 27px);
-  -webkit-mask-image: linear-gradient(180deg, #000 0, transparent 100%);
-  mask-image: linear-gradient(180deg, #000 0, transparent 100%);
+  background:
+    repeating-linear-gradient(90deg,
+      transparent 0 5px, var(--drip) 5px 6px, transparent 6px 13px,
+      var(--drip) 13px 14px, transparent 14px 27px),
+    repeating-linear-gradient(90deg,
+      transparent 0 9px, var(--drip) 9px 12px, transparent 12px 30px,
+      var(--drip) 30px 31px, transparent 31px 41px),
+    repeating-linear-gradient(90deg,
+      transparent 0 17px, var(--drip) 17px 19px, transparent 19px 44px,
+      var(--drip) 44px 45px, transparent 45px 58px);
+  -webkit-mask-image:
+    linear-gradient(180deg, #000 0, transparent 44%),
+    linear-gradient(180deg, #000 0, transparent 70%),
+    linear-gradient(180deg, #000 0, transparent 100%);
+  mask-image:
+    linear-gradient(180deg, #000 0, transparent 44%),
+    linear-gradient(180deg, #000 0, transparent 70%),
+    linear-gradient(180deg, #000 0, transparent 100%);
 }
 /* Content sits above the ::before glitch overlay — without its own stacking
  * context the scanlines would wash over the text. */
@@ -834,12 +866,34 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-stack__kp { color: var(--muted); }
 
 /* ── Skeleton (loading placeholder — blocky pulse, never rounded) ────────── */
-.cr-skeleton { background: var(--cr-skeleton-bg); border: var(--brd-hair) solid color-mix(in srgb, var(--border) 30%, transparent); animation: cr-skel-pulse 1.4s ease-in-out infinite; }
+/* The pulse says "waiting"; the horizontal sweep says "still reading". The sweep
+ * is a hard-edged band, not a soft sheen — Law 1 bans the gradient-glow that the
+ * usual shimmer placeholder is built from, so this is a narrow flat bar of ink
+ * travelling left→right, clipped by the placeholder box.
+ * .cr-skeleton is a bare <span> with no children, so the band has to be ::after,
+ * which is why the host gains position/overflow here. */
+.cr-skeleton { position: relative; overflow: hidden; background: var(--cr-skeleton-bg); border: var(--brd-hair) solid color-mix(in srgb, var(--border) 30%, transparent); animation: cr-skel-pulse 1.4s ease-in-out infinite; }
+.cr-skeleton::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  /* a flat band, not a soft sheen: hard stops either side of the lit strip */
+  background: linear-gradient(90deg,
+    transparent 0 42%, color-mix(in srgb, var(--ink) 14%, transparent) 42% 58%, transparent 58% 100%);
+  animation: cr-skel-scan 1.9s linear infinite;
+}
 .cr-skeleton--line { height: var(--space-2); }
 .cr-skeleton--text { height: var(--space-3); }
 .cr-skeleton--block { height: var(--space-10); }
 @keyframes cr-skel-pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.9; } }
-@media (prefers-reduced-motion: reduce) { .cr-skeleton { animation: none; } }
+@keyframes cr-skel-scan { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+/* Reduced motion REMOVES the sweep rather than just stopping it. The global
+ * reduced-motion rule sets `animation: none`, which would freeze the band
+ * mid-travel and leave a stray lit stripe parked on the placeholder — the same
+ * failure mode motion.md documents for the scroll rail ("a frozen indicator is
+ * worse than none"). Do not simplify this to `animation: none`. */
+@media (prefers-reduced-motion: reduce) {
+  .cr-skeleton { animation: none; }
+  .cr-skeleton::after { display: none; }
+}
 
 /* ── Data / description list (key → value readout) ──────────────────────── */
 /* Key and value sit at different sizes (--text-xs label vs --text-sm datum), so the

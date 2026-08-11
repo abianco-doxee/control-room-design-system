@@ -1727,9 +1727,14 @@ rail, or masthead, **never** on a flat data field, and keep it `aria-hidden`
 ### Seeded chrome strip {#seeded-chrome}
 
 For a whole varied hardware bar, `CrChrome` paints a **seeded** pixel-art metal
-strip — a deterministic mix of fasteners (rivets / hex bolts / slot + phillips
-screws), panel seams, wear scratches, and one indicator LED. Same seed → same
-strip, so a rack/unit gets a stable, distinct face (like the seeded cat/sigil).
+strip — a deterministic graduated scale (minor index ticks with taller major
+graduations), panel seams, a registration mark, wear scratches, and one indicator
+LED. Same seed → same strip, so a rack/unit gets a stable, distinct face (like
+the seeded cat/sigil).
+
+The vocabulary is **measurement marks, not fixings**: it deliberately does not
+paint rivets, hex bolts or screw heads, which read as a novelty machine-panel
+skin rather than as an instrument face.
 
 ```tsx
 import { CrChrome } from "@alebianco/cr-design-system/react";
