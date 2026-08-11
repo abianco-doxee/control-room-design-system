@@ -837,7 +837,9 @@ git commit -m "feat(components): port computePosition into components/lib"
 
 **Interfaces:**
 - Consumes: `placeEl` from Task 11.
-- Produces: the `placement?: string` prop shape that Tasks 13-15 copy — `"auto" | "top" | "bottom" | "left" | "right"` optionally suffixed `-start`/`-end`, default `"bottom-start"`.
+- Produces: the `placement?: string` prop shape that Tasks 13-15 copy — `"top" | "bottom" | "left" | "right"` optionally suffixed `-start`/`-end`, default `"bottom-start"`.
+
+> **Plan correction (found during Task 12):** an earlier draft of this task documented an `"auto"` value. `computePosition` does **not** implement it — `OPPOSITE` has only the four side keys, so `"auto"` falls through to the `left` branch, never flips, and returns `data-placement="auto-start"`: silently wrong. The review requirement ("position determined automatically") is already met by flip + shift, which keep the panel in the viewport without the author computing anything. `"auto"` as an explicit side-selection value is a separate feature nobody asked for, and adding it would mean changing a port that is already reviewed and CI-pinned. Do **not** document or accept `"auto"` in this or any later task.
 
 The flicker is caused by `focusPanel` retrying on a 16ms `setTimeout` until the panel exists and only *then* placing it — the panel paints unpositioned for at least one frame.
 
@@ -855,8 +857,9 @@ In `CrPopoverProps`, delete `align?: "left" | "right";` and add:
 
 ```tsx
   /** Preferred placement, `${side}` or `${side}-${align}` — e.g. "bottom-start"
-   *  (default), "top-end", "right". "auto" picks the side with the most room.
-   *  Flips and shifts to stay in the viewport regardless. */
+   *  (default), "top-end", "right". Sides: top · bottom · left · right;
+   *  aligns: start · end. Flips to the opposite side and shifts along the cross
+   *  axis as needed to stay within the viewport. */
   placement?: string;
 ```
 
@@ -1139,7 +1142,7 @@ Expected: all PASS.
 **Breaking:** overlay placement is now collision-aware and two-axis. `CrPopover`,
 `CrMenu` and `CrHoverCard` no longer accept `align?: "left" | "right"` — use
 `placement?: string` instead (`"bottom-start"` default, `${side}` or
-`${side}-${align}`, or `"auto"`). `CrTooltip` gains the same `placement` prop.
+`${side}-${align}`). `CrTooltip` gains the same `placement` prop.
 
 All four now flip and shift to stay within the viewport. `CrMenu` and
 `CrHoverCard` previously had no placement logic at all (alignment was a CSS
