@@ -2583,6 +2583,32 @@ grep -rn "tone?:" packages/components/components/*.lite.tsx | sed 's|packages/co
 ```
 Record each component's union members and whether it calls the prop `signal` or `tone`.
 
+- [ ] **Step 1b: Fix `--sig-work` on the light theme — one token cause, three symptoms**
+
+Three separate W6 tasks deferred a contrast finding, and they all reduce to the
+same token: `--sig-work` is `#0891b2` against `--board` `#e2e2e9` in light, which
+measures **2.86:1** — below the 3:1 non-text UI threshold.
+
+The symptoms, all verified:
+
+| Symptom | Ratio (light) | Found in |
+| --- | --- | --- |
+| Focus ring (`--focus` → `--sig-work`) | 2.86 | Task 26 |
+| Checkbox checked fill (`--cr-check-checked` → `--sig-work`) | 2.86 / 3.57 | Task 26 |
+| Data-grid row rule (black mix) | 1.07 / 4.46 / 1.07 / 1.03 | Task 26 |
+
+None of these ships an inaccessible control — in each case another channel
+carries the state (the checked box keeps a 15.21:1 ink border and a 5.33:1 mark;
+the row rule is a separator, not a signal). But the focus ring is the one that
+matters most: a 2.86:1 focus indicator is a genuine WCAG 2.4.11 problem.
+
+Fix it **at the token layer**, in the light theme's `--sig-work` (or by giving
+the focus ring its own token that does not inherit the signal colour). Do not
+patch it three times in three component rules — that is what the deferrals were
+avoiding. Re-measure all three symptoms afterwards, and check the change does not
+regress `--sig-work`'s other uses in light (it is the "working" machine state, so
+it appears on progress fills, spinners and status dots).
+
 - [ ] **Step 2: Decide the canonical vocabulary**
 
 Read Law 2 in `references/design-language.md`. The canonical set is `work · wait · done · err · idle`. Two decisions to make and apply uniformly: whether any component legitimately needs a subset (e.g. a component where `idle` is meaningless), and whether `tone` and `signal` are genuinely different concepts or the same thing under two names. If they are the same, keep `signal` and remove `tone`.
