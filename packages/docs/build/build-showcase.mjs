@@ -455,18 +455,20 @@ body { margin: 0; }
 .switch button[aria-pressed="true"] { background: var(--sig-accent); color: var(--on-accent); }
 .wrap { display: grid; grid-template-columns: 220px 1fr; gap: 0; align-items: start; }
 /* chrome surfaces track the theme — use --board/--ink (not the app's always-dark --rail). */
-.idx { position: sticky; top: 61px; align-self: start; max-height: calc(100vh - 61px); overflow: auto;
+.idx { position: sticky; top: 61px; align-self: start; height: calc(100vh - 61px);
+  display: flex; flex-direction: column; overflow: hidden;
   padding: 16px; border-right: var(--brd) solid var(--border); background: var(--board); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
   clip-path: inset(50%); white-space: nowrap; border: 0; }
 /* The index is 83 entries in a sticky column — filtering beats scrolling. */
-.idx__filter { display: block; margin-bottom: 12px; }
+.idx__filter { display: block; margin-bottom: 12px; flex: none; }
 .idx__filter input { width: 100%; box-sizing: border-box; padding: 6px 8px;
   font-family: var(--font-mono); font-size: 12px; color: var(--ink);
   background: var(--panel); border: var(--brd) solid var(--border); border-radius: var(--radius); }
 .idx__filter input::placeholder { color: var(--muted); }
 .idx__filter input:focus-visible { outline: var(--focus-w, 2px) solid var(--sig-work); outline-offset: 2px; }
-.idx__none { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin: 0 0 12px; }
+.idx__none { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin: 0 0 12px; flex: none; }
+.idx__list { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
 .idx__group { margin-bottom: 14px; }
 .idx__cat { font-family: var(--font-mono); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 4px; display: flex; justify-content: space-between; gap: 8px; }
 .idx__count { color: var(--muted); font-weight: 700; }
@@ -541,7 +543,9 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
 .vrow { display: flex; gap: 10px; font-family: var(--font-mono); font-size: 11px; padding: 1px 0; }
 .vrow code { color: var(--sig-accent); }
 .vrow span { color: var(--muted); }
-@media (max-width: 720px) { .wrap { grid-template-columns: 1fr; } .idx { position: static; max-height: none; border-right: 0; border-bottom: var(--brd) solid var(--border); } }
+@media (max-width: 720px) { .wrap { grid-template-columns: 1fr; }
+  .idx { position: static; height: auto; overflow: visible; border-right: 0; border-bottom: var(--brd) solid var(--border); }
+  .idx__list { overflow: visible; } }
 </style>
 </head>
 <body>
@@ -566,7 +570,7 @@ ${brandButtons}
       <input type="search" id="idx-filter" placeholder="filter…" autocomplete="off" spellcheck="false" />
     </label>
     <p class="idx__none" hidden role="status">no match</p>
-    ${indexHtml}
+    <div class="idx__list">${indexHtml}</div>
   </nav>
   <main>${cardsHtml}</main>
 </div>
