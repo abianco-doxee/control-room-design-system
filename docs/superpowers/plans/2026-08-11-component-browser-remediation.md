@@ -43,7 +43,14 @@
 | `pnpm run test:frameworks` | Cross-framework parity |
 | `pnpm run lint` | Biome |
 
-**Visual baselines:** generated on Linux. On macOS `test:visual` may report diffs that are not regressions. Treat a macOS-only diff as inconclusive, not as a pass or a failure; confirm on CI.
+**Visual baselines — the gate is currently DARK, and was before this branch started.** Commit `44f3502` ("fold the Live Gallery into the Component Browser", 08:45, pre-dating this work) retargeted `visual.spec.mjs` from `gallery.html` to `components.html` and deleted the snapshot directory without regenerating. Verified: there is **no `visual.spec.mjs-snapshots/` directory anywhere in the tree**.
+
+Consequences:
+
+- `test:visual` fails 4/4 on **missing snapshots**, not pixel diffs. It is not evidence of a regression, and — more importantly — it has not been catching regressions at any point during this remediation.
+- Do **not** treat a red `test:visual` as a signal from your change. Do not "fix" it by editing CSS.
+- The baselines must be regenerated **on Linux** (`pnpm run test:visual:update`), where the committed baselines are rasterised. Doing it on macOS would bake in the wrong platform's rendering.
+- W9 owns closing this out. Until then, every visual claim in this plan rests on measured contrast numbers and manual four-theme inspection, not on the visual suite.
 
 ## File Structure
 
@@ -2682,6 +2689,25 @@ opacity is wrong in general rather than only in this composition). Occurrences:
 `references/components.md:675,1608` and `references/motion.md:167`, plus the
 skill-bundle and MCP mirrors, which regenerate.
 
+- [ ] **Step 1c: Add a guard against part misrouting**
+
+Carried over from Task 25, which found `.cr-modal__head`, `__title` and `__body`
+shipping inside `parts/cron.css` — they sat after the Cron section header, so a
+consumer importing only `styles/modal.css` got an unstyled modal header.
+
+`verify:styles` is **structurally incapable** of catching this: it asserts only
+that the segmentation rejoins to the source byte-for-byte and that no generated
+file is stale. Routing is derived purely from which `/* ── … ── */` header a rule
+physically sits under, so a misplaced rule is *losslessly* routed to the wrong
+part and the check passes clean.
+
+Add the cheap guard: for each part slug, assert every top-level `.cr-<slug>*`
+selector in the bundle routes to that slug's part, with an allowlist for the
+shared base rules (the dismiss control, the tap-floor list). The controller has
+already audited the current tree and found no further instance, so this is
+prevention, not an outstanding defect — but the failure mode is silent and ships
+broken CSS to per-part consumers.
+
 - [ ] **Step 2: Sweep the reference docs for the changed APIs**
 
 Every breaking change in W3-W8 must be reflected. Check each:
@@ -2747,18 +2773,23 @@ pnpm run skills:check
 ```
 Expected: all PASS. Fix any failure before proceeding — this is the last gate before an outward-facing publish.
 
-- [ ] **Step 3: Run the visual suite and interpret it correctly**
+- [ ] **Step 3: Regenerate the visual baselines — the gate has been dark all along**
 
-Run:
-```bash
-pnpm run test:visual
-```
-This phase changed a great deal of styling deliberately, so diffs are **expected**. Baselines are Linux-generated, so on macOS a diff is inconclusive. Review each diff and confirm it matches an intended change from W5-W7; then update the baselines **on CI/Linux**, not locally:
+The snapshot directory does not exist. Commit `44f3502` (pre-dating this branch) retargeted `visual.spec.mjs` from `gallery.html` to `components.html` and deleted the baselines without regenerating, so `test:visual` has been failing on **missing snapshots** — not pixel diffs — throughout this remediation. It has caught nothing.
+
+So this is not "review the diffs and accept the intended ones": there is nothing to diff against. The baselines must be **created**, on **Linux**, against the finished branch:
 
 ```bash
-# only where the platform matches the baselines
-pnpm run test:visual:update
+pnpm run test:visual:update   # Linux/CI only — never on macOS
+pnpm run test:visual          # must then pass
 ```
+
+Two things to get right:
+
+- **Linux only.** The suite's committed baselines are Linux-rasterised; generating on macOS bakes in the wrong platform and makes every future CI run fail.
+- **Generate against the finished branch, after Task 40's full rebuild** — not mid-phase, or the baselines capture a half-migrated state.
+
+If Linux is unavailable in this environment, do **not** generate them locally. Report that the baselines still need generating on CI and leave the gate red with an explanation — a wrong baseline is worse than a missing one.
 
 - [ ] **Step 4: Confirm the working tree is clean and the branch is coherent**
 
