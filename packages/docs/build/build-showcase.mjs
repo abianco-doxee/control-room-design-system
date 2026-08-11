@@ -43,7 +43,7 @@ const brandThemeCss = brandThemes
 const brandButtons = brandThemes
   .map(
     (n) =>
-      `    <button data-set="${n}" aria-pressed="false" title="external brand — packages/tokens/brands/${n}.json">${n} ▸</button>`
+      `    <button data-set="${n}" aria-pressed="false" title="external brand — packages/tokens/brands/${n}.json">${n}</button>`
   )
   .join("\n");
 const catalog = JSON.parse(readFileSync(join(ROOT, "..", "..", "catalog", "catalog.json"), "utf8"));
@@ -447,9 +447,11 @@ body { margin: 0; }
 .top a.home { font-family: var(--font-mono); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
 .top a.home:hover { color: var(--sig-accent); }
 .top .brand { display: flex; flex-direction: column; gap: 2px; }
-.switch { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
-.switch button { font-family: var(--font-mono); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em;
-  padding: 5px 10px; background: var(--panel); color: var(--muted); border: var(--brd) solid var(--border); cursor: pointer; }
+.switch { display: flex; gap: 6px; margin-left: auto; flex-wrap: nowrap;
+  overflow-x: auto; max-width: min(52vw, 560px); scrollbar-width: thin; padding-bottom: 2px; }
+.switch button { flex: none; font-family: var(--font-mono); font-size: 11px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .06em; padding: 5px 10px; background: var(--panel);
+  color: var(--muted); border: var(--brd) solid var(--border); cursor: pointer; }
 .switch button[aria-pressed="true"] { background: var(--sig-accent); color: var(--on-accent); }
 .wrap { display: grid; grid-template-columns: 220px 1fr; gap: 0; align-items: start; }
 /* chrome surfaces track the theme — use --board/--ink (not the app's always-dark --rail). */
