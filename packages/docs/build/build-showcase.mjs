@@ -92,10 +92,25 @@ const EXAMPLES = {
       html: `<div style="width:280px"><p class="cr-sep-label">recent events</p><ul class="cr-list cr-list--tick"><li class="cr-list__item">stream opened</li><li class="cr-list__item">SSE closed</li></ul><div class="cr-leader"><span class="cr-leader__k">uptime</span><span class="cr-leader__fill"></span><span class="cr-leader__v">41h</span></div></div>`,
     },
   ],
+  // Four shapes, four fixed meanings (Law 4). A grid rather than one flex row:
+  // as a row they overflowed and the card scrolled, and the meanings need labels
+  // to read as a vocabulary rather than decoration.
   "diagonal-primitives": [
     {
-      state: "chev · notch · wedge",
-      html: `<div style="display:flex;gap:16px;align-items:center"><span class="cr-chev" style="font-family:var(--font-mono);font-size:13px">route</span><span class="cr-notch" style="font-family:var(--font-mono);font-size:11px;font-weight:800;text-transform:uppercase">held</span><span class="cr-wedge cr-panel" style="padding:8px 20px 8px 12px;font-family:var(--font-mono);font-size:13px">active</span></div>`,
+      state: "chevron · direction",
+      html: `<span class="cr-chev" style="font-family:var(--font-mono);font-size:13px">route</span>`,
+    },
+    {
+      state: "notch · state",
+      html: `<span class="cr-notch" style="font-family:var(--font-mono);font-size:11px;font-weight:800;text-transform:uppercase">held</span>`,
+    },
+    {
+      state: "wedge · focus",
+      html: `<span class="cr-wedge" style="display:inline-block;flex:none;padding:8px 28px 8px 12px;background:var(--panel);border:var(--brd) solid var(--border);font-family:var(--font-mono);font-size:13px">active</span>`,
+    },
+    {
+      state: "arrow-rail · sequence",
+      html: `<div class="cr-rail" style="font-family:var(--font-mono);font-size:12px"><span class="cr-rail__step cr-rail__step--on">queue</span><span class="cr-rail__step">run</span><span class="cr-rail__step">verify</span></div>`,
     },
   ],
 };
@@ -287,12 +302,17 @@ const ISLAND_IDS = new Set([
   "key-hints",
 ]);
 
+// Demos that must not be squeezed below their intrinsic width (see .cell--intrinsic).
+const INTRINSIC_IDS = new Set(["diagonal-primitives"]);
+// Demos too wide to wrap — they scroll inside their cell instead of the page.
+const SCROLL_IDS = new Set(["datagrid", "table", "timeline", "carousel", "calendar"]);
+
 function stageHtml(id) {
   const ex = EXAMPLES[id] || [];
   // Live cell first: the actual shipped component, hydrated. <noscript> keeps a
   // sensible message if JS is off; the static state cells below still render.
   const island = ISLAND_IDS.has(id)
-    ? `<div class="cell cell--live"><div class="cell__label">playground · editable props</div><div class="cell__demo" data-island="${id}"><span class="cell__pending">mounting…<noscript> (enable JavaScript)</noscript></span></div></div>`
+    ? `<div class="cell cell--live${SCROLL_IDS.has(id) ? " cell--scroll" : ""}"><div class="cell__label">playground · editable props</div><div class="cell__demo" data-island="${id}"><span class="cell__pending">mounting…<noscript> (enable JavaScript)</noscript></span></div></div>`
     : "";
   if (!island && !ex.length) {
     return `<div class="stage stage--empty">No isolated example — this composes other components.</div>`;
@@ -300,7 +320,7 @@ function stageHtml(id) {
   const cells = ex
     .map(
       (s) =>
-        `<div class="cell"><div class="cell__demo">${s.html}</div><div class="cell__label">${s.state}</div></div>`
+        `<div class="cell${INTRINSIC_IDS.has(id) ? " cell--intrinsic" : ""}"><div class="cell__demo">${s.html}</div><div class="cell__label">${s.state}</div></div>`
     )
     .join("");
   return `<div class="stage">${island}${cells}</div>`;
@@ -459,14 +479,32 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
 .stage { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; padding: 16px; background: var(--board); border: var(--brd-hair) dashed color-mix(in srgb, var(--border) 45%, transparent); }
 .stage--empty { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
 .stage--empty a { color: var(--ink); }
+/* min-width:0 let a cell shrink below its demo's intrinsic width, squeezing padded
+ * demos (the wedge lost its label to its own clip-path). min-content fixed that but
+ * overflowed the page at 375px, so cap the floor: respect intrinsic width until it
+ * would exceed the viewport, then allow shrinking. */
 .cell { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.cell__demo { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; overflow-x: auto; }
+/* Demos whose intrinsic width must be respected: a padded shape squeezed below it
+ * loses content to its own clip-path (the wedge lost its label). Opt in per demo
+ * rather than globally — a wide demo like the data grid must still be allowed to
+ * shrink and scroll internally, or it overflows the page at 375px. */
+.cell--intrinsic { min-width: min-content; }
+/* Wrap before scrolling, and leave room for a focus ring. overflow-x:auto used to
+ * be unconditional, which clipped outlines at the container edge and put a
+ * scrollbar on demos that would have fitted if allowed to wrap. Wrapping handles
+ * those; clipping is NOT used because a genuinely wide demo (the data grid, with
+ * ~500px of fixed columns) must still scroll rather than overflow the page. */
+.cell__demo { display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  min-width: 0; max-width: 100%; padding: 3px; }
 /* keep fixed-size decorative canvases from forcing horizontal scroll on narrow screens */
 .stage canvas { max-width: 100%; height: auto; }
 .cell__label { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
 /* live playground gets a full row */
 .cell--live { flex: 1 1 100%; min-width: 0; order: -1; }
 .cell--live > .cell__demo { display: block; }
+/* Only demos too wide to wrap get a scroller, so every other demo keeps its focus
+ * ring visible. Declared after the .cell--live reset above, or that would win. */
+.cell--scroll > .cell__demo { overflow-x: auto; }
 /* "playground" marker: label stays ink (AA in every theme); the signal is a
  * decorative CSS dot, so it never trips a text-contrast check. */
 .cell--live > .cell__label { color: var(--ink); font-weight: 800; display: flex; align-items: center; gap: 5px; }
