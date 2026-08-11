@@ -164,22 +164,73 @@ The 99 app tokens with no same-name counterpart split cleanly:
   - the 8-section wayfinding ramp (`--acc-*`, `--on-acc-*`, `--section-accent-*`)
   - symbology ramps for issues, jobs, notes, ref-cards, status-dots
 
-**An accessibility caveat, not just an aesthetic one.** The app defines per-signal
-foregrounds deliberately — its own `tokens.css` states that one `--on-sig` cannot
-clear AA across the whole ramp, and documents `--sig-idle` at 4.14:1 needing `--ink`
-rather than the dark pole. Collapsing to the DS's single `--on-sig` risks silent
-contrast regressions on exactly the state indicators this dashboard exists to convey.
+**The accessibility concern I raised earlier was unfounded — retracted on measurement.**
+The app splits `--on-sig` six ways because *its* `--sig-idle` (`#5a5a78`) sat at
+4.14:1 against `--ink`. The design system lightened idle to `#848496` and uses three
+foregrounds (`--on-sig` / `--on-err` / `--on-idle`). Computing WCAG ratios for all six
+signal↔foreground pairings across **all four themes**:
 
-**Two decisions required before this step can be planned:**
+| Theme | Result |
+|---|---|
+| dark | ALL PASS |
+| light | ALL PASS |
+| extreme | ALL PASS |
+| phosphor | ALL PASS |
 
-1. **Palette:** accept the design system's colours (restyle, and the honest reading
-   of "use the design system"), or author a brand file so `cr-tokens` reproduces the
-   app's current palette (`packages/tokens/brands/*.json` supports this without forking)?
-2. **The 68:** upstream them into `cr-tokens` — the wayfinding and per-signal-foreground
-   ramps look genuinely general — or keep them app-local as a thin layer over the package?
+Worst case is `--sig-idle` at 5.53:1 (dark), comfortably over AA's 4.5:1. The app's
+per-signal split therefore solves a problem the DS palette no longer has.
 
-Until both are answered, **nothing else proceeds** — every component swap inherits
-whatever this decides.
+### Decisions (settled)
+
+**Palette: accept the design system's colours.** No brand file. The dashboard's
+appearance changes; that is the intended consequence of adopting the system.
+
+**The 68 domain tokens: stay app-local.** They live in a thin app layer that
+*derives* from DS signals rather than redefining them.
+
+### What I would move to the design system — and what I would not
+
+Applying one test: *is the concept part of a general instrument vocabulary, or does
+it encode this app's data model?*
+
+**Nothing, as it stands.** Concretely, per group:
+
+| Group | Verdict | Why |
+|---|---|---|
+| `--on-sig-*` (6) | **Delete, don't move** | Obsolete. Solves a contrast problem the DS palette fixed in the palette itself. Porting it would re-import a workaround. |
+| `--acc-*`, `--on-acc-*`, `--section-accent-*` (24) | **Keep local** | Violates Law 2. |
+| `--issue-stage-*` (12) | **Keep local** | Encodes a Jira workflow (todo/ready/progress/review/blocked/done). |
+| `--job-status-*` (4) | **Keep local** | This app's job runner outcomes (ok/error/skipped/timeout). |
+| `--note-*` (8) | **Keep local** | This app's note taxonomy (bug/idea/info/question/task; high/med/low). |
+| `--ref-card-accent-*` (9) | **Keep local** | Names specific integrations — jira, figma, confluence, pr, repo. |
+| `--status-dot-fill-*` (5) | **Keep local** | Already redundant: `CrStatusDot` takes `signal` and reads `--sig-*` directly. |
+
+The Law 2 point deserves spelling out, because it is the strongest argument and it
+is the system's own rule. Law 2 says colour **MUST** bind to real state — *"A flooded
+panel means 'this is the state of this thing,' never 'this looked nice here'"* — and
+**NEVER** key a region to a hue that does not correspond to real state. The 8-section
+ramp keys colour to **route identity** (`--acc-sessions` cyan, `--acc-sprint` purple).
+That is wayfinding, not state. It is defensible in *this app*, where a fixed nav
+benefits from stable per-route hues, but promoting it into `cr-tokens` would install a
+Law-2 counterexample in the vocabulary every future component is generated from. The
+system should not ship a token that its own design language forbids using.
+
+The four symbology ramps fail a simpler test: they are **derived, not primitive**. Each
+is already defined as `var(--acc-*)` or `var(--sig-*)` — a mapping from this app's
+domain enums onto DS signals. The mapping is the app's business logic expressed in CSS.
+
+**The one thing I would genuinely propose upstreaming — but not now:** if a second
+consumer ever needs per-route accents, the right shape is not eight named routes but a
+*mechanism* — a documented recipe for deriving an N-way wayfinding ramp deterministically
+from a route name. The design system already has the deterministic primitives this would
+build on (`hashSeed` + `mulberry32`, used by `CrSigil` and the pixel-cat) but **no
+seeded-colour utility and no `--seeded-*` tokens** — the app's `src/ui/seededPalette.ts`
+is its own. So this would be a real addition, not a wiring-up: a design-language decision
+about where Law 2's boundary sits, plus a contrast-safe hue generator. Out of scope here;
+noted for later.
+
+**Net effect on Step 2.0:** delete 6 tokens, mechanically rename 31, keep 62 in a
+local layer, and adopt the DS palette for the 30 shared names.
 
 ### Step 2.1..N — one primitive per commit
 
