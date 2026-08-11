@@ -1,4 +1,4 @@
-// Responsiveness gate — the gallery and component browser must not force
+// Responsiveness gate — the component browser and brand preview must not force
 // horizontal scroll at common breakpoints. Dense dashboards can be desktop-first,
 // but "no horizontal overflow" is the floor, verified rather than assumed.
 
@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { expect, test } from "@playwright/test";
 
-const PAGES = ["gallery.html", "components.html", "brands.html"];
+const PAGES = ["components.html", "brands.html"];
 const WIDTHS = [375, 768, 1024];
 
 for (const file of PAGES) {

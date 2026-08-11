@@ -36,7 +36,7 @@ Set the theme on the root: `<html data-theme="dark|light|extreme|phosphor">`.
 Every component is catalogued with its variants, design tokens, and keywords in
 [catalog.json](https://alebianco.github.io/control-room-design-system/catalog.json) (83 entries). Rendered and
 exercised in all four themes in the [Component Browser](https://alebianco.github.io/control-room-design-system/components.html); see them
-live in the [Gallery](https://alebianco.github.io/control-room-design-system/gallery.html).
+live in the [Component Browser](https://alebianco.github.io/control-room-design-system/components.html).
 
 ### Action
 - [Button](https://alebianco.github.io/control-room-design-system/components.html#c-button): Primary action with the signature mechanical snap-press; secondary 'controls' variant for utilities.
@@ -2458,23 +2458,42 @@ competing stages. Each tile keys to its item's state.
 **Purpose.** The house glitch for failure. Vertical downward bleed in `--drip`
 over a `--sig-err` field. Reserved for error surfaces and the masthead.
 
+The glitch is **signal corruption on a CRT**, not liquid running down a wall:
+vertical scanlines in `--drip`, masked to fade downward. It is a `::before`
+overlay, so `__title` and `__sub` carry their own stacking context.
+
 ```html
-<div class="dripbox">
-  <div class="dt">connection lost</div>
-  <div class="ds">ai-global-chat · SSE closed · retry 3/5</div>
+<div class="cr-drip">
+  <div class="cr-drip__title">connection lost</div>
+  <div class="cr-drip__sub">ai-global-chat · SSE closed · retry 3/5</div>
 </div>
-```
-```css
-.dripbox { position: relative; overflow: hidden;
-  border: var(--brd) solid var(--border);
-  background: var(--sig-err); color: #fff; padding: 20px; min-height: 104px; }
-.dripbox .dt { font-weight: 900; font-size: 19px; text-transform: uppercase;
-  letter-spacing: -.02em; line-height: 1.05; }
-.dripbox .ds { font-family: var(--font-mono); font-size: 11.5px; opacity: .85; margin-top: 4px; }
 ```
 
 - **MUST** reserve drip for real errors; **NEVER** decorate a healthy surface
   with it.
+- **MUST** draw it in `--drip` — not in the surface's own `--sig-err`, or the
+  glitch stops reading as corruption and becomes a gradient.
+
+### Glitch tiers — intensity is the readout
+
+Law 3 maps corruption depth to severity, so pick the tier that matches the state
+rather than dialling a decorative amount:
+
+| Class | Tier | Meaning |
+| --- | --- | --- |
+| `.cr-glitch-t1` | split | nominal |
+| `.cr-glitch-t2` | slice | degraded |
+| *(authored content)* | cursed | failed — zalgo, **max 2 combining marks per glyph** |
+
+`.cr-glitch-t2` reads its text from `data-glitch`:
+
+```html
+<span class="cr-glitch-t2" data-glitch="DEGRADED" aria-label="degraded">DEGRADED</span>
+```
+
+- **MUST** let the clean string own the accessible name and mark the corrupted
+  copies `aria-hidden` — a screen reader must never hear the glitch.
+- **NEVER** glitch data, numerals, labels, or anything under 18px.
 
 ---
 

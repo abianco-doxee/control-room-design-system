@@ -635,7 +635,7 @@ function stageHtml(id) {
     ? `<div class="cell cell--live"><div class="cell__label">playground · editable props</div><div class="cell__demo" data-island="${id}"><span class="cell__pending">mounting…<noscript> (enable JavaScript)</noscript></span></div></div>`
     : "";
   if (!island && !ex.length) {
-    return `<div class="stage stage--empty">Composed in the <a href="./gallery.html">Live Gallery</a> and the <code>examples/console</code> app.</div>`;
+    return `<div class="stage stage--empty">Composed in the <code>examples/console</code> app.</div>`;
   }
   const cells = ex
     .map(
@@ -741,7 +741,6 @@ body { margin: 0; }
 .switch button { font-family: var(--font-mono); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em;
   padding: 5px 10px; background: var(--panel); color: var(--muted); border: var(--brd) solid var(--border); cursor: pointer; }
 .switch button[aria-pressed="true"] { background: var(--sig-accent); color: var(--on-accent); }
-.top a.gallery { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--ink); text-decoration: none; border-bottom: 2px dotted var(--muted); }
 .wrap { display: grid; grid-template-columns: 220px 1fr; gap: 0; align-items: start; }
 /* chrome surfaces track the theme — use --board/--ink (not the app's always-dark --rail). */
 .idx { position: sticky; top: 61px; align-self: start; max-height: calc(100vh - 61px); overflow: auto;
@@ -812,7 +811,6 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
     <h1>Component Browser</h1>
   </div>
   <span class="sub">${entries.length} components · exercised in all states</span>
-  <a class="gallery" href="./gallery.html">Live Gallery ↗</a>
   <div class="switch" role="group" aria-label="Theme">
     <button data-set="dark" aria-pressed="true">dark</button>
     <button data-set="light" aria-pressed="false">light</button>

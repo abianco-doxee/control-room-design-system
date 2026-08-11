@@ -16,7 +16,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const DOCS = join(ROOT, "src", "content", "docs");
 const REPO = "https://github.com/alebianco/control-room-design-system/blob/main";
-// Base path for the self-contained browser pages (gallery.html / components.html),
+// Base path for the self-contained browser pages (components.html / brands.html),
 // which live at the site root, not under a Starlight route. Matches astro.config.mjs.
 const BASE = process.env.BASE_PATH || "/control-room-design-system/";
 

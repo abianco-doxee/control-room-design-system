@@ -6,7 +6,6 @@
   "description": "Control Room documentation site (Astro + Starlight) — the dev-only leaf. Builds the reference docs, the live gallery, the component browser (React islands from @alebianco/cr-components), and the brand preview from the sibling packages; plus the Playwright a11y / islands / responsive / visual suites.",
   "scripts": {
     "build:content": "node build/build-docs-content.mjs",
-    "build:gallery": "node build/build-gallery.mjs",
     "build:showcase": "node build/build-showcase.mjs",
     "build:brand-preview": "node build/build-brand-preview.mjs",
     "build:llms": "node build/build-llms.mjs",

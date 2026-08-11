@@ -183,28 +183,61 @@
 .cr-rail__step--on { background: var(--sig-work); color: var(--on-sig); }
 
 /* ── Drip / error surface (Law 3) ──────────────────────────────────────── */
-.cr-drip { position: relative; border: var(--brd) solid var(--border); background: var(--sig-err); color: var(--on-err); padding: var(--space-4); }
-/* the surface actually DRIPS — uneven columns of the fill bleed past the bottom
- * edge, hard-outlined to stay neobrutalist. Follows the loudness dial. */
-.cr-drip::after {
-  content: ""; position: absolute; left: calc(var(--brd) * -1); right: calc(var(--brd) * -1);
-  top: 100%; height: 22px; pointer-events: none;
-  opacity: var(--decoration-intensity, 1);
-  background:
-    radial-gradient(7px 20px at 10% 0, var(--sig-err) 62%, transparent 64%),
-    radial-gradient(5px 11px at 26% 0, var(--sig-err) 62%, transparent 64%),
-    radial-gradient(8px 15px at 45% 0, var(--sig-err) 62%, transparent 64%),
-    radial-gradient(5px 22px at 63% 0, var(--sig-err) 62%, transparent 64%),
-    radial-gradient(6px 9px at 80% 0, var(--sig-err) 62%, transparent 64%),
-    radial-gradient(7px 17px at 93% 0, var(--sig-err) 62%, transparent 64%);
-  background-repeat: no-repeat;
-  filter: drop-shadow(0 1.5px 0 var(--border));
+/* The house glitch: VERTICAL, DOWNWARD, in --drip. Law 3 reserves it for error
+ * surfaces and the masthead only. It is signal corruption on a CRT — not liquid
+ * running down a wall, which is why it is scanlines in --drip rather than blobs
+ * of the fill bleeding past the bottom edge.
+ * repeating-linear-gradient + mask rather than canvas, so it costs nothing and
+ * needs no script. */
+.cr-drip { position: relative; overflow: hidden; border: var(--brd) solid var(--border); background: var(--sig-err); color: var(--on-err); padding: var(--space-4); }
+.cr-drip::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 62%;
+  pointer-events: none;
+  opacity: calc(0.55 * var(--decoration-intensity, 1));
+  background: repeating-linear-gradient(90deg,
+    transparent 0 5px, var(--drip) 5px 6px, transparent 6px 13px,
+    var(--drip) 13px 14px, transparent 14px 27px);
+  -webkit-mask-image: linear-gradient(180deg, #000 0, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0, transparent 100%);
 }
-.cr-drip__title { font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
-.cr-drip__sub { font-family: var(--font-mono); font-size: var(--text-xs); margin-top: var(--space-0-5); }
+/* Content sits above the ::before glitch overlay — without its own stacking
+ * context the scanlines would wash over the text. */
+.cr-drip__title { position: relative; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
+.cr-drip__sub { position: relative; font-family: var(--font-mono); font-size: var(--text-xs); margin-top: var(--space-0-5); }
 
+/* Reduced motion kills the drip: it is motion even when it is not animated.
+ * Declared inside the .cr-drip block so parts/drip.css carries its own guard —
+ * an import-on-use consumer must not have to also import the glitch tiers to
+ * get it. */
+@media (prefers-reduced-motion: reduce) {
+  .cr-drip::before { display: none; }
+}
+
+/* ── Glitch tiers (Law 3) ──────────────────────────────────────────────── */
+/* Intensity IS the readout: each tier maps to a severity, so a caller picks the
+ * tier that matches the state rather than dialling a decorative amount.
+ *   T1 split  — nominal
+ *   T2 slice  — degraded
+ *   T3 cursed — failed (zalgo; authored in content, capped at 2 marks/glyph)
+ * T2/T3 corruption is decorative only: the clean string owns the accessible
+ * name and the corrupted copies are aria-hidden, so a screen reader never
+ * hears the glitch. */
+.cr-glitch-t1 { text-shadow: -2px 0 var(--sig-accent), 2px 0 var(--sig-work); }
+.cr-glitch-t2 { position: relative; }
+.cr-glitch-t2::before, .cr-glitch-t2::after {
+  content: attr(data-glitch); position: absolute; left: 0; top: 0; width: 100%;
+  pointer-events: none; opacity: var(--decoration-intensity, 1);
+}
+.cr-glitch-t2::before { color: var(--drip); clip-path: inset(10% 0 60% 0); transform: translateX(-3px); }
+.cr-glitch-t2::after { color: var(--sig-accent); clip-path: inset(64% 0 6% 0); transform: translateX(3px); }
+
+/* Reduced motion leashes every corruption tier — it is motion even when it is
+ * not animated. Per-tier rather than one switch, so a subtree can opt out of
+ * exactly the tiers it uses. */
 @media (prefers-reduced-motion: reduce) {
   .cr-btn { transition: none; }
+  .cr-glitch-t1 { text-shadow: none; }
+  .cr-glitch-t2::before, .cr-glitch-t2::after { display: none; }
 }
 
 /* ── Masthead (stark title card) ────────────────────────────────────────── */

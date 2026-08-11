@@ -108,7 +108,7 @@ ${BUILDING.map(link).join("\n")}
 Every component is catalogued with its variants, design tokens, and keywords in
 [catalog.json](${site("catalog.json")}) (${catalog.entries.length} entries). Rendered and
 exercised in all four themes in the [Component Browser](${site("components.html")}); see them
-live in the [Gallery](${site("gallery.html")}).
+live in the [Component Browser](${site("components.html")}).
 ${componentsSection()}
 
 ## Machine-readable

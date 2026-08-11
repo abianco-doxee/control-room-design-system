@@ -974,28 +974,61 @@ body {
 .cr-rail__step--on { background: var(--sig-work); color: var(--on-sig); }
 
 /* ── Drip / error surface (Law 3) ──────────────────────────────────────── */
-.cr-drip { position: relative; border: var(--brd) solid var(--border); background: var(--sig-err); color: var(--on-err); padding: var(--space-4); }
-/* the surface actually DRIPS — uneven columns of the fill bleed past the bottom
- * edge, hard-outlined to stay neobrutalist. Follows the loudness dial. */
-.cr-drip::after {
-  content: ""; position: absolute; left: calc(var(--brd) * -1); right: calc(var(--brd) * -1);
-  top: 100%; height: 22px; pointer-events: none;
-  opacity: var(--decoration-intensity, 1);
-  background:
-    radial-gradient(7px 20px at 10% 0, var(--sig-err) 62%, transparent 64%),
-    radial-gradient(5px 11px at 26% 0, var(--sig-err) 62%, transparent 64%),
-    radial-gradient(8px 15px at 45% 0, var(--sig-err) 62%, transparent 64%),
-    radial-gradient(5px 22px at 63% 0, var(--sig-err) 62%, transparent 64%),
-    radial-gradient(6px 9px at 80% 0, var(--sig-err) 62%, transparent 64%),
-    radial-gradient(7px 17px at 93% 0, var(--sig-err) 62%, transparent 64%);
-  background-repeat: no-repeat;
-  filter: drop-shadow(0 1.5px 0 var(--border));
+/* The house glitch: VERTICAL, DOWNWARD, in --drip. Law 3 reserves it for error
+ * surfaces and the masthead only. It is signal corruption on a CRT — not liquid
+ * running down a wall, which is why it is scanlines in --drip rather than blobs
+ * of the fill bleeding past the bottom edge.
+ * repeating-linear-gradient + mask rather than canvas, so it costs nothing and
+ * needs no script. */
+.cr-drip { position: relative; overflow: hidden; border: var(--brd) solid var(--border); background: var(--sig-err); color: var(--on-err); padding: var(--space-4); }
+.cr-drip::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 62%;
+  pointer-events: none;
+  opacity: calc(0.55 * var(--decoration-intensity, 1));
+  background: repeating-linear-gradient(90deg,
+    transparent 0 5px, var(--drip) 5px 6px, transparent 6px 13px,
+    var(--drip) 13px 14px, transparent 14px 27px);
+  -webkit-mask-image: linear-gradient(180deg, #000 0, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 0, transparent 100%);
 }
-.cr-drip__title { font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
-.cr-drip__sub { font-family: var(--font-mono); font-size: var(--text-xs); margin-top: var(--space-0-5); }
+/* Content sits above the ::before glitch overlay — without its own stacking
+ * context the scanlines would wash over the text. */
+.cr-drip__title { position: relative; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
+.cr-drip__sub { position: relative; font-family: var(--font-mono); font-size: var(--text-xs); margin-top: var(--space-0-5); }
 
+/* Reduced motion kills the drip: it is motion even when it is not animated.
+ * Declared inside the .cr-drip block so parts/drip.css carries its own guard —
+ * an import-on-use consumer must not have to also import the glitch tiers to
+ * get it. */
+@media (prefers-reduced-motion: reduce) {
+  .cr-drip::before { display: none; }
+}
+
+/* ── Glitch tiers (Law 3) ──────────────────────────────────────────────── */
+/* Intensity IS the readout: each tier maps to a severity, so a caller picks the
+ * tier that matches the state rather than dialling a decorative amount.
+ *   T1 split  — nominal
+ *   T2 slice  — degraded
+ *   T3 cursed — failed (zalgo; authored in content, capped at 2 marks/glyph)
+ * T2/T3 corruption is decorative only: the clean string owns the accessible
+ * name and the corrupted copies are aria-hidden, so a screen reader never
+ * hears the glitch. */
+.cr-glitch-t1 { text-shadow: -2px 0 var(--sig-accent), 2px 0 var(--sig-work); }
+.cr-glitch-t2 { position: relative; }
+.cr-glitch-t2::before, .cr-glitch-t2::after {
+  content: attr(data-glitch); position: absolute; left: 0; top: 0; width: 100%;
+  pointer-events: none; opacity: var(--decoration-intensity, 1);
+}
+.cr-glitch-t2::before { color: var(--drip); clip-path: inset(10% 0 60% 0); transform: translateX(-3px); }
+.cr-glitch-t2::after { color: var(--sig-accent); clip-path: inset(64% 0 6% 0); transform: translateX(3px); }
+
+/* Reduced motion leashes every corruption tier — it is motion even when it is
+ * not animated. Per-tier rather than one switch, so a subtree can opt out of
+ * exactly the tiers it uses. */
 @media (prefers-reduced-motion: reduce) {
   .cr-btn { transition: none; }
+  .cr-glitch-t1 { text-shadow: none; }
+  .cr-glitch-t2::before, .cr-glitch-t2::after { display: none; }
 }
 
 /* ── Masthead (stark title card) ────────────────────────────────────────── */
@@ -2385,7 +2418,6 @@ body { margin: 0; }
 .switch button { font-family: var(--font-mono); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em;
   padding: 5px 10px; background: var(--panel); color: var(--muted); border: var(--brd) solid var(--border); cursor: pointer; }
 .switch button[aria-pressed="true"] { background: var(--sig-accent); color: var(--on-accent); }
-.top a.gallery { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--ink); text-decoration: none; border-bottom: 2px dotted var(--muted); }
 .wrap { display: grid; grid-template-columns: 220px 1fr; gap: 0; align-items: start; }
 /* chrome surfaces track the theme — use --board/--ink (not the app's always-dark --rail). */
 .idx { position: sticky; top: 61px; align-self: start; max-height: calc(100vh - 61px); overflow: auto;
@@ -2456,7 +2488,6 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
     <h1>Component Browser</h1>
   </div>
   <span class="sub">83 components · exercised in all states</span>
-  <a class="gallery" href="./gallery.html">Live Gallery ↗</a>
   <div class="switch" role="group" aria-label="Theme">
     <button data-set="dark" aria-pressed="true">dark</button>
     <button data-set="light" aria-pressed="false">light</button>
@@ -2689,7 +2720,7 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
       <span class="badge">forms</span><span class="badge">component</span><span class="badge">stable</span>
     </header>
     <p class="card__desc">Interactive multi-select filter pill (role=checkbox). Distinct from the static Chip and single-select Segmented; several toggle independently. On/off announced via aria-checked + data-state.</p>
-    <div class="stage stage--empty">Composed in the <a href="./gallery.html">Live Gallery</a> and the <code>examples/console</code> app.</div>
+    <div class="stage stage--empty">Composed in the <code>examples/console</code> app.</div>
     <div class="card__meta"><div class="vbox vbox--props"><h4>props · <code>&lt;CrToggleChip /&gt;</code></h4><div class="prow"><code class="prow__n">label</code><code class="prow__t">string</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">pressed?</code><code class="prow__t">boolean</code><span class="prow__d">On/off state (multi-select filter semantics — use several independently).</span></div><div class="prow"><code class="prow__n">count?</code><code class="prow__t">number</code><span class="prow__d">Optional trailing count badge (e.g. matches for this facet).</span></div><div class="prow"><code class="prow__n">onToggle?</code><code class="prow__t">() =&gt; void</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">disabled?</code><code class="prow__t">boolean</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">unstyled?</code><code class="prow__t">boolean</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">pt?</code><code class="prow__t">any</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">dt?</code><code class="prow__t">any</code><span class="prow__d"></span></div></div><div class="vbox"><h4>variants</h4><div class="vrow"><code>state</code><span>off · on</span></div></div><div class="vbox"><h4>tokens</h4><div class="vrow"><code>--cr-togglechip-on-bg</code><span>ON-state fill (a state, not a per-option identity hue — Law 2)</span></div></div></div>
   </article>
   <article class="card" id="c-breadcrumb">
@@ -2707,7 +2738,7 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
       <span class="badge">navigation</span><span class="badge">component</span><span class="badge">stable</span>
     </header>
     <p class="card__desc">An a11y-correct "+N more" disclosure for truncated lists; a button (aria-expanded) with onToggle, or an inert count. The accessible name always includes the noun.</p>
-    <div class="stage stage--empty">Composed in the <a href="./gallery.html">Live Gallery</a> and the <code>examples/console</code> app.</div>
+    <div class="stage stage--empty">Composed in the <code>examples/console</code> app.</div>
     <div class="card__meta"><div class="vbox vbox--props"><h4>props · <code>&lt;CrOverflow /&gt;</code></h4><div class="prow"><code class="prow__n">count</code><code class="prow__t">number</code><span class="prow__d">How many items are hidden.</span></div><div class="prow"><code class="prow__n">expanded?</code><code class="prow__t">boolean</code><span class="prow__d">Whether the hidden items are currently revealed.</span></div><div class="prow"><code class="prow__n">noun</code><code class="prow__t">string</code><span class="prow__d">Noun for the accessible name, e.g. "sessions" → "show 3 more sessions".</span></div><div class="prow"><code class="prow__n">onToggle?</code><code class="prow__t">() =&gt; void</code><span class="prow__d">When omitted, the control is inert (a plain "+N" count, not a button).</span></div><div class="prow"><code class="prow__n">unstyled?</code><code class="prow__t">boolean</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">pt?</code><code class="prow__t">any</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">dt?</code><code class="prow__t">any</code><span class="prow__d"></span></div></div><div class="vbox"><h4>variants</h4><div class="vrow"><code>mode</code><span>toggle · static</span></div></div></div>
   </article>
   <article class="card" id="c-pagination">
@@ -2725,7 +2756,7 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
       <span class="badge">navigation</span><span class="badge">component</span><span class="badge">stable</span>
     </header>
     <p class="card__desc">Primary navigation — persistent left chassis; active item keyed to accent, count badge to its state.</p>
-    <div class="stage stage--empty">Composed in the <a href="./gallery.html">Live Gallery</a> and the <code>examples/console</code> app.</div>
+    <div class="stage stage--empty">Composed in the <code>examples/console</code> app.</div>
     <div class="card__meta"><div class="vbox vbox--props"><h4>props · <code>&lt;CrNav /&gt;</code></h4><div class="prow"><code class="prow__n">brand?</code><code class="prow__t">string</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">items</code><code class="prow__t">CrNavItem[]</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">unstyled?</code><code class="prow__t">boolean</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">pt?</code><code class="prow__t">any</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">dt?</code><code class="prow__t">any</code><span class="prow__d"></span></div></div><div class="vbox"><h4>variants</h4><div class="vrow"><code>item</code><span>default · active</span></div><div class="vrow"><code>badge</code><span>off · on</span></div></div><div class="vbox"><h4>tokens</h4><div class="vrow"><code>--rail</code><span>rail background</span></div><div class="vrow"><code>--rail-ink</code><span>rail text</span></div><div class="vrow"><code>--sig-accent</code><span>active item</span></div><div class="vrow"><code>--sig-err</code><span>attention badge</span></div><div class="vrow"><code>--brd-heavy</code><span>right border</span></div></div></div>
   </article>
   <article class="card" id="c-segmented">
@@ -2896,7 +2927,7 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
       <span class="badge">layout</span><span class="badge">block</span><span class="badge">stable</span>
     </header>
     <p class="card__desc">The dashboard chassis — composes the nav rail and a board (masthead/hero + panels).</p>
-    <div class="stage stage--empty">Composed in the <a href="./gallery.html">Live Gallery</a> and the <code>examples/console</code> app.</div>
+    <div class="stage stage--empty">Composed in the <code>examples/console</code> app.</div>
     <div class="card__meta"><div class="vbox vbox--props"><h4>props · <code>&lt;CrInstrument /&gt;</code></h4><div class="prow"><code class="prow__n">children?</code><code class="prow__t">any</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">unstyled?</code><code class="prow__t">boolean</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">pt?</code><code class="prow__t">any</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">dt?</code><code class="prow__t">any</code><span class="prow__d"></span></div></div><div class="vbox"><h4>tokens</h4><div class="vrow"><code>--brd-brush</code><span>outer chassis</span></div><div class="vrow"><code>--board</code><span>board fill</span></div><div class="vrow"><code>--shadow-off-lg</code><span>chassis shadow</span></div></div></div>
   </article>
   <article class="card" id="c-panel">
@@ -2960,7 +2991,7 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
     </header>
     <p class="card__desc">The house glitch for failure — vertical downward bleed in --drip over a --sig-err field. Errors only.</p>
     <div class="stage"><div class="cell"><div class="cell__demo"><div class="cr-drip" style="max-width:340px"><div class="cr-drip__title">connection lost</div><div class="cr-drip__sub">SSE closed · retry 3/5</div></div></div><div class="cell__label">error surface</div></div></div>
-    <div class="card__meta"><div class="vbox vbox--props"><h4>props · <code>&lt;CrDrip /&gt;</code></h4><div class="prow"><code class="prow__n">title</code><code class="prow__t">string</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">sub?</code><code class="prow__t">string</code><span class="prow__d"></span></div></div><div class="vbox"><h4>tokens</h4><div class="vrow"><code>--sig-err</code><span>field</span></div><div class="vrow"><code>--drip</code><span>bleed hue</span></div><div class="vrow"><code>--border</code><span>outline</span></div></div></div>
+    <div class="card__meta"><div class="vbox vbox--props"><h4>props · <code>&lt;CrDrip /&gt;</code></h4><div class="prow"><code class="prow__n">title</code><code class="prow__t">string</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">pt?</code><code class="prow__t">any</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">dt?</code><code class="prow__t">any</code><span class="prow__d"></span></div></div><div class="vbox"><h4>tokens</h4><div class="vrow"><code>--sig-err</code><span>field</span></div><div class="vrow"><code>--drip</code><span>bleed hue</span></div><div class="vrow"><code>--border</code><span>outline</span></div></div></div>
   </article>
   <article class="card" id="c-empty-error-state">
     <header class="card__head">
@@ -2977,7 +3008,7 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
       <span class="badge">state</span><span class="badge">block</span><span class="badge">stable</span>
     </header>
     <p class="card__desc">A grid of uniform state-keyed tiles that reads as one instrument, not competing stages (Law 2).</p>
-    <div class="stage stage--empty">Composed in the <a href="./gallery.html">Live Gallery</a> and the <code>examples/console</code> app.</div>
+    <div class="stage stage--empty">Composed in the <code>examples/console</code> app.</div>
     <div class="card__meta"><div class="vbox"><h4>tokens</h4><div class="vrow"><code>--brd-brush</code><span>sheet border</span></div><div class="vrow"><code>--border</code><span>tile dividers</span></div></div></div>
   </article>
   <article class="card" id="c-meter">
@@ -3004,7 +3035,7 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
       <span class="badge">state</span><span class="badge">component</span><span class="badge">stable</span>
     </header>
     <p class="card__desc">Relative-time display ("5m ago") as a semantic &lt;time&gt;; the clock is injected as a prop so SSR and client agree (no hydration flicker).</p>
-    <div class="stage stage--empty">Composed in the <a href="./gallery.html">Live Gallery</a> and the <code>examples/console</code> app.</div>
+    <div class="stage stage--empty">Composed in the <code>examples/console</code> app.</div>
     <div class="card__meta"><div class="vbox vbox--props"><h4>props · <code>&lt;CrRelativeTime /&gt;</code></h4><div class="prow"><code class="prow__n">time</code><code class="prow__t">number</code><span class="prow__d">The moment to describe, epoch milliseconds.</span></div><div class="prow"><code class="prow__n">now?</code><code class="prow__t">number</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">prefix?</code><code class="prow__t">string</code><span class="prow__d">Rendered before the phrase, e.g. "updated ".</span></div><div class="prow"><code class="prow__n">unstyled?</code><code class="prow__t">boolean</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">pt?</code><code class="prow__t">any</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">dt?</code><code class="prow__t">any</code><span class="prow__d"></span></div></div></div>
   </article>
   <article class="card" id="c-session-row">
@@ -3112,7 +3143,7 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
       <span class="badge">media</span><span class="badge">utility</span><span class="badge">stable</span>
     </header>
     <p class="card__desc">The FUI/decoration utility layer for dead space and chassis edges: styled scrollbar, tick-ruler edge, whisper drafting field, hazard stripe, and the Breach blur-blob. All aria-hidden, non-interactive, whisper contrast — never on a content field.</p>
-    <div class="stage stage--empty">Composed in the <a href="./gallery.html">Live Gallery</a> and the <code>examples/console</code> app.</div>
+    <div class="stage stage--empty">Composed in the <code>examples/console</code> app.</div>
     <div class="card__meta"><div class="vbox"><h4>variants</h4><div class="vrow"><code>class</code><span>cr-scrollbar · cr-scrollbar--local · cr-ruler · cr-bg--field · cr-stripe · cr-blob · cr-trim · cr-trim--4 · cr-mark</span></div></div><div class="vbox"><h4>tokens</h4><div class="vrow"><code>--muted</code><span>ruler ticks, trim brackets</span></div><div class="vrow"><code>--field</code><span>drafting-field background</span></div><div class="vrow"><code>--sig-wait</code><span>hazard stripe hue</span></div><div class="vrow"><code>--border</code><span>registration-mark ink</span></div></div></div>
   </article>
   <article class="card" id="c-icon">
@@ -3130,7 +3161,7 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
       <span class="badge">media</span><span class="badge">component</span><span class="badge">experimental</span>
     </header>
     <p class="card__desc">Identity+state sprite: fur/markings from the session id, pose from state; deterministic paint() to canvas.</p>
-    <div class="stage stage--empty">Composed in the <a href="./gallery.html">Live Gallery</a> and the <code>examples/console</code> app.</div>
+    <div class="stage stage--empty">Composed in the <code>examples/console</code> app.</div>
     <div class="card__meta"><div class="vbox vbox--props"><h4>props · <code>&lt;CrCat /&gt;</code></h4><div class="prow"><code class="prow__n">seed</code><code class="prow__t">string</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">state</code><code class="prow__t">"working" | "waiting" | "idle" | "error" | "done"</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">size?</code><code class="prow__t">number</code><span class="prow__d"></span></div></div><div class="vbox"><h4>variants</h4><div class="vrow"><code>state</code><span>working · waiting · idle · error · done</span></div><div class="vrow"><code>frame</code><span>0 · 1 · 2 · 3</span></div></div><div class="vbox"><h4>tokens</h4><div class="vrow"><code>--sig-work</code><span>eye color by state (via stateHex)</span></div></div></div>
   </article>
   <article class="card" id="c-sigil">
@@ -3220,7 +3251,7 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
       <span class="badge">behavior</span><span class="badge">component</span><span class="badge">stable</span>
     </header>
     <p class="card__desc">Headless behavior — while the reveal key (default Alt) is held, sets data-cr-keys on the root so every secondary key hint fades in at once (a peek-all-shortcuts gesture). Renders nothing visible.</p>
-    <div class="stage stage--empty">Composed in the <a href="./gallery.html">Live Gallery</a> and the <code>examples/console</code> app.</div>
+    <div class="stage stage--empty">Composed in the <code>examples/console</code> app.</div>
     <div class="card__meta"><div class="vbox vbox--props"><h4>props · <code>&lt;CrKeyHints /&gt;</code></h4><div class="prow"><code class="prow__n">revealKey?</code><code class="prow__t">string</code><span class="prow__d">Hold this key to reveal every secondary key-hint at once. Default "Alt".</span></div><div class="prow"><code class="prow__n">unstyled?</code><code class="prow__t">boolean</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">pt?</code><code class="prow__t">any</code><span class="prow__d"></span></div><div class="prow"><code class="prow__n">dt?</code><code class="prow__t">any</code><span class="prow__d"></span></div></div><div class="vbox"><h4>variants</h4><div class="vrow"><code>prop</code><span>revealKey</span></div></div></div>
   </article></main>
 </div>

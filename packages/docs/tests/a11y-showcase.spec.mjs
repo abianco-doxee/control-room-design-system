@@ -1,5 +1,5 @@
 // Accessibility gate — runs axe-core over the per-component browser
-// (components.html) in every theme. Same contract as the gallery gate: fail CI
+// (components.html) in every theme: fail CI
 // on any serious/critical WCAG violation in the rendered components.
 
 import { join } from "node:path";
