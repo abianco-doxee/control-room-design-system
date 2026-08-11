@@ -10,5 +10,19 @@
   cursor: pointer;
 }
 .cr-tab:hover { color: var(--cr-tabs-tab-hover-fg); }
-.cr-tab--on { color: var(--cr-tabs-tab-active-fg); border-bottom-color: var(--cr-tabs-indicator); }
+.cr-tab--on { position: relative; color: var(--cr-tabs-tab-active-fg); border-bottom-color: var(--cr-tabs-indicator); }
+/* Law 4 — the wedge means "active-panel focus", which is exactly what a selected
+ * tab designates: this strip's chosen panel. The shape restates aria-selected,
+ * it never replaces it. Geometry matches the shared `.cr-wedge` primitive (a
+ * trailing-edge triangle) but is declared here, component-locally, so the base
+ * definition stays untouched and parts/tabs.css is self-sufficient — .cr-wedge
+ * lives in base.css and a wedge-classed tab would lose its shape for anyone
+ * importing only the part. It keys off the indicator token so a per-instance dt
+ * override moves the underline and the wedge together. */
+.cr-tab--on::after {
+  content: ""; position: absolute; inset-block: 0; inset-inline-end: 0;
+  inline-size: var(--space-2); pointer-events: none;
+  background: var(--cr-tabs-indicator);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
 

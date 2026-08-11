@@ -326,7 +326,21 @@
   cursor: pointer;
 }
 .cr-tab:hover { color: var(--cr-tabs-tab-hover-fg); }
-.cr-tab--on { color: var(--cr-tabs-tab-active-fg); border-bottom-color: var(--cr-tabs-indicator); }
+.cr-tab--on { position: relative; color: var(--cr-tabs-tab-active-fg); border-bottom-color: var(--cr-tabs-indicator); }
+/* Law 4 — the wedge means "active-panel focus", which is exactly what a selected
+ * tab designates: this strip's chosen panel. The shape restates aria-selected,
+ * it never replaces it. Geometry matches the shared `.cr-wedge` primitive (a
+ * trailing-edge triangle) but is declared here, component-locally, so the base
+ * definition stays untouched and parts/tabs.css is self-sufficient — .cr-wedge
+ * lives in base.css and a wedge-classed tab would lose its shape for anyone
+ * importing only the part. It keys off the indicator token so a per-instance dt
+ * override moves the underline and the wedge together. */
+.cr-tab--on::after {
+  content: ""; position: absolute; inset-block: 0; inset-inline-end: 0;
+  inline-size: var(--space-2); pointer-events: none;
+  background: var(--cr-tabs-indicator);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
 
 /* ── Meter (capacity / utilisation bar) ─────────────────────────────────── */
 .cr-meter { --cr-meter-c: var(--sig-work); display: flex; align-items: center; gap: var(--space-2); }
@@ -1371,13 +1385,51 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-grid__cell--active { outline: var(--focus-w) solid var(--sig-work); outline-offset: calc(-1 * var(--focus-w)); position: relative; z-index: 1; }
 
 /* ── Stepper ─────────────────────────────────────────────────────────────── */
+/* Law 4 — a stepper IS the "sequence / pipeline step" primitive, so it carries
+ * the arrow-rail's geometry: the marker is chevron-clipped and points forward,
+ * so the shape itself says "this is an ordered run" before any colour is read.
+ * We restate the geometry here rather than composing `.cr-rail__step`, because
+ * that class is a self-contained block (own background/border/padding and a
+ * -10px overlap) which would fight the dot+label+connector anatomy — and it
+ * ships in a SEPARATE part file (parts/arrow-rail.css), so markup depending on
+ * it would silently lose its shape for anyone importing only parts/stepper.css.
+ * Shape is reinforcement only: aria-current="step" remains the announced state. */
 .cr-stepper { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); list-style: none; margin: 0; padding: 0; }
 .cr-stepper__item { display: flex; align-items: center; gap: var(--space-2); flex: 1 1 auto; min-width: 0; }
 .cr-stepper__item:not(:last-child)::after { content: ""; flex: 1; min-width: var(--space-4); height: 0; border-top: var(--brd) solid var(--cr-stepper-line); opacity: .55; }
 .cr-stepper__btn { display: flex; align-items: center; gap: var(--space-2); background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; text-align: start; }
-.cr-stepper__dot { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; flex: none; font-family: var(--font-mono); font-weight: 700; border: var(--brd) solid var(--cr-stepper-line); background: var(--cr-stepper-pending-bg); color: var(--muted); }
-.cr-stepper__item--active .cr-stepper__dot { background: var(--cr-stepper-accent-bg); color: var(--cr-stepper-accent-fg); border-color: var(--cr-stepper-accent-bg); }
-.cr-stepper__item--done .cr-stepper__dot { background: var(--cr-stepper-done-bg); color: var(--cr-stepper-accent-fg); border-color: var(--cr-stepper-done-bg); }
+/* The marker carries the sequence geometry: a notch cut out of the leading edge
+ * and a point on the trailing edge, i.e. the arrow-rail step at marker scale.
+ * `border` cannot survive a clip-path (the clip cuts the border box), so the
+ * outline that the pending/upcoming state needs comes from an inset box-shadow,
+ * which IS clipped with the box instead of being sliced off. --cr-stepper-arrow
+ * is the depth of the cut; it stays well inside Law 4's 15° off-axis ceiling at
+ * this size. */
+.cr-stepper__dot {
+  --cr-stepper-arrow: 0.4rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.75rem; height: 1.75rem; flex: none;
+  padding-inline-start: calc(var(--cr-stepper-arrow) / 2);
+  font-family: var(--font-mono); font-weight: 700;
+  background: var(--cr-stepper-pending-bg); color: var(--muted);
+  box-shadow: inset 0 0 0 var(--brd) var(--cr-stepper-line);
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--cr-stepper-arrow)) 0,
+    100% 50%,
+    calc(100% - var(--cr-stepper-arrow)) 100%,
+    0 100%,
+    var(--cr-stepper-arrow) 50%
+  );
+}
+.cr-stepper__item--active .cr-stepper__dot { background: var(--cr-stepper-accent-bg); color: var(--cr-stepper-accent-fg); box-shadow: inset 0 0 0 var(--brd) var(--cr-stepper-accent-bg); }
+.cr-stepper__item--done .cr-stepper__dot { background: var(--cr-stepper-done-bg); color: var(--cr-stepper-accent-fg); box-shadow: inset 0 0 0 var(--brd) var(--cr-stepper-done-bg); }
+/* The last step ends the run, so it has no forward point — a flat trailing edge
+ * is what makes the preceding arrows read as "flow toward" rather than as a row
+ * of loose chevrons. */
+.cr-stepper__item:last-child .cr-stepper__dot {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, var(--cr-stepper-arrow) 50%);
+}
 .cr-stepper__text { display: flex; flex-direction: column; }
 .cr-stepper__label { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: var(--text-xs); }
 .cr-stepper__item--upcoming .cr-stepper__label { color: var(--muted); }
