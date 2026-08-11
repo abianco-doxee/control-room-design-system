@@ -140,6 +140,7 @@
     "test:forms": "node --test tests/forms.test.mjs",
     "test:theme": "node --test packages/tokens/tests/theme.test.mjs",
     "test:position": "node --test tests/position.test.mjs",
+    "test:position:port": "node --test tests/position-port.test.mjs",
     "test:timescale": "node --test tests/time-scale.test.mjs",
     "test:separation": "node --test tests/appearance-separation.test.mjs",
     "test:rtl": "node --test tests/rtl.test.mjs",
