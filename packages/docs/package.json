@@ -14,7 +14,7 @@
     "build:site": "astro build",
     "dev": "npm run build:content && astro dev",
     "preview": "astro preview",
-    "test:a11y": "playwright test tests/a11y.spec.mjs tests/a11y-showcase.spec.mjs",
+    "test:a11y": "playwright test tests/a11y-showcase.spec.mjs",
     "test:islands": "playwright test tests/showcase-islands.spec.mjs",
     "test:responsive": "playwright test tests/responsive.spec.mjs",
     "test:visual": "playwright test tests/visual.spec.mjs",

@@ -57,7 +57,7 @@ test("resolves the ./qwik subpath to optimizer-processable source, not compiled 
   assert.match(
     resolved,
     /dist[/\\]frameworks[/\\]qwik[/\\]index\.ts$/,
-    `./qwik must resolve to dist/frameworks/qwik/index.ts, got ${resolved}`,
+    `./qwik must resolve to dist/frameworks/qwik/index.ts, got ${resolved}`
   );
   const src = readFileSync(resolved, "utf8");
   assert.match(src, /\.tsx"/, "the source barrel re-exports .tsx components");
@@ -66,6 +66,6 @@ test("resolves the ./qwik subpath to optimizer-processable source, not compiled 
   // long the sole omission, which is what let the broken export path stand.
   assert.ok(
     existsSync(join(dirname(resolved), "index.d.ts")),
-    "dist/frameworks/qwik/index.d.ts present",
+    "dist/frameworks/qwik/index.d.ts present"
   );
 });

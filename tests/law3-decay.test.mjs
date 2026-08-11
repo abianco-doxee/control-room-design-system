@@ -61,16 +61,35 @@ test("the three glitch tiers exist so intensity can map to severity", () => {
   assert.match(components, /\.cr-glitch-t2\s*\{/, "T2 (slice, degraded) must exist");
   // T2's slice is the one tier the law pins to a specific pair of hues.
   assert.match(components, /\.cr-glitch-t2::before[^}]*var\(--drip\)/, "T2 slices in --drip");
-  assert.match(components, /\.cr-glitch-t2::after[^}]*var\(--sig-accent\)/, "T2 slices in --sig-accent");
+  assert.match(
+    components,
+    /\.cr-glitch-t2::after[^}]*var\(--sig-accent\)/,
+    "T2 slices in --sig-accent"
+  );
 });
 
 test("every corruption tier is leashed by reduced motion", () => {
   // It is motion even when it is not animated.
-  for (const [name, css] of [["drip", dripPart], ["glitch tiers", tiersPart]]) {
-    assert.match(css, /@media \(prefers-reduced-motion: reduce\)/, `${name} must guard reduced motion`);
+  for (const [name, css] of [
+    ["drip", dripPart],
+    ["glitch tiers", tiersPart],
+  ]) {
+    assert.match(
+      css,
+      /@media \(prefers-reduced-motion: reduce\)/,
+      `${name} must guard reduced motion`
+    );
   }
   // Each part must carry its OWN guard: an import-on-use consumer taking only
   // parts/drip.css must not silently lose it.
-  assert.match(dripPart, /prefers-reduced-motion[^}]*\}[\s\S]*?\.cr-drip::before\s*\{\s*display:\s*none|\.cr-drip::before\s*\{\s*display:\s*none/, "parts/drip.css must disable its own drip");
-  assert.match(tiersPart, /\.cr-glitch-t1\s*\{\s*text-shadow:\s*none/, "parts/glitch-tiers.css must disable T1");
+  assert.match(
+    dripPart,
+    /prefers-reduced-motion[^}]*\}[\s\S]*?\.cr-drip::before\s*\{\s*display:\s*none|\.cr-drip::before\s*\{\s*display:\s*none/,
+    "parts/drip.css must disable its own drip"
+  );
+  assert.match(
+    tiersPart,
+    /\.cr-glitch-t1\s*\{\s*text-shadow:\s*none/,
+    "parts/glitch-tiers.css must disable T1"
+  );
 });

@@ -20,7 +20,8 @@
       "!examples",
       "!packages/components/overrides",
       "!packages/components/components",
-      "!packages/icons/pixel.ts"
+      "!packages/icons/pixel.ts",
+      "!docs/superpowers/specs/assets"
     ]
   },
   "formatter": {
