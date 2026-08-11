@@ -1940,6 +1940,40 @@ border-radius: 0;                                          /* always          */
 
 ---
 
+## Dismiss control {#dismiss-control}
+
+**Purpose.** The one ✕ treatment, shared by every dismissible surface — Alert,
+Toast, Modal and Drawer. All four render the same markup, so they share **one
+rule** rather than four that drift:
+
+```html
+<button type="button" class="cr-alert__close" aria-label="Dismiss">✕</button>
+```
+
+```css
+.cr-alert__close, .cr-toast__close, .cr-modal__close, .cr-drawer__close { … }
+```
+
+It lives in the **base layer** (`styles/base.css`), not in any one part file — a
+per-part consumer imports `base` first, and duplicating the block per component
+section is exactly the drift being closed.
+
+- **MUST** keep `color: inherit` and `border-color: currentColor`. That is what
+  makes one treatment correct on every host: on a `--panel` surface it resolves
+  to `--ink`; on a flooded toast it resolves to `--on-sig` / `--on-err`. A fixed
+  `--panel`/`--border` chip cannot — its border measures **1.21:1** against its
+  own fill in dark/extreme/phosphor, and it would punch a hole in the toast's
+  Law 2 key.
+- **MUST** pin `font-size` / `line-height` rather than inheriting them. `.cr-alert`
+  sets no `font-size` while `.cr-toast` sets `--text-sm`; the two previously
+  agreed only by accident of their parents computing to the same value.
+- **MUST** carry an `aria-label` — the ✕ glyph is not an accessible name.
+- On coarse pointers the control takes the 44px floor on **both** axes (WCAG
+  2.5.5) — it is roughly square, so `min-height` alone would leave an ~18px-wide
+  target.
+
+---
+
 ## Panel
 
 **Purpose.** The default container for a group of related data. The system's
@@ -2896,7 +2930,20 @@ if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(
 ## Alert {#alert}
 
 **Purpose.** An inline callout keyed to a signal (Law 2) — a left brush-bar in the
-signal hue. `err` announces assertively (`role=alert`); the rest are polite.
+signal hue, parted from the lit field by a hard seam (Law 1) so the bar reads as
+inset into the casing. `err` announces assertively (`role=alert`); the rest are
+polite.
+
+The icon is a **severity shape** (Law 4), not a coloured square: side-count
+encodes how much the alert needs the operator, orthogonally to hue — so the
+reading survives phosphor's single colour and colour-blind viewers.
+
+| `signal` | key | shape | severity |
+| --- | --- | --- | --- |
+| `info` | `--sig-work` | pentagon ⬠ (5) | working |
+| `wait` | `--sig-wait` | diamond ◆ (4) | attend |
+| `done` | `--sig-done` | hexagon ⬡ (6) | nominal |
+| `err` | `--sig-err` | triangle ▲ (3) | act now |
 
 ```tsx
 <CrAlert signal="wait" title="Scheduled maintenance" message="Workers restart at 02:00 UTC." dismissible />
@@ -2905,6 +2952,9 @@ signal hue. `err` announces assertively (`role=alert`); the rest are polite.
 - **MUST** map `signal` to a real state; `err` uses `role="alert"` + assertive.
 - **SHOULD** carry a title only when it adds information — a one-line notice is fine
   as `message` alone.
+
+The dismiss ✕ is the shared control described under
+[Dismiss control](#dismiss-control).
 
 ---
 

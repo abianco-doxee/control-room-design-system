@@ -11,8 +11,5 @@
 .cr-toast--wait { background: var(--sig-wait); color: var(--on-sig); }
 .cr-toast--err  { background: var(--sig-err);  color: var(--on-err); }
 .cr-toast__msg { flex: 1; }
-.cr-toast__close {
-  font-family: var(--font-mono); cursor: pointer; background: transparent; color: inherit;
-  border: var(--brd-hair) solid currentColor; padding: 0 var(--space-1); line-height: 1.4;
-}
+/* .cr-toast__close — see the shared "Dismiss control" rule in the base layer. */
 

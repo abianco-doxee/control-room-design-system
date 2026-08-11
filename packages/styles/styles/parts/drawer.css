@@ -17,6 +17,6 @@
 .cr-drawer__box { display: flex; flex-direction: column; height: 100%; }
 .cr-drawer__head { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: var(--brd) solid var(--border); }
 .cr-drawer__title { flex: 1; margin: 0; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
-.cr-drawer__close { font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1; cursor: pointer; background: var(--panel); color: var(--ink); border: var(--brd) solid var(--border); padding: var(--space-1) var(--space-2); }
+/* .cr-drawer__close — see the shared "Dismiss control" rule in the base layer. */
 .cr-drawer__body { flex: 1; overflow: auto; padding: var(--space-4); }
 

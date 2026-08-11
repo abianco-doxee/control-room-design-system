@@ -26,6 +26,33 @@
 .cr-well, .cr-card, .cr-badge, .cr-kbd, .cr-combobox__input, .cr-combobox__list,
 .cr-cron__input, .cr-cron__preset { border-radius: var(--radius); }
 
+/* ── Dismiss control (the one ✕ treatment, shared by every dismissible surface)
+ * Alert, Toast, Modal and Drawer all render the same markup — a bare
+ * <button class="cr-*__close" aria-label="…">✕</button> — so they get ONE rule,
+ * not four that drift. Lives in the base layer on purpose: a per-part consumer
+ * imports `base` first (references/styling-contract.md), and a rule duplicated
+ * per component section is exactly the drift being closed here.
+ *
+ * `color: inherit` + `border-color: currentColor` is what makes one treatment
+ * correct on every host: on a --panel surface it resolves to --ink, on a
+ * flooded toast it resolves to --on-sig / --on-err. A fixed --panel/--border
+ * chip cannot do this — its border measures 1.21:1 against its own fill in
+ * dark/extreme/phosphor, and it would punch a hole in the toast's Law 2 key.
+ *
+ * font-size/line-height are pinned rather than inherited: .cr-alert sets no
+ * font-size while .cr-toast sets --text-sm, so the two agreed only by accident
+ * of their parents computing to the same value. */
+.cr-alert__close,
+.cr-toast__close,
+.cr-modal__close,
+.cr-drawer__close {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1;
+  cursor: pointer; background: transparent; color: inherit;
+  border: var(--brd-hair) solid currentColor;
+  padding: var(--space-0-5) var(--space-1); flex-shrink: 0;
+}
+
 /* ── Panel ─────────────────────────────────────────────────────────────── */
 .cr-panel {
   background: var(--cr-panel-bg);
@@ -559,6 +586,13 @@
   padding: 0; max-width: min(92vw, 34rem); border-radius: var(--radius);
 }
 .cr-modal::backdrop { background: var(--cr-modal-backdrop); }
+.cr-modal__head {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--cr-modal-head-pad-y) var(--cr-modal-head-pad-x); border-bottom: var(--brd) solid var(--cr-modal-border);
+}
+.cr-modal__title { flex: 1; margin: 0; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
+/* .cr-modal__close — see the shared "Dismiss control" rule in the base layer. */
+.cr-modal__body { padding: var(--cr-modal-body-pad); font-size: var(--text-base); }
 
 /* ── Command palette (⌘K) ───────────────────────────────────────────────── */
 .cr-palette {
@@ -586,26 +620,50 @@
 .cr-palette__item--active .cr-palette__group { color: inherit; }
 .cr-palette__empty { padding: var(--space-3) var(--space-4); font-family: var(--font-mono); color: var(--muted); }
 
-/* ── Alert / callout (inline message, keyed to a signal) ────────────────── */
+/* ── Alert / callout (inline message, keyed to a signal) ────────────────────
+ * The frame is an instrument panel, not a generic callout. Three changes carry
+ * that, and each is structural — no glow, no gradient, no second key:
+ *
+ * 1. A seam (--brd-hair in --cr-alert-border) inboard of the signal bar. This is
+ *    the bezel/rail vocabulary already shipped as .cr-seam — the casing and the
+ *    lit field are two tones with a hard boundary between them (Law 1), which is
+ *    what makes the bar read as INSET into metal instead of painted on.
+ * 2. The icon becomes a severity shape (Law 4) instead of a coloured square that
+ *    only repeated what the bar already said. Side-count now encodes how much
+ *    the alert needs the operator, orthogonally to hue — so the reading survives
+ *    phosphor's single colour and colour-blind viewers.
+ *
+ * Deliberately NOT changed: the casing stays --brd. Stepping it to --brd-heavy
+ * was tried and measured — --cr-alert-border (--border, black) sits at 1.21 /
+ * 20.34 / 1.21 / 1.01 against --cr-alert-bg and 1.11 / 16.29 / 1.11 / 1.06
+ * against --board, so in dark/extreme/phosphor a thicker casing is invisible ink
+ * on ink. Separation from the ground is the hard offset shadow's job (Law 1 —
+ * black is a mass), not the border's, so the extra pixel buys nothing. */
 .cr-alert {
   --cr-alert-key: var(--sig-work);
+  --cr-alert-sev: polygon(50% 0,98% 35%,79% 100%,21% 100%,2% 35%);   /* 5 · working */
+  position: relative;
   display: flex; gap: var(--space-3); align-items: flex-start;
-  border: var(--brd) solid var(--cr-alert-border); border-inline-start: var(--brd-brush) solid var(--cr-alert-key);
+  border: var(--brd) solid var(--cr-alert-border);
+  border-inline-start: var(--brd-brush) solid var(--cr-alert-key);
   background: var(--cr-alert-bg); padding: var(--space-3) var(--space-4);
   box-shadow: var(--shadow-off-sm) var(--shadow-off-sm) 0 var(--shadow-col);
 }
-.cr-alert--info { --cr-alert-key: var(--sig-work); }
-.cr-alert--wait { --cr-alert-key: var(--sig-wait); }
-.cr-alert--done { --cr-alert-key: var(--sig-done); }
-.cr-alert--err  { --cr-alert-key: var(--sig-err); }
-.cr-alert__icon { width: var(--space-3); height: var(--space-3); background: var(--cr-alert-key); border: var(--brd-hair) solid var(--cr-alert-border); margin-top: var(--space-0-5); flex-shrink: 0; }
+/* The seam: a hard boundary parting the signal bar from the lit field (Law 1).
+ * Decorative structure only — it carries nothing a label doesn't. */
+.cr-alert::before {
+  content: ""; position: absolute; inset-block: 0; inset-inline-start: 0;
+  width: var(--brd-hair); background: var(--cr-alert-border); pointer-events: none;
+}
+.cr-alert--info { --cr-alert-key: var(--sig-work); --cr-alert-sev: polygon(50% 0,98% 35%,79% 100%,21% 100%,2% 35%); }        /* 5 · working */
+.cr-alert--wait { --cr-alert-key: var(--sig-wait); --cr-alert-sev: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }              /* 4 · attend  */
+.cr-alert--done { --cr-alert-key: var(--sig-done); --cr-alert-sev: polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%); }  /* 6 · nominal */
+.cr-alert--err  { --cr-alert-key: var(--sig-err);  --cr-alert-sev: polygon(50% 0, 100% 100%, 0 100%); }                      /* 3 · act now */
+.cr-alert__icon { width: var(--space-4); height: var(--space-4); background: var(--cr-alert-key); clip-path: var(--cr-alert-sev); margin-top: var(--space-0-5); flex-shrink: 0; }
 .cr-alert__body { flex: 1; min-width: 0; }
 .cr-alert__title { font-family: var(--font-display); font-weight: 900; text-transform: uppercase; letter-spacing: -0.01em; font-size: var(--text-md); margin: 0 0 var(--space-0-5); color: var(--ink); }
 .cr-alert__msg { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); margin: 0; }
-.cr-alert__close {
-  font-family: var(--font-mono); cursor: pointer; background: transparent; color: inherit;
-  border: var(--brd-hair) solid currentColor; padding: 0 var(--space-1); line-height: 1.4;
-}
+/* .cr-alert__close — see the shared "Dismiss control" rule in the base layer. */
 
 /* ── Choice group (grouped CrChoice — both checkbox and radio) ───────────── */
 .cr-choicegroup { display: flex; flex-direction: column; gap: var(--space-2); }
@@ -787,7 +845,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-drawer__box { display: flex; flex-direction: column; height: 100%; }
 .cr-drawer__head { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: var(--brd) solid var(--border); }
 .cr-drawer__title { flex: 1; margin: 0; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
-.cr-drawer__close { font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1; cursor: pointer; background: var(--panel); color: var(--ink); border: var(--brd) solid var(--border); padding: var(--space-1) var(--space-2); }
+/* .cr-drawer__close — see the shared "Dismiss control" rule in the base layer. */
 .cr-drawer__body { flex: 1; overflow: auto; padding: var(--space-4); }
 
 /* ── Breadcrumb (ascii "/" separators) ──────────────────────────────────── */
@@ -948,17 +1006,6 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-cron__presets { display: flex; gap: var(--space-1); flex-wrap: wrap; }
 .cr-cron__preset { font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 700; background: var(--panel-2); color: var(--muted); border: var(--brd-hair) solid var(--border); padding: var(--space-0-5) var(--space-2); cursor: pointer; }
 .cr-cron__preset:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
-.cr-modal__head {
-  display: flex; align-items: center; gap: var(--space-3);
-  padding: var(--cr-modal-head-pad-y) var(--cr-modal-head-pad-x); border-bottom: var(--brd) solid var(--cr-modal-border);
-}
-.cr-modal__title { flex: 1; margin: 0; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
-.cr-modal__close {
-  font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1; cursor: pointer;
-  background: var(--panel); color: var(--ink); border: var(--brd) solid var(--border);
-  padding: var(--space-0-5) var(--space-2);
-}
-.cr-modal__body { padding: var(--cr-modal-body-pad); font-size: var(--text-base); }
 
 /* ── Toast (keyed to a signal; role=status/alert) ──────────────────────── */
 .cr-toast {
@@ -971,10 +1018,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-toast--wait { background: var(--sig-wait); color: var(--on-sig); }
 .cr-toast--err  { background: var(--sig-err);  color: var(--on-err); }
 .cr-toast__msg { flex: 1; }
-.cr-toast__close {
-  font-family: var(--font-mono); cursor: pointer; background: transparent; color: inherit;
-  border: var(--brd-hair) solid currentColor; padding: 0 var(--space-1); line-height: 1.4;
-}
+/* .cr-toast__close — see the shared "Dismiss control" rule in the base layer. */
 
 /* ── Toast region (stacks toasts in a screen corner) ────────────────────── */
 .cr-toast-region {
@@ -1682,7 +1726,11 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
   .cr-btn, .cr-input, .cr-select, .cr-textarea, .cr-datetime, .cr-tab, .cr-segmented__opt,
   .cr-togglechip, .cr-menu__item, .cr-pager__btn, .cr-overflow, .cr-tap,
   .cr-rating__star, .cr-carousel__nav, .cr-carousel__dot, .cr-calendar__nav { min-height: 44px; }
+  /* The ✕ dismiss control is roughly square, so it needs the floor on BOTH axes —
+   * min-height alone would leave an ~18px-wide target (WCAG 2.5.5). */
+  .cr-alert__close, .cr-toast__close, .cr-modal__close, .cr-drawer__close,
   .cr-rating__star, .cr-carousel__nav, .cr-carousel__dot, .cr-calendar__nav { min-width: 44px; }
+  .cr-alert__close, .cr-toast__close, .cr-modal__close, .cr-drawer__close { min-height: 44px; }
   .cr-calendar__day { min-width: 40px; min-height: 40px; }
 }
 

@@ -32,6 +32,7 @@ const HEADER = /^\/\* ── /;
 // gives catalog-aligned filenames; anything else becomes its own part (auto slug).
 const TO_BASE = new Set([
   "__preamble__",
+  "dismiss control",
   "diagonal primitives",
   "interaction states",
   "texture utilities",
