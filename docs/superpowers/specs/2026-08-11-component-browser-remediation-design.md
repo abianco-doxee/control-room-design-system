@@ -58,13 +58,14 @@ because the bug conceals itself.
 
 ### Supporting findings
 
-- **Form validity is applied unevenly.** `CrInput`/`CrTextarea` expose
-  `invalid?: boolean`; `CrField` owns `error?: string`; and `CrSelect`,
-  `CrInputGroup`, `CrNumberField`, `CrPinInput`, `CrTagsInput`, `CrCombobox`,
-  `CrChoice`, `CrRadioGroup`, `CrSwitch` have **no validity prop at all**.
-  These are not two competing conventions — they are two correct layers of one
-  contract (see "Validation ownership"), with nine components missing their
-  half of it.
+- **Form validity is applied unevenly, mostly in CSS.** `CrInput`/`CrTextarea`
+  expose `invalid?: boolean`; `CrField` owns `error?: string`; nine other
+  controls have no validity prop. These are not competing conventions but two
+  layers of one contract (see "Validation ownership"). The larger gap is in the
+  **stylesheet**, not the API: only `.cr-input`, `.cr-textarea` and `.cr-select`
+  have any `.cr-field--error` styling, leaving **eight** parts with no error
+  appearance at all. Error styling is derived from the wrapper's class and needs
+  no prop; `invalid` exists only to set `aria-invalid`, which CSS cannot do.
 - **`CrChoice` is one component with `type: "checkbox" | "radio"`**, which is
   precisely why the two control types look identical — same element, same parts,
   differing only in native input type. `CrRadioGroup` does not reuse it: it
@@ -103,19 +104,50 @@ only carried through on some components, not that the architecture is unsettled.
 
 Consequences:
 
-- `CrInput`/`CrTextarea` exposing `invalid?: boolean` is **correct** and stays.
-  An earlier reading of this as a deviation was wrong.
-- The real defect is the nine leaf controls with **no** validity prop at all, so
-  a wrapper cannot tell them to render as invalid: `CrSelect`, `CrInputGroup`,
-  `CrNumberField`, `CrPinInput`, `CrTagsInput`, `CrCombobox`, `CrChoice`,
-  `CrRadioGroup`, `CrSwitch`.
-- The review item "InputGroup has no error prop" resolves as: InputGroup needs
-  `invalid?: boolean`, **not** `error?: string`. Standalone use with a message is
-  served by wrapping it in a `CrField`.
 - Leaf controls deliberately do **not** get `error?: string`. Two ways to render
   one message is the thing this contract exists to prevent.
-- `aria-invalid` is set by whichever layer owns the labelled control: the wrapper
-  when wrapped, the leaf when standalone.
+
+#### Styling is derived; aria is not
+
+The visual and accessible halves of "invalid" have **different** answers, and
+conflating them overstates the work.
+
+**Styling is already derived from the parent.** `input.css:12-14` is a descendant
+selector — `.cr-field--error .cr-input, .cr-textarea, .cr-select` — so a wrapped
+control gets its error border from `CrField`'s class with no prop involved.
+`CrInput`'s `invalid` prop contributes **nothing** to styling; it sets only
+`aria-invalid` and `data-state` (`CrInput.lite.tsx:42-43`), and its own comment
+says so: *"a low-level aria hook — for real validation use CrField / CrForm."*
+
+**`aria-invalid` cannot be derived.** CSS can style a descendant but cannot set
+an attribute on one. A screen reader needs `aria-invalid="true"` on the focused
+control itself; an error border on an ancestor is invisible to it. A
+wrapper-sets-it-via-DOM approach was rejected: imperative DOM-poking is fragile
+across six Mitosis targets and breaks SSR, since the attribute would be absent
+from server HTML and appear only after hydration.
+
+Resolution: **leaves keep `invalid?: boolean` as an aria-only hook**, and
+`CrField` passes it down to the control it renders. Authors never set it for
+looks. It is load-bearing for the **composite** leaves — `CrInputGroup`,
+`CrPinInput`, `CrCombobox`, `CrTagsInput` — because those render their own inner
+elements and only the component knows which one should carry the attribute; a
+wrapper cannot reach inside them.
+
+This splits W4 into two halves that were previously conflated:
+
+| Half | Work | Components |
+| --- | --- | --- |
+| **CSS** (visible) | add `.cr-field--error` descendant rules | the **eight** parts with no error styling at all: `input-group`, `checkbox`, `radio-group`, `switch`, `number-field`, `pin-input`, `tags-input`, `combobox` |
+| **Props** (a11y) | add `invalid?: boolean`, aria-only | the leaves lacking it, composites first |
+
+Only `.cr-input`, `.cr-textarea`, `.cr-select` currently have any error styling —
+so the stylesheet, not the component API, is where most of the real gap is. Note
+`.cr-select` is already styled for error despite `CrSelect` having no prop,
+which is consistent: styling never needed one.
+
+The review item "InputGroup has no error prop" therefore resolves as: it needs a
+`.cr-field--error` CSS rule for the visible defect, plus `invalid?: boolean` for
+the a11y half — **not** `error?: string`.
 
 ## Deploy mechanism
 
@@ -164,17 +196,28 @@ replacing static-on-open measurement with `autoPlace`.
 ### W4 · Form contract *(breaking)*
 
 Apply the three-layer validation contract (see "Validation ownership") uniformly.
+Two distinct halves — the CSS half is the larger and more visible one.
 
-- Add `invalid?: boolean` to the nine leaf controls that lack any validity prop:
-  `CrSelect`, `CrInputGroup`, `CrNumberField`, `CrPinInput`, `CrTagsInput`,
-  `CrCombobox`, `CrChoice`, `CrSwitch`, and the group component from W4b.
-- Give every leaf a consistent invalid **style** hook and `data-state`, matching
-  the `cr-field--error` treatment.
-- Leave `CrField`/`CrFormRow` owning `error?: string` and the aria wiring.
+**CSS (the visible defect).** Add `.cr-field--error` descendant rules to the
+eight parts that have **no error styling whatsoever**: `input-group`, `checkbox`,
+`radio-group`, `switch`, `number-field`, `pin-input`, `tags-input`, `combobox`.
+Extend `input.css:12-14`'s existing pattern rather than inventing a second one.
+No component changes are needed for this half.
+
+**Props (the a11y half).** Add `invalid?: boolean` — documented as an
+**aria-only hook, never a style hook** — to the leaves lacking it. Prioritise the
+composites (`CrInputGroup`, `CrPinInput`, `CrCombobox`, `CrTagsInput`), where it
+is genuinely load-bearing because a wrapper cannot reach their inner elements.
+Have `CrField` pass `invalid` down to the control it renders, so wrapped use
+requires no author action.
+
+Also:
+
+- Leave `CrField`/`CrFormRow` owning `error?: string` and the message aria wiring.
 - Do **not** add `error?: string` to leaves.
-- Audit `onChange` signatures for consistency while here — they currently vary in
-  payload type by control, which is defensible (`string` vs `number` vs
-  `string[]`), but the naming and arity should not.
+- Audit `onChange` signatures for consistency while here — payload types
+  legitimately vary (`string` vs `number` vs `string[]`), but naming and arity
+  should not.
 
 ### W4b · CrChoiceGroup *(breaking, structural)*
 
