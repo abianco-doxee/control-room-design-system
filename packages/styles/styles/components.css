@@ -146,11 +146,20 @@
     inset -2px -2px 0 var(--cr-bezel-shade),
     var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
 }
-/* Fasteners: the four corner squares now read as seated bolts — same inset
- * lit/shade pair as .cr-rivet, scaled to the bezel's own corner studs. */
+/* Fasteners: the four corner squares read as seated bolts — the inset lit/shade
+ * pair is the same idiom as .cr-rivet.
+ * The FACE is --muted, not --rail-ink. --rail-ink is unusable here: it inverts
+ * across themes and lands on the casing's own luminance in two of them
+ * (measured face-vs--panel-2 contrast: light 1.08, extreme 1.31 — invisible).
+ * A color-mix toward --ink fails too, and less obviously: CSS mixes in sRGB
+ * channel space, so 35% near-black-purple + near-white still resolves close to
+ * the casing (~1.34 in dark/extreme/phosphor). --muted is the one token that sits
+ * BETWEEN casing and ink in all four themes by construction — semantically the
+ * readable-but-recessive tone, which is exactly a fastener's job.
+ * Measured: dark 4.65 · light 6.55 · extreme 6.58 · phosphor 5.73. */
 .cr-bezel__rivets { display: flex; justify-content: space-between; margin-bottom: var(--space-2); }
 .cr-bezel__rivets i {
-  width: var(--space-2); height: var(--space-2); background: var(--rail-ink); display: block;
+  width: var(--space-2); height: var(--space-2); background: var(--muted); display: block;
   border: 1px solid var(--border);
   box-shadow:
     inset 1px 1px 0 color-mix(in srgb, #fff 30%, transparent),

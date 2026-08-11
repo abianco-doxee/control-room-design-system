@@ -418,23 +418,61 @@ body {
 .cr-hero__sub  { font-family: var(--font-mono); font-size: var(--text-sm); margin-top: var(--space-0-5); }
 
 /* ── Bezel + screen (the only texture host) ────────────────────────────── */
+/* The casing is milled metal, not a flat card: a hard two-tone bevel (lit top-left
+ * edge, dark bottom-right mass) reads as a machined lip. Same lit/unlit boundary
+ * CrChrome paints on its metal strip — hard 1px insets, never a gradient (Law 1).
+ * Mixed against #fff/#000 rather than --rail-ink, which INVERTS across themes
+ * (light in dark/light, near-black in extreme) and would flip the bevel wrong. */
 .cr-bezel {
+  --cr-bezel-lip: color-mix(in srgb, #fff 20%, transparent);
+  --cr-bezel-shade: color-mix(in srgb, #000 45%, transparent);
+  position: relative;
   border: var(--brd-brush) solid var(--border); background: var(--panel-2); padding: var(--space-3);
-  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
+  box-shadow:
+    inset 2px 2px 0 var(--cr-bezel-lip),
+    inset -2px -2px 0 var(--cr-bezel-shade),
+    var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
 }
+/* Fasteners: the four corner squares read as seated bolts — the inset lit/shade
+ * pair is the same idiom as .cr-rivet.
+ * The FACE is --muted, not --rail-ink. --rail-ink is unusable here: it inverts
+ * across themes and lands on the casing's own luminance in two of them
+ * (measured face-vs--panel-2 contrast: light 1.08, extreme 1.31 — invisible).
+ * A color-mix toward --ink fails too, and less obviously: CSS mixes in sRGB
+ * channel space, so 35% near-black-purple + near-white still resolves close to
+ * the casing (~1.34 in dark/extreme/phosphor). --muted is the one token that sits
+ * BETWEEN casing and ink in all four themes by construction — semantically the
+ * readable-but-recessive tone, which is exactly a fastener's job.
+ * Measured: dark 4.65 · light 6.55 · extreme 6.58 · phosphor 5.73. */
 .cr-bezel__rivets { display: flex; justify-content: space-between; margin-bottom: var(--space-2); }
-.cr-bezel__rivets i { width: var(--space-2); height: var(--space-2); background: var(--border); display: block; }
+.cr-bezel__rivets i {
+  width: var(--space-2); height: var(--space-2); background: var(--muted); display: block;
+  border: 1px solid var(--border);
+  box-shadow:
+    inset 1px 1px 0 color-mix(in srgb, #fff 30%, transparent),
+    inset -1px -1px 0 color-mix(in srgb, #000 50%, transparent);
+}
+/* The screen is recessed INTO the casing — its lit/shade pair runs the opposite
+ * way round from the outer bevel (dark top-left, lit bottom-right), which is what
+ * makes the glass read as sunk rather than raised. */
 .cr-bezel__screen {
   position: relative; isolation: isolate;
   background: var(--board); border: var(--brd) solid var(--border); padding: var(--space-4);
   font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink);
+  box-shadow:
+    inset 2px 2px 0 color-mix(in srgb, #000 42%, transparent),
+    inset -1px -1px 0 color-mix(in srgb, #fff 12%, transparent);
 }
-/* CRT halftone rides BEHIND the text (own layer, toned + dialable) so the readout
- * stays crisp — texture under body text is a readability tax, not a feature. */
-.cr-bezel__screen::before {
-  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+/* CRT halftone rides ON THE GLASS — above the readout, like grime on a real
+ * screen (Law 6: the texture is on the glass, and the glass is in front).
+ * MUST stay pointer-events:none or the pane eats every click inside the bezel.
+ * Toned well below the old under-text value: at 0.55 over the text it read as a
+ * scrim; on top, ~0.3 is the most that keeps the readout crisp in all four
+ * themes (light's halftone is dark dots on a light board — the worst case). */
+.cr-bezel__screen::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background-image: var(--halftone); background-size: var(--halftone-size) var(--halftone-size);
-  opacity: calc(0.55 * var(--decoration-intensity, 1));
+  opacity: calc(0.3 * var(--decoration-intensity, 1));
 }
 
 /* ── Diagonal primitives (Law 4 — shape carries meaning, never decoration) ──
@@ -613,7 +651,21 @@ body {
   cursor: pointer;
 }
 .cr-tab:hover { color: var(--cr-tabs-tab-hover-fg); }
-.cr-tab--on { color: var(--cr-tabs-tab-active-fg); border-bottom-color: var(--cr-tabs-indicator); }
+.cr-tab--on { position: relative; color: var(--cr-tabs-tab-active-fg); border-bottom-color: var(--cr-tabs-indicator); }
+/* Law 4 — the wedge means "active-panel focus", which is exactly what a selected
+ * tab designates: this strip's chosen panel. The shape restates aria-selected,
+ * it never replaces it. Geometry matches the shared `.cr-wedge` primitive (a
+ * trailing-edge triangle) but is declared here, component-locally, so the base
+ * definition stays untouched and parts/tabs.css is self-sufficient — .cr-wedge
+ * lives in base.css and a wedge-classed tab would lose its shape for anyone
+ * importing only the part. It keys off the indicator token so a per-instance dt
+ * override moves the underline and the wedge together. */
+.cr-tab--on::after {
+  content: ""; position: absolute; inset-block: 0; inset-inline-end: 0;
+  inline-size: var(--space-2); pointer-events: none;
+  background: var(--cr-tabs-indicator);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
 
 /* ── Meter (capacity / utilisation bar) ─────────────────────────────────── */
 .cr-meter { --cr-meter-c: var(--sig-work); display: flex; align-items: center; gap: var(--space-2); }
@@ -1658,13 +1710,53 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-grid__cell--active { outline: var(--focus-w) solid var(--sig-work); outline-offset: calc(-1 * var(--focus-w)); position: relative; z-index: 1; }
 
 /* ── Stepper ─────────────────────────────────────────────────────────────── */
+/* Law 4 — a stepper IS the "sequence / pipeline step" primitive, so it carries
+ * the arrow-rail's geometry: the marker is chevron-clipped and points forward,
+ * so the shape itself says "this is an ordered run" before any colour is read.
+ * We restate the geometry here rather than composing `.cr-rail__step`, because
+ * that class is a self-contained block (own background/border/padding and a
+ * -10px overlap) which would fight the dot+label+connector anatomy — and it
+ * ships in a SEPARATE part file (parts/arrow-rail.css), so markup depending on
+ * it would silently lose its shape for anyone importing only parts/stepper.css.
+ * Shape is reinforcement only: aria-current="step" remains the announced state. */
 .cr-stepper { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); list-style: none; margin: 0; padding: 0; }
 .cr-stepper__item { display: flex; align-items: center; gap: var(--space-2); flex: 1 1 auto; min-width: 0; }
 .cr-stepper__item:not(:last-child)::after { content: ""; flex: 1; min-width: var(--space-4); height: 0; border-top: var(--brd) solid var(--cr-stepper-line); opacity: .55; }
 .cr-stepper__btn { display: flex; align-items: center; gap: var(--space-2); background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; text-align: start; }
-.cr-stepper__dot { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; flex: none; font-family: var(--font-mono); font-weight: 700; border: var(--brd) solid var(--cr-stepper-line); background: var(--cr-stepper-pending-bg); color: var(--muted); }
-.cr-stepper__item--active .cr-stepper__dot { background: var(--cr-stepper-accent-bg); color: var(--cr-stepper-accent-fg); border-color: var(--cr-stepper-accent-bg); }
-.cr-stepper__item--done .cr-stepper__dot { background: var(--cr-stepper-done-bg); color: var(--cr-stepper-accent-fg); border-color: var(--cr-stepper-done-bg); }
+/* The marker carries the sequence geometry: a notch cut out of the leading edge
+ * and a point on the trailing edge, i.e. the arrow-rail step at marker scale.
+ * `border` cannot survive a clip-path (the clip cuts the border box), so the
+ * outline that the pending/upcoming state needs comes from an inset box-shadow,
+ * which IS clipped with the box instead of being sliced off. --cr-stepper-arrow
+ * is the depth of the cut. Law 4's 15° off-axis ceiling is scoped to LARGE
+ * shapes; at marker scale this edge is steeper (~25°), but still shallower than
+ * the shipped .cr-rail__step it mirrors (~32°), so it reads as the same
+ * vocabulary rather than a new angle. */
+.cr-stepper__dot {
+  --cr-stepper-arrow: 0.4rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.75rem; height: 1.75rem; flex: none;
+  padding-inline-start: calc(var(--cr-stepper-arrow) / 2);
+  font-family: var(--font-mono); font-weight: 700;
+  background: var(--cr-stepper-pending-bg); color: var(--muted);
+  box-shadow: inset 0 0 0 var(--brd) var(--cr-stepper-line);
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--cr-stepper-arrow)) 0,
+    100% 50%,
+    calc(100% - var(--cr-stepper-arrow)) 100%,
+    0 100%,
+    var(--cr-stepper-arrow) 50%
+  );
+}
+.cr-stepper__item--active .cr-stepper__dot { background: var(--cr-stepper-accent-bg); color: var(--cr-stepper-accent-fg); box-shadow: inset 0 0 0 var(--brd) var(--cr-stepper-accent-bg); }
+.cr-stepper__item--done .cr-stepper__dot { background: var(--cr-stepper-done-bg); color: var(--cr-stepper-accent-fg); box-shadow: inset 0 0 0 var(--brd) var(--cr-stepper-done-bg); }
+/* The last step ends the run, so it has no forward point — a flat trailing edge
+ * is what makes the preceding arrows read as "flow toward" rather than as a row
+ * of loose chevrons. */
+.cr-stepper__item:last-child .cr-stepper__dot {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, var(--cr-stepper-arrow) 50%);
+}
 .cr-stepper__text { display: flex; flex-direction: column; }
 .cr-stepper__label { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: var(--text-xs); }
 .cr-stepper__item--upcoming .cr-stepper__label { color: var(--muted); }
@@ -1727,7 +1819,27 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-avatar--lg { width: 3rem; height: 3rem; }
 .cr-avatar__img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .cr-avatar__initials { font-family: var(--font-mono); font-weight: 700; font-size: var(--text-xs); text-transform: uppercase; color: var(--cr-avatar-fg); }
-.cr-avatar__status { position: absolute; bottom: -3px; right: -3px; width: .6rem; height: .6rem; border: 1.5px solid var(--panel); background: var(--muted); }
+/* Law 4 — the notch means "state", and the presence dot is nothing but state, so
+ * the dot carries the notch geometry: a corner cut out of the trailing-bottom
+ * edge. This matters most on the phosphor CRT, where every signal collapses into
+ * one green/yellow band and --sig-done / --sig-wait / --sig-err stop being
+ * separable on a 9.6px dot — the cut is the non-colour reading Law 4 promises.
+ * The shape is reinforcement only: role="img" + aria-label={status} remains the
+ * announced state, and "offline" keeps the notch too (absent is not a state).
+ * Geometry is restated here rather than composing `.cr-notch`, which is a padded
+ * badge block (own background/border/padding) shipped in base.css — a
+ * notch-classed dot would lose its shape for anyone importing only
+ * parts/avatar.css, and would fight the dot's absolute positioning.
+ * The cut is a percentage, not the primitive's fixed 11px, so it stays
+ * proportional across --sm/--lg; `border` cannot survive a clip-path (the clip
+ * cuts the border box), so the ring that separates the dot from the portrait
+ * comes from an inset box-shadow, which IS clipped with the box. */
+.cr-avatar__status {
+  position: absolute; bottom: -3px; right: -3px; width: .6rem; height: .6rem;
+  background: var(--muted);
+  box-shadow: inset 0 0 0 1.5px var(--panel);
+  clip-path: polygon(0 0, 100% 0, 100% 55%, 55% 100%, 0 100%);
+}
 .cr-avatar__status--online { background: var(--sig-done); }
 .cr-avatar__status--idle { background: var(--sig-wait); }
 .cr-avatar__status--busy { background: var(--sig-err); }

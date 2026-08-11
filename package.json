@@ -109,7 +109,7 @@
     "build:llms": "pnpm --filter @alebianco/cr-docs run build:llms",
     "build:content": "pnpm --filter @alebianco/cr-docs run build:content",
     "build:site": "pnpm --filter @alebianco/cr-docs run build:site",
-    "build": "pnpm run build:tokens && pnpm run build:theme && pnpm run build:brand-preview && pnpm run build:tw && pnpm run build:styles && pnpm run build:icons && pnpm run build:catalog && pnpm run build:components && pnpm run build:pkg && pnpm run build:showcase && pnpm run build:mcp && pnpm run build:skill && pnpm run build:llms && pnpm run build:content && pnpm run build:site",
+    "build": "pnpm run build:tokens && pnpm run build:theme && pnpm run build:tw && pnpm run build:styles && pnpm run build:brand-preview && pnpm run build:icons && pnpm run build:catalog && pnpm run build:components && pnpm run build:pkg && pnpm run build:showcase && pnpm run build:mcp && pnpm run build:skill && pnpm run build:llms && pnpm run build:content && pnpm run build:site",
     "prepack": "pnpm run build:components && pnpm run build:pkg",
     "dev": "pnpm --filter @alebianco/cr-docs run dev",
     "preview": "pnpm --filter @alebianco/cr-docs run preview",
@@ -123,6 +123,7 @@
     "verify:styles": "node packages/styles/build/build-styles.mjs --check",
     "verify:icons": "node packages/icons/build/build-icons.mjs --check",
     "verify:llms": "pnpm --filter @alebianco/cr-docs run verify:llms",
+    "verify:brand-preview": "pnpm --filter @alebianco/cr-docs run verify:brand-preview",
     "verify:mcp": "pnpm --filter @alebianco/cr-mcp run verify",
     "verify:skill": "pnpm --filter @alebianco/cr-skill run verify",
     "skills:sync": "node scripts/skills-sync.mjs",
@@ -153,7 +154,7 @@
     "changeset": "changeset",
     "version": "changeset version",
     "release": "changeset publish",
-    "verify": "pnpm run verify:tokens && pnpm run verify:theme && pnpm run verify:palette && pnpm run verify:styles && pnpm run verify:icons && pnpm run verify:catalog && pnpm run verify:llms && pnpm run verify:mcp && pnpm run verify:skill && pnpm run skills:check"
+    "verify": "pnpm run verify:tokens && pnpm run verify:theme && pnpm run verify:palette && pnpm run verify:styles && pnpm run verify:icons && pnpm run verify:catalog && pnpm run verify:llms && pnpm run verify:brand-preview && pnpm run verify:mcp && pnpm run verify:skill && pnpm run skills:check"
   },
   "devDependencies": {
     "@angular/common": "^21.2.19",
