@@ -603,6 +603,36 @@ test.describe("component browser — live islands", () => {
     expect(box.x, "left edge in view").toBeGreaterThanOrEqual(-1);
     expect(box.x + box.width, "right edge in view").toBeLessThanOrEqual(vp.width + 1);
     expect(box.y, "top edge in view").toBeGreaterThanOrEqual(-1);
+
+    // reset before the third path
+    await trigger.blur();
+    await page.mouse.move(0, 0);
+    await expect(panel).toBeHidden();
+
+    // third reveal path: the panel has no focusable content in this playground
+    // demo (its children are a plain <p>), so a focusable child is injected for
+    // this assertion only — it is what components.md warns hover-card content
+    // normally shouldn't need, but the component must still cope with it. Hover
+    // to reveal (CSS :hover, which also runs place() via mouseenter), Tab from
+    // the trigger into that child (staying within the subtree keeps
+    // :focus-within true), then move the pointer away so only :focus-within
+    // holds the card open — the transition that had no place() call on it
+    // before onFocus moved from the trigger to the root.
+    await panel.evaluate((el) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = "inner";
+      btn.className = "cr-hovercard-test-inner";
+      el.appendChild(btn);
+    });
+    await trigger.hover();
+    await expect(panel).toBeVisible();
+    await page.keyboard.press("Tab"); // trigger -> inner button, still inside the card
+    await expect(panel.locator(".cr-hovercard-test-inner")).toBeFocused();
+    await page.mouse.move(0, 0); // pointer leaves; only :focus-within holds it open now
+    await expect(panel).toBeVisible();
+    await expect(panel).toHaveAttribute("data-placement", /^(top|bottom)-(start|end)$/);
+    expect(await panel.evaluate((el) => getComputedStyle(el).position)).toBe("fixed");
   });
 
   test("keyboard focus shows a visible ring", async ({ page }) => {

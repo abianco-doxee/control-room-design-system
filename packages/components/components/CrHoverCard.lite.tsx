@@ -38,13 +38,21 @@ export default function CrHoverCard(props: CrHoverCardProps) {
       state.dismissed = false;
     },
     /* Reveal here is CSS-driven (:hover/:focus-within on root), so there is no
-     * open/close JS state to gate a hide-then-show cycle like popover/menu. Both
-     * paths that precede the CSS reveal — pointer entering root, keyboard focus
-     * landing on the trigger — call this so the panel is already positioned by
-     * the time CSS flips its opacity/visibility on. Layout is available via
-     * getBoundingClientRect() even while the CSS transition hasn't started, so
-     * measuring here is safe. Absence of window/trigger/panel just leaves the
-     * panel at its CSS fallback position — never blocks the CSS reveal. */
+     * open/close JS state to gate a hide-then-show cycle like popover/menu.
+     * Both paths that precede the CSS reveal — pointer entering root, and
+     * focus landing anywhere in the subtree (the trigger, or a focusable
+     * child inside the panel once :focus-within has already made it
+     * reachable) — call this so the panel is positioned before/as CSS flips
+     * its opacity/visibility on. onFocus lives on the ROOT, not just the
+     * trigger: focus bubbles, so one handler there covers both without a
+     * second listener, and it re-places on every focus transition within the
+     * card (harmless — placeEl is idempotent) rather than only the first one
+     * that opened it. mouseenter/focus dispatch synchronously and this write
+     * lands in the same task, before the next style-recalc/paint — that's
+     * the same-frame guarantee, not the panel's transition-delay (which
+     * disappears under prefers-reduced-motion). Absence of window/trigger/
+     * panel just leaves the panel at its CSS fallback position — never
+     * blocks the CSS reveal. */
     place() {
       const root: any = rootRef;
       const panel = root ? root.querySelector(".cr-hovercard__panel") : null;
@@ -57,8 +65,8 @@ export default function CrHoverCard(props: CrHoverCardProps) {
   });
 
   return (
-    <span {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-hovercard", "root")} data-part="root" data-state={state.dismissed ? "dismissed" : undefined} style={ptStyle(props.pt, props.dt, "root")} data-dismissed={state.dismissed ? "true" : undefined} ref={rootRef} onMouseEnter={() => state.place()} onMouseLeave={() => state.reset()}>
-      <span {...ptAttrs(props.pt, "trigger")} class={ptClass(props.pt, props.unstyled, "cr-hovercard__trigger", "trigger")} data-part="trigger" tabIndex={0} onFocus={() => state.place()} onKeyDown={(event) => state.onKey(event)} onBlur={() => state.reset()}>
+    <span {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-hovercard", "root")} data-part="root" data-state={state.dismissed ? "dismissed" : undefined} style={ptStyle(props.pt, props.dt, "root")} data-dismissed={state.dismissed ? "true" : undefined} ref={rootRef} onMouseEnter={() => state.place()} onMouseLeave={() => state.reset()} onFocus={() => state.place()}>
+      <span {...ptAttrs(props.pt, "trigger")} class={ptClass(props.pt, props.unstyled, "cr-hovercard__trigger", "trigger")} data-part="trigger" tabIndex={0} onKeyDown={(event) => state.onKey(event)} onBlur={() => state.reset()}>
         {props.label}
       </span>
       <span
