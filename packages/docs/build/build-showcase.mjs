@@ -686,6 +686,36 @@ const cats = Object.keys(byCat).sort((a, b) => catRank(a) - catRank(b) || a.loca
 // entries within a category read alphabetically by name
 for (const c of cats) byCat[c].sort((a, b) => a.name.localeCompare(b.name));
 
+// Sidebar filter. Lives here rather than in gallery-scripts.mjs because that
+// module is shared with the brand-preview page, which has no component index.
+const filterScript = `
+(() => {
+  const input = document.getElementById("idx-filter");
+  if (!input) return;
+  const none = document.querySelector(".idx__none");
+  const groups = [...document.querySelectorAll(".idx__group")];
+  const apply = () => {
+    const q = input.value.trim().toLowerCase();
+    let hits = 0;
+    for (const group of groups) {
+      let groupHits = 0;
+      for (const link of group.querySelectorAll(".idx__link")) {
+        const match = !q || link.textContent.toLowerCase().includes(q);
+        link.hidden = !match;
+        if (match) groupHits++;
+      }
+      group.hidden = groupHits === 0;
+      hits += groupHits;
+    }
+    if (none) none.hidden = hits > 0;
+  };
+  input.addEventListener("input", apply);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { input.value = ""; apply(); }
+  });
+})();
+`;
+
 const indexHtml = cats
   .map(
     (c) =>
@@ -745,6 +775,16 @@ body { margin: 0; }
 /* chrome surfaces track the theme — use --board/--ink (not the app's always-dark --rail). */
 .idx { position: sticky; top: 61px; align-self: start; max-height: calc(100vh - 61px); overflow: auto;
   padding: 16px; border-right: var(--brd) solid var(--border); background: var(--board); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap; border: 0; }
+/* The index is 83 entries in a sticky column — filtering beats scrolling. */
+.idx__filter { display: block; margin-bottom: 12px; }
+.idx__filter input { width: 100%; box-sizing: border-box; padding: 6px 8px;
+  font-family: var(--font-mono); font-size: 12px; color: var(--ink);
+  background: var(--panel); border: var(--brd) solid var(--border); border-radius: var(--radius); }
+.idx__filter input::placeholder { color: var(--muted); }
+.idx__filter input:focus-visible { outline: var(--focus-w, 2px) solid var(--sig-work); outline-offset: 2px; }
+.idx__none { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin: 0 0 12px; }
 .idx__group { margin-bottom: 14px; }
 .idx__cat { font-family: var(--font-mono); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 4px; display: flex; justify-content: space-between; gap: 8px; }
 .idx__count { color: var(--muted); font-weight: 700; }
@@ -820,10 +860,18 @@ ${brandButtons}
   </div>
 </div>
 <div class="wrap">
-  <nav class="idx" aria-label="Components">${indexHtml}</nav>
+  <nav class="idx" aria-label="Components">
+    <label class="idx__filter">
+      <span class="sr-only">Filter components</span>
+      <input type="search" id="idx-filter" placeholder="filter…" autocomplete="off" spellcheck="false" />
+    </label>
+    <p class="idx__none" hidden role="status">no match</p>
+    ${indexHtml}
+  </nav>
   <main>${cardsHtml}</main>
 </div>
 <script>${browserScript}</script>
+<script>${filterScript}</script>
 <script>${islandsBundle}</script>
 </body>
 </html>
