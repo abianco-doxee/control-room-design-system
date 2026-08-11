@@ -134,7 +134,7 @@ fine:
 />
 ```
 
-See `examples/console` for a live "provision a session" form wired this way.
+The `examples/console` app in this repository wires a "provision a session" form this way (source-only; not published).
 
 ### Validation modes
 

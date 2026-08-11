@@ -278,6 +278,13 @@ const ISLAND_IDS = new Set([
   "chrome",
   "ascii",
   "telemetry",
+  "seeded-cat",
+  "toggle-chip",
+  "overflow",
+  "relative-time",
+  "instrument",
+  "rail",
+  "key-hints",
 ]);
 
 function stageHtml(id) {
@@ -288,7 +295,7 @@ function stageHtml(id) {
     ? `<div class="cell cell--live"><div class="cell__label">playground · editable props</div><div class="cell__demo" data-island="${id}"><span class="cell__pending">mounting…<noscript> (enable JavaScript)</noscript></span></div></div>`
     : "";
   if (!island && !ex.length) {
-    return `<div class="stage stage--empty">Composed in the <code>examples/console</code> app.</div>`;
+    return `<div class="stage stage--empty">No isolated example — this composes other components.</div>`;
   }
   const cells = ex
     .map(

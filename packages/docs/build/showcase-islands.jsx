@@ -24,6 +24,7 @@ import {
   CrButton,
   CrCalendar,
   CrCarousel,
+  CrCat,
   CrChip,
   CrChrome,
   CrChoice,
@@ -42,13 +43,17 @@ import {
   CrIcon,
   CrInput,
   CrInputGroup,
+  CrInstrument,
   CrKbd,
+  CrKeyHints,
   CrLineChart,
   CrMasthead,
   CrMenu,
   CrMeter,
   CrModal,
+  CrNav,
   CrNumberField,
+  CrOverflow,
   CrPagination,
   CrPalette,
   CrPanel,
@@ -57,6 +62,7 @@ import {
   CrProgress,
   CrRadioGroup,
   CrRating,
+  CrRelativeTime,
   CrResizable,
   CrScrollArea,
   CrSegmented,
@@ -80,6 +86,7 @@ import {
   CrTimeline,
   CrToast,
   CrToastRegion,
+  CrToggleChip,
   CrToolbar,
   CrTooltip,
   CrTree,
@@ -1596,6 +1603,112 @@ const DEMOS = {
     tag: "CrTelemetry",
     defs: [T("text", "seed", "nova-01")],
     render: (s) => h(CrTelemetry, { seed: s.seed }),
+  },
+  // ── promoted from the empty "examples/console" fallback ──────────────────
+  // The seeded pixel-cat: identity from a seed, state keys the hue. Same
+  // determinism demo as the sigil — two of one seed, then a different seed.
+  "seeded-cat": {
+    tag: "CrCat",
+    defs: [
+      T("text", "seed", "nova-01"),
+      T("enum", "state", "working", { options: ["working", "waiting", "idle", "error", "done"] }),
+      T("number", "size", 48, { min: 24, max: 96, step: 8 }),
+    ],
+    render: (s) =>
+      h(
+        "div",
+        { style: { display: "flex", gap: "16px", alignItems: "flex-end", flexWrap: "wrap" } },
+        h(CrCat, { seed: s.seed, state: s.state, size: s.size }),
+        h(CrCat, { seed: s.seed, state: s.state, size: s.size }),
+        h(CrCat, { seed: s.seed + "-b", state: s.state, size: s.size })
+      ),
+  },
+  "toggle-chip": {
+    tag: "CrToggleChip",
+    defs: [
+      T("text", "label", "failing"),
+      T("boolean", "pressed", true),
+      T("number", "count", 3, { min: 0, max: 99, step: 1 }),
+      T("boolean", "disabled", false),
+    ],
+    render: (s, set) =>
+      h(CrToggleChip, {
+        label: s.label,
+        pressed: s.pressed,
+        count: s.count,
+        disabled: s.disabled,
+        onToggle: () => set("pressed", !s.pressed),
+      }),
+  },
+  overflow: {
+    tag: "CrOverflow",
+    defs: [
+      T("number", "count", 7, { min: 0, max: 99, step: 1 }),
+      T("text", "noun", "session"),
+      T("boolean", "expanded", false),
+    ],
+    render: (s, set) =>
+      h(CrOverflow, {
+        count: s.count,
+        noun: s.noun,
+        expanded: s.expanded,
+        onToggle: () => set("expanded", !s.expanded),
+      }),
+  },
+  "relative-time": {
+    tag: "CrRelativeTime",
+    defs: [
+      T("number", "minutesAgo", 14, { min: -600, max: 600, step: 1 }),
+      T("text", "prefix", ""),
+    ],
+    // `now` is passed explicitly so the readout is deterministic in a snapshot;
+    // the component never reads the clock itself.
+    render: (s) =>
+      h(CrRelativeTime, {
+        time: 1_770_000_000_000 - s.minutesAgo * 60_000,
+        now: 1_770_000_000_000,
+        prefix: s.prefix,
+      }),
+  },
+  instrument: {
+    tag: "CrInstrument",
+    defs: [T("text", "children", "READOUT · 14 sessions · p95 210ms")],
+    render: (s) =>
+      h(CrInstrument, null, h("div", { style: { fontFamily: "var(--font-mono)", fontSize: "13px" } }, s.children)),
+  },
+  rail: {
+    tag: "CrNav",
+    defs: [
+      T("text", "brand", "CONTROL ROOM"),
+      T("enum", "active", "sessions", { options: ["attention", "sessions", "sprint", "jobs"] }),
+    ],
+    render: (s) =>
+      h(CrNav, {
+        brand: s.brand,
+        items: [
+          { label: "Attention", badge: "2", active: s.active === "attention" },
+          { label: "Sessions", badge: "14", active: s.active === "sessions" },
+          { label: "Sprint", active: s.active === "sprint" },
+          { label: "Jobs", badge: "1", active: s.active === "jobs" },
+        ],
+      }),
+  },
+  // Headless: renders nothing itself, so pair it with the CrKbd hint badges it
+  // reveals. Hold the reveal key to see them fade in.
+  "key-hints": {
+    tag: "CrKeyHints",
+    defs: [T("text", "revealKey", "Alt")],
+    render: (s) =>
+      h(
+        "div",
+        { style: { display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" } },
+        h(CrKeyHints, { revealKey: s.revealKey }),
+        h("span", { style: { fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--muted)" } },
+          "hold " + (s.revealKey || "Alt") + " →"),
+        h("button", { className: "cr-btn cr-btn--outline cr-btn--sm" }, "Deploy ", h(CrKbd, { keys: "D", hint: true })),
+        h("button", { className: "cr-btn cr-btn--outline cr-btn--sm" }, "Scan ", h(CrKbd, { keys: "S", hint: true })),
+        h("button", { className: "cr-btn cr-btn--sig-err cr-btn--sm" }, "Kill ", h(CrKbd, { keys: "K", hint: true, on: true }))
+      ),
   },
 };
 

@@ -150,8 +150,9 @@ import { CrSwitch } from "@alebianco/cr-design-system/qwik";
 <CrSwitch checked={on.value} label="Live" onChange$={(v) => (on.value = v)} />
 ```
 
-The **`examples/console/`** app is a real Qwik dashboard built on this barrel —
-see it for a full composition (nav rail, masthead, session panels, breach).
+The **`examples/console/`** app in this repository is a real Qwik dashboard built
+on this barrel — read it for a full composition (nav rail, masthead, session
+panels, breach). It is source-only; the published site does not host it.
 
 Need just one component? The deep path still works (extension required):
 `import CrSwitch from "@alebianco/cr-design-system/frameworks/react/components/CrSwitch.tsx"`.
