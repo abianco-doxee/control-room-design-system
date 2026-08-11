@@ -2852,6 +2852,16 @@ git commit -m "docs(references): sync reference docs with the 1.0 APIs"
 - Consumes: every prior task.
 - Produces: a fully regenerated, verified tree ready for the deploy gate.
 
+> **`build:pkg` does not prune outputs for deleted sources** (found in Task 33).
+> Deleting a component leaves its compiled artifacts in `dist/pkg/{react,qwik}` —
+> and in this repo that includes a **`Ka*` alias set** from the Kaon dual-brand
+> naming, so one deleted component left 16 stale files. They are gitignored and
+> unreferenced by any barrel, but they remain deep-importable locally. Task 33
+> cleaned up `CrMeter`/`KaMeter`; a scan found no other orphans. If this phase
+> deletes anything further, delete its `dist/pkg` artifacts too, and re-run the
+> orphan scan: for each `dist/pkg` component output, confirm a matching
+> `packages/components/components/<name>.lite.tsx` still exists.
+
 - [ ] **Step 1: Clean rebuild**
 
 Run:
