@@ -2678,6 +2678,24 @@ The likely fix is splitting the token into chassis-edge and internal-seam
 variants rather than re-keying one value — that is a design decision, which is
 why it was deferred out of the component tasks rather than guessed at.
 
+- [ ] **Step 1c: Reconcile the two direction glyph vocabularies**
+
+Found during Task 34. The library now uses **two** unrelated direction markers:
+
+| Glyph | Used as | Where |
+| --- | --- | --- |
+| `▸` | inline direction marker | `.cr-list__item::before`, `.cr-combobox__opt::before`, `CrCalendar`, `CrCarousel`, and now `CrBreadcrumb`'s separator |
+| `‹` `›` | prev/next **control** affordance | `CrPagination` (`:62`, `:93`) |
+
+These may be a legitimate distinction — a static marker versus an interactive
+control — in which case document it so it reads as deliberate. If it is not,
+pick one. Either way, record the decision; this is exactly the kind of
+undocumented near-duplicate that the Meter/Progress merge existed to remove.
+
+(Note: Task 34's rationale claimed `›` "appears nowhere in the library", which is
+false — it is Pagination's next-page control. The glyph choice was still right,
+but do not re-derive from that premise.)
+
 - [ ] **Step 2: Decide the canonical vocabulary**
 
 Read Law 2 in `references/design-language.md`. The canonical set is `work · wait · done · err · idle`. Two decisions to make and apply uniformly: whether any component legitimately needs a subset (e.g. a component where `idle` is meaningless), and whether `tone` and `signal` are genuinely different concepts or the same thing under two names. If they are the same, keep `signal` and remove `tone`.
@@ -2871,11 +2889,11 @@ pnpm run build
 ```
 Expected: completes with no errors. This regenerates tokens, styles, parts, icons, catalog, components, packages, showcase, MCP, skill, llms, content, and the site.
 
-> **Known-failing gate to clear here.** `verify:mcp` (`node build/build-mcp-data.mjs --check`) fails on a stale
-> `catalog.json` / `components.md` in `packages/mcp/data`. Confirmed **pre-existing** on a clean tree in Task 29, and
-> deliberately not fixed there rather than burying a CSS change under unrelated regenerated output. The full `pnpm run
-> build` should regenerate it; confirm `pnpm run verify` is green afterwards, and if it is not, fix it here — this is
-> the phase that owns it.
+> **`verify:mcp` — RESOLVED, no longer an open item.** It failed on stale
+> `catalog.json` / `components.md` in `packages/mcp/data` from Task 29 onward, and
+> was scheduled here. Task 34's regeneration cleared it; verified exiting 0 with
+> "✓ MCP data is up to date". Nothing to do — just confirm it is still green in
+> the full run below.
 
 - [ ] **Step 2: Run every suite**
 
