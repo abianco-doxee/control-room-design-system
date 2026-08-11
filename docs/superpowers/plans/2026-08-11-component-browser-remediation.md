@@ -1811,12 +1811,30 @@ rebuild → inspect in all four themes → run the gates → commit.
 **Standard verification loop** (referenced by each task below as "the loop"):
 
 ```bash
-pnpm run build:styles && pnpm run build:showcase   # add build:components if a .lite.tsx changed
+pnpm run build:styles && pnpm run build:brand-preview && pnpm run build:showcase
+# add build:components if a .lite.tsx changed
 pnpm run test:islands && pnpm run test:a11y
 ```
 Then open `packages/docs/public/components.html`, find the named card, and check
 it in **all four themes** (dark · light · extreme · phosphor) using the header
 switch. Contrast regressions in a single theme are the usual failure here.
+
+> **Two traps found in Task 24 — they apply to every CSS task in W6 and W7.**
+>
+> **1. Measure contrast; do not eyeball it.** Task 24 recoloured the bezel rivets
+> to fix fasteners that were invisible in dark and phosphor — and a four-theme
+> screenshot pass reported success. Computed ratios showed it had *regressed*
+> light (18.98 → 1.08, near-white on near-white) and done nothing for extreme
+> (1.37 → 1.31). A theme-keyed token can invert: `--rail-ink` is `#c8c8de` dark,
+> `#ecebe3` light, `#0c0510` extreme, `#43ff7a` phosphor. Before keying a
+> foreground to a token, check it against the background **in all four themes**
+> numerically, and put the numbers in the report.
+>
+> **2. `packages/docs/public/brands.html` is a tracked generated file that
+> inlines `components.css`** — and there is **no `verify:brand-preview` step**,
+> so `pnpm run verify` passing is *not* evidence it is current. Any task that
+> edits `components.css` must run `pnpm run build:brand-preview` and commit the
+> result, or the 13-theme brand preview silently keeps rendering the old CSS.
 
 ### Task 24: Bezel/Screen — texture above the content, richer chrome
 
@@ -1846,6 +1864,16 @@ Restack so the texture overlay sits **above** the content but remains non-intera
 Add depth to the bezel frame (inner bevel, corner detail, or a screw/rivet motif consistent with `CrChrome`). Keep it token-driven so all four themes track.
 
 - [ ] **Step 4: Run the loop** (see phase header). Card: **Bezel**. Confirm content remains clickable and legible through the texture.
+
+> **Follow-up this task deliberately does NOT fix — pick it up in W9's docs sweep.**
+> `.cr-tex--glass` sets `opacity` on the *element* (`base.css:93`), so the
+> documented `<div class="cr-bezel__screen cr-tex--glass">` fades the readout
+> along with the texture. It predates this work, but moving the bezel's own
+> texture above the content raises its priority: that markup now paints **two**
+> texture layers — the element-level one under the content and the new `::after`
+> one over it — so the docs teach the exact placement this task removed. It
+> appears in `references/components.md:675,1608` and `motion.md:167`, and is
+> mirrored into the skill bundle and MCP data.
 
 - [ ] **Step 5: Commit**
 
@@ -2615,6 +2643,17 @@ The review asks: *"eyebrow is a common term for the space over the title?"* It i
 ```bash
 grep -rn "eyebrow\|kicker\|overline" packages/components/components/*.lite.tsx references/*.md
 ```
+
+- [ ] **Step 1b: Fix the `.cr-tex--glass` double-texture the docs teach**
+
+Carried over from Task 24. `.cr-tex--glass` sets `opacity` on the *element*
+(`base.css:93`), so the documented `<div class="cr-bezel__screen cr-tex--glass">`
+fades the readout along with the texture — and now also paints a second texture
+layer beneath the content, contradicting the above-content placement W6
+established. Fix the documented markup (and the utility, if the element-level
+opacity is wrong in general rather than only in this composition). Occurrences:
+`references/components.md:675,1608` and `references/motion.md:167`, plus the
+skill-bundle and MCP mirrors, which regenerate.
 
 - [ ] **Step 2: Sweep the reference docs for the changed APIs**
 
