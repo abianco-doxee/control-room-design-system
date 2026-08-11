@@ -2621,9 +2621,13 @@
       "description": "Hint bubble revealed on hover/focus; role=tooltip wired via aria-describedby, pure-CSS reveal.",
       "spec": "references/components.md#tooltip",
       "variants": {
-        "state": [
-          "hidden",
-          "shown"
+        "placement": [
+          "bottom-start",
+          "bottom-end",
+          "top-start",
+          "top-end",
+          "left",
+          "right"
         ]
       },
       "tokens": [

@@ -3452,8 +3452,17 @@ Focus is always visible (`*:focus-visible` → a `--sig-work` outline, system-wi
 
 A hint bubble revealed on hover **and** keyboard focus, wired to its trigger with
 `aria-describedby` so it's announced without stealing focus. The reveal is **pure
-CSS** (`:hover` / `:focus-within`) — no JS state, no positioning library — so it
-works in a server-rendered page with no component at all.
+CSS** (`:hover` / `:focus-within`) — no JS state — so the plain HTML markup below
+still works in a server-rendered page with no component at all; the CSS positions
+the bubble above the trigger as a fallback in that case.
+
+**Positioning.** When the component runs, collision-aware placement layers on top
+of that CSS fallback — same algorithm as **Popover**, **Menu** and **Hover card**:
+on reveal (pointer hover or keyboard focus) the bubble anchors to the trigger via
+`placement` (`${side}` or `${side}-${align}`, default `"top"` — tooltips
+conventionally sit above), **flips** to the opposite side when there's no room, and
+**shifts** along the cross axis to stay in the viewport, tagging itself with
+`data-placement`.
 
 ```html
 <span class="cr-tooltip">
@@ -3462,7 +3471,7 @@ works in a server-rendered page with no component at all.
 </span>
 ```
 ```tsx
-<CrTooltip id="tt-drift" label="latency > SLA for 3 turns">drifting</CrTooltip>
+<CrTooltip id="tt-drift" label="latency > SLA for 3 turns" placement="top">drifting</CrTooltip>
 ```
 
 - **MUST** give the trigger `tabindex="0"` (or use a natively focusable element) so

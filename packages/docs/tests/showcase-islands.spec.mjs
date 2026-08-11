@@ -635,6 +635,64 @@ test.describe("component browser — live islands", () => {
     expect(await panel.evaluate((el) => getComputedStyle(el).position)).toBe("fixed");
   });
 
+  test("tooltip is collision-positioned on both hover and keyboard focus, and flips off the top edge", async ({
+    page,
+  }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const tt = page.locator('[data-island="tooltip"]');
+    const trigger = tt.locator(".cr-tooltip__trigger");
+    const bubble = tt.locator(".cr-tooltip__bubble");
+
+    // pointer path: hovering the trigger reveals the bubble (CSS :hover) and the
+    // placer must have run before/alongside that reveal. Default placement is
+    // "top", so with room above the trigger it should stay on top.
+    await trigger.hover();
+    await expect(bubble).toBeVisible();
+    await expect(bubble).toHaveAttribute("data-placement", /^(top|bottom)-(start|end)$/);
+    expect(await bubble.evaluate((el) => getComputedStyle(el).position)).toBe("fixed");
+
+    // reset the CSS reveal (:hover/:focus-within) between paths
+    await page.mouse.move(0, 0);
+    await expect(bubble).toBeHidden();
+
+    // keyboard path: focusing the trigger reveals the bubble (CSS :focus-within)
+    // via the same placer call.
+    await trigger.focus();
+    await expect(bubble).toBeVisible();
+    await expect(bubble).toHaveAttribute("data-placement", /^(top|bottom)-(start|end)$/);
+    expect(await bubble.evaluate((el) => getComputedStyle(el).position)).toBe("fixed");
+
+    // and it doesn't clip off the viewport edges
+    const box = await bubble.boundingBox();
+    const vp = page.viewportSize();
+    expect(box.x, "left edge in view").toBeGreaterThanOrEqual(-1);
+    expect(box.x + box.width, "right edge in view").toBeLessThanOrEqual(vp.width + 1);
+    expect(box.y, "top edge in view").toBeGreaterThanOrEqual(-1);
+
+    await trigger.blur();
+    await page.mouse.move(0, 0);
+    await expect(bubble).toBeHidden();
+
+    // flip case: pin the trigger flush against the top edge so there's no room
+    // above it for the default "top" placement — the placer must flip it to
+    // "bottom" rather than clipping off-screen. The page header is itself
+    // `position: sticky; top: 0`, so it always occupies the very top of the
+    // viewport and nothing under it is really hoverable — hide it for this one
+    // assertion so the trigger's top edge can reach y≈0 and still receive a
+    // genuine (non-occluded) hover.
+    await page.evaluate(() => {
+      document.querySelector(".top").style.display = "none";
+    });
+    await trigger.evaluate((el) => window.scrollBy(0, el.getBoundingClientRect().top - 2));
+    await trigger.hover();
+    await expect(bubble).toBeVisible();
+    await expect(bubble).toHaveAttribute("data-placement", "bottom-start");
+    expect(await bubble.evaluate((el) => getComputedStyle(el).position)).toBe("fixed");
+    const flippedBox = await bubble.boundingBox();
+    expect(flippedBox.y, "flipped bubble stays within the top edge").toBeGreaterThanOrEqual(-1);
+  });
+
   test("keyboard focus shows a visible ring", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));

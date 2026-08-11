@@ -742,9 +742,18 @@ const DEMOS = {
   },
   tooltip: {
     tag: "CrTooltip",
-    defs: [T("text", "label", "Reaps sessions idle > 30m")],
+    defs: [
+      T("text", "label", "Reaps sessions idle > 30m"),
+      T("enum", "placement", "top", {
+        options: ["top", "bottom-start", "bottom-end", "top-start", "top-end", "left", "right"],
+      }),
+    ],
     render: (s) =>
-      h(CrTooltip, { label: s.label }, h("button", { className: "cr-btn cr-btn--sm" }, "Hover me")),
+      h(
+        CrTooltip,
+        { label: s.label, placement: s.placement },
+        h("button", { className: "cr-btn cr-btn--sm" }, "Hover me")
+      ),
   },
   table: {
     tag: "CrTable",

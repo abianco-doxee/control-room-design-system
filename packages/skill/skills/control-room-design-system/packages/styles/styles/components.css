@@ -997,6 +997,11 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-tooltip { position: relative; display: inline-flex; }
 .cr-tooltip__trigger { cursor: help; border-bottom: 1.5px dotted var(--muted); }
 .cr-tooltip__bubble {
+  /* CSS fallback position only — for the no-JS SSR path documented in
+   * references/components.md#tooltip (plain HTML/CSS, no component). Once the
+   * component runs, CrTooltip's place() sets an inline position: fixed via
+   * placeEl, which overrides this — this rule is not authoritative when JS is
+   * present. */
   position: absolute; bottom: calc(100% + var(--space-2)); left: 50%; transform: translateX(-50%);
   min-width: max-content; max-width: 16rem; z-index: var(--z-overlay);
   background: var(--cr-tooltip-bg); color: var(--cr-tooltip-fg); border: var(--brd) solid var(--cr-tooltip-border);
