@@ -2060,9 +2060,38 @@ git commit -m "feat(styles): accordion chrome, breach padding, resizable grip, d
 - Consumes: the W2 repaint fix (Task 9) — `CrChrome`'s props must be live for its retune to be judgeable.
 - Produces: nothing.
 
-- [ ] **Step 1: Make the drip irregular**
+- [ ] **Step 1: Make the drip irregular — in CSS, without a seed or a canvas**
 
-The review: *"the vertical bleed is too regularly spaced/sized."* Read `CrDrip.lite.tsx`. Drive the drip positions and lengths from the existing seeded RNG rather than an even distribution, so the bleed reads as organic. Keep it deterministic — same seed, same drip, which is the system's contract for seeded output.
+The review: *"the vertical bleed is too regularly spaced/sized."*
+
+> **Plan correction (found during Task 28).** An earlier draft said to "drive the
+> positions and lengths from the existing seeded RNG". **`CrDrip` has no seeded
+> RNG and no seed** — its props are `title` / `sub` / `unstyled` / `pt` / `dt`,
+> and the file contains zero occurrences of seed, RNG, canvas or `Math.random`.
+> That phrasing was carried over from `CrChrome`/`CrCat`, which do have one.
+>
+> The bleed is pure CSS (`components.css:258-267`): a `repeating-linear-gradient`
+> on a fixed 27px period, masked by a vertical fade. The "regularity" is the
+> gradient's period, not an even draw from a random source.
+>
+> Do **not** add a seed prop or a canvas painter. The rule's own comment records
+> a deliberate decision — *"repeating-linear-gradient + mask **rather than
+> canvas, so it costs nothing and needs no script**"* — and reversing it would
+> turn a zero-cost, SSR-identical component into a scripted client-only paint.
+> There is history here too: this component once shipped the **wrong glitch**
+> (liquid `sig-err` blobs instead of the vertical `--drip` scanlines Law 3
+> requires), and that comment is the correction. A canvas painter is the
+> direction that drift came from.
+
+Instead: layer several `repeating-linear-gradient`s at **co-prime periods** with
+differing bar widths, and give each layer its own mask stop so the bars terminate
+at visibly different depths — the review said "spaced **and** sized". Report the
+combined repeat length so "no visually repeating cadence at realistic widths" is
+checkable rather than asserted.
+
+Determinism is then true **by construction** (static CSS, no RNG) — a stronger
+guarantee than "same seed, same output". Do not claim a seed contract that does
+not exist.
 
 - [ ] **Step 2: Add the scanning animation to Skeleton**
 
