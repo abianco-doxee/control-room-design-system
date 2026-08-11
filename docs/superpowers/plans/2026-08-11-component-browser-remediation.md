@@ -2609,6 +2609,26 @@ avoiding. Re-measure all three symptoms afterwards, and check the change does no
 regress `--sig-work`'s other uses in light (it is the "working" machine state, so
 it appears on progress fills, spinners and status dots).
 
+**A second token with the same shape — fix it in the same pass.**
+`--cr-accordion-border` measures **1.21 / 1.21 / 1.01** against the panel on
+dark, extreme and phosphor: invisible wherever it is used as an *internal* seam,
+correct only as the outer chassis edge (where `--border` against `--board` is
+what you want). Task 27 routed around it by keying the accordion's new header
+seam to `--muted`, which leaves two pre-existing symptoms inconsistent beside it:
+
+| Symptom | Ratio (dark/extreme/phosphor) |
+| --- | --- |
+| `.cr-accordion__item + .cr-accordion__item` divider | 1.21 / 1.21 / 1.01 |
+| `.cr-resizable__handle`'s bare rule vs the pane | 1.21 / 1.21 / 1.01 |
+
+The resizable case is materially mitigated (the new grip sits on top at
+5.19–7.45), but on a tall pane the rule away from the grip still vanishes, so the
+handle reads as a floating 32px grip with no line connecting it.
+
+The likely fix is splitting the token into chassis-edge and internal-seam
+variants rather than re-keying one value — that is a design decision, which is
+why it was deferred out of the component tasks rather than guessed at.
+
 - [ ] **Step 2: Decide the canonical vocabulary**
 
 Read Law 2 in `references/design-language.md`. The canonical set is `work · wait · done · err · idle`. Two decisions to make and apply uniformly: whether any component legitimately needs a subset (e.g. a component where `idle` is meaningless), and whether `tone` and `signal` are genuinely different concepts or the same thing under two names. If they are the same, keep `signal` and remove `tone`.
