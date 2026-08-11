@@ -1957,7 +1957,7 @@
       "category": "media",
       "lifecycle": "stable",
       "origin": "control-room",
-      "description": "Seeded NERV-style decorative telemetry string (hex id, byte, latency, mini bar) for a frame corner. Decoration, not data.",
+      "description": "Seeded NERV-style decorative telemetry string (hex id, byte, channel tag, mini bar) for a frame corner. Decoration, not data — every field is unitless so it cannot be mistaken for a real measurement.",
       "spec": "references/decoration.md",
       "variants": {
         "prop": [
@@ -1987,7 +1987,7 @@
       "category": "navigation",
       "lifecycle": "stable",
       "origin": "control-room",
-      "description": "Navigation trail — ascii \"/\" separators from CSS; the last crumb is the current page (aria-current).",
+      "description": "Navigation trail — an aria-hidden \"▸\" separator between crumbs (override with `separator`); the last crumb is the current page (aria-current).",
       "spec": "references/components.md#breadcrumb",
       "variants": {
         "prop": [
@@ -3118,23 +3118,30 @@
       "category": "state",
       "lifecycle": "stable",
       "origin": "control-room",
-      "description": "Indeterminate loading indicator — role=status with an accessible label; the ring is aria-hidden and honours reduced-motion. For a known fraction, or a static capacity reading, use Progress.",
+      "description": "Indeterminate loading indicator — role=status with an accessible label; the cells are aria-hidden and honour reduced-motion. `signal` keys the cells to the canonical vocabulary. For a known fraction, or a static capacity reading, use Progress.",
       "spec": "references/components.md#spinner",
       "variants": {
         "size": [
           "sm",
           "md",
           "lg"
+        ],
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle"
         ]
       },
       "tokens": [
         {
-          "cssVar": "--sig-work",
-          "description": "ring sweep"
+          "cssVar": "--cr-spinner-accent",
+          "description": "cells (defaults to --sig-work)"
         },
         {
-          "cssVar": "--panel-2",
-          "description": "ring track"
+          "cssVar": "--sig-err",
+          "description": "cells when signal=err"
         }
       ],
       "keywords": [

@@ -99,10 +99,10 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 - [Icon](https://alebianco.github.io/control-room-design-system/components.html#c-icon): The house operational glyph set — 24×24, currentColor, single 2px stroke, square caps to match the neobrutalist geometry. Decorative by default; pass a label to name it.
 - [Seeded pixel-cat](https://alebianco.github.io/control-room-design-system/components.html#c-seeded-cat): Identity+state sprite: fur/markings from the session id, pose from state; deterministic paint() to canvas.
 - [Sigil](https://alebianco.github.io/control-room-design-system/components.html#c-sigil): Seeded cyber-sigil — a retro-futuristic pixel glyph generated from a seed; optional state keys the hue.
-- [Telemetry](https://alebianco.github.io/control-room-design-system/components.html#c-telemetry): Seeded NERV-style decorative telemetry string (hex id, byte, latency, mini bar) for a frame corner. Decoration, not data.
+- [Telemetry](https://alebianco.github.io/control-room-design-system/components.html#c-telemetry): Seeded NERV-style decorative telemetry string (hex id, byte, channel tag, mini bar) for a frame corner. Decoration, not data — every field is unitless so it cannot be mistaken for a real measurement.
 
 ### Navigation
-- [Breadcrumb](https://alebianco.github.io/control-room-design-system/components.html#c-breadcrumb): Navigation trail — ascii "/" separators from CSS; the last crumb is the current page (aria-current).
+- [Breadcrumb](https://alebianco.github.io/control-room-design-system/components.html#c-breadcrumb): Navigation trail — an aria-hidden "▸" separator between crumbs (override with `separator`); the last crumb is the current page (aria-current).
 - [Overflow](https://alebianco.github.io/control-room-design-system/components.html#c-overflow): An a11y-correct "+N more" disclosure for truncated lists; a button (aria-expanded) with onToggle, or an inert count. The accessible name always includes the noun.
 - [Pagination](https://alebianco.github.io/control-room-design-system/components.html#c-pagination): Controlled pager — prev/next plus a windowed run of page numbers with ellipses; current page keyed and aria-current.
 - [Rail + Nav](https://alebianco.github.io/control-room-design-system/components.html#c-rail): Primary navigation — persistent left chassis; active item keyed to accent, count badge to its state.
@@ -137,7 +137,7 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 - [SessionRow](https://alebianco.github.io/control-room-design-system/components.html#c-session-row): One row of a live list — the densest unit; calm at rest, one-shot glitch on a real state change.
 - [Shape](https://alebianco.github.io/control-room-design-system/components.html#c-shape): Severity glyph — polygon side-count encodes danger/focus (fewer sides = more urgent); a shape channel beside colour (Law 4).
 - [Skeleton](https://alebianco.github.io/control-room-design-system/components.html#c-skeleton): Loading placeholder — a blocky pulse (never rounded). Sizes: --line, --text, --block; give it a width inline.
-- [Spinner](https://alebianco.github.io/control-room-design-system/components.html#c-spinner): Indeterminate loading indicator — role=status with an accessible label; the ring is aria-hidden and honours reduced-motion. For a known fraction, or a static capacity reading, use Progress.
+- [Spinner](https://alebianco.github.io/control-room-design-system/components.html#c-spinner): Indeterminate loading indicator — role=status with an accessible label; the cells are aria-hidden and honour reduced-motion. `signal` keys the cells to the canonical vocabulary. For a known fraction, or a static capacity reading, use Progress.
 - [StatusDot](https://alebianco.github.io/control-room-design-system/components.html#c-status-dot): The smallest state readout — a square keyed to the signal ramp, with an aria-label naming the state.
 - [Tag](https://alebianco.github.io/control-room-design-system/components.html#c-tag): Inline status label inside dense content; variants map to the signal ramp.
 - [Timeline](https://alebianco.github.io/control-room-design-system/components.html#c-timeline): Vertical event timeline — an ordered list of moments on a rail, each with a signal-coloured node, machine time, title and optional detail. Presentational; node colour is the semantic signal.
@@ -3341,15 +3341,22 @@ height. Controlled via `open` (like Modal).
 
 ## Breadcrumb {#breadcrumb}
 
-**Purpose.** A navigation trail. Separators are ascii `/` drawn from CSS; the last
-crumb is the current page (`aria-current="page"`).
+**Purpose.** A navigation trail. The last crumb is the current page
+(`aria-current="page"`).
+
+**Notes** — the separator is a real `aria-hidden` element between crumbs,
+defaulting to `▸` (the system's direction marker, shared with List bullets and the
+Calendar / Carousel next controls). Override it with `separator`.
 
 ```tsx
 <CrBreadcrumb items={[{ label: "control room", href: "#" }, { label: "sessions", href: "#" }, { label: "cr-1130" }]} />
+<CrBreadcrumb separator="//" items={[{ label: "hub", href: "#" }, { label: "worker-01" }]} />
 ```
 
 - **MUST** wrap it in `<nav aria-label>` and mark the last crumb `aria-current` (it
   is not a link).
+- **MUST** keep the separator `aria-hidden` — otherwise a screen reader announces
+  it between every crumb.
 
 ---
 
@@ -3853,13 +3860,18 @@ fraction, or a static capacity reading, use **Progress** with a `label`.
 
 **Notes** — the wrapper is `role="status"` with an accessible `label` (default
 "Loading") so assistive tech announces the wait; the ring is `aria-hidden` and its
-spin honours `prefers-reduced-motion`. `size` is `sm` · `md` · `lg`.
+spin honours `prefers-reduced-motion`. `size` is `sm` · `md` · `lg`. `signal` keys
+the cells to the canonical vocabulary — `work` · `wait` · `done` · `err` · `idle`,
+the same tone set as **Progress** — and defaults to `work`. Tone is a redundant
+cue: the accessible name carries the meaning.
 
 ```tsx
 <CrSpinner label="Provisioning session" />
+<CrSpinner label="Retrying upload" signal="err" />
 ```
 
-**Tokens** — `--sig-work` (ring sweep), `--panel-2` (ring track).
+**Tokens** — `--cr-spinner-accent` (cells, defaults to `--sig-work`),
+`--sig-work`/`--sig-wait`/`--sig-done`/`--sig-err`/`--sig-idle` (per `signal`).
 
 ## Scroll area {#scroll-area}
 
@@ -5075,7 +5087,9 @@ modifier fades it off the content edge (`-l` toward left-aligned text, `-r`,
   surface (structure, not signal; `--cr-trim-c` re-colours).
 - `.cr-ruler` — a fine FUI tick-ruler edge (short ticks every 8px, tall every 40).
 - `CrTelemetry` / `.cr-telemetry` — a seeded NERV-style string
-  (`SEED 2E7A · 0x4F · 12ms ▮▮▮▯▯`) for a frame corner. **Decoration, not data.**
+  (`SEED 2E7A · 0x4F · CH12 ▮▮▮▯▯`) for a frame corner. **Decoration, not data.**
+  Every field is unitless on purpose: a `ms`-suffixed number would read as a real
+  latency measurement, which is exactly what this component must not be taken for.
 
 ```tsx
 import { CrTelemetry } from "@alebianco/cr-design-system/react";

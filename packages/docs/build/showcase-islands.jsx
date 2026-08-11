@@ -1238,10 +1238,11 @@ const DEMOS = {
   },
   breadcrumb: {
     tag: "CrBreadcrumb",
-    defs: [T("text", "label", "Breadcrumb")],
+    defs: [T("text", "label", "Breadcrumb"), T("text", "separator", "▸")],
     render: (s) =>
       h(CrBreadcrumb, {
         label: s.label,
+        separator: s.separator,
         items: [{ label: "Hub", href: "#" }, { label: "Fleet", href: "#" }, { label: "worker-01" }],
       }),
   },
@@ -1393,8 +1394,9 @@ const DEMOS = {
     defs: [
       T("text", "label", "Provisioning"),
       T("enum", "size", "md", { options: ["sm", "md", "lg"] }),
+      T("enum", "signal", "work", { options: ["work", "wait", "done", "err", "idle"] }),
     ],
-    render: (s) => h(CrSpinner, { label: s.label, size: s.size }),
+    render: (s) => h(CrSpinner, { label: s.label, size: s.size, signal: s.signal }),
   },
   "scroll-area": {
     tag: "CrScrollArea",

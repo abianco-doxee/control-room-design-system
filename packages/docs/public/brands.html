@@ -1390,10 +1390,12 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 /* .cr-drawer__close — see the shared "Dismiss control" rule in the base layer. */
 .cr-drawer__body { flex: 1; overflow: auto; padding: var(--space-4); }
 
-/* ── Breadcrumb (ascii "/" separators) ──────────────────────────────────── */
+/* ── Breadcrumb (aria-hidden "▸" separators) ────────────────────────────── */
 .cr-breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font-family: var(--font-mono); font-size: var(--text-xs); margin: 0; padding: 0; list-style: none; }
 .cr-breadcrumb__item { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--cr-breadcrumb-fg); }
-.cr-breadcrumb__item + .cr-breadcrumb__item::before { content: "/"; color: color-mix(in srgb, var(--cr-breadcrumb-fg) 55%, transparent); }
+/* The separator is a real aria-hidden element (so `separator` can override the
+ * glyph), not a ::before — hence a class rule rather than generated content. */
+.cr-breadcrumb__separator { color: color-mix(in srgb, var(--cr-breadcrumb-fg) 55%, transparent); }
 .cr-breadcrumb__link { color: var(--cr-breadcrumb-fg); text-decoration: none; }
 .cr-breadcrumb__link:hover { color: var(--cr-breadcrumb-current-fg); text-decoration: underline; }
 .cr-breadcrumb__item[aria-current="page"] { color: var(--cr-breadcrumb-current-fg); font-weight: 700; }
@@ -2180,6 +2182,16 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-spinner__ring:nth-child(4) { opacity: 0.22; animation-delay: calc(var(--dur-ambient) / -10 * 3); }
 .cr-spinner--sm { --cr-spinner-cell: 4px; --cr-spinner-gap: 2px; }
 .cr-spinner--lg { --cr-spinner-cell: 9px; --cr-spinner-gap: 4px; }
+/* Signal keying — same canonical vocabulary and same tone set as Progress
+ * (work · wait · done · err · idle). The cells are a redundant cue on top of the
+ * role=status accessible name, so tone carries no meaning on its own. Overriding
+ * --cr-spinner-accent (rather than `color`) keeps the single styling-contract
+ * hook authoritative for consumers who retint the spinner. */
+.cr-spinner--work { --cr-spinner-accent: var(--sig-work); }
+.cr-spinner--wait { --cr-spinner-accent: var(--sig-wait); }
+.cr-spinner--done { --cr-spinner-accent: var(--sig-done); }
+.cr-spinner--err  { --cr-spinner-accent: var(--sig-err); }
+.cr-spinner--idle { --cr-spinner-accent: var(--sig-idle); }
 @keyframes cr-spinner-track {
   0%, 100% { transform: translate(0, 0); }
   25% { transform: translate(calc(var(--cr-spinner-cell) * 2 + var(--cr-spinner-gap) * 2), 0); }

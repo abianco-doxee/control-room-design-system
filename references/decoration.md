@@ -54,7 +54,9 @@ modifier fades it off the content edge (`-l` toward left-aligned text, `-r`,
   surface (structure, not signal; `--cr-trim-c` re-colours).
 - `.cr-ruler` — a fine FUI tick-ruler edge (short ticks every 8px, tall every 40).
 - `CrTelemetry` / `.cr-telemetry` — a seeded NERV-style string
-  (`SEED 2E7A · 0x4F · 12ms ▮▮▮▯▯`) for a frame corner. **Decoration, not data.**
+  (`SEED 2E7A · 0x4F · CH12 ▮▮▮▯▯`) for a frame corner. **Decoration, not data.**
+  Every field is unitless on purpose: a `ms`-suffixed number would read as a real
+  latency measurement, which is exactly what this component must not be taken for.
 
 ```tsx
 import { CrTelemetry } from "@alebianco/cr-design-system/react";

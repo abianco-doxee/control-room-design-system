@@ -1431,15 +1431,22 @@ height. Controlled via `open` (like Modal).
 
 ## Breadcrumb {#breadcrumb}
 
-**Purpose.** A navigation trail. Separators are ascii `/` drawn from CSS; the last
-crumb is the current page (`aria-current="page"`).
+**Purpose.** A navigation trail. The last crumb is the current page
+(`aria-current="page"`).
+
+**Notes** — the separator is a real `aria-hidden` element between crumbs,
+defaulting to `▸` (the system's direction marker, shared with List bullets and the
+Calendar / Carousel next controls). Override it with `separator`.
 
 ```tsx
 <CrBreadcrumb items={[{ label: "control room", href: "#" }, { label: "sessions", href: "#" }, { label: "cr-1130" }]} />
+<CrBreadcrumb separator="//" items={[{ label: "hub", href: "#" }, { label: "worker-01" }]} />
 ```
 
 - **MUST** wrap it in `<nav aria-label>` and mark the last crumb `aria-current` (it
   is not a link).
+- **MUST** keep the separator `aria-hidden` — otherwise a screen reader announces
+  it between every crumb.
 
 ---
 
@@ -1943,13 +1950,18 @@ fraction, or a static capacity reading, use **Progress** with a `label`.
 
 **Notes** — the wrapper is `role="status"` with an accessible `label` (default
 "Loading") so assistive tech announces the wait; the ring is `aria-hidden` and its
-spin honours `prefers-reduced-motion`. `size` is `sm` · `md` · `lg`.
+spin honours `prefers-reduced-motion`. `size` is `sm` · `md` · `lg`. `signal` keys
+the cells to the canonical vocabulary — `work` · `wait` · `done` · `err` · `idle`,
+the same tone set as **Progress** — and defaults to `work`. Tone is a redundant
+cue: the accessible name carries the meaning.
 
 ```tsx
 <CrSpinner label="Provisioning session" />
+<CrSpinner label="Retrying upload" signal="err" />
 ```
 
-**Tokens** — `--sig-work` (ring sweep), `--panel-2` (ring track).
+**Tokens** — `--cr-spinner-accent` (cells, defaults to `--sig-work`),
+`--sig-work`/`--sig-wait`/`--sig-done`/`--sig-err`/`--sig-idle` (per `signal`).
 
 ## Scroll area {#scroll-area}
 
