@@ -1838,10 +1838,24 @@ switch. Contrast regressions in a single theme are the usual failure here.
 > numerically, and put the numbers in the report.
 >
 > **2. `packages/docs/public/brands.html` is a tracked generated file that
-> inlines `components.css`** — and there is **no `verify:brand-preview` step**,
-> so `pnpm run verify` passing is *not* evidence it is current. Any task that
-> edits `components.css` must run `pnpm run build:brand-preview` and commit the
-> result, or the 13-theme brand preview silently keeps rendering the old CSS.
+> inlines `components.css`.** A `verify:brand-preview` gate now exists (added in
+> Task 24, and proven to fail on a stale page), so run
+> `pnpm run build:brand-preview` after any `components.css` edit and commit the
+> result.
+>
+> **3. `currentColor` on a form control does NOT resolve to the theme's ink**
+> (found in Task 26). Form controls do not inherit `color` from their parent, so
+> a rule like `border: … solid currentColor` on a bare `<input type="checkbox">`
+> resolves against the **UA `color-scheme` default** — pure white or pure black —
+> not `--ink`. It can look right by coincidence while tracking nothing. Whenever
+> you use `currentColor` on an input, set `color: inherit` (or a token) on the
+> same rule. Note `.cr-check` gets this for free because it sets
+> `color: var(--ink)` on the element itself; a bare input does not.
+>
+> **4. Verify which element you measured.** Task 26's report transposed the grid's
+> head select-all box with its body-row box and mislabelled a text colour as a box
+> colour. All the figures cleared 3:1 so nothing shipped badly, but the numbers are
+> the evidence base for later tasks — label them by the exact selector measured.
 
 ### Task 24: Bezel/Screen — texture above the content, richer chrome
 
