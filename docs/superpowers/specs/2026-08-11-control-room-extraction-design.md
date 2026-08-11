@@ -114,25 +114,72 @@ known-good baseline every later step is measured against.
 
 Exit criterion: the app runs and the suite passes with **zero design-system code involved.**
 
-### Prerequisite — fix the Qwik export upstream
+### Prerequisite — fix the Qwik export upstream (DONE — `91ae1d4`)
 
-Before Phase 2, in `control-room-design-system`: repoint `./qwik` in
-`packages/components/package.json` at `dist/frameworks/qwik` raw source, matching
-the Vue/Angular/Solid pattern. Verify with the Phase 0 spike test. Own commit,
-own repo.
+Shipped in `control-room-design-system`:
+
+- `./qwik` now resolves to `dist/frameworks/qwik` raw source, matching Vue/Angular/Solid.
+- Qwik was also **absent from `TARGETS` in `build-pkg-types.mjs`** — the root cause.
+  It was the only framework never emitting an `index.d.ts`, which is why `types`
+  had nothing to point at and the broken `dist/pkg` path stood. Added; 80 components typed.
+- `tests/pkg-qwik.test.mjs` extended to pin what `./qwik` resolves to. The old gate
+  couldn't catch this: it asserted on `dist/pkg` and reasoned SSR was untestable
+  because of `@qwik-client-manifest`. `createDOM()` renders fine without it.
+  Verified the new test fails on the old export.
+- `pnpm run build`, `verify:types`, and `verify:pkg-types` all pass.
+
+Verified end-to-end: `@alebianco/cr-components/qwik` renders via a `link:`ed
+sibling checkout.
 
 ## Phase 2 — port
 
-### Step 2.0 — reconcile tokens first
+### Step 2.0 — reconcile tokens first (MEASURED — needs a decision)
 
-The app has its own `src/styles/tokens.css` (224 lines) defining `--ground`,
-`--panel`, `--sig-*`; `cr-tokens` defines its own set. If names overlap but values
-or semantics diverge, swapping stylesheets shifts colours app-wide. The app also
-has `tests/ui/tokenContract.test.ts` and `tests/styles/theme-bridge.test.ts` that
-likely encode the local contract.
+The diff is done, and it is **larger than a rename**. App: 129 tokens. Design
+system: 277. Only **30 names are shared, and 16 of those 30 carry different values.**
 
-Diff both token sets, reconcile, get theme tests green. **Nothing else proceeds
-until tokens are one layer** — every component swap depends on it.
+The whole ground/signal ramp moved:
+
+| Token | App | Design system |
+|---|---|---|
+| `--ground` | `#0a0a12` | `#0f0327` |
+| `--panel` | `#14141f` | `#1d133a` |
+| `--sig-work` | `#22d3ee` | `#00d3fb` |
+| `--sig-done` | `#5eead4` | `#00deaa` |
+| `--sig-wait` | `#fde047` | `#f9ad00` |
+| `--sig-err` | `#ff3b6b` | `#f45058` |
+
+The near-neutral blue-black chassis became a purple cast, and every signal colour
+shifted. **Adopting `cr-tokens` is therefore a deliberate visual restyle, not a
+lossless swap.**
+
+The 99 app tokens with no same-name counterpart split cleanly:
+
+- **31 typography — mechanically renameable.** The app's four parallel families
+  (`--type-body` / `--leading-body` / `--tracking-body` / `--weight-body`) became one
+  namespaced family (`--type-body-size` / `-leading` / `-tracking` / `-weight`).
+- **68 domain/semantic — genuinely absent.** Consumed from `src/styles/global.css`,
+  so this is a styling-layer concern, not just TSX:
+  - per-signal foregrounds (`--on-sig-work` …) — the DS has only a single `--on-sig`
+  - the 8-section wayfinding ramp (`--acc-*`, `--on-acc-*`, `--section-accent-*`)
+  - symbology ramps for issues, jobs, notes, ref-cards, status-dots
+
+**An accessibility caveat, not just an aesthetic one.** The app defines per-signal
+foregrounds deliberately — its own `tokens.css` states that one `--on-sig` cannot
+clear AA across the whole ramp, and documents `--sig-idle` at 4.14:1 needing `--ink`
+rather than the dark pole. Collapsing to the DS's single `--on-sig` risks silent
+contrast regressions on exactly the state indicators this dashboard exists to convey.
+
+**Two decisions required before this step can be planned:**
+
+1. **Palette:** accept the design system's colours (restyle, and the honest reading
+   of "use the design system"), or author a brand file so `cr-tokens` reproduces the
+   app's current palette (`packages/tokens/brands/*.json` supports this without forking)?
+2. **The 68:** upstream them into `cr-tokens` — the wayfinding and per-signal-foreground
+   ramps look genuinely general — or keep them app-local as a thin layer over the package?
+
+Until both are answered, **nothing else proceeds** — every component swap inherits
+whatever this decides.
 
 ### Step 2.1..N — one primitive per commit
 
