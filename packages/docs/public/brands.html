@@ -1129,20 +1129,50 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 @media (prefers-reduced-motion: reduce) { .cr-skeleton { animation: none; } }
 
 /* ── Data / description list (key → value readout) ──────────────────────── */
-.cr-dl { display: grid; grid-template-columns: max-content 1fr; gap: var(--space-1) var(--space-4); margin: 0; }
+/* Key and value sit at different sizes (--text-xs label vs --text-sm datum), so the
+ * grid must align them on the SHARED TEXT BASELINE — the default `stretch` lets each
+ * cell top-align its own line box and the readout reads visibly stepped. */
+.cr-dl { display: grid; grid-template-columns: max-content 1fr; align-items: baseline; gap: var(--space-1) var(--space-4); margin: 0; }
 .cr-dl__k { font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
 .cr-dl__v { margin: 0; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); }
 
 /* ── Accordion (collapsible sections) ───────────────────────────────────── */
 .cr-accordion { border: var(--brd) solid var(--cr-accordion-border); background: var(--cr-accordion-bg); }
 .cr-accordion__item + .cr-accordion__item { border-top: var(--brd) solid var(--cr-accordion-border); }
+/* Header chrome. The header carried none — flat text on the panel, with expansion
+ * state announced only by the chevron. Two additions, both structural, no decoration:
+ *
+ * 1. A --panel-2 ground plus a seam under an OPEN header, separating the control from
+ *    the body it reveals (the house head-vs-body pattern — .cr-modal__head and
+ *    .cr-drawer__head do the same). The tone step alone would be a no-op: --panel-2
+ *    against --panel measures only 1.07–1.13:1 across the four themes. The SEAM is
+ *    what draws the boundary, and it is keyed to --muted rather than the house
+ *    --cr-accordion-border: that token resolves to --border, which is pure/near
+ *    black on dark, extreme AND phosphor, i.e. 1.21:1 / 1.21:1 / 1.01:1 against the
+ *    panel — an invisible rule on three of the four themes. --muted brackets between
+ *    surface and ink in all four by construction (4.65 / 6.55 / 6.58 / 5.73 against
+ *    --panel-2). Still a hard edge, not a graded step (Law 1).
+ * 2. An inline-start bar carrying expansion as a STATE channel (Law 2), not
+ *    decoration: --muted while collapsed, flooding to --cr-accordion-accent when open.
+ *    It duplicates a reading the chevron already carries geometrically, so the state
+ *    survives with colour removed. */
 .cr-accordion__header {
   width: 100%; display: flex; align-items: center; gap: var(--space-2); justify-content: space-between;
-  background: transparent; border: 0; cursor: pointer; padding: var(--space-3) var(--space-4);
+  background: var(--panel-2); border: 0; cursor: pointer;
+  padding: var(--space-3) var(--space-4);
+  border-inline-start: var(--brd-heavy) solid var(--muted);
+  /* reserved so toggling the seam on/off never changes the header's height */
+  border-bottom: var(--brd) solid transparent;
   font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 700; color: var(--ink);
   text-transform: uppercase; letter-spacing: 0.04em; text-align: start;
+  transition: border-inline-start-color var(--dur-press), background var(--dur-press);
 }
-.cr-accordion__header:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
+.cr-accordion__header:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), var(--panel-2)); }
+.cr-accordion__header[aria-expanded="true"] {
+  border-inline-start-color: var(--cr-accordion-accent);
+  border-bottom-color: var(--muted);
+}
+@media (prefers-reduced-motion: reduce) { .cr-accordion__header { transition: none; } }
 .cr-accordion__chevron {
   display: inline-block; width: 0; height: 0; flex-shrink: 0;
   border-inline-start: 7px solid var(--muted); border-top: 5px solid transparent; border-bottom: 5px solid transparent;
@@ -1644,6 +1674,10 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
   --cr-breach-2: var(--sig-accent-2);     /* the paired hue (acid) — the neon pairing */
   --cr-breach-fill: var(--panel);         /* interior; --wash swaps this for a tint */
   position: relative;
+  /* Interior margin. The rim is a 3px gradient border and the corner is a squircle,
+   * so content set flush to the edge collides with both. The padding keeps the
+   * children clear of the rim on every side. */
+  padding: var(--space-4);
   border-radius: var(--breach-radius);
   /* the corner is a SQUIRCLE (superellipse), not a plain arc — the one place the
    * system softens (the Law-9 breach). corner-shape keeps the glow + rim following
@@ -2060,12 +2094,58 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-resizable { position: relative; display: grid; grid-template-columns: 50% 1fr; width: 100%; border: var(--brd) solid var(--border); overflow: hidden; }
 .cr-resizable--vertical { grid-template-columns: none; grid-template-rows: 50% 1fr; }
 .cr-resizable > * { min-width: 0; min-height: 0; overflow: auto; }
-.cr-resizable__handle { position: absolute; z-index: 2; background: var(--border); touch-action: none; }
-.cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle { top: 0; bottom: 0; width: var(--brd-heavy); transform: translateX(-50%); cursor: col-resize; }
-.cr-resizable--vertical .cr-resizable__handle { left: 0; right: 0; height: var(--brd-heavy); transform: translateY(-50%); cursor: row-resize; }
-.cr-resizable__handle::before { content: ""; position: absolute; inset: -5px; } /* generous hit area */
-.cr-resizable__handle:hover, .cr-resizable[data-dragging="true"] .cr-resizable__handle { background: var(--sig-work); }
-.cr-resizable__handle:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+/* The handle BOX is the pointer target and is deliberately wider than the line it
+ * draws: the box is --space-3 (12px) across, and ::before paints the --brd-heavy
+ * rule centred inside it. The box must carry the target itself — the old approach
+ * (a 3px box + an `inset: -5px` ::before) silently had NO extended hit area at all,
+ * because .cr-resizable sets `overflow: hidden`, which clips any pseudo-element
+ * reaching outside the box. Verified by hit-test: 12px wide, ≥8px as required. */
+.cr-resizable__handle { position: absolute; z-index: 2; background: transparent; touch-action: none; }
+.cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle { top: 0; bottom: 0; width: var(--space-3); transform: translateX(-50%); cursor: col-resize; }
+.cr-resizable--vertical .cr-resizable__handle { left: 0; right: 0; height: var(--space-3); transform: translateY(-50%); cursor: row-resize; }
+/* the visible rule, centred in the target box */
+.cr-resizable__handle::before { content: ""; position: absolute; background: var(--border); }
+.cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle::before {
+  top: 0; bottom: 0; left: 50%; width: var(--brd-heavy); transform: translateX(-50%);
+}
+.cr-resizable--vertical .cr-resizable__handle::before {
+  left: 0; right: 0; top: 50%; height: var(--brd-heavy); transform: translateY(-50%);
+}
+/* The GRIP. Without it the handle is a --brd-heavy line in --border — visually
+ * identical to the container's own frame, so it reads as a grid rule, not a control.
+ * ::after is a knurled plate straddling the split: a short block of evenly spaced
+ * hard-stop bars (repeating-linear-gradient with no soft stop — a stripe, NOT a
+ * graded fill, so Law 1's two-tone rule holds). Hardware texture on a piece of
+ * hardware (Law 6), square-cornered.
+ *
+ * The bars are keyed to --muted, NOT to the handle's own --border: --border is
+ * pure/near black on dark, extreme AND phosphor, so a plate inheriting it sits at
+ * 1.21:1 / 1.21:1 / 1.01:1 against the --panel pane behind — an invisible grip in
+ * exactly the themes that need it most. --muted brackets between surface and ink in
+ * all four themes by construction (5.19 / 7.02 / 7.45 / 6.26 against --panel), so
+ * the grip reads everywhere. It goes to --sig-work with the handle on hover/drag. */
+.cr-resizable__handle::after {
+  content: ""; position: absolute; pointer-events: none;
+  --cr-resizable-grip: var(--muted);
+}
+.cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle::after {
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: var(--space-2); height: var(--space-8);
+  background-image: repeating-linear-gradient(
+    to bottom, var(--cr-resizable-grip) 0 3px, transparent 3px 6px);
+}
+.cr-resizable--vertical .cr-resizable__handle::after {
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: var(--space-8); height: var(--space-2);
+  background-image: repeating-linear-gradient(
+    to right, var(--cr-resizable-grip) 0 3px, transparent 3px 6px);
+}
+.cr-resizable__handle:hover::after,
+.cr-resizable[data-dragging="true"] .cr-resizable__handle::after { --cr-resizable-grip: var(--sig-work); }
+/* the rule (::before), not the transparent target box, carries the active state */
+.cr-resizable__handle:hover::before,
+.cr-resizable[data-dragging="true"] .cr-resizable__handle::before { background: var(--sig-work); }
+.cr-resizable__handle:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -2px; }
 
 /* ── ToggleChip (interactive multi-select filter pill; role=checkbox) ─────── */
 .cr-togglechip {

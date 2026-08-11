@@ -4,10 +4,56 @@
 .cr-resizable { position: relative; display: grid; grid-template-columns: 50% 1fr; width: 100%; border: var(--brd) solid var(--border); overflow: hidden; }
 .cr-resizable--vertical { grid-template-columns: none; grid-template-rows: 50% 1fr; }
 .cr-resizable > * { min-width: 0; min-height: 0; overflow: auto; }
-.cr-resizable__handle { position: absolute; z-index: 2; background: var(--border); touch-action: none; }
-.cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle { top: 0; bottom: 0; width: var(--brd-heavy); transform: translateX(-50%); cursor: col-resize; }
-.cr-resizable--vertical .cr-resizable__handle { left: 0; right: 0; height: var(--brd-heavy); transform: translateY(-50%); cursor: row-resize; }
-.cr-resizable__handle::before { content: ""; position: absolute; inset: -5px; } /* generous hit area */
-.cr-resizable__handle:hover, .cr-resizable[data-dragging="true"] .cr-resizable__handle { background: var(--sig-work); }
-.cr-resizable__handle:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+/* The handle BOX is the pointer target and is deliberately wider than the line it
+ * draws: the box is --space-3 (12px) across, and ::before paints the --brd-heavy
+ * rule centred inside it. The box must carry the target itself — the old approach
+ * (a 3px box + an `inset: -5px` ::before) silently had NO extended hit area at all,
+ * because .cr-resizable sets `overflow: hidden`, which clips any pseudo-element
+ * reaching outside the box. Verified by hit-test: 12px wide, ≥8px as required. */
+.cr-resizable__handle { position: absolute; z-index: 2; background: transparent; touch-action: none; }
+.cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle { top: 0; bottom: 0; width: var(--space-3); transform: translateX(-50%); cursor: col-resize; }
+.cr-resizable--vertical .cr-resizable__handle { left: 0; right: 0; height: var(--space-3); transform: translateY(-50%); cursor: row-resize; }
+/* the visible rule, centred in the target box */
+.cr-resizable__handle::before { content: ""; position: absolute; background: var(--border); }
+.cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle::before {
+  top: 0; bottom: 0; left: 50%; width: var(--brd-heavy); transform: translateX(-50%);
+}
+.cr-resizable--vertical .cr-resizable__handle::before {
+  left: 0; right: 0; top: 50%; height: var(--brd-heavy); transform: translateY(-50%);
+}
+/* The GRIP. Without it the handle is a --brd-heavy line in --border — visually
+ * identical to the container's own frame, so it reads as a grid rule, not a control.
+ * ::after is a knurled plate straddling the split: a short block of evenly spaced
+ * hard-stop bars (repeating-linear-gradient with no soft stop — a stripe, NOT a
+ * graded fill, so Law 1's two-tone rule holds). Hardware texture on a piece of
+ * hardware (Law 6), square-cornered.
+ *
+ * The bars are keyed to --muted, NOT to the handle's own --border: --border is
+ * pure/near black on dark, extreme AND phosphor, so a plate inheriting it sits at
+ * 1.21:1 / 1.21:1 / 1.01:1 against the --panel pane behind — an invisible grip in
+ * exactly the themes that need it most. --muted brackets between surface and ink in
+ * all four themes by construction (5.19 / 7.02 / 7.45 / 6.26 against --panel), so
+ * the grip reads everywhere. It goes to --sig-work with the handle on hover/drag. */
+.cr-resizable__handle::after {
+  content: ""; position: absolute; pointer-events: none;
+  --cr-resizable-grip: var(--muted);
+}
+.cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle::after {
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: var(--space-2); height: var(--space-8);
+  background-image: repeating-linear-gradient(
+    to bottom, var(--cr-resizable-grip) 0 3px, transparent 3px 6px);
+}
+.cr-resizable--vertical .cr-resizable__handle::after {
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: var(--space-8); height: var(--space-2);
+  background-image: repeating-linear-gradient(
+    to right, var(--cr-resizable-grip) 0 3px, transparent 3px 6px);
+}
+.cr-resizable__handle:hover::after,
+.cr-resizable[data-dragging="true"] .cr-resizable__handle::after { --cr-resizable-grip: var(--sig-work); }
+/* the rule (::before), not the transparent target box, carries the active state */
+.cr-resizable__handle:hover::before,
+.cr-resizable[data-dragging="true"] .cr-resizable__handle::before { background: var(--sig-work); }
+.cr-resizable__handle:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -2px; }
 
