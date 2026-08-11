@@ -24,15 +24,31 @@ helper: `computePosition` (pure math), `place` (DOM), and `autoPlace`
 
 No overlay component imports it. Instead:
 
-- `CrPopover` has the algorithm **copy-pasted inline** (`CrPopover.lite.tsx:56-58`
-  comments "Same algorithm as @alebianco/cr-utils/position"), computed **statically
-  on open** — which is the cause of the reported open-flicker.
-- `CrPopover`, `CrMenu`, `CrHoverCard` expose only `align?: "left" | "right"` —
-  a single cross-axis with two values, no main axis, no `auto`, no viewport awareness.
+- `CrPopover` has a **reduced** copy of the algorithm inline
+  (`CrPopover.lite.tsx:54-81`): it flips only vertically, aligns only
+  horizontally, and hardcodes `bottom` as the preferred side.
+- `CrMenu` and `CrHoverCard` have **no placement JS whatsoever** — `align` is a
+  pure CSS modifier class (`.cr-menu__panel--right`). Nothing measures anything,
+  so collision detection is impossible for them today.
 - `CrTooltip` has no placement prop at all.
+- All three expose only `align?: "left" | "right"` — one cross-axis, two values,
+  no main axis, no `auto`, no viewport awareness.
 
-The four "position should be determined automatically" review items are therefore
-**adoption of existing code plus deletion of a duplicate**, not new construction.
+**Constraint discovered:** `.lite.tsx` components import **only** from
+`../lib/` (currently just `pt.ts`) — never from `@alebianco/cr-utils`, because a
+cross-package import would not resolve across all six Mitosis targets.
+`CrPopover`'s comment says exactly this. The repo's established answer is the
+"ported utility" pattern: logic is duplicated between `cr-utils` (for consumers)
+and component-side code, with a shared test pinning the behaviour
+(`tests/utils-ports.test.mjs`, `tests/position.test.mjs`).
+
+So W3 is **not** a simple import swap. It is: port the full `computePosition`
+into `packages/components/lib/`, have all four overlays consume it from there,
+and pin it against the existing `cr-utils` tests so the two copies cannot drift.
+
+**The open-flicker cause is now identified**: `focusPanel` retries on a 16ms
+`setTimeout` until the panel exists, *then* calls `place()`. The panel therefore
+renders unpositioned for at least one frame and visibly jumps.
 
 ### F2 — The diagonal primitives have zero component usage
 
