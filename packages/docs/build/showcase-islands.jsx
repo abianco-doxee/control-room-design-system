@@ -1192,15 +1192,23 @@ const DEMOS = {
     defs: [
       T("text", "label", "Filter"),
       T("text", "placeholder", "search sessions…"),
+      T("text", "value", "nova-01"),
+      T("text", "icon", "search"),
+      T("boolean", "clearable", true),
       T("boolean", "disabled", false),
       T("boolean", "invalid", false),
     ],
-    render: (s) =>
+    render: (s, set) =>
       h(CrInput, {
         label: s.label,
         placeholder: s.placeholder,
+        value: s.value,
+        icon: s.icon,
+        clearable: s.clearable,
         disabled: s.disabled,
         invalid: s.invalid,
+        onChange: (v) => set("value", v),
+        onClear: () => set("value", ""),
       }),
   },
   textarea: {

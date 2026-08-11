@@ -2683,6 +2683,32 @@ with a non-color `✗` marker as well as the `--sig-err` border (never color alo
 ```
 
 **Input / textarea / select** — `.cr-input`, `.cr-textarea`, `.cr-select`.
+
+`CrInput` takes two optional in-field affordances. `icon="search"` paints a glyph
+on the leading edge; `clearable` adds a real `<button type="button"
+aria-label="Clear">` on the trailing edge, shown only while the field has a
+value, firing `onClear` (and clearing through `onChange`). Either one wraps the
+input in `.cr-input-wrap` and pads that edge; with neither, the component still
+renders a bare `<input>`. Both edges use logical properties, so they mirror
+under RTL.
+
+```html
+<span class="cr-input-wrap">
+  <span class="cr-input__icon" aria-hidden="true"><!-- 16px icon --></span>
+  <input class="cr-input" data-icon="true" data-clearable="true" value="nova" />
+  <button type="button" class="cr-input__clear" aria-label="Clear"></button>
+</span>
+```
+
+`.cr-textarea` resizes on both axes and is capped at `max-width: 100%` so the
+drag handle cannot pull it outside its container.
+
+A native `<select>`'s open option list is drawn by the OS, not the page, so it
+takes none of our border, shadow, font, or padding. We set `option`
+background/colour — honoured by Chromium and Firefox on Windows/Linux, ignored
+on macOS and iOS. A fully styled popup would require abandoning the native
+element (and with it mobile pickers, type-ahead, and screen-reader semantics);
+use `CrCombobox` when that is genuinely needed.
 **Checkbox / radio** — square (radius 0); checked fills `--sig-work` with an
 `--on-sig` mark:
 

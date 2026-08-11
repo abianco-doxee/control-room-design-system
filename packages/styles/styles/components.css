@@ -611,8 +611,49 @@
   padding: var(--space-2) var(--space-3);
 }
 .cr-input::placeholder, .cr-textarea::placeholder { color: var(--cr-field-placeholder); }
-.cr-textarea { min-height: var(--space-16); resize: vertical; }
+/* Resizes on both axes. max-width keeps the handle from dragging the textarea
+ * out past its container (Law 1: the box stays a box). */
+.cr-textarea { min-height: var(--space-16); resize: both; max-width: 100%; }
 .cr-input:disabled, .cr-textarea:disabled, .cr-select:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Native <select> option list is OS-drawn: only background/colour are honoured,
+ * and only on some platforms (Windows/Linux Chromium + Firefox). macOS and iOS
+ * ignore both. This is the honest ceiling without a custom listbox — see the
+ * CrSelect doc comment. Values are the field surface, so it matches the closed
+ * control where the platform does listen. */
+.cr-select option {
+  background: var(--cr-field-bg);
+  color: var(--cr-field-fg);
+}
+.cr-select option:disabled { color: var(--cr-field-placeholder); }
+
+/* Text input affordances: in-field icon + clear button.
+ * The wrapper is only emitted when `icon` or `clearable` is set, so the plain
+ * input keeps its flat DOM. Both edges are logical, so they mirror under RTL. */
+.cr-input-wrap { position: relative; display: block; width: 100%; }
+.cr-input-wrap .cr-input { width: 100%; }
+/* Pad the text away from whichever affordance is present. */
+.cr-input-wrap .cr-input[data-icon] { padding-inline-start: var(--space-8); }
+.cr-input-wrap .cr-input[data-clearable] { padding-inline-end: var(--space-8); }
+.cr-input__icon, .cr-input__clear {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  display: inline-flex; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+/* --muted on --board measures 5.62:1 (light) … 8.16:1 (extreme) — clears the
+ * 4.5:1 text threshold in all four themes, and the 3:1 non-text one. */
+.cr-input__icon { inset-inline-start: var(--space-3); color: var(--cr-field-placeholder); }
+/* The clear button is interactive, so it takes pointer events back and sits at
+ * full --ink: 14.45:1 (phosphor) … 17.27:1 (extreme) on --board. */
+.cr-input__clear {
+  inset-inline-end: var(--space-2);
+  pointer-events: auto;
+  padding: var(--space-1);
+  background: transparent; border: 0; cursor: pointer;
+  color: var(--cr-field-fg);
+}
+.cr-input__clear:disabled { opacity: 0.5; cursor: not-allowed; }
+.cr-input__clear:focus-visible { outline: var(--focus-w) solid var(--cr-field-focus); outline-offset: var(--focus-offset); }
 .cr-field--error .cr-input,
 .cr-field--error .cr-textarea,
 .cr-field--error .cr-select { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
