@@ -27,7 +27,7 @@
 - **Every component carries the styling contract**: `unstyled?: boolean`, `pt?: any`, `dt?: any`, with `ptClass`/`ptAttrs`/`ptStyle` from `../lib/pt.ts` and a `data-part` on each part. Match the surrounding file exactly.
 - **`ISLAND_IDS` in `packages/docs/build/build-showcase.mjs` must match the `DEMOS` keys in `packages/docs/build/showcase-islands.jsx`.** `packages/docs/tests/showcase-islands.spec.mjs` fails the build otherwise.
 - **Adding/removing a component ripples to:** `catalog/registry.json` → `catalog/catalog.json`, `ISLAND_IDS` + `DEMOS`, the per-component CSS part in `packages/styles/styles/parts/`, framework barrels (`build:components`, `build:pkg`), `references/*.md`, and the regenerated `llms.txt`/`llms-full.txt`.
-- **The catalog has FOUR generated copies, not one** (found the hard way in Task 12, via `verify:skill` failing): `catalog/catalog.json`, `packages/docs/public/catalog.json`, `packages/mcp/data/catalog.json`, and `packages/skill/skills/control-room-design-system/catalog/catalog.json`. The skill bundle also vendors the **whole styles package**, so `packages/skill/skills/control-room-design-system/packages/styles/styles/components.css` needs the same edit as the real one. Always edit `catalog/registry.json` (the source), then run the builds and `pnpm run verify` — the `verify:*` suite is what catches a missed copy.
+- **The catalog has FOUR *committed* generated copies, not one** (found the hard way in Task 12, via `verify:skill` failing): `catalog/catalog.json`, `packages/docs/public/catalog.json`, `packages/mcp/data/catalog.json`, and `packages/skill/skills/control-room-design-system/catalog/catalog.json`. **Two more exist on disk** under `.claude/skills/` (`control-room-design-system` and `kaon-design-system`) — gitignored local skill installs, which is why `pnpm run skills:sync` is sometimes required before `verify` passes. Six on disk, four in git. The skill bundle also vendors the **whole styles package**, so `packages/skill/skills/control-room-design-system/packages/styles/styles/components.css` needs the same edit as the real one. Always edit `catalog/registry.json` (the source), then run the builds and `pnpm run verify` — the `verify:*` suite is what catches a missed copy.
 - **Removing a prop is not finished when the prop is gone.** Clear it from `catalog/registry.json` too, or the Component Browser keeps advertising it: `build-showcase.mjs` renders `entry.variants` verbatim. Better still, replace the entry with the new prop's values rather than just deleting it.
 - **Write one changeset per phase** in `.changeset/`, marking breaking changes, so the eventual Version Packages PR carries an accurate migration note.
 - **Run `pnpm run lint` before every commit.** Biome is the formatter and linter.
@@ -1859,6 +1859,20 @@ switch. Contrast regressions in a single theme are the usual failure here.
 > head select-all box with its body-row box and mislabelled a text colour as a box
 > colour. All the figures cleared 3:1 so nothing shipped badly, but the numbers are
 > the evidence base for later tasks — label them by the exact selector measured.
+>
+> **5. Use the right WCAG threshold — "bold" is not "large".** Task 30 reported a
+> hover state as passing AA against the **3:1 large-text** threshold because the
+> type is bold uppercase. WCAG large text means **≥18.66px bold (14pt)** or
+> ≥24px regular; 11–12px bold does not qualify however heavy it is, so the real
+> threshold is **4.5:1** and the state was failing. Most type in this system is
+> small (`--text-xs` is `clamp(11px, 1.3cqi, 12px)`), so **4.5:1 is the default
+> for text** and 3:1 applies only to non-text UI components and graphical objects.
+>
+> **6. Know which gate actually covers your change before citing it.** Task 30's
+> two relevant suites were both blind to it: `test:rtl` only greps physical *flow*
+> properties and explicitly excludes positional `left`/`right`, and `test:a11y`
+> (axe) evaluates resting states and does not test `:hover`. A green gate that
+> does not exercise what you changed is not evidence.
 
 ### Task 24: Bezel/Screen — texture above the content, richer chrome
 
