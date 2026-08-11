@@ -43,7 +43,7 @@ jobs:
         run: pnpm run test:pkg
       - name: Cross-framework runtime gate (Vue/Svelte/Solid SSR-render the output)
         run: pnpm run test:frameworks
-      - name: Styling-contract gate (pt/dt/unstyled coverage + finer tokens + util ports + responsive tokens)
+      - name: Styling-contract gate (pt/dt/unstyled coverage + finer tokens + util ports incl. position + responsive tokens)
         run: pnpm run test:contract
       - name: Forms core gate (ArkType ⇄ JSON Schema + validation)
         run: pnpm run test:forms
