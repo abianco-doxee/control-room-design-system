@@ -904,8 +904,18 @@ so nothing double-announces. Bottom anchors stack newest nearest the edge.
 **Packing.** Consecutive toasts sharing the same `message` **and** `signal`
 collapse into one row with a `×N` counter, so a retry storm costs one row instead
 of ten. Only *consecutive* runs pack — an unrelated toast in between keeps the
-occurrences separate and preserves arrival order. The row's dismiss target is the
-**newest** member's id, so `onDismiss` removes what the user is looking at.
+occurrences separate and preserves arrival order.
+
+A packed row carries **two ids**, and keeping them apart is what makes the row
+safe inside a live region:
+
+| field | which toast | why |
+|---|---|---|
+| `id` | **oldest** (first) member | identity. Stable while the run grows, so the row is patched rather than remounted on a count bump. |
+| `newestId` | **newest** member | dismiss target. `onDismiss` receives this, so it removes the toast the user is looking at. |
+
+Collapsing them into one field is an accessibility bug: an identity that changes
+on every duplicate remounts the row, and a remounted `role="alert"` re-announces.
 
 ```tsx
 <CrToastRegion position="bc" toasts={list} onDismiss={remove} />
@@ -920,7 +930,12 @@ occurrences separate and preserves arrival order. The row's dismiss target is th
   second live region — that double-announces).
 - **MUST** keep the `×N` counter `aria-hidden`. It is the only thing that changes
   when a duplicate arrives; leaving it inside the announced text would re-fire the
-  live region on every repeat, and `err` announces *assertively*.
+  live region on every repeat, and `err` announces *assertively*. (`aria-atomic`
+  defaults to `false`, so an AT announces only the changed node — and that node is
+  hidden.)
+- **MUST NOT** key the row on `newestId`, in any target. It changes on every
+  duplicate, so it would remount the row and refire the live region. Guarded by
+  `tests/cross-fw-contract.test.mjs` across all six framework outputs.
 - **SHOULD** cap how many stack at once and drop oldest, so a burst can't bury the
   screen.
 

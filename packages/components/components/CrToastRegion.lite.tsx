@@ -9,9 +9,19 @@ export interface CrToastItem {
 }
 
 /* One rendered row: a run of consecutive toasts sharing message + signal.
- * `id` is the NEWEST member's id, so dismissing removes what the user sees. */
+ *
+ * TWO ids, deliberately kept apart — collapsing them into one field is a real
+ * accessibility bug, not a style preference:
+ *  - `id`        IDENTITY. The OLDEST (first) member's id, so it is STABLE while
+ *                the run grows. Mitosis auto-derives React/Qwik `key={g.id}`
+ *                from a field named `id`, so this is the field the reconciler
+ *                keys on — it must never change on a count bump, or the row
+ *                remounts and refires its live region.
+ *  - `newestId`  DISMISS TARGET. The NEWEST member's id, so `onDismiss` removes
+ *                the toast the user is actually looking at. */
 export interface CrToastGroup {
   id: string | number;
+  newestId: string | number;
   signal?: "work" | "wait" | "done" | "err";
   message: string;
   count: number;
@@ -35,16 +45,17 @@ export interface CrToastRegionProps {
  * announces. Consecutive toasts with the same message AND signal pack into one
  * row carrying an aria-hidden ×N counter — the announced text never changes, so
  * a repeat updates the count instead of re-firing the live region. The group's
- * dismiss target is the NEWEST member's id. Styling via .cr-toast-region /
+ * dismiss target is the group's `newestId`. Styling via .cr-toast-region /
  * .cr-toast.
  *
- * DO NOT add `key={g.id}` to the group loop, however tempting React's
- * "unique key" warning makes it. The no-re-announce guarantee depends on every
- * target reconciling this list POSITIONALLY, so the row's DOM node survives a
- * count bump. The group id is the NEWEST member's id and therefore changes on
- * every duplicate — keying on it would remount the row, refiring the live
- * region on each repeat. For `err` toasts (role=alert, assertive) that means
- * spamming a screen reader, which is the exact defect this design prevents. */
+ * The no-re-announce guarantee needs the row's DOM node to SURVIVE a count bump
+ * rather than remount — a remounted role=alert refires, and for `err` toasts
+ * (assertive) that spams a screen reader. So the row's identity must be stable
+ * while a run grows. That is why CrToastGroup carries TWO ids: `id` is the
+ * OLDEST member's (stable identity, and the field Mitosis auto-keys React/Qwik
+ * on), while `newestId` is the dismiss target. Never key this loop on
+ * `newestId`, and never reassign `id` when a duplicate merges. Guarded by
+ * tests/cross-fw-contract.test.mjs across all six targets. */
 export default function CrToastRegion(props: CrToastRegionProps) {
   const state = useStore({
     /* Collapse runs of consecutive same-message/same-signal toasts. Only
@@ -57,12 +68,15 @@ export default function CrToastRegion(props: CrToastRegionProps) {
         const t = list[i];
         const last = out.length > 0 ? out[out.length - 1] : null;
         if (last && last.message === t.message && last.signal === t.signal) {
-          /* newest wins the dismiss target — onDismiss must remove the row the
-           * user is actually looking at, not the oldest hidden duplicate */
-          last.id = t.id;
+          /* newest wins the DISMISS TARGET — onDismiss must remove the row the
+           * user is actually looking at, not the oldest hidden duplicate.
+           * `last.id` (identity) is deliberately NOT touched: it stays the
+           * oldest member's id so the row's reconciliation key is stable and
+           * the live region is patched rather than remounted. */
+          last.newestId = t.id;
           last.count = last.count + 1;
         } else {
-          out.push({ id: t.id, signal: t.signal, message: t.message, count: 1 });
+          out.push({ id: t.id, newestId: t.id, signal: t.signal, message: t.message, count: 1 });
         }
       }
       return out;
@@ -112,7 +126,7 @@ export default function CrToastRegion(props: CrToastRegionProps) {
               data-part="close"
               class={ptClass(props.pt, props.unstyled, "cr-toast__close", "close")}
               aria-label="Dismiss"
-              onClick={() => props.onDismiss && props.onDismiss(g.id)}
+              onClick={() => props.onDismiss && props.onDismiss(g.newestId)}
             >
               ✕
             </button>

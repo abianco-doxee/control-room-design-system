@@ -8,8 +8,14 @@
 Consecutive toasts sharing the same `message` **and** `signal` now collapse into a
 single row carrying a `×N` counter, so a retry storm costs one row instead of ten.
 Only *consecutive* runs pack — an unrelated toast in between keeps the occurrences
-separate and preserves arrival order. The row's dismiss target is the **newest**
-member's id, so `onDismiss` removes the toast the user is actually looking at.
+separate and preserves arrival order.
+
+The new `CrToastGroup` type carries two ids on purpose: `id` is the **oldest**
+member's (stable identity, so the row is patched rather than remounted as the run
+grows) and `newestId` is the **dismiss target** passed to `onDismiss`, so
+dismissing removes the toast the user is actually looking at. Keying the row on
+`newestId` would remount it on every duplicate and refire its live region; a
+cross-framework gate now enforces that in all six compiled targets.
 
 The counter is `aria-hidden`. It is the only thing that changes when a duplicate
 arrives, so the live region's announced text stays byte-identical and a repeat
