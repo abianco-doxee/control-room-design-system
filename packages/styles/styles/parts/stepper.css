@@ -19,8 +19,10 @@
  * `border` cannot survive a clip-path (the clip cuts the border box), so the
  * outline that the pending/upcoming state needs comes from an inset box-shadow,
  * which IS clipped with the box instead of being sliced off. --cr-stepper-arrow
- * is the depth of the cut; it stays well inside Law 4's 15° off-axis ceiling at
- * this size. */
+ * is the depth of the cut. Law 4's 15° off-axis ceiling is scoped to LARGE
+ * shapes; at marker scale this edge is steeper (~25°), but still shallower than
+ * the shipped .cr-rail__step it mirrors (~32°), so it reads as the same
+ * vocabulary rather than a new angle. */
 .cr-stepper__dot {
   --cr-stepper-arrow: 0.4rem;
   display: inline-flex; align-items: center; justify-content: center;
