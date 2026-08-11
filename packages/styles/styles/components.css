@@ -1494,7 +1494,27 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-avatar--lg { width: 3rem; height: 3rem; }
 .cr-avatar__img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .cr-avatar__initials { font-family: var(--font-mono); font-weight: 700; font-size: var(--text-xs); text-transform: uppercase; color: var(--cr-avatar-fg); }
-.cr-avatar__status { position: absolute; bottom: -3px; right: -3px; width: .6rem; height: .6rem; border: 1.5px solid var(--panel); background: var(--muted); }
+/* Law 4 — the notch means "state", and the presence dot is nothing but state, so
+ * the dot carries the notch geometry: a corner cut out of the trailing-bottom
+ * edge. This matters most on the phosphor CRT, where every signal collapses into
+ * one green/yellow band and --sig-done / --sig-wait / --sig-err stop being
+ * separable on a 9.6px dot — the cut is the non-colour reading Law 4 promises.
+ * The shape is reinforcement only: role="img" + aria-label={status} remains the
+ * announced state, and "offline" keeps the notch too (absent is not a state).
+ * Geometry is restated here rather than composing `.cr-notch`, which is a padded
+ * badge block (own background/border/padding) shipped in base.css — a
+ * notch-classed dot would lose its shape for anyone importing only
+ * parts/avatar.css, and would fight the dot's absolute positioning.
+ * The cut is a percentage, not the primitive's fixed 11px, so it stays
+ * proportional across --sm/--lg; `border` cannot survive a clip-path (the clip
+ * cuts the border box), so the ring that separates the dot from the portrait
+ * comes from an inset box-shadow, which IS clipped with the box. */
+.cr-avatar__status {
+  position: absolute; bottom: -3px; right: -3px; width: .6rem; height: .6rem;
+  background: var(--muted);
+  box-shadow: inset 0 0 0 1.5px var(--panel);
+  clip-path: polygon(0 0, 100% 0, 100% 55%, 55% 100%, 0 100%);
+}
 .cr-avatar__status--online { background: var(--sig-done); }
 .cr-avatar__status--idle { background: var(--sig-wait); }
 .cr-avatar__status--busy { background: var(--sig-err); }
