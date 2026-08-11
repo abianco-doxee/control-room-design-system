@@ -799,4 +799,36 @@ test.describe("component browser — live islands", () => {
     const overflows = await sa.evaluate((el) => el.scrollHeight > el.clientHeight + 1);
     expect(overflows, "content exceeds the capped height → scrolls").toBe(true);
   });
+
+  // CrChoiceGroup deliberately keeps two different keyboard models depending on
+  // `type`: radio inputs share ONE `name` so the browser supplies roving
+  // tabindex + arrow-key selection for free; checkbox inputs are independently
+  // tabbable and must NOT share a name (that would make the browser treat them
+  // as one mutually-exclusive group). This guards that difference: without it,
+  // a future refactor could silently drop the shared `name` (or reintroduce a
+  // hand-rolled roving-tabindex handler) and revert the radio branch to three
+  // independent tab stops with no regression test catching it.
+  test("choice-group: radio inputs share one name, checkbox inputs do not", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const cg = page.locator('[data-island="choice-group"]');
+    const inputs = cg.locator(".pg__live input");
+
+    // default demo state is type="radio": every input shares one non-empty name.
+    const radioNames = await inputs.evaluateAll((els) => els.map((el) => el.getAttribute("name")));
+    expect(radioNames.length).toBeGreaterThanOrEqual(2);
+    expect(radioNames.every((n) => !!n)).toBe(true);
+    expect(new Set(radioNames).size, "all radios share one name").toBe(1);
+
+    // switch the `type` control to checkbox → inputs must NOT share a name.
+    await cg.locator(".pg__controls select").first().selectOption("checkbox");
+    const checkboxNames = await inputs.evaluateAll((els) =>
+      els.map((el) => el.getAttribute("name"))
+    );
+    expect(checkboxNames.length).toBeGreaterThanOrEqual(2);
+    expect(
+      new Set(checkboxNames).size === 1 && checkboxNames[0],
+      "checkboxes must not collapse onto one shared name"
+    ).toBeFalsy();
+  });
 });

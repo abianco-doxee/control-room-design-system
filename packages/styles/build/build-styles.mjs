@@ -63,7 +63,6 @@ const SLUG_MAP = {
   "checkbox / radio": "checkbox",
   "command palette": "palette",
   "alert / callout": "alert",
-  "radio group": "radio-group",
   "data / description list": "data-list",
   "drawer / sheet": "drawer",
   "segmented control": "segmented",

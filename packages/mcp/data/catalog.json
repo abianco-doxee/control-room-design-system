@@ -5,12 +5,12 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 84,
+    "count": 83,
     "categories": {
       "action": 2,
       "behavior": 1,
       "chart": 4,
-      "forms": 21,
+      "forms": 20,
       "identity": 3,
       "layout": 10,
       "media": 9,
@@ -20,7 +20,7 @@
       "state": 15
     },
     "lifecycles": {
-      "stable": 83,
+      "stable": 82,
       "experimental": 1
     }
   },
@@ -819,44 +819,6 @@
         "code",
         "verification",
         "2fa"
-      ]
-    },
-    {
-      "id": "radio-group",
-      "name": "Radio group",
-      "kind": "component",
-      "category": "forms",
-      "lifecycle": "stable",
-      "origin": "control-room",
-      "description": "Single-choice group (role=radiogroup) with roving tabindex + arrow-key nav. Square radios (radius 0) — a filled inner square marks the choice.",
-      "spec": "references/components.md#radio-group",
-      "variants": {
-        "prop": [
-          "value",
-          "row"
-        ]
-      },
-      "tokens": [
-        {
-          "cssVar": "--sig-work",
-          "description": "checked mark"
-        },
-        {
-          "cssVar": "--panel-2",
-          "description": "box fill"
-        },
-        {
-          "cssVar": "--border",
-          "description": "box border"
-        }
-      ],
-      "keywords": [
-        "radio",
-        "radiogroup",
-        "choice",
-        "option",
-        "single-select",
-        "form"
       ]
     },
     {

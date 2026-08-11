@@ -61,7 +61,6 @@ import {
   CrPinInput,
   CrPopover,
   CrProgress,
-  CrRadioGroup,
   CrRating,
   CrRelativeTime,
   CrResizable,
@@ -189,11 +188,6 @@ const SEG_OPTS = [
   { value: "live", label: "Live" },
   { value: "1h", label: "1h" },
   { value: "24h", label: "24h" },
-];
-const RADIO_OPTS = [
-  { value: "packed", label: "Bin-packed" },
-  { value: "balanced", label: "Balanced" },
-  { value: "spread", label: "Spread" },
 ];
 const CRON_PRESETS = [
   { label: "Hourly", cron: "0 * * * *" },
@@ -647,22 +641,6 @@ const DEMOS = {
         values: s.values,
         onChange: (v) => set("value", v),
         onChangeMany: (v) => set("values", v),
-      }),
-  },
-  "radio-group": {
-    tag: "CrRadioGroup",
-    defs: [
-      T("enum", "value", "balanced", { options: RADIO_OPTS }),
-      T("boolean", "row", false),
-      T("text", "label", "Placement"),
-    ],
-    render: (s, set) =>
-      h(CrRadioGroup, {
-        options: RADIO_OPTS,
-        value: s.value,
-        row: s.row,
-        label: s.label,
-        onChange: (v) => set("value", v),
       }),
   },
   slider: {

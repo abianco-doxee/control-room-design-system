@@ -43,12 +43,13 @@ export interface CrChoiceGroupProps {
  * every input shares one `name`, so the BROWSER supplies the roving tabindex (one
  * tab stop) and arrow-key selection. checkbox: role=group, independent inputs,
  * each its own tab stop, arrows inert. Neither branch attaches a key handler.
- * WHY THERE IS NO ROVING-TABINDEX JS (do not restore it): the hand-rolled
- * tabbable/onKey pair in CrRadioGroup exists ONLY because that component renders
- * button elements with a radio role, which have no native semantics. Over real
- * inputs the platform already does it, and a verbatim port would be DEAD code
- * here because it queries a radio role and data-value, which CrChoice never emits.
- * Native arrow selection also fires change, so onChange still round-trips.
+ * WHY THERE IS NO ROVING-TABINDEX JS (do not add one): a hand-rolled tabbable/
+ * onKey pair is only ever needed when the radio role is faked on non-native
+ * elements (e.g. a <button role="radio">, which has no native keyboard
+ * semantics). Over real <input> elements the platform already does it, so such
+ * a handler would be DEAD code here — it would have to query a radio role and
+ * a data-value attribute, neither of which CrChoice emits. Native arrow
+ * selection also fires change, so onChange still round-trips.
  * Styling via .cr-choicegroup. */
 export default function CrChoiceGroup(props: CrChoiceGroupProps) {
   const state = useStore({

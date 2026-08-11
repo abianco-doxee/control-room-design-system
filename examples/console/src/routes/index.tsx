@@ -25,7 +25,7 @@ import {
   CrKeyHints,
   CrPalette,
   CrAlert,
-  CrRadioGroup,
+  CrChoiceGroup,
   CrSlider,
   CrProgress,
   CrAccordion,
@@ -399,7 +399,8 @@ export default component$(() => {
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--space-4);align-items:start">
             <div>
               <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">density</p>
-              <CrRadioGroup
+              <CrChoiceGroup
+                type="radio"
                 label="Row density"
                 value={ui.density}
                 row

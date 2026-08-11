@@ -34,7 +34,7 @@ Set the theme on the root: `<html data-theme="dark|light|extreme|phosphor">`.
 
 ## Components
 Every component is catalogued with its variants, design tokens, and keywords in
-[catalog.json](https://alebianco.github.io/control-room-design-system/catalog.json) (84 entries). Rendered and
+[catalog.json](https://alebianco.github.io/control-room-design-system/catalog.json) (83 entries). Rendered and
 exercised in all four themes in the [Component Browser](https://alebianco.github.io/control-room-design-system/components.html); see them
 live in the [Component Browser](https://alebianco.github.io/control-room-design-system/components.html).
 
@@ -64,7 +64,6 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 - [InputGroup](https://alebianco.github.io/control-room-design-system/components.html#c-input-group): An input flanked by decorative prefix / suffix addons (protocol, currency, unit). Addons are aria-hidden; give the field a label. For a validated field use Field or Form.
 - [Number field](https://alebianco.github.io/control-room-design-system/components.html#c-number-field): Number input with −/+ steppers, clamped to min/max; the native input keeps its own keyboard.
 - [PinInput](https://alebianco.github.io/control-room-design-system/components.html#c-pin-input): One-time-code / PIN entry — N single-digit cells acting as one field; typing advances, Backspace steps back, arrows move, paste fills across. role=group with per-cell labels.
-- [Radio group](https://alebianco.github.io/control-room-design-system/components.html#c-radio-group): Single-choice group (role=radiogroup) with roving tabindex + arrow-key nav. Square radios (radius 0) — a filled inner square marks the choice.
 - [Rating](https://alebianco.github.io/control-room-design-system/components.html#c-rating): Star-rating control — a radiogroup with roving tabindex (interactive) or an inert score readout (readonly). Geometric-glyph marks (no icon font); fill encodes the value.
 - [Select](https://alebianco.github.io/control-room-design-system/components.html#c-select): Native select styled to the chassis.
 - [Slider](https://alebianco.github.io/control-room-design-system/components.html#c-slider): Styled native range input — square track + thumb, keyboard for free (arrows, Home/End, PageUp/Down).
@@ -2909,29 +2908,12 @@ signal hue. `err` announces assertively (`role=alert`); the rest are polite.
 
 ---
 
-## Radio group {#radio-group}
-
-**Purpose.** Single choice from a small set. `role=radiogroup` with roving
-tabindex: only the checked radio (or the first) is tabbable, `↑`/`↓`/`←`/`→` move
-selection. Square radios (radius 0) — a filled inner square marks the choice.
-
-```tsx
-<CrRadioGroup value={density} row
-  options={[{ value: "cozy", label: "cozy" }, { value: "compact", label: "compact" }]}
-  onChange={setDensity} />
-```
-
-- **MUST** keep it controlled (`value` in, `onChange` out) and set `aria-checked`
-  on each radio.
-- **NEVER** round it — the mark is a square, not a dot (Law: radius 0).
-
----
-
 ## Choice group {#choice-group}
 
-**Purpose.** One grouped-choice control for BOTH types, rendering `CrChoice`
-(native inputs) so each type gets the keyboard model its role requires. Replaces
-`CrRadioGroup` and fills the missing checkbox-group case.
+**Purpose.** One grouped-choice control for BOTH types — single choice
+(`type="radio"`, the default) or multi-choice (`type="checkbox"`) — rendering
+`CrChoice` (native inputs) so each type gets the keyboard model its role
+requires. Square marks (radius 0) — a filled inner square, not a dot.
 
 | | `type="radio"` (default) | `type="checkbox"` |
 | --- | --- | --- |
@@ -2953,8 +2935,8 @@ selection. Square radios (radius 0) — a filled inner square marks the choice.
   for checkbox.
 - **MUST** let the platform drive the radio keyboard model: the inputs share one
   `name`, so the browser supplies roving tabindex and arrow selection. Do **NOT**
-  add a JS key handler — a roving-tabindex port from `CrRadioGroup` would be dead
-  code here (it queries `[role="radio"]`, which native inputs do not emit).
+  add a JS key handler — native `role="radio"` inputs already get this for free,
+  and a hand-rolled roving-tabindex port would be dead code here.
 - **NEVER** apply the radio arrow-key model to checkboxes — independent tabbing is
   required, and arrow-key selection would be an accessibility defect.
 - `invalid` is **ARIA-only** (sets `aria-invalid`); visual error styling comes from
@@ -3478,7 +3460,8 @@ The interactive widgets follow the WAI-ARIA patterns, so they work without a mou
 | **Popover / Drawer** | `Esc` closes (drawer traps focus natively); popover returns focus to its trigger |
 | **Segmented control** | roving tabindex — `←`/`→`/`Home`/`End` move and select (radiogroup semantics) |
 | **Combobox** | `↑`/`↓` move the active option, `Enter` selects, `Esc` closes; focus stays in the input |
-| **Radio group** | roving tabindex — `↑`/`↓`/`←`/`→` move and select; only the checked radio is tabbable |
+| **Choice group** (`type="radio"`) | roving tabindex — `↑`/`↓`/`←`/`→` move and select; only the checked radio is tabbable |
+| **Choice group** (`type="checkbox"`) | no roving tabindex — every box is independently tabbable, arrows are inert |
 | **Slider** | native range — `←`/`→` step, `Home`/`End` to ends, `PageUp`/`PageDown` jump |
 | **Modal / Switch / Pagination** | native focus-trap (dialog), `Space` toggle, `Tab` between page buttons |
 

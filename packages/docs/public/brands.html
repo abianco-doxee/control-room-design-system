@@ -842,20 +842,6 @@ body {
   border: var(--brd-hair) solid currentColor; padding: 0 var(--space-1); line-height: 1.4;
 }
 
-/* ── Radio group (a square — radius 0; filled when checked) ──────────────── */
-.cr-radiogroup { display: flex; flex-direction: column; gap: var(--space-2); }
-.cr-radiogroup--row { flex-direction: row; flex-wrap: wrap; gap: var(--space-4); }
-.cr-radio {
-  display: inline-flex; align-items: center; gap: var(--space-2); cursor: pointer;
-  font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink);
-  background: transparent; border: 0; padding: 0; text-align: start;
-}
-.cr-radio__box { position: relative; width: var(--space-3); height: var(--space-3); flex-shrink: 0; background: var(--cr-radio-bg); border: var(--brd) solid var(--cr-field-border); }
-.cr-radio[aria-checked="true"] .cr-radio__box::after { content: ""; position: absolute; inset: 3px; background: var(--cr-radio-dot); }
-.cr-radio[disabled] { opacity: var(--state-disabled-op); cursor: not-allowed; }
-/* Error state, derived from the wrapper — no per-control prop needed. */
-.cr-field--error .cr-radio__box { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
-
 /* ── Choice group (grouped CrChoice — both checkbox and radio) ───────────── */
 .cr-choicegroup { display: flex; flex-direction: column; gap: var(--space-2); }
 .cr-choicegroup--row { flex-direction: row; flex-wrap: wrap; gap: var(--space-4); }

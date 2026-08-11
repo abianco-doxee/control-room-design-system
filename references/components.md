@@ -997,29 +997,12 @@ signal hue. `err` announces assertively (`role=alert`); the rest are polite.
 
 ---
 
-## Radio group {#radio-group}
-
-**Purpose.** Single choice from a small set. `role=radiogroup` with roving
-tabindex: only the checked radio (or the first) is tabbable, `↑`/`↓`/`←`/`→` move
-selection. Square radios (radius 0) — a filled inner square marks the choice.
-
-```tsx
-<CrRadioGroup value={density} row
-  options={[{ value: "cozy", label: "cozy" }, { value: "compact", label: "compact" }]}
-  onChange={setDensity} />
-```
-
-- **MUST** keep it controlled (`value` in, `onChange` out) and set `aria-checked`
-  on each radio.
-- **NEVER** round it — the mark is a square, not a dot (Law: radius 0).
-
----
-
 ## Choice group {#choice-group}
 
-**Purpose.** One grouped-choice control for BOTH types, rendering `CrChoice`
-(native inputs) so each type gets the keyboard model its role requires. Replaces
-`CrRadioGroup` and fills the missing checkbox-group case.
+**Purpose.** One grouped-choice control for BOTH types — single choice
+(`type="radio"`, the default) or multi-choice (`type="checkbox"`) — rendering
+`CrChoice` (native inputs) so each type gets the keyboard model its role
+requires. Square marks (radius 0) — a filled inner square, not a dot.
 
 | | `type="radio"` (default) | `type="checkbox"` |
 | --- | --- | --- |
@@ -1041,8 +1024,8 @@ selection. Square radios (radius 0) — a filled inner square marks the choice.
   for checkbox.
 - **MUST** let the platform drive the radio keyboard model: the inputs share one
   `name`, so the browser supplies roving tabindex and arrow selection. Do **NOT**
-  add a JS key handler — a roving-tabindex port from `CrRadioGroup` would be dead
-  code here (it queries `[role="radio"]`, which native inputs do not emit).
+  add a JS key handler — native `role="radio"` inputs already get this for free,
+  and a hand-rolled roving-tabindex port would be dead code here.
 - **NEVER** apply the radio arrow-key model to checkboxes — independent tabbing is
   required, and arrow-key selection would be an accessibility defect.
 - `invalid` is **ARIA-only** (sets `aria-invalid`); visual error styling comes from
@@ -1566,7 +1549,8 @@ The interactive widgets follow the WAI-ARIA patterns, so they work without a mou
 | **Popover / Drawer** | `Esc` closes (drawer traps focus natively); popover returns focus to its trigger |
 | **Segmented control** | roving tabindex — `←`/`→`/`Home`/`End` move and select (radiogroup semantics) |
 | **Combobox** | `↑`/`↓` move the active option, `Enter` selects, `Esc` closes; focus stays in the input |
-| **Radio group** | roving tabindex — `↑`/`↓`/`←`/`→` move and select; only the checked radio is tabbable |
+| **Choice group** (`type="radio"`) | roving tabindex — `↑`/`↓`/`←`/`→` move and select; only the checked radio is tabbable |
+| **Choice group** (`type="checkbox"`) | no roving tabindex — every box is independently tabbable, arrows are inert |
 | **Slider** | native range — `←`/`→` step, `Home`/`End` to ends, `PageUp`/`PageDown` jump |
 | **Modal / Switch / Pagination** | native focus-trap (dialog), `Space` toggle, `Tab` between page buttons |
 

@@ -240,7 +240,6 @@ const ISLAND_IDS = new Set([
   "hover-card",
   "segmented",
   "choice-group",
-  "radio-group",
   "slider",
   "number-field",
   "pagination",
