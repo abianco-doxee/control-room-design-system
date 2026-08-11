@@ -18,4 +18,6 @@
 .cr-combobox__opt--active { background: var(--cr-combobox-opt-active-bg); color: var(--cr-combobox-opt-active-fg); }
 .cr-combobox__opt--active::before { color: currentColor; opacity: 1; }
 .cr-combobox__empty { padding: var(--space-2); font-family: var(--font-mono); color: var(--muted); }
+/* Error state, derived from the wrapper — no per-control prop needed. */
+.cr-field--error .cr-combobox__input { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 

@@ -761,6 +761,10 @@ body {
   content: ""; width: var(--space-2); height: var(--space-2); background: var(--cr-check-mark);
 }
 .cr-check input:disabled { opacity: 0.5; cursor: not-allowed; }
+/* Error state, derived from the wrapper (Law: the field owns the error, the
+ * control only reflects it) — no per-control prop needed. .cr-check has no
+ * __box element; the visible border is on the native input. */
+.cr-field--error .cr-check input { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 
 /* ── Switch (button[role=switch]) ──────────────────────────────────────── */
 .cr-switch {
@@ -778,6 +782,8 @@ body {
 }
 .cr-switch[aria-checked="true"] .cr-switch__track { background: var(--cr-switch-track-on); }
 .cr-switch[aria-checked="true"] .cr-switch__track::after { left: calc(100% - var(--space-4)); background: var(--cr-switch-thumb-on); }
+/* Error state, derived from the wrapper — no per-control prop needed. */
+.cr-field--error .cr-switch__track { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 
 @media (prefers-reduced-motion: reduce) { .cr-switch__track::after { transition: none; } }
 
@@ -847,6 +853,8 @@ body {
 .cr-radio__box { position: relative; width: var(--space-3); height: var(--space-3); flex-shrink: 0; background: var(--cr-radio-bg); border: var(--brd) solid var(--cr-field-border); }
 .cr-radio[aria-checked="true"] .cr-radio__box::after { content: ""; position: absolute; inset: 3px; background: var(--cr-radio-dot); }
 .cr-radio[disabled] { opacity: var(--state-disabled-op); cursor: not-allowed; }
+/* Error state, derived from the wrapper — no per-control prop needed. */
+.cr-field--error .cr-radio__box { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 
 /* ── Slider (styled native range — keyboard for free) ───────────────────── */
 .cr-slider { -webkit-appearance: none; appearance: none; width: 100%; height: var(--space-2); background: var(--cr-slider-track); border: var(--brd-hair) solid var(--cr-field-border); cursor: pointer; }
@@ -1064,6 +1072,8 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-combobox__opt--active { background: var(--cr-combobox-opt-active-bg); color: var(--cr-combobox-opt-active-fg); }
 .cr-combobox__opt--active::before { color: currentColor; opacity: 1; }
 .cr-combobox__empty { padding: var(--space-2); font-family: var(--font-mono); color: var(--muted); }
+/* Error state, derived from the wrapper — no per-control prop needed. */
+.cr-field--error .cr-combobox__input { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 
 /* ── Number field (input + −/+ steppers) ────────────────────────────────── */
 .cr-numberfield { display: inline-flex; border: var(--brd) solid var(--cr-field-border); background: var(--cr-field-bg); }
@@ -1080,6 +1090,8 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-numberfield__btn:last-child { border-inline-start: var(--brd-hair) solid var(--cr-field-border); }
 .cr-numberfield__btn:hover:not([disabled]) { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
 .cr-numberfield__btn[disabled] { opacity: var(--state-disabled-op); cursor: not-allowed; }
+/* Error state, derived from the wrapper — no per-control prop needed. */
+.cr-field--error .cr-numberfield { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 
 /* ── ASCII separators & lists ───────────────────────────────────────────── */
 .cr-sep { border: 0; height: 0; border-top: var(--brd-hair) dashed color-mix(in srgb, var(--border) 60%, transparent); margin: var(--space-3) 0; }
@@ -1737,15 +1749,23 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-input-group__addon--prefix { border-inline-end: 0; }
 .cr-input-group__addon--suffix { border-inline-start: 0; }
 .cr-input-group__input { min-width: 0; }
+/* Error state, derived from the wrapper — no per-control prop needed. The
+ * inner input already inherits .cr-field--error .cr-input above; the addons
+ * are the other bordered part of this control and need it explicitly. */
+.cr-field--error .cr-input-group__addon { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 
 /* ── PinInput ────────────────────────────────────────────────────────────── */
 .cr-pin { display: inline-flex; gap: var(--space-2); }
 .cr-pin__cell { width: 2.5rem; height: 2.75rem; text-align: center; font-family: var(--font-mono); font-size: var(--text-lg); font-weight: 700; color: var(--cr-field-fg); background: var(--panel-2); border: var(--brd) solid var(--cr-field-border); }
 .cr-pin__cell:focus { outline: none; border-color: var(--cr-field-focus); box-shadow: inset 0 -3px 0 var(--cr-field-focus); }
+/* Error state, derived from the wrapper — no per-control prop needed. */
+.cr-field--error .cr-pin__cell { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 
 /* ── TagsInput ───────────────────────────────────────────────────────────── */
 .cr-tags { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); padding: var(--space-2); border: var(--brd) solid var(--cr-field-border); background: var(--panel-2); }
 .cr-tags:focus-within { border-color: var(--cr-field-focus); }
+/* Error state, derived from the wrapper — no per-control prop needed. */
+.cr-field--error .cr-tags { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 .cr-tags__list { display: contents; list-style: none; margin: 0; padding: 0; }
 .cr-tags__tag { display: inline-flex; align-items: center; gap: var(--space-1); padding: 2px var(--space-2); background: var(--panel); border: var(--brd-hair) solid var(--cr-field-border); font-family: var(--font-mono); font-size: var(--text-xs); }
 .cr-tags__remove { display: inline-flex; background: none; border: 0; padding: 0 2px; color: var(--muted); cursor: pointer; font: inherit; line-height: 1; }

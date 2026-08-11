@@ -16,6 +16,8 @@
 }
 .cr-switch[aria-checked="true"] .cr-switch__track { background: var(--cr-switch-track-on); }
 .cr-switch[aria-checked="true"] .cr-switch__track::after { left: calc(100% - var(--space-4)); background: var(--cr-switch-thumb-on); }
+/* Error state, derived from the wrapper — no per-control prop needed. */
+.cr-field--error .cr-switch__track { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 
 @media (prefers-reduced-motion: reduce) { .cr-switch__track::after { transition: none; } }
 

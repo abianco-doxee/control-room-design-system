@@ -3,6 +3,8 @@
 /* ── TagsInput ───────────────────────────────────────────────────────────── */
 .cr-tags { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); padding: var(--space-2); border: var(--brd) solid var(--cr-field-border); background: var(--panel-2); }
 .cr-tags:focus-within { border-color: var(--cr-field-focus); }
+/* Error state, derived from the wrapper — no per-control prop needed. */
+.cr-field--error .cr-tags { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 .cr-tags__list { display: contents; list-style: none; margin: 0; padding: 0; }
 .cr-tags__tag { display: inline-flex; align-items: center; gap: var(--space-1); padding: 2px var(--space-2); background: var(--panel); border: var(--brd-hair) solid var(--cr-field-border); font-family: var(--font-mono); font-size: var(--text-xs); }
 .cr-tags__remove { display: inline-flex; background: none; border: 0; padding: 0 2px; color: var(--muted); cursor: pointer; font: inherit; line-height: 1; }

@@ -16,4 +16,8 @@
   content: ""; width: var(--space-2); height: var(--space-2); background: var(--cr-check-mark);
 }
 .cr-check input:disabled { opacity: 0.5; cursor: not-allowed; }
+/* Error state, derived from the wrapper (Law: the field owns the error, the
+ * control only reflects it) — no per-control prop needed. .cr-check has no
+ * __box element; the visible border is on the native input. */
+.cr-field--error .cr-check input { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 
