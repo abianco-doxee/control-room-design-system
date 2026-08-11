@@ -17,7 +17,6 @@ import {
   CrChip,
   CrTable,
   CrTabs,
-  CrMeter,
   CrMenu,
   CrPagination,
   CrToastRegion,
@@ -384,9 +383,9 @@ export default component$(() => {
             />
           </div>
           <div style="display:flex;flex-direction:column;gap:var(--space-2)">
-            <CrMeter label="cpu" value={72} signal="work" />
-            <CrMeter label="queue" value={40} signal="wait" />
-            <CrMeter label="errors" value={12} signal="err" />
+            <CrProgress label="cpu" value={72} signal="work" />
+            <CrProgress label="queue" value={40} signal="wait" />
+            <CrProgress label="errors" value={12} signal="err" />
           </div>
           <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
             <CrPagination page={ui.page} total={9} onChange={$((p: number) => (ui.page = p))} />

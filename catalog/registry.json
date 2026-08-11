@@ -557,46 +557,6 @@
       ]
     },
     {
-      "id": "meter",
-      "name": "Meter",
-      "category": "state",
-      "kind": "component",
-      "lifecycle": "stable",
-      "description": "Token-driven capacity / utilisation bar (role=meter), square and hard-edged, keyed to a signal tone.",
-      "spec": "references/components.md#meter",
-      "variants": {
-        "signal": [
-          "work",
-          "wait",
-          "done",
-          "err",
-          "idle"
-        ]
-      },
-      "tokens": [
-        {
-          "cssVar": "--sig-work",
-          "description": "default fill"
-        },
-        {
-          "cssVar": "--panel-2",
-          "description": "track"
-        },
-        {
-          "cssVar": "--brd-hair",
-          "description": "track outline"
-        }
-      ],
-      "keywords": [
-        "meter",
-        "bar",
-        "gauge",
-        "capacity",
-        "utilisation",
-        "progress"
-      ]
-    },
-    {
       "id": "sparkline",
       "name": "Sparkline",
       "category": "chart",
@@ -2031,24 +1991,29 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Task progress (role=progressbar) \u2014 determinate fills to value/max; indeterminate runs an animated hazard sweep. Distinct from Meter (a static capacity reading).",
+      "description": "Task progress and capacity / utilisation (role=progressbar) \u2014 determinate fills to value/max; indeterminate runs an animated hazard sweep. An optional label renders inline before the track.",
       "spec": "references/components.md#progress",
       "variants": {
         "signal": [
           "work",
           "wait",
           "done",
-          "err"
+          "err",
+          "idle"
         ]
       },
       "tokens": [
         {
           "cssVar": "--sig-work",
-          "description": "fill"
+          "description": "default fill"
         },
         {
           "cssVar": "--panel-2",
           "description": "track"
+        },
+        {
+          "cssVar": "--brd-hair",
+          "description": "track outline"
         }
       ],
       "keywords": [
@@ -2057,7 +2022,11 @@
         "loading",
         "task",
         "indeterminate",
-        "bar"
+        "bar",
+        "meter",
+        "gauge",
+        "capacity",
+        "utilisation"
       ]
     },
     {

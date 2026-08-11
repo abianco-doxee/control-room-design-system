@@ -478,25 +478,6 @@ keyed underline on the active tab (scalar active-index state in `CrTabs`).
 
 ---
 
-## Meter {#meter}
-
-**Purpose.** Capacity / utilisation as a square, hard-edged bar keyed to a signal
-tone. `role=meter` with `aria-valuenow/min/max`.
-
-```html
-<div class="cr-meter cr-meter--work">
-  <span class="cr-meter__label">cpu</span>
-  <span class="cr-meter__track" role="meter" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" aria-label="cpu">
-    <span class="cr-meter__fill" style="width:72%"></span>
-  </span>
-</div>
-```
-
-- **MUST** carry the numeric value in ARIA — the fill width alone is not
-  accessible. Tone (`--work/--wait/--done/--err/--idle`) follows Law 2.
-
----
-
 ## Tag
 
 **Purpose.** Inline status label inside dense content (distinct from Chip, which
@@ -772,6 +753,32 @@ with a non-color `✗` marker as well as the `--sig-err` border (never color alo
 ```
 
 **Input / textarea / select** — `.cr-input`, `.cr-textarea`, `.cr-select`.
+
+`CrInput` takes two optional in-field affordances. `icon="search"` paints a glyph
+on the leading edge; `clearable` adds a real `<button type="button"
+aria-label="Clear">` on the trailing edge, shown only while the field has a
+value, firing `onClear` (and clearing through `onChange`). Either one wraps the
+input in `.cr-input-wrap` and pads that edge; with neither, the component still
+renders a bare `<input>`. Both edges use logical properties, so they mirror
+under RTL.
+
+```html
+<span class="cr-input-wrap">
+  <span class="cr-input__icon" aria-hidden="true"><!-- 16px icon --></span>
+  <input class="cr-input" data-icon="true" data-clearable="true" value="nova" />
+  <button type="button" class="cr-input__clear" aria-label="Clear"></button>
+</span>
+```
+
+`.cr-textarea` resizes on both axes and is capped at `max-width: 100%` so the
+drag handle cannot pull it outside its container.
+
+A native `<select>`'s open option list is drawn by the OS, not the page, so it
+takes none of our border, shadow, font, or padding. We set `option`
+background/colour — honoured by Chromium and Firefox on Windows/Linux, ignored
+on macOS and iOS. A fully styled popup would require abandoning the native
+element (and with it mobile pickers, type-ahead, and screen-reader semantics);
+use `CrCombobox` when that is genuinely needed.
 **Checkbox / radio** — square (radius 0); checked fills `--sig-work` with an
 `--on-sig` mark:
 
@@ -1099,17 +1106,31 @@ screen-reader support come for free.
 
 ## Progress {#progress}
 
-**Purpose.** Task progress. **Determinate** fills to `value/max`; **indeterminate**
-runs an animated hazard sweep and drops the numeric ARIA values. Distinct from
-**Meter** (a static capacity reading, not a running task).
+**Purpose.** Task progress **and** capacity / utilisation in one square,
+hard-edged bar keyed to a signal tone. **Determinate** fills to `value/max`;
+**indeterminate** runs an animated hazard sweep and drops the numeric ARIA
+values. An optional `label` renders inline before the track, which covers the
+capacity reading that the removed **Meter** used to serve.
 
 ```tsx
 <CrProgress value={64} label="Indexing" />
-<CrProgress indeterminate tone="wait" label="Syncing" />
+<CrProgress indeterminate signal="wait" label="Syncing" />
+<CrProgress value={72} signal="idle" label="cpu" />
+```
+
+```html
+<div class="cr-progress cr-progress--work">
+  <span class="cr-progress__label">cpu</span>
+  <span class="cr-progress__track" role="progressbar" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" aria-label="cpu">
+    <span class="cr-progress__fill" style="width:72%"></span>
+  </span>
+</div>
 ```
 
 - **MUST** use `role="progressbar"`; set `aria-valuenow/min/max` only when
   determinate. Both stop animating under `prefers-reduced-motion`.
+- **MUST** carry the numeric value in ARIA — the fill width alone is not
+  accessible. Tone (`--work/--wait/--done/--err/--idle`) follows Law 2.
 
 ---
 
@@ -1727,9 +1748,14 @@ rail, or masthead, **never** on a flat data field, and keep it `aria-hidden`
 ### Seeded chrome strip {#seeded-chrome}
 
 For a whole varied hardware bar, `CrChrome` paints a **seeded** pixel-art metal
-strip — a deterministic mix of fasteners (rivets / hex bolts / slot + phillips
-screws), panel seams, wear scratches, and one indicator LED. Same seed → same
-strip, so a rack/unit gets a stable, distinct face (like the seeded cat/sigil).
+strip — a deterministic graduated scale (minor index ticks with taller major
+graduations), panel seams, a registration mark, wear scratches, and one indicator
+LED. Same seed → same strip, so a rack/unit gets a stable, distinct face (like
+the seeded cat/sigil).
+
+The vocabulary is **measurement marks, not fixings**: it deliberately does not
+paint rivets, hex bolts or screw heads, which read as a novelty machine-panel
+skin rather than as an instrument face.
 
 ```tsx
 import { CrChrome } from "@alebianco/cr-design-system/react";
@@ -1972,7 +1998,11 @@ there are no global listeners and it can't get stuck. `orientation` is
 An interactive **multi-select filter pill** — several toggle independently (unlike
 the single-select [Segmented](#segmented) or the static [Chip](#chip)). It is a
 `role="checkbox"` button; on/off is announced via `aria-checked` and exposed as
-`data-state`. Props: `label`, `pressed`, `count?`, `onToggle`, `disabled`.
+`data-state`. Props: `label`, `pressed`, `badge?`, `onToggle`, `disabled`.
+`badge` is generic: `false`/omitted renders nothing, `true` renders a bare
+(decorative, `aria-hidden`) dot for "has matches, count irrelevant", and any
+string or number renders verbatim — `0` and `""` still render, because an
+explicit zero is a meaningful filter result.
 **Tokens** — `--cr-togglechip-on-bg` / `--cr-togglechip-on-fg` (the ON state).
 Per Law 2 the ON colour is the accent (a *state*), **not** a per-option identity
 hue; override `--cr-togglechip-on-bg` via `dt` only when a facet genuinely needs
@@ -2122,16 +2152,28 @@ buttons, **roving tabindex** (←/→ ±1 day, ↑/↓ ±1 week, Home/End to the
 PageUp/PageDown step months, Enter/Space select). Fully **controlled and SSR-safe**:
 the displayed `month` and `today` are **injected props**, never read from the clock,
 so server and client render the same grid. Props: `month` (`YYYY-MM`), `value?`
-(`YYYY-MM-DD`), `today?`, `min?`/`max?`, `weekStart?` (0 Sun · 1 Mon), `label`,
+(`YYYY-MM-DD`), `today?`, `min?`/`max?`, `weekStart?` (`"sunday"` default ·
+`"monday"`), `switcher?` (default true), `yearSpan?` (default 8), `label`,
 `onSelect`, `onMonthChange`.
+
+The header carries a **month/year switcher** — a month dropdown and a year
+dropdown beside the prev/next steppers. Every one of the four controls emits
+`onMonthChange` with the new `YYYY-MM`; none of them reads the clock. The year
+list is derived from the **displayed** year (`yearSpan` either side, clamped to
+`min`/`max`), which is what keeps the switcher SSR-safe — there is no "now" in
+it. Pass `switcher={false}` for the bare prev/next header.
 
 ```tsx
 <CrCalendar month="2026-08" value="2026-08-09" today="2026-08-09"
-  onSelect={setDate} onMonthChange={setMonth} label="run date" />
+  weekStart="monday" onSelect={setDate} onMonthChange={setMonth} label="run date" />
 ```
 
 **Tokens** — `--cr-calendar-selected-bg` (selected-day fill, a *state*) ·
 `--cr-calendar-today-ring` · `--cr-calendar-muted` (adjacent-month days) ·
 `--cr-calendar-bg`. **A11y** — grid semantics with `aria-selected`, `aria-current="date"`
 for today, `aria-disabled` outside `min`/`max`; one tab stop with full keyboard
-traversal.
+traversal. The month label stays in the a11y tree as an `aria-live` region behind
+the switcher, and the two selects are named `Month` and `Year`. Hovering the
+**selected** day keeps the accent fill (sunk 15% toward `--cr-calendar-bg`)
+rather than falling back to the plain hover surface, which is what keeps the
+selected+hovered numeral above 4.5:1 in all four themes.

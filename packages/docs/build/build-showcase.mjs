@@ -260,7 +260,6 @@ const ISLAND_IDS = new Set([
   "checkbox",
   "alert",
   "toast",
-  "meter",
   "progress",
   "input",
   "textarea",

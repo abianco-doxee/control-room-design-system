@@ -5,7 +5,7 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 83,
+    "count": 82,
     "categories": {
       "action": 2,
       "behavior": 1,
@@ -17,10 +17,10 @@
       "navigation": 8,
       "overlay": 9,
       "primitives": 2,
-      "state": 15
+      "state": 14
     },
     "lifecycles": {
-      "stable": 82,
+      "stable": 81,
       "experimental": 1
     }
   },
@@ -2928,14 +2928,14 @@
       ]
     },
     {
-      "id": "meter",
-      "name": "Meter",
+      "id": "progress",
+      "name": "Progress",
       "kind": "component",
       "category": "state",
       "lifecycle": "stable",
       "origin": "control-room",
-      "description": "Token-driven capacity / utilisation bar (role=meter), square and hard-edged, keyed to a signal tone.",
-      "spec": "references/components.md#meter",
+      "description": "Task progress and capacity / utilisation (role=progressbar) — determinate fills to value/max; indeterminate runs an animated hazard sweep. An optional label renders inline before the track.",
+      "spec": "references/components.md#progress",
       "variants": {
         "signal": [
           "work",
@@ -2960,48 +2960,16 @@
         }
       ],
       "keywords": [
-        "meter",
-        "bar",
-        "gauge",
-        "capacity",
-        "utilisation",
-        "progress"
-      ]
-    },
-    {
-      "id": "progress",
-      "name": "Progress",
-      "kind": "component",
-      "category": "state",
-      "lifecycle": "stable",
-      "origin": "control-room",
-      "description": "Task progress (role=progressbar) — determinate fills to value/max; indeterminate runs an animated hazard sweep. Distinct from Meter (a static capacity reading).",
-      "spec": "references/components.md#progress",
-      "variants": {
-        "signal": [
-          "work",
-          "wait",
-          "done",
-          "err"
-        ]
-      },
-      "tokens": [
-        {
-          "cssVar": "--sig-work",
-          "description": "fill"
-        },
-        {
-          "cssVar": "--panel-2",
-          "description": "track"
-        }
-      ],
-      "keywords": [
         "progress",
         "progressbar",
         "loading",
         "task",
         "indeterminate",
-        "bar"
+        "bar",
+        "meter",
+        "gauge",
+        "capacity",
+        "utilisation"
       ]
     },
     {

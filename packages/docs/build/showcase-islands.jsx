@@ -50,7 +50,6 @@ import {
   CrLineChart,
   CrMasthead,
   CrMenu,
-  CrMeter,
   CrModal,
   CrNav,
   CrNumberField,
@@ -939,23 +938,13 @@ const DEMOS = {
     ],
     render: (s) => h(CrToast, { signal: s.signal, message: s.message }),
   },
-  meter: {
-    tag: "CrMeter",
-    defs: [
-      T("number", "value", 68, { min: 0, max: 100 }),
-      T("number", "max", 100),
-      T("enum", "signal", "work", { options: ["work", "wait", "done", "err", "idle"] }),
-      T("text", "label", "CPU"),
-    ],
-    render: (s) => h(CrMeter, { value: s.value, max: s.max, signal: s.signal, label: s.label }),
-  },
   progress: {
     tag: "CrProgress",
     defs: [
       T("number", "value", 40, { min: 0, max: 100 }),
       T("number", "max", 100),
       T("boolean", "indeterminate", false),
-      T("enum", "signal", "work", { options: ["work", "wait", "done", "err"] }),
+      T("enum", "signal", "work", { options: ["work", "wait", "done", "err", "idle"] }),
       T("text", "label", "Uploading"),
     ],
     render: (s) =>

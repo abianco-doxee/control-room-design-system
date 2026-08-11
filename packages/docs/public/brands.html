@@ -774,23 +774,6 @@ body {
   clip-path: polygon(100% 0, 100% 100%, 0 100%);
 }
 
-/* ── Meter (capacity / utilisation bar) ─────────────────────────────────── */
-.cr-meter { --cr-meter-c: var(--sig-work); display: flex; align-items: center; gap: var(--space-2); }
-.cr-meter__label {
-  font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); min-width: 6ch;
-}
-.cr-meter__track {
-  flex: 1; display: block; height: var(--space-2); background: var(--panel-2);
-  border: var(--brd-hair) solid var(--border);
-}
-.cr-meter__fill { display: block; height: 100%; background: var(--cr-meter-c); }
-.cr-meter--work { --cr-meter-c: var(--sig-work); }
-.cr-meter--wait { --cr-meter-c: var(--sig-wait); }
-.cr-meter--done { --cr-meter-c: var(--sig-done); }
-.cr-meter--err  { --cr-meter-c: var(--sig-err); }
-.cr-meter--idle { --cr-meter-c: var(--sig-idle); }
-
 /* ── Keyed contact sheet (Law 2) ───────────────────────────────────────── */
 .cr-tiles {
   display: grid; gap: 0; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
@@ -1173,11 +1156,20 @@ body {
 .cr-slider::-moz-range-thumb { width: var(--space-3); height: var(--space-4); border-radius: 0; background: var(--cr-slider-thumb); border: var(--brd) solid var(--cr-field-border); }
 .cr-slider:focus-visible { outline: var(--focus-w) solid var(--cr-field-focus); outline-offset: var(--focus-offset); }
 
-/* ── Progress (task progress; determinate + indeterminate) ──────────────── */
-.cr-progress { --cr-prog-c: var(--sig-work); height: var(--space-2); background: var(--panel-2); border: var(--brd-hair) solid var(--border); overflow: hidden; }
+/* ── Progress (task progress + capacity; determinate + indeterminate) ───── */
+.cr-progress { --cr-prog-c: var(--sig-work); display: flex; align-items: center; gap: var(--space-2); }
+.cr-progress__label {
+  font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); min-width: 6ch;
+}
+.cr-progress__track {
+  flex: 1; display: block; height: var(--space-2); background: var(--panel-2);
+  border: var(--brd-hair) solid var(--border); overflow: hidden;
+}
 .cr-progress--wait { --cr-prog-c: var(--sig-wait); }
 .cr-progress--done { --cr-prog-c: var(--sig-done); }
 .cr-progress--err  { --cr-prog-c: var(--sig-err); }
+.cr-progress--idle { --cr-prog-c: var(--sig-idle); }
 .cr-progress__fill { display: block; height: 100%; width: 0; background: var(--cr-prog-c); }
 .cr-progress--indeterminate .cr-progress__fill {
   width: 38%;

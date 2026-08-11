@@ -34,7 +34,7 @@ Set the theme on the root: `<html data-theme="dark|light|extreme|phosphor">`.
 
 ## Components
 Every component is catalogued with its variants, design tokens, and keywords in
-[catalog.json](https://alebianco.github.io/control-room-design-system/catalog.json) (83 entries). Rendered and
+[catalog.json](https://alebianco.github.io/control-room-design-system/catalog.json) (82 entries). Rendered and
 exercised in all four themes in the [Component Browser](https://alebianco.github.io/control-room-design-system/components.html); see them
 live in the [Component Browser](https://alebianco.github.io/control-room-design-system/components.html).
 
@@ -132,8 +132,7 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 - [Drip / error surface](https://alebianco.github.io/control-room-design-system/components.html#c-drip): The house glitch for failure — vertical downward bleed in --drip over a --sig-err field. Errors only.
 - [EmptyState / ErrorState](https://alebianco.github.io/control-room-design-system/components.html#c-empty-error-state): Zero-data (calm) and failure (error keying + drip) fallbacks for any panel — must not look alike.
 - [Keyed contact sheet](https://alebianco.github.io/control-room-design-system/components.html#c-keyed-contact-sheet): A grid of uniform state-keyed tiles that reads as one instrument, not competing stages (Law 2).
-- [Meter](https://alebianco.github.io/control-room-design-system/components.html#c-meter): Token-driven capacity / utilisation bar (role=meter), square and hard-edged, keyed to a signal tone.
-- [Progress](https://alebianco.github.io/control-room-design-system/components.html#c-progress): Task progress (role=progressbar) — determinate fills to value/max; indeterminate runs an animated hazard sweep. Distinct from Meter (a static capacity reading).
+- [Progress](https://alebianco.github.io/control-room-design-system/components.html#c-progress): Task progress and capacity / utilisation (role=progressbar) — determinate fills to value/max; indeterminate runs an animated hazard sweep. An optional label renders inline before the track.
 - [RelativeTime](https://alebianco.github.io/control-room-design-system/components.html#c-relative-time): Relative-time display ("5m ago") as a semantic <time>; the clock is injected as a prop so SSR and client agree (no hydration flicker).
 - [SessionRow](https://alebianco.github.io/control-room-design-system/components.html#c-session-row): One row of a live list — the densest unit; calm at rest, one-shot glitch on a real state change.
 - [Shape](https://alebianco.github.io/control-room-design-system/components.html#c-shape): Severity glyph — polygon side-count encodes danger/focus (fewer sides = more urgent); a shape channel beside colour (Law 4).
@@ -2389,25 +2388,6 @@ keyed underline on the active tab (scalar active-index state in `CrTabs`).
 
 ---
 
-## Meter {#meter}
-
-**Purpose.** Capacity / utilisation as a square, hard-edged bar keyed to a signal
-tone. `role=meter` with `aria-valuenow/min/max`.
-
-```html
-<div class="cr-meter cr-meter--work">
-  <span class="cr-meter__label">cpu</span>
-  <span class="cr-meter__track" role="meter" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" aria-label="cpu">
-    <span class="cr-meter__fill" style="width:72%"></span>
-  </span>
-</div>
-```
-
-- **MUST** carry the numeric value in ARIA — the fill width alone is not
-  accessible. Tone (`--work/--wait/--done/--err/--idle`) follows Law 2.
-
----
-
 ## Tag
 
 **Purpose.** Inline status label inside dense content (distinct from Chip, which
@@ -3036,17 +3016,31 @@ screen-reader support come for free.
 
 ## Progress {#progress}
 
-**Purpose.** Task progress. **Determinate** fills to `value/max`; **indeterminate**
-runs an animated hazard sweep and drops the numeric ARIA values. Distinct from
-**Meter** (a static capacity reading, not a running task).
+**Purpose.** Task progress **and** capacity / utilisation in one square,
+hard-edged bar keyed to a signal tone. **Determinate** fills to `value/max`;
+**indeterminate** runs an animated hazard sweep and drops the numeric ARIA
+values. An optional `label` renders inline before the track, which covers the
+capacity reading that the removed **Meter** used to serve.
 
 ```tsx
 <CrProgress value={64} label="Indexing" />
-<CrProgress indeterminate tone="wait" label="Syncing" />
+<CrProgress indeterminate signal="wait" label="Syncing" />
+<CrProgress value={72} signal="idle" label="cpu" />
+```
+
+```html
+<div class="cr-progress cr-progress--work">
+  <span class="cr-progress__label">cpu</span>
+  <span class="cr-progress__track" role="progressbar" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" aria-label="cpu">
+    <span class="cr-progress__fill" style="width:72%"></span>
+  </span>
+</div>
 ```
 
 - **MUST** use `role="progressbar"`; set `aria-valuenow/min/max` only when
   determinate. Both stop animating under `prefers-reduced-motion`.
+- **MUST** carry the numeric value in ARIA — the fill width alone is not
+  accessible. Tone (`--work/--wait/--done/--err/--idle`) follows Law 2.
 
 ---
 
