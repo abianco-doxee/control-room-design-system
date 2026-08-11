@@ -1405,7 +1405,7 @@ applied to checkboxes is an accessibility defect.
 
 **Files:**
 - Create: `packages/components/components/CrChoiceGroup.lite.tsx`
-- Reference: `packages/components/components/CrRadioGroup.lite.tsx` (roving tabindex to preserve), `CrChoice.lite.tsx` (the control to render)
+- Reference: `packages/components/components/CrRadioGroup.lite.tsx` (the implementation being replaced — its roving-tabindex JS is deliberately **not** carried over; see the correction below), `CrChoice.lite.tsx` (the control to render)
 
 **Interfaces:**
 - Consumes: `CrChoice` (`type`, `label`, `checked`, `disabled`, `onChange`, `invalid` from Task 18).
@@ -1435,7 +1435,8 @@ export interface CrChoiceOption {
 }
 
 export interface CrChoiceGroupProps {
-  /** "radio" (default) — single choice, roving tabindex, arrows move selection.
+  /** "radio" (default) — single choice; the shared `name` gives the native
+   *  radio group its roving focus and arrow-key selection.
    *  "checkbox" — multiple choice, each independently tabbable, arrows inert. */
   type?: "checkbox" | "radio";
   options: CrChoiceOption[];
@@ -1465,8 +1466,27 @@ Implementation requirements:
 
 - Root `role`: `"radiogroup"` when `type !== "checkbox"`, otherwise `"group"`.
 - Root carries `aria-label={props.label}` and `aria-invalid={props.invalid ? "true" : "false"}`.
-- **Radio branch:** port `tabbable(i)` and `onKey(event)` from `CrRadioGroup` unchanged (roving tabindex; ↑/↓/←/→ move selection). Attach `onKeyDown` to the root.
+- **Radio branch:** render `CrChoice` with `type="radio"` and a **shared `name`** across the group. Attach **no** `onKeyDown` — see the correction below.
 - **Checkbox branch:** attach **no** `onKeyDown`; every option is independently tabbable. Toggling computes the next array — `values` plus or minus the clicked value — and calls `onChangeMany`.
+
+> **Plan correction (found during Task 20).** An earlier draft told the
+> implementer to port `CrRadioGroup`'s `tabbable(i)` / `onKey(event)` roving
+> tabindex **verbatim** *and* to render `CrChoice` internally. Those are mutually
+> exclusive: the ported `onKey` queries `[role="radio"]` and reads `data-value`
+> off hand-rolled `<button>` elements, but `CrChoice` renders a **native**
+> `<input type="radio">` with no `role`, no `data-value` and no `tabIndex`. The
+> selector would match zero elements and arrow keys would silently do nothing —
+> passing every gate with the headline feature broken.
+>
+> The fix is to drop the JS entirely: native radio inputs **sharing a `name`**
+> already get roving tabindex and arrow-key selection from the browser.
+> `CrRadioGroup` only needed that JS because its `<button>` elements had no
+> native semantics. Verified safe — the only roving-tabindex contract test in the
+> repo (`tests/cross-fw-contract.test.mjs:45-60`) targets `CrRating`, not
+> `CrRadioGroup`, so nothing depends on those functions surviving.
+>
+> The shared `name` is now the load-bearing mechanism for arrow selection: it
+> must be verified live, and it must not collide between two groups on one page.
 - Render each option as a `CrChoice` with the group's `type`, passing `invalid` down.
 - Root class: `"cr-choicegroup" + (props.row ? " cr-choicegroup--row" : "")`.
 

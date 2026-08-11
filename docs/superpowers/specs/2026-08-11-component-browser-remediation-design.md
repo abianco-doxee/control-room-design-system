@@ -257,7 +257,7 @@ hook, but **must not** share the keyboard model:
 | --- | --- | --- |
 | roles | `radiogroup` / `radio` | `group` + native checkboxes |
 | `value` | `string` (single) | `string[]` (multiple) |
-| keyboard | roving tabindex; arrows **move selection** | each independently tabbable; arrows inert |
+| keyboard | native: a shared `name` gives roving focus; arrows **move selection** | each independently tabbable; arrows inert |
 
 Applying radio arrow-key selection to checkboxes would be an accessibility
 defect, so the branch is mandatory rather than an implementation convenience.
