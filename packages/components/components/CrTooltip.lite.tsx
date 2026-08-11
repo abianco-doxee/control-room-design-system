@@ -32,10 +32,10 @@ export interface CrTooltipProps {
  * lives on the ROOT since focus bubbles, covering the trigger with one
  * handler). mouseenter/focus dispatch synchronously and place()'s writes land
  * in the same task, before the next style-recalc/paint — that same-frame
- * guarantee is what avoids a flicker, not the bubble's transition-delay
- * (which disappears under prefers-reduced-motion). Absence of window/trigger/
- * bubble just leaves the bubble at its CSS fallback position — never blocks
- * the CSS reveal.
+ * guarantee is the ONLY thing preventing a flicker here: unlike
+ * .cr-hovercard__panel, .cr-tooltip__bubble has no transition-delay to buy any
+ * extra headroom. Absence of window/trigger/bubble just leaves the bubble at
+ * its CSS fallback position — never blocks the CSS reveal.
  * See references/components.md#tooltip. */
 export default function CrTooltip(props: CrTooltipProps) {
   const rootRef = useRef(null);
