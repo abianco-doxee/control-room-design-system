@@ -137,7 +137,7 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 - [SessionRow](https://alebianco.github.io/control-room-design-system/components.html#c-session-row): One row of a live list — the densest unit; calm at rest, one-shot glitch on a real state change.
 - [Shape](https://alebianco.github.io/control-room-design-system/components.html#c-shape): Severity glyph — polygon side-count encodes danger/focus (fewer sides = more urgent); a shape channel beside colour (Law 4).
 - [Skeleton](https://alebianco.github.io/control-room-design-system/components.html#c-skeleton): Loading placeholder — a blocky pulse (never rounded). Sizes: --line, --text, --block; give it a width inline.
-- [Spinner](https://alebianco.github.io/control-room-design-system/components.html#c-spinner): Indeterminate loading indicator — role=status with an accessible label; the ring is aria-hidden and honours reduced-motion. For a known fraction use Progress or Meter.
+- [Spinner](https://alebianco.github.io/control-room-design-system/components.html#c-spinner): Indeterminate loading indicator — role=status with an accessible label; the ring is aria-hidden and honours reduced-motion. For a known fraction, or a static capacity reading, use Progress.
 - [StatusDot](https://alebianco.github.io/control-room-design-system/components.html#c-status-dot): The smallest state readout — a square keyed to the signal ramp, with an aria-label naming the state.
 - [Tag](https://alebianco.github.io/control-room-design-system/components.html#c-tag): Inline status label inside dense content; variants map to the signal ramp.
 - [Timeline](https://alebianco.github.io/control-room-design-system/components.html#c-timeline): Vertical event timeline — an ordered list of moments on a rail, each with a signal-coloured node, machine time, title and optional detail. Presentational; node colour is the semantic signal.
@@ -715,7 +715,7 @@ Coverage is library-wide. Two conventions keep the surface small:
   `--cr-stepper-accent-bg`, `--cr-pager-accent-bg`, `--cr-nav-active-bg` follow the
   same shape.
 
-Signal-driven components (Tag, Tile, Meter, Progress, Toast) intentionally have no
+Signal-driven components (Tag, Tile, Progress, Toast) intentionally have no
 per-component tokens — their colour *is* the semantic signal, so retheme them via
 the signal tokens (`--sig-work`, `--sig-done`, …). Alert is the hybrid: a base
 surface (`--cr-alert-bg`/`--cr-alert-border`) plus a per-variant `--cr-alert-key`.
@@ -3849,7 +3849,7 @@ dot is a labelled `role="img"`. `size` is `sm` · `md` · `lg`.
 ## Spinner {#spinner}
 
 **Purpose** — signal an indeterminate wait (unknown duration). For a known
-fraction use **Progress**; for a static capacity reading use **Meter**.
+fraction, or a static capacity reading, use **Progress** with a `label`.
 
 **Notes** — the wrapper is `role="status"` with an accessible `label` (default
 "Loading") so assistive tech announces the wait; the ring is `aria-hidden` and its
@@ -4195,7 +4195,7 @@ Two conventions keep the token count small:
 is preserved; a per-instance `dt` override of the backdrop is best-effort — it
 relies on `::backdrop` inheriting from its `<dialog>`, modern browsers only.
 
-**Signal-driven components** (Tag, Tile, Meter, Progress, Toast) intentionally get
+**Signal-driven components** (Tag, Tile, Progress, Toast) intentionally get
 no per-component tokens — their colour *is* the semantic signal, so retheme them
 through the signal tokens (`--sig-work`, `--sig-done`, …).
 

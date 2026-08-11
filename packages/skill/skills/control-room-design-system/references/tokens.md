@@ -79,7 +79,7 @@ Coverage is library-wide. Two conventions keep the surface small:
   `--cr-stepper-accent-bg`, `--cr-pager-accent-bg`, `--cr-nav-active-bg` follow the
   same shape.
 
-Signal-driven components (Tag, Tile, Meter, Progress, Toast) intentionally have no
+Signal-driven components (Tag, Tile, Progress, Toast) intentionally have no
 per-component tokens — their colour *is* the semantic signal, so retheme them via
 the signal tokens (`--sig-work`, `--sig-done`, …). Alert is the hybrid: a base
 surface (`--cr-alert-bg`/`--cr-alert-border`) plus a per-variant `--cr-alert-key`.

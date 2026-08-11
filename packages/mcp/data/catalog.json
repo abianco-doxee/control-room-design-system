@@ -3118,7 +3118,7 @@
       "category": "state",
       "lifecycle": "stable",
       "origin": "control-room",
-      "description": "Indeterminate loading indicator — role=status with an accessible label; the ring is aria-hidden and honours reduced-motion. For a known fraction use Progress or Meter.",
+      "description": "Indeterminate loading indicator — role=status with an accessible label; the ring is aria-hidden and honours reduced-motion. For a known fraction, or a static capacity reading, use Progress.",
       "spec": "references/components.md#spinner",
       "variants": {
         "size": [

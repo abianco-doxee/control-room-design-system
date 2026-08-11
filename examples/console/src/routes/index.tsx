@@ -415,10 +415,9 @@ export default component$(() => {
               <CrSlider value={ui.refresh} min={5} max={120} step={5} label="Refresh interval seconds" onChange={$((v: number) => (ui.refresh = v))} />
             </div>
             <div>
-              <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">indexing</p>
-              <CrProgress value={64} label="Indexing 64%" />
+              <CrProgress value={64} label="indexing" />
               <div style="height:var(--space-2)"></div>
-              <CrProgress indeterminate signal="wait" label="Syncing" />
+              <CrProgress indeterminate signal="wait" label="syncing" />
             </div>
             <div>
               <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">scope</p>

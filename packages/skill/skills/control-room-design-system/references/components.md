@@ -1939,7 +1939,7 @@ dot is a labelled `role="img"`. `size` is `sm` · `md` · `lg`.
 ## Spinner {#spinner}
 
 **Purpose** — signal an indeterminate wait (unknown duration). For a known
-fraction use **Progress**; for a static capacity reading use **Meter**.
+fraction, or a static capacity reading, use **Progress** with a `label`.
 
 **Notes** — the wrapper is `role="status"` with an accessible `label` (default
 "Loading") so assistive tech announces the wait; the ring is `aria-hidden` and its

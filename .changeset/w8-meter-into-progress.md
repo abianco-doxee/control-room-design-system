@@ -13,4 +13,9 @@ wrapper and the bar itself is the new `.cr-progress__track` part — restyle any
 rule that targeted `.cr-progress` as the bar. The `.cr-meter` class family is
 gone.
 
+`role="progressbar"` and the `aria-value*` attributes also moved from the root
+down to the track, so selectors and tests matching
+`[role=progressbar].cr-progress` or `.cr-progress[aria-valuenow]` must now target
+`.cr-progress__track`.
+
 Migration: `<CrMeter … />` → `<CrProgress … />`.
