@@ -2019,14 +2019,24 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
  * and --on-sig are the same colour. The ON chip keeps --cr-togglechip-on-fg. */
 .cr-togglechip:not(.cr-togglechip--on):hover { color: var(--ink); }
 .cr-togglechip--on { background: var(--cr-togglechip-on-bg); color: var(--cr-togglechip-on-fg); border-color: var(--cr-togglechip-on-bg); }
-/* ON + hover: darken the fill toward the on-ink (a second tone with a hard
- * boundary — Law 1, no gradient) and raise the chip on the system's one hard
- * offset shadow. The shadow is the load-bearing half in LIGHT, where the ON fill
- * is --sig-work — a token already scheduled for a contrast fix — so the state
- * stays legible there structurally rather than depending on that hue. */
+/* ON + hover: darken the fill toward the on-ink AND flip the label to --panel —
+ * two tones, hard boundary, no gradient (Law 1). The label flip is what makes
+ * this work in all four themes: mixing toward the on-ink alone kept the label
+ * dark, and in LIGHT the ON fill (--sig-work) is itself a mid-dark teal, so
+ * darkening walked the fill INTO the text (5.33:1 → 3.63:1 at 22%, falling
+ * further the more you mix — raising the percentage makes light strictly worse).
+ * Flipping the label to the theme's light surface inverts that: the fill now
+ * darkens AWAY from the label, so contrast climbs with the mix in light while
+ * still reading as "pressed harder" in the three dark themes.
+ * The chip's type is 11–12px bold — NOT "large text" under WCAG (that needs
+ * ≥18.66px bold), so the applicable threshold is 4.5:1, not 3:1. At 26% all four
+ * themes clear it: 5.46 / 5.64 / 6.10 / 7.67 (dark/light/extreme/phosphor).
+ * The hard offset shadow below carries the state structurally as well, so the
+ * cue never rests solely on --sig-work, a token already queued for a fix. */
 .cr-togglechip--on:hover:not([disabled]) {
-  background: color-mix(in srgb, var(--cr-togglechip-on-fg) 22%, var(--cr-togglechip-on-bg));
-  border-color: color-mix(in srgb, var(--cr-togglechip-on-fg) 22%, var(--cr-togglechip-on-bg));
+  background: color-mix(in srgb, var(--cr-togglechip-on-fg) 26%, var(--cr-togglechip-on-bg));
+  border-color: color-mix(in srgb, var(--cr-togglechip-on-fg) 26%, var(--cr-togglechip-on-bg));
+  color: var(--panel);
   box-shadow: var(--shadow-off-sm) var(--shadow-off-sm) 0 var(--shadow-col);
 }
 /* Pressing moves the chip into its own shadow (Law 1's raised/pressed pair). */
