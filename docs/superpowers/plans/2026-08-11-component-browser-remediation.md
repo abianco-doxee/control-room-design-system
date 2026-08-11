@@ -1905,9 +1905,36 @@ grep -n -B2 -A10 "cr-toast__close" packages/styles/styles/components.css
 ```
 Record the differences — the goal is one treatment, not two similar ones.
 
-- [ ] **Step 2: Unify the close button**
+- [ ] **Step 2: Unify the close button — across all FOUR, not just alert and toast**
 
-Make the alert's close button match the toast's. If the rules are substantially identical afterwards, factor them into a shared selector list (e.g. `.cr-alert__close, .cr-toast__close { … }`) so they cannot drift again.
+> **Plan correction (found during Task 25).** This step originally said "make the
+> alert's close button match the toast's". They are already **byte-identical**
+> (`--brd-hair` border, transparent background, `currentColor`), and compute
+> identically too. The real divergence is a different pair: `.cr-modal__close`
+> and `.cr-drawer__close` use an incompatible family (`--panel` background,
+> `--brd` border, `--ink` text). So the review item "close button looks different
+> from others" is true of **alert-vs-modal**, not alert-vs-toast.
+
+Unify all four (`alert`, `toast`, `modal`, `drawer`) onto one treatment. Pick
+whichever is the better design and record why.
+
+Two defects to fix while in here:
+
+- **Pin `font-size` and `line-height` explicitly.** The shared block omits both,
+  so each inherits from its parent: `.cr-alert` sets no `font-size` while
+  `.cr-toast` sets `--text-sm`. They agree today only because both parents happen
+  to compute to 13.33px — change either and they silently diverge.
+- **Add the close buttons to the coarse-pointer tap floor** (`components.css`
+  ~1682). They are ~18×21px against WCAG 2.5.5's 44px minimum, and unlike
+  `.cr-btn` they appear in neither the `min-height` nor the `min-width` list.
+  A ✕ is roughly square, so check whether both are needed.
+
+**Put the shared rule in a base-routed section, not per-component.** Duplicating
+it per section would reintroduce the drift being closed, and base is the
+sanctioned home: `references/styling-contract.md:40` tells per-part consumers to
+**"Import `base` first — it carries the cross-cutting layers the component rules
+build on"**, and `verify:styles` asserts every rule lands in exactly one of
+`base.css` or a part.
 
 - [ ] **Step 3: Strengthen the alert frame**
 
