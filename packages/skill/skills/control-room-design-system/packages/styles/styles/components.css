@@ -371,15 +371,29 @@
 }
 .cr-chip--stamp { animation: cr-stamp 0.18s ease-out 1; }
 @keyframes cr-stamp { 0% { transform: scale(1.18); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
-.cr-btn--kick { position: relative; }
+/* Press glitch — a one-shot accent frame that kicks sideways and dies. This is
+ * the machine acknowledging a command: a <200ms discrete confirmation of a user
+ * action, NOT ambient motion, which is why it is not leashed by the ambient
+ * reduced-motion rule below (it is still leashed there, but as its own case).
+ *
+ * Driven by :active so it fires in all six framework targets without any
+ * per-framework click state. `.cr-btn--kick` stays as an explicit opt-in for a
+ * caller that drives the class itself (a Qwik signal, a test fixture). */
+.cr-btn { position: relative; }
+.cr-btn:active::after,
 .cr-btn--kick::after {
-  content: ""; position: absolute; inset: -3px; border: 3px solid var(--sig-work);
-  opacity: 0; animation: cr-kick 0.2s ease-out 1;
+  content: ""; position: absolute; inset: -3px; border: 3px solid var(--cr-btn-tint, var(--sig-work));
+  opacity: 0; pointer-events: none; animation: cr-kick var(--dur-fast) var(--ease-snap) 1;
 }
 @keyframes cr-kick { 0% { opacity: 0.9; transform: translate(-2px, 0); } 100% { opacity: 0; transform: translate(2px, 0); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .cr-row--event, .cr-chip--stamp, .cr-btn--kick::after { animation: none; }
+  /* The press kick is discrete confirmation, not ambient motion, but it still
+   * translates — so honour the preference by dropping the movement and leaving
+   * the frame as a static flash. */
+  .cr-row--event, .cr-chip--stamp,
+  .cr-btn:active::after, .cr-btn--kick::after { animation: none; }
+  .cr-btn:active::after, .cr-btn--kick::after { opacity: 0.9; transform: none; }
 }
 
 /* ── Instrument shell (composes rail + board) ──────────────────────────── */
@@ -1367,12 +1381,54 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-stepper__btn:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
 
 /* ── Spinner ─────────────────────────────────────────────────────────────── */
-.cr-spinner { display: inline-flex; }
-.cr-spinner__ring { width: 1.25rem; height: 1.25rem; border: var(--brd-heavy) solid var(--cr-spinner-track); border-top-color: var(--cr-spinner-accent); border-radius: 50%; animation: cr-spin .7s linear infinite; }
-.cr-spinner--sm .cr-spinner__ring { width: .9rem; height: .9rem; }
-.cr-spinner--lg .cr-spinner__ring { width: 2rem; height: 2rem; }
-@keyframes cr-spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .cr-spinner__ring { animation-duration: 2.4s; } }
+/* Four cells from the block shade ramp (░▒▓█, see references/decoration.md)
+ * chase each other around a SQUARE track. A rotating circle would contradict
+ * Law 1 — the chassis is rectangular and --radius is 0 — and reads as every
+ * other framework's default. This reads as a machine cycling through a state.
+ * Cells step rather than glide (--ease-step), so the motion is discrete like a
+ * character cell advancing, not a smooth sweep. */
+/* Cells are real rectangles, not glyphs: a text ramp's box is font-dependent
+ * (U+2588 overflows its 1ch advance by ~70%, so the four cells merged into one
+ * filled square at large sizes). Painting them keeps the geometry exact at every
+ * size and drops the font dependency entirely. The shade ramp survives as
+ * opacity — the same ░▒▓█ ladder, in the medium the chassis is actually made of. */
+.cr-spinner {
+  --cr-spinner-cell: 6px;   /* one block */
+  --cr-spinner-gap: 3px;    /* the hairline between blocks on the track */
+  position: relative; display: inline-block;
+  width: calc(var(--cr-spinner-cell) * 3 + var(--cr-spinner-gap) * 2);
+  height: calc(var(--cr-spinner-cell) * 3 + var(--cr-spinner-gap) * 2);
+  color: var(--cr-spinner-accent);
+}
+.cr-spinner__ring {
+  position: absolute; top: 0; left: 0; display: block;
+  width: var(--cr-spinner-cell); height: var(--cr-spinner-cell);
+  background: currentColor;
+  animation: cr-spinner-track var(--dur-ambient) var(--ease-step) infinite;
+}
+/* The shade ramp: █ ▓ ▒ ░ as four opacity stops, so the tail decays behind the
+ * leading block and the whole thing reads as one object in motion. */
+.cr-spinner__ring:nth-child(1) { opacity: 1; }
+.cr-spinner__ring:nth-child(2) { opacity: 0.72; animation-delay: calc(var(--dur-ambient) / -10 * 1); }
+.cr-spinner__ring:nth-child(3) { opacity: 0.45; animation-delay: calc(var(--dur-ambient) / -10 * 2); }
+.cr-spinner__ring:nth-child(4) { opacity: 0.22; animation-delay: calc(var(--dur-ambient) / -10 * 3); }
+.cr-spinner--sm { --cr-spinner-cell: 4px; --cr-spinner-gap: 2px; }
+.cr-spinner--lg { --cr-spinner-cell: 9px; --cr-spinner-gap: 4px; }
+@keyframes cr-spinner-track {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(calc(var(--cr-spinner-cell) * 2 + var(--cr-spinner-gap) * 2), 0); }
+  50% { transform: translate(calc(var(--cr-spinner-cell) * 2 + var(--cr-spinner-gap) * 2), calc(var(--cr-spinner-cell) * 2 + var(--cr-spinner-gap) * 2)); }
+  75% { transform: translate(0, calc(var(--cr-spinner-cell) * 2 + var(--cr-spinner-gap) * 2)); }
+}
+/* Reduced motion: the blocks stop travelling and hold the four corners, the ramp
+ * pulsing in place. Still an indeterminate "working" readout, no position change. */
+@media (prefers-reduced-motion: reduce) {
+  .cr-spinner__ring { animation: cr-spinner-hold var(--dur-ambient) steps(2, jump-none) infinite; }
+  .cr-spinner__ring:nth-child(2) { transform: translate(calc(var(--cr-spinner-cell) * 2 + var(--cr-spinner-gap) * 2), 0); }
+  .cr-spinner__ring:nth-child(3) { transform: translate(calc(var(--cr-spinner-cell) * 2 + var(--cr-spinner-gap) * 2), calc(var(--cr-spinner-cell) * 2 + var(--cr-spinner-gap) * 2)); }
+  .cr-spinner__ring:nth-child(4) { transform: translate(0, calc(var(--cr-spinner-cell) * 2 + var(--cr-spinner-gap) * 2)); }
+}
+@keyframes cr-spinner-hold { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
 /* ── Avatar ──────────────────────────────────────────────────────────────── */
 .cr-avatar { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; flex: none; border: var(--brd) solid var(--cr-avatar-border); background: var(--cr-avatar-bg); }

@@ -58,15 +58,29 @@
 }
 .cr-chip--stamp { animation: cr-stamp 0.18s ease-out 1; }
 @keyframes cr-stamp { 0% { transform: scale(1.18); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
-.cr-btn--kick { position: relative; }
+/* Press glitch — a one-shot accent frame that kicks sideways and dies. This is
+ * the machine acknowledging a command: a <200ms discrete confirmation of a user
+ * action, NOT ambient motion, which is why it is not leashed by the ambient
+ * reduced-motion rule below (it is still leashed there, but as its own case).
+ *
+ * Driven by :active so it fires in all six framework targets without any
+ * per-framework click state. `.cr-btn--kick` stays as an explicit opt-in for a
+ * caller that drives the class itself (a Qwik signal, a test fixture). */
+.cr-btn { position: relative; }
+.cr-btn:active::after,
 .cr-btn--kick::after {
-  content: ""; position: absolute; inset: -3px; border: 3px solid var(--sig-work);
-  opacity: 0; animation: cr-kick 0.2s ease-out 1;
+  content: ""; position: absolute; inset: -3px; border: 3px solid var(--cr-btn-tint, var(--sig-work));
+  opacity: 0; pointer-events: none; animation: cr-kick var(--dur-fast) var(--ease-snap) 1;
 }
 @keyframes cr-kick { 0% { opacity: 0.9; transform: translate(-2px, 0); } 100% { opacity: 0; transform: translate(2px, 0); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .cr-row--event, .cr-chip--stamp, .cr-btn--kick::after { animation: none; }
+  /* The press kick is discrete confirmation, not ambient motion, but it still
+   * translates — so honour the preference by dropping the movement and leaving
+   * the frame as a static flash. */
+  .cr-row--event, .cr-chip--stamp,
+  .cr-btn:active::after, .cr-btn--kick::after { animation: none; }
+  .cr-btn:active::after, .cr-btn--kick::after { opacity: 0.9; transform: none; }
 }
 
 /* ── Texture utilities (hardware only — Law 6) ─────────────────────────────
