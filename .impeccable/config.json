@@ -1,0 +1,19 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [
+      "packages/styles/styles/parts/*.css"
+    ],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "packages/styles/styles/components.css"
+        ],
+        "createdAt": "2026-08-11T06:49:03.003Z",
+        "reason": "CSS triangle idiom (width/height:0 + transparent top/bottom) draws chevrons and tree twisties, not card side-tabs; cr-nav__item's 3px transparent border is a reserved gutter only colored on aria-current=page to prevent layout shift"
+      }
+    ]
+  }
+}
