@@ -1562,20 +1562,46 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-toast--wait { background: var(--sig-wait); color: var(--on-sig); }
 .cr-toast--err  { background: var(--sig-err);  color: var(--on-err); }
 .cr-toast__msg { flex: 1; }
+/* Repeat counter on a packed row (identical message + signal collapsed into one
+ * toast). aria-hidden in the markup — it must never enter the live region's
+ * announced text, or every duplicate would re-announce.
+ *
+ * Deliberately NO background tint. A `color-mix(currentColor N%, transparent)`
+ * fill darkens the toast underneath and measured 3.88–4.35:1 against the ink on
+ * light/work, light/done, dark/err and extreme/err — under the 4.5:1 that 14px
+ * bold text needs (bold is not "large"; large starts at 18.66px). Sitting the
+ * counter directly on the untouched signal fill inherits the --on-sig / --on-err
+ * pairing the theme already guarantees, so it can't drift out of contrast. The
+ * border alone delimits it — it is non-text UI at a 3:1 bar. */
+.cr-toast__count {
+  font-variant-numeric: tabular-nums; font-weight: 700; color: currentColor;
+  border: var(--brd-hair) solid currentColor;
+  padding: 0 var(--space-1);
+}
 /* .cr-toast__close — see the shared "Dismiss control" rule in the base layer. */
 
-/* ── Toast region (stacks toasts in a screen corner) ────────────────────── */
+/* ── Toast region (stacks toasts at a screen anchor) ────────────────────── */
 .cr-toast-region {
   position: fixed; z-index: var(--z-overlay); display: flex; flex-direction: column;
   gap: var(--space-2); max-width: min(92vw, 30rem); pointer-events: none;
 }
 .cr-toast-region > * { pointer-events: auto; }
+/* corners */
 .cr-toast-region--tr { top: var(--space-4); right: var(--space-4); }
 .cr-toast-region--br { bottom: var(--space-4); right: var(--space-4); }
 .cr-toast-region--tl { top: var(--space-4); left: var(--space-4); }
 .cr-toast-region--bl { bottom: var(--space-4); left: var(--space-4); }
-/* bottom-anchored regions stack newest nearest the corner */
-.cr-toast-region--br, .cr-toast-region--bl { flex-direction: column-reverse; }
+/* top/bottom CENTER — centred on the horizontal axis via a 50% + translate pair
+ * rather than left:0;right:0, so the region keeps shrink-to-fit width and the
+ * toasts don't stretch the full viewport. */
+.cr-toast-region--tc { top: var(--space-4); left: 50%; transform: translateX(-50%); align-items: center; }
+.cr-toast-region--bc { bottom: var(--space-4); left: 50%; transform: translateX(-50%); align-items: center; }
+/* MIDDLE — centred on the vertical axis, same technique on the other axis. */
+.cr-toast-region--ml { top: 50%; left: var(--space-4); transform: translateY(-50%); }
+.cr-toast-region--mr { top: 50%; right: var(--space-4); transform: translateY(-50%); }
+.cr-toast-region--mc { top: 50%; left: 50%; transform: translate(-50%, -50%); align-items: center; }
+/* bottom-anchored regions stack newest nearest the edge */
+.cr-toast-region--br, .cr-toast-region--bl, .cr-toast-region--bc { flex-direction: column-reverse; }
 
 /* ── Menu (dropdown) ────────────────────────────────────────────────────── */
 .cr-menu { position: relative; display: inline-block; }

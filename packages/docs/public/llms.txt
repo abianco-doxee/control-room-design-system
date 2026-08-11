@@ -119,7 +119,7 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 - [Modal](https://alebianco.github.io/control-room-design-system/components.html#c-modal): Native <dialog> modal; browser owns focus-trap, Esc, and backdrop.
 - [Popover](https://alebianco.github.io/control-room-design-system/components.html#c-popover): Generic anchored overlay for arbitrary content — a trigger toggles a floating panel; scrim closes on outside click, Esc closes and returns focus. Use Menu for a list of actions.
 - [Toast](https://alebianco.github.io/control-room-design-system/components.html#c-toast): Transient status readout keyed to a machine signal; err announces assertively.
-- [Toast region](https://alebianco.github.io/control-room-design-system/components.html#c-toast-region): A fixed screen corner that stacks live toasts (parent owns the list). Each toast is its own live region — err announces assertively — so nothing double-announces. Bottom corners stack newest nearest the edge.
+- [Toast region](https://alebianco.github.io/control-room-design-system/components.html#c-toast-region): A fixed screen anchor that stacks live toasts (parent owns the list). Each row is its own live region — err announces assertively — so nothing double-announces. Consecutive toasts with the same message and signal pack into one row with an aria-hidden ×N counter, so a repeat updates the count instead of re-announcing. Bottom anchors stack newest nearest the edge.
 - [Tooltip](https://alebianco.github.io/control-room-design-system/components.html#c-tooltip): Hint bubble revealed on hover/focus; role=tooltip wired via aria-describedby, pure-CSS reveal.
 
 ### Primitives

@@ -778,11 +778,20 @@ const DEMOS = {
   },
   "toast-region": {
     tag: "CrToastRegion",
-    defs: [T("enum", "position", "br", { options: ["tr", "br", "tl", "bl"] })],
+    defs: [
+      T("enum", "position", "br", {
+        options: ["tr", "br", "tl", "bl", "tc", "bc", "ml", "mr", "mc"],
+      }),
+    ],
     extra: {
+      // ids 3/4/5 are the SAME message + signal, so they pack into one row
+      // reading "Retry 3/5 failed ×3" — dismissing it removes id 5, the newest.
       toasts: [
         { id: 1, signal: "done", message: "Deploy complete" },
         { id: 2, signal: "work", message: "Scanning 3 workers…" },
+        { id: 3, signal: "err", message: "Retry 3/5 failed" },
+        { id: 4, signal: "err", message: "Retry 3/5 failed" },
+        { id: 5, signal: "err", message: "Retry 3/5 failed" },
       ],
     },
     // `transform` makes this a containing block so the region's position:fixed

@@ -2589,14 +2589,19 @@
       "category": "overlay",
       "lifecycle": "stable",
       "origin": "control-room",
-      "description": "A fixed screen corner that stacks live toasts (parent owns the list). Each toast is its own live region — err announces assertively — so nothing double-announces. Bottom corners stack newest nearest the edge.",
+      "description": "A fixed screen anchor that stacks live toasts (parent owns the list). Each row is its own live region — err announces assertively — so nothing double-announces. Consecutive toasts with the same message and signal pack into one row with an aria-hidden ×N counter, so a repeat updates the count instead of re-announcing. Bottom anchors stack newest nearest the edge.",
       "spec": "references/components.md#toast-region",
       "variants": {
         "position": [
           "tr",
           "br",
           "tl",
-          "bl"
+          "bl",
+          "tc",
+          "bc",
+          "ml",
+          "mr",
+          "mc"
         ]
       },
       "tokens": [

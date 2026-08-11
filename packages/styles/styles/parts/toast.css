@@ -11,5 +11,21 @@
 .cr-toast--wait { background: var(--sig-wait); color: var(--on-sig); }
 .cr-toast--err  { background: var(--sig-err);  color: var(--on-err); }
 .cr-toast__msg { flex: 1; }
+/* Repeat counter on a packed row (identical message + signal collapsed into one
+ * toast). aria-hidden in the markup — it must never enter the live region's
+ * announced text, or every duplicate would re-announce.
+ *
+ * Deliberately NO background tint. A `color-mix(currentColor N%, transparent)`
+ * fill darkens the toast underneath and measured 3.88–4.35:1 against the ink on
+ * light/work, light/done, dark/err and extreme/err — under the 4.5:1 that 14px
+ * bold text needs (bold is not "large"; large starts at 18.66px). Sitting the
+ * counter directly on the untouched signal fill inherits the --on-sig / --on-err
+ * pairing the theme already guarantees, so it can't drift out of contrast. The
+ * border alone delimits it — it is non-text UI at a 3:1 bar. */
+.cr-toast__count {
+  font-variant-numeric: tabular-nums; font-weight: 700; color: currentColor;
+  border: var(--brd-hair) solid currentColor;
+  padding: 0 var(--space-1);
+}
 /* .cr-toast__close — see the shared "Dismiss control" rule in the base layer. */
 

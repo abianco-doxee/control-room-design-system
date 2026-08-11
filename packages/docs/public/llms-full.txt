@@ -119,7 +119,7 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 - [Modal](https://alebianco.github.io/control-room-design-system/components.html#c-modal): Native <dialog> modal; browser owns focus-trap, Esc, and backdrop.
 - [Popover](https://alebianco.github.io/control-room-design-system/components.html#c-popover): Generic anchored overlay for arbitrary content — a trigger toggles a floating panel; scrim closes on outside click, Esc closes and returns focus. Use Menu for a list of actions.
 - [Toast](https://alebianco.github.io/control-room-design-system/components.html#c-toast): Transient status readout keyed to a machine signal; err announces assertively.
-- [Toast region](https://alebianco.github.io/control-room-design-system/components.html#c-toast-region): A fixed screen corner that stacks live toasts (parent owns the list). Each toast is its own live region — err announces assertively — so nothing double-announces. Bottom corners stack newest nearest the edge.
+- [Toast region](https://alebianco.github.io/control-room-design-system/components.html#c-toast-region): A fixed screen anchor that stacks live toasts (parent owns the list). Each row is its own live region — err announces assertively — so nothing double-announces. Consecutive toasts with the same message and signal pack into one row with an aria-hidden ×N counter, so a repeat updates the count instead of re-announcing. Bottom anchors stack newest nearest the edge.
 - [Tooltip](https://alebianco.github.io/control-room-design-system/components.html#c-tooltip): Hint bubble revealed on hover/focus; role=tooltip wired via aria-describedby, pure-CSS reveal.
 
 ### Primitives
@@ -2802,20 +2802,35 @@ Hero. Errors announce assertively; everything else is polite.
 
 ## Toast region {#toast-region}
 
-**Purpose.** A fixed screen corner that **stacks** live toasts. The parent owns
-the list (`CrToastRegion` is presentational); each toast stays its own live region
-so nothing double-announces. Bottom corners stack newest nearest the edge.
+**Purpose.** A fixed screen anchor that **stacks** live toasts. The parent owns
+the list (`CrToastRegion` is presentational); each row stays its own live region
+so nothing double-announces. Bottom anchors stack newest nearest the edge.
+
+**Nine anchors.** `position` takes four corners (`tr` default · `br` · `tl` ·
+`bl`), the two horizontal centers (`tc` · `bc`), and the three vertical middles
+(`ml` · `mr` · `mc`). Centred anchors use `50%` + a `translate` rather than
+`left:0;right:0`, so the region keeps its shrink-to-fit width.
+
+**Packing.** Consecutive toasts sharing the same `message` **and** `signal`
+collapse into one row with a `×N` counter, so a retry storm costs one row instead
+of ten. Only *consecutive* runs pack — an unrelated toast in between keeps the
+occurrences separate and preserves arrival order. The row's dismiss target is the
+**newest** member's id, so `onDismiss` removes what the user is looking at.
 
 ```tsx
-<CrToastRegion position="br" toasts={list} onDismiss={remove} />
+<CrToastRegion position="bc" toasts={list} onDismiss={remove} />
 ```
 ```css
 .cr-toast-region { position: fixed; display: flex; flex-direction: column; gap: var(--space-2); }
 .cr-toast-region--br { bottom: var(--space-4); right: var(--space-4); flex-direction: column-reverse; }
+.cr-toast-region--mc { top: 50%; left: 50%; transform: translate(-50%, -50%); align-items: center; }
 ```
 
-- **MUST** keep each toast's own `role`/`aria-live` (don't wrap the region in a
+- **MUST** keep each row's own `role`/`aria-live` (don't wrap the region in a
   second live region — that double-announces).
+- **MUST** keep the `×N` counter `aria-hidden`. It is the only thing that changes
+  when a duplicate arrives; leaving it inside the announced text would re-fire the
+  live region on every repeat, and `err` announces *assertively*.
 - **SHOULD** cap how many stack at once and drop oldest, so a burst can't bury the
   screen.
 
