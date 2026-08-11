@@ -177,6 +177,18 @@ function readProps(comp) {
       doc = "";
     }
   }
+  // Deterministic order: required first (callers must supply them), then optional
+  // props alphabetically, then the styling-contract trio last — it is boilerplate
+  // on every component and repeating it mid-table buries the real API.
+  const CONTRACT = { unstyled: 1, pt: 2, dt: 3 };
+  rows.sort((a, b) => {
+    const ca = CONTRACT[a.prop] || 0;
+    const cb = CONTRACT[b.prop] || 0;
+    if (ca !== cb) return ca - cb; // contract trio sinks to the bottom
+    if (ca) return ca - cb; // and keeps unstyled · pt · dt order
+    if (a.req !== b.req) return a.req ? -1 : 1; // required before optional
+    return a.prop.localeCompare(b.prop);
+  });
   return rows.length ? rows : null;
 }
 function propsHtml(e) {
