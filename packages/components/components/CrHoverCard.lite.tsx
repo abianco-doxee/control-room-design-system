@@ -1,12 +1,17 @@
-import { useStore } from "@builder.io/mitosis";
+import { useStore, useRef } from "@builder.io/mitosis";
 import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { placeEl } from "../lib/position.ts";
 
 export interface CrHoverCardProps {
   /** Trigger text (focusable so keyboard users get the card too). */
   label: string;
   /** Accessible name for the card panel. */
   title?: string;
-  align?: "left" | "right";
+  /** Preferred placement, `${side}` or `${side}-${align}` — e.g. "bottom-start"
+   *  (default), "top-end", "right". Sides: top · bottom · left · right;
+   *  aligns: start · end. Flips to the opposite side and shifts along the cross
+   *  axis as needed to stay within the viewport. */
+  placement?: string;
   children?: any;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "trigger" · "panel". */
@@ -22,6 +27,8 @@ export interface CrHoverCardProps {
  * next hover/focus shows it again. For a plain text hint use Tooltip; for a list
  * of actions use Menu. Styling via .cr-hovercard. */
 export default function CrHoverCard(props: CrHoverCardProps) {
+  const rootRef = useRef(null);
+
   const state = useStore({
     dismissed: false,
     onKey(event: any) {
@@ -30,16 +37,33 @@ export default function CrHoverCard(props: CrHoverCardProps) {
     reset() {
       state.dismissed = false;
     },
+    /* Reveal here is CSS-driven (:hover/:focus-within on root), so there is no
+     * open/close JS state to gate a hide-then-show cycle like popover/menu. Both
+     * paths that precede the CSS reveal — pointer entering root, keyboard focus
+     * landing on the trigger — call this so the panel is already positioned by
+     * the time CSS flips its opacity/visibility on. Layout is available via
+     * getBoundingClientRect() even while the CSS transition hasn't started, so
+     * measuring here is safe. Absence of window/trigger/panel just leaves the
+     * panel at its CSS fallback position — never blocks the CSS reveal. */
+    place() {
+      const root: any = rootRef;
+      const panel = root ? root.querySelector(".cr-hovercard__panel") : null;
+      if (!panel) return;
+      if (root && typeof window !== "undefined") {
+        const trigger = root.querySelector(".cr-hovercard__trigger");
+        if (trigger) placeEl(trigger, panel, { placement: props.placement || "bottom-start" });
+      }
+    },
   });
 
   return (
-    <span {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-hovercard", "root")} data-part="root" data-state={state.dismissed ? "dismissed" : undefined} style={ptStyle(props.pt, props.dt, "root")} data-dismissed={state.dismissed ? "true" : undefined} onMouseLeave={() => state.reset()}>
-      <span {...ptAttrs(props.pt, "trigger")} class={ptClass(props.pt, props.unstyled, "cr-hovercard__trigger", "trigger")} data-part="trigger" tabIndex={0} onKeyDown={(event) => state.onKey(event)} onBlur={() => state.reset()}>
+    <span {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-hovercard", "root")} data-part="root" data-state={state.dismissed ? "dismissed" : undefined} style={ptStyle(props.pt, props.dt, "root")} data-dismissed={state.dismissed ? "true" : undefined} ref={rootRef} onMouseEnter={() => state.place()} onMouseLeave={() => state.reset()}>
+      <span {...ptAttrs(props.pt, "trigger")} class={ptClass(props.pt, props.unstyled, "cr-hovercard__trigger", "trigger")} data-part="trigger" tabIndex={0} onFocus={() => state.place()} onKeyDown={(event) => state.onKey(event)} onBlur={() => state.reset()}>
         {props.label}
       </span>
       <span
         {...ptAttrs(props.pt, "panel")}
-        class={ptClass(props.pt, props.unstyled, "cr-hovercard__panel" + (props.align === "right" ? " cr-hovercard__panel--right" : ""), "panel")}
+        class={ptClass(props.pt, props.unstyled, "cr-hovercard__panel", "panel")}
         data-part="panel"
         role="group"
         aria-label={props.title || props.label}

@@ -2319,7 +2319,11 @@
       "description": "A rich hover/focus card for structured content (Tooltip is for plain text, Menu for actions). CSS-driven reveal with an open delay; the trigger is focusable so keyboard users get it too.",
       "spec": "references/components.md#hover-card",
       "variants": {
-        "align": [
+        "placement": [
+          "bottom-start",
+          "bottom-end",
+          "top-start",
+          "top-end",
           "left",
           "right"
         ]

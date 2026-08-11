@@ -3347,8 +3347,14 @@ content (a stat block, a preview). CSS-driven with an open delay; the trigger is
 focusable so keyboard users get it too. For plain text use Tooltip; for actions use
 Menu.
 
+**Positioning.** Collision-aware, same algorithm as **Popover** and **Menu**: on
+reveal (pointer hover or keyboard focus) the panel anchors to the trigger via
+`placement` (`${side}` or `${side}-${align}`, default `"bottom-start"`), **flips**
+to the opposite side when there's no room, and **shifts** along the cross axis to
+stay in the viewport, tagging itself with `data-placement`.
+
 ```tsx
-<CrHoverCard label="health" title="Fleet health">
+<CrHoverCard label="health" title="Fleet health" placement="bottom-start">
   <dl class="cr-dl"><dt class="cr-dl__k">workers</dt><dd class="cr-dl__v">4 online</dd></dl>
 </CrHoverCard>
 ```
