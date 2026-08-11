@@ -507,9 +507,11 @@ const DEMOS = {
     tag: "CrMenu",
     defs: [
       T("text", "label", "Actions"),
-      T("enum", "align", "left", { options: ["left", "right"] }),
+      T("enum", "placement", "bottom-start", {
+        options: ["bottom-start", "bottom-end", "top-start", "top-end", "left", "right"],
+      }),
     ],
-    render: (s) => h(CrMenu, { label: s.label, align: s.align, items: MENU_ITEMS }),
+    render: (s) => h(CrMenu, { label: s.label, placement: s.placement, items: MENU_ITEMS }),
   },
   combobox: {
     tag: "CrCombobox",

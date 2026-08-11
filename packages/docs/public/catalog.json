@@ -2357,7 +2357,11 @@
       "description": "Dropdown menu — a trigger toggles a role=menu panel; a transparent full-viewport scrim closes it on outside click (no global listeners). Optional danger items.",
       "spec": "references/components.md#menu",
       "variants": {
-        "align": [
+        "placement": [
+          "bottom-start",
+          "bottom-end",
+          "top-start",
+          "top-end",
           "left",
           "right"
         ]

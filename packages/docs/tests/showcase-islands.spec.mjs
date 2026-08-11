@@ -552,6 +552,26 @@ test.describe("component browser — live islands", () => {
     expect(box.y, "top edge in view").toBeGreaterThanOrEqual(-1);
   });
 
+  test("menu is collision-positioned and stays within the viewport", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const menu = page.locator('[data-island="menu"]');
+    await menu.locator("[aria-haspopup]").click();
+    const panel = menu.locator(".cr-menu__panel");
+    await expect(panel).toBeVisible();
+
+    // the placer ran: fixed position + a resolved placement
+    await expect(panel).toHaveAttribute("data-placement", /^(top|bottom)-(start|end)$/);
+    expect(await panel.evaluate((el) => getComputedStyle(el).position)).toBe("fixed");
+
+    // and it doesn't clip off the viewport edges
+    const box = await panel.boundingBox();
+    const vp = page.viewportSize();
+    expect(box.x, "left edge in view").toBeGreaterThanOrEqual(-1);
+    expect(box.x + box.width, "right edge in view").toBeLessThanOrEqual(vp.width + 1);
+    expect(box.y, "top edge in view").toBeGreaterThanOrEqual(-1);
+  });
+
   test("keyboard focus shows a visible ring", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));

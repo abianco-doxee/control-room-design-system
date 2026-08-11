@@ -876,8 +876,14 @@ so nothing double-announces. Bottom corners stack newest nearest the edge.
 transparent full-viewport **scrim** closes it on outside click — no global
 listeners, so every framework target behaves the same.
 
+**Positioning.** Collision-aware, same algorithm as **Popover**: on open the
+panel anchors to the trigger via `placement` (`${side}` or `${side}-${align}`,
+default `"bottom-start"`), **flips** to the opposite side when there's no room,
+and **shifts** along the cross axis to stay in the viewport, tagging itself
+with `data-placement`.
+
 ```tsx
-<CrMenu label="actions ▾" align="right" onSelect={run}
+<CrMenu label="actions ▾" placement="bottom-end" onSelect={run}
   items={[{ label: "pause all" }, { label: "kill all", danger: true }]} />
 ```
 ```css
