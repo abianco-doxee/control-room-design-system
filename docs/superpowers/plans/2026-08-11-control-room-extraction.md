@@ -1544,7 +1544,7 @@ control loses its accessible name."
 | 12 | `RelativeTime` | `CrRelativeTime` | 7 |
 | 13 | `IconToggle` | `CrToggleChip` | 5 |
 | 14 | `ToggleChip` | `CrToggleChip` | 16 |
-| 15 | `ErrorState` | `CrAlert` | 10 |
+| 15 | `ErrorState` | `CrDrip` | 10 |
 | 16 | `Hero` | `CrHero` | 10 |
 | 17 | `Field` / `SelectField` | `CrField` / `CrInput` / `CrSelect` | 16 |
 | 18 | `CronField` | `CrCronField` | 3 |
@@ -1554,6 +1554,21 @@ control loses its accessible name."
 | 22 | `CrIcon` | `CrIcon` | 20 |
 | 23 | `ToastStack` | `CrToastRegion` / `CrToast` | 2 |
 | 24 | `Shell` | `CrMasthead` + `CrNav` | 1 |
+
+**Note on `ErrorState` (#15).** It maps to `CrDrip`, not `CrAlert`: the app's
+error surface floods with `--sig-err` and carries Law 3's drip, which is exactly
+`CrDrip`'s job. The design system's drip was fixed upstream first (commit
+`ff278ca`) — it had been painting liquid `--sig-err` blobs instead of the vertical
+`--drip` glitch the law specifies, and the app's version was the correct one. The
+T1/T2/T3 glitch tiers moved upstream in the same commit, so **delete the app's
+local `.cr-drip` and `.cr-glitch-t*` blocks from `global.css` during this swap**
+rather than keeping a local copy. The app's `detail` prop becomes `sub`.
+
+Verified safe: after Task 2 removes `/design`, `ErrorState` is the *only*
+consumer of those classes in the app, so the local CSS is fully dead once
+swapped. Law 3 also allows the drip on the masthead — if a masthead drip is
+wanted later, apply `.cr-drip` from the style layer rather than re-adding the
+local block.
 
 **For each primitive, run this cycle. Do not batch.**
 
