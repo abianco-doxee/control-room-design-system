@@ -26,8 +26,8 @@ import {
   CrCarousel,
   CrCat,
   CrChip,
-  CrChrome,
   CrChoice,
+  CrChrome,
   CrCombobox,
   CrCronField,
   CrDataGrid,
@@ -1541,23 +1541,32 @@ const DEMOS = {
       h(
         CrBreach,
         { signal: s.signal, wash: s.wash, alive: s.alive },
-        h("strong", { style: { fontFamily: "var(--font-display)", textTransform: "uppercase" } }, "build failing"),
-        h("p", { style: { fontFamily: "var(--font-mono)", fontSize: "12px", margin: "6px 0 0" } }, "SSE closed · retry 3/5")
+        h(
+          "strong",
+          { style: { fontFamily: "var(--font-display)", textTransform: "uppercase" } },
+          "build failing"
+        ),
+        h(
+          "p",
+          { style: { fontFamily: "var(--font-mono)", fontSize: "12px", margin: "6px 0 0" } },
+          "SSE closed · retry 3/5"
+        )
       ),
   },
   drip: {
     tag: "CrDrip",
-    defs: [
-      T("text", "title", "connection lost"),
-      T("text", "sub", "SSE closed · retry 3/5"),
-    ],
+    defs: [T("text", "title", "connection lost"), T("text", "sub", "SSE closed · retry 3/5")],
     render: (s) => h(CrDrip, { title: s.title, sub: s.sub }),
   },
   bezel: {
     tag: "CrBezel",
     defs: [T("text", "children", "READOUT NOMINAL · 14 sessions · p95 210ms")],
     render: (s) =>
-      h(CrBezel, null, h("div", { style: { fontFamily: "var(--font-mono)", fontSize: "13px" } }, s.children)),
+      h(
+        CrBezel,
+        null,
+        h("div", { style: { fontFamily: "var(--font-mono)", fontSize: "13px" } }, s.children)
+      ),
   },
   // Seeded generators: same seed → same artwork, forever. Two copies of one seed
   // prove determinism; a third seed proves it actually varies.
@@ -1597,7 +1606,8 @@ const DEMOS = {
       T("number", "width", 240, { min: 120, max: 420, step: 20 }),
       T("number", "height", 110, { min: 60, max: 200, step: 10 }),
     ],
-    render: (s) => h(CrAscii, { seed: s.seed, variant: s.variant, width: s.width, height: s.height }),
+    render: (s) =>
+      h(CrAscii, { seed: s.seed, variant: s.variant, width: s.width, height: s.height }),
   },
   telemetry: {
     tag: "CrTelemetry",
@@ -1674,7 +1684,11 @@ const DEMOS = {
     tag: "CrInstrument",
     defs: [T("text", "children", "READOUT · 14 sessions · p95 210ms")],
     render: (s) =>
-      h(CrInstrument, null, h("div", { style: { fontFamily: "var(--font-mono)", fontSize: "13px" } }, s.children)),
+      h(
+        CrInstrument,
+        null,
+        h("div", { style: { fontFamily: "var(--font-mono)", fontSize: "13px" } }, s.children)
+      ),
   },
   rail: {
     tag: "CrNav",
@@ -1703,11 +1717,29 @@ const DEMOS = {
         "div",
         { style: { display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" } },
         h(CrKeyHints, { revealKey: s.revealKey }),
-        h("span", { style: { fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--muted)" } },
-          "hold " + (s.revealKey || "Alt") + " →"),
-        h("button", { className: "cr-btn cr-btn--outline cr-btn--sm" }, "Deploy ", h(CrKbd, { keys: "D", hint: true })),
-        h("button", { className: "cr-btn cr-btn--outline cr-btn--sm" }, "Scan ", h(CrKbd, { keys: "S", hint: true })),
-        h("button", { className: "cr-btn cr-btn--sig-err cr-btn--sm" }, "Kill ", h(CrKbd, { keys: "K", hint: true, on: true }))
+        h(
+          "span",
+          { style: { fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--muted)" } },
+          "hold " + (s.revealKey || "Alt") + " →"
+        ),
+        h(
+          "button",
+          { className: "cr-btn cr-btn--outline cr-btn--sm" },
+          "Deploy ",
+          h(CrKbd, { keys: "D", hint: true })
+        ),
+        h(
+          "button",
+          { className: "cr-btn cr-btn--outline cr-btn--sm" },
+          "Scan ",
+          h(CrKbd, { keys: "S", hint: true })
+        ),
+        h(
+          "button",
+          { className: "cr-btn cr-btn--sig-err cr-btn--sm" },
+          "Kill ",
+          h(CrKbd, { keys: "K", hint: true, on: true })
+        )
       ),
   },
 };
