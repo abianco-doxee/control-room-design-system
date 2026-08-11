@@ -239,6 +239,7 @@ const ISLAND_IDS = new Set([
   "popover",
   "hover-card",
   "segmented",
+  "choice-group",
   "radio-group",
   "slider",
   "number-field",

@@ -1980,6 +1980,50 @@
       ]
     },
     {
+      "id": "choice-group",
+      "name": "Choice group",
+      "category": "forms",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Grouped choices for both types, rendering CrChoice. type=\"radio\" is a radiogroup of native radios sharing one name (browser-supplied roving tabindex + arrow selection); type=\"checkbox\" is a group of independently tabbable boxes with arrows inert.",
+      "spec": "references/components.md#choice-group",
+      "variants": {
+        "prop": [
+          "type",
+          "value",
+          "values",
+          "row",
+          "invalid"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--cr-check-checked",
+          "description": "checked fill"
+        },
+        {
+          "cssVar": "--cr-check-mark",
+          "description": "checked mark"
+        },
+        {
+          "cssVar": "--cr-field-border",
+          "description": "box border"
+        }
+      ],
+      "keywords": [
+        "choice",
+        "choicegroup",
+        "radiogroup",
+        "checkbox group",
+        "radio",
+        "checkbox",
+        "option",
+        "multi-select",
+        "single-select",
+        "form"
+      ]
+    },
+    {
       "id": "slider",
       "name": "Slider",
       "category": "forms",

@@ -27,6 +27,7 @@ import {
   CrCat,
   CrChip,
   CrChoice,
+  CrChoiceGroup,
   CrChrome,
   CrCombobox,
   CrCronField,
@@ -619,6 +620,33 @@ const DEMOS = {
         value: s.value,
         label: s.label,
         onChange: (v) => set("value", v),
+      }),
+  },
+  "choice-group": {
+    tag: "CrChoiceGroup",
+    defs: [
+      T("enum", "type", "radio", { options: ["radio", "checkbox"] }),
+      T("boolean", "row", false),
+      T("boolean", "invalid", false),
+      T("boolean", "disabled", false),
+    ],
+    extra: { value: "queue", values: ["queue"] },
+    render: (s, set) =>
+      h(CrChoiceGroup, {
+        type: s.type,
+        row: s.row,
+        invalid: s.invalid,
+        disabled: s.disabled,
+        label: "stage",
+        options: [
+          { value: "queue", label: "queue" },
+          { value: "run", label: "run" },
+          { value: "verify", label: "verify" },
+        ],
+        value: s.value,
+        values: s.values,
+        onChange: (v) => set("value", v),
+        onChangeMany: (v) => set("values", v),
       }),
   },
   "radio-group": {

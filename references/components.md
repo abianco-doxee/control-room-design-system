@@ -1015,6 +1015,41 @@ selection. Square radios (radius 0) — a filled inner square marks the choice.
 
 ---
 
+## Choice group {#choice-group}
+
+**Purpose.** One grouped-choice control for BOTH types, rendering `CrChoice`
+(native inputs) so each type gets the keyboard model its role requires. Replaces
+`CrRadioGroup` and fills the missing checkbox-group case.
+
+| | `type="radio"` (default) | `type="checkbox"` |
+| --- | --- | --- |
+| roles | `radiogroup` / native radios | `group` / native checkboxes |
+| selection | `value: string` → `onChange` | `values: string[]` → `onChangeMany` |
+| keyboard | one tab stop; arrows move selection | each box tabbable; arrows inert |
+
+```tsx
+<CrChoiceGroup label="stage" value={stage}
+  options={[{ value: "queue", label: "queue" }, { value: "run", label: "run" }]}
+  onChange={setStage} />
+
+<CrChoiceGroup type="checkbox" label="signals" values={signals}
+  options={[{ value: "err", label: "err" }, { value: "warn", label: "warn" }]}
+  onChangeMany={setSignals} />
+```
+
+- **MUST** keep it controlled — `value`/`onChange` for radio, `values`/`onChangeMany`
+  for checkbox.
+- **MUST** let the platform drive the radio keyboard model: the inputs share one
+  `name`, so the browser supplies roving tabindex and arrow selection. Do **NOT**
+  add a JS key handler — a roving-tabindex port from `CrRadioGroup` would be dead
+  code here (it queries `[role="radio"]`, which native inputs do not emit).
+- **NEVER** apply the radio arrow-key model to checkboxes — independent tabbing is
+  required, and arrow-key selection would be an accessibility defect.
+- `invalid` is **ARIA-only** (sets `aria-invalid`); visual error styling comes from
+  a wrapping `CrField`.
+
+---
+
 ## Slider {#slider}
 
 **Purpose.** A numeric operator control (threshold, interval). A **styled native

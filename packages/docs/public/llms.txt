@@ -34,7 +34,7 @@ Set the theme on the root: `<html data-theme="dark|light|extreme|phosphor">`.
 
 ## Components
 Every component is catalogued with its variants, design tokens, and keywords in
-[catalog.json](https://alebianco.github.io/control-room-design-system/catalog.json) (83 entries). Rendered and
+[catalog.json](https://alebianco.github.io/control-room-design-system/catalog.json) (84 entries). Rendered and
 exercised in all four themes in the [Component Browser](https://alebianco.github.io/control-room-design-system/components.html); see them
 live in the [Component Browser](https://alebianco.github.io/control-room-design-system/components.html).
 
@@ -54,6 +54,7 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 ### Forms
 - [Calendar](https://alebianco.github.io/control-room-design-system/components.html#c-calendar): Month calendar grid — role=grid with roving tabindex (arrows move day/week, PageUp/Down step months, Enter/Space select). Fully controlled, SSR-safe (month + today injected, never read from the clock).
 - [Checkbox / Radio](https://alebianco.github.io/control-room-design-system/components.html#c-checkbox): Square checkbox and radio (radius 0); checked fills to --sig-work with an --on-sig mark.
+- [Choice group](https://alebianco.github.io/control-room-design-system/components.html#c-choice-group): Grouped choices for both types, rendering CrChoice. type="radio" is a radiogroup of native radios sharing one name (browser-supplied roving tabindex + arrow selection); type="checkbox" is a group of independently tabbable boxes with arrows inert.
 - [Combobox](https://alebianco.github.io/control-room-design-system/components.html#c-combobox): Autocomplete — an input (role=combobox) filtering a listbox; ↑/↓ move the active option (aria-activedescendant), Enter selects, Esc closes. Active row shows an ascii ▸ marker.
 - [Cron field](https://alebianco.github.io/control-room-design-system/components.html#c-cron-field): A proper cron-expression form field: label + input + quick presets + a live human-readable readout. The translation is injected as `description` (compute with cronstrue in the host) so the design system stays dependency-free; validity is message-driven via `error` (no hand-set `invalid`), wired like CrField (aria-invalid + aria-describedby).
 - [Date-time](https://alebianco.github.io/control-room-design-system/components.html#c-datetime): A styled native date/time input (datetime-local / date / time) — the browser owns the picker, keyboard, and locale.

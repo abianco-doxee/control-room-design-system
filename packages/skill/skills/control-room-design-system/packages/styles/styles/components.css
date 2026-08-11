@@ -569,6 +569,10 @@
 /* Error state, derived from the wrapper — no per-control prop needed. */
 .cr-field--error .cr-radio__box { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 
+/* ── Choice group (grouped CrChoice — both checkbox and radio) ───────────── */
+.cr-choicegroup { display: flex; flex-direction: column; gap: var(--space-2); }
+.cr-choicegroup--row { flex-direction: row; flex-wrap: wrap; gap: var(--space-4); }
+
 /* ── Slider (styled native range — keyboard for free) ───────────────────── */
 .cr-slider { -webkit-appearance: none; appearance: none; width: 100%; height: var(--space-2); background: var(--cr-slider-track); border: var(--brd-hair) solid var(--cr-field-border); cursor: pointer; }
 .cr-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: var(--space-3); height: var(--space-4); background: var(--cr-slider-thumb); border: var(--brd) solid var(--cr-field-border); box-shadow: var(--space-px) var(--brd-hair) 0 var(--shadow-col); }
