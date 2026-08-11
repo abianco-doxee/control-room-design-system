@@ -74,76 +74,6 @@ try {
 const sig = (seed, st, n) =>
   `<canvas class="crsig" width="${n || 40}" height="${n || 40}" data-seed="${seed}" data-state="${st}"></canvas>`;
 const EXAMPLES = {
-  shape: [
-    {
-      state: "crit (▲)",
-      html: `<span class="cr-sev cr-sev--crit" role="img" aria-label="critical"></span>`,
-    },
-    {
-      state: "warn (◆)",
-      html: `<span class="cr-sev cr-sev--warn" role="img" aria-label="warn"></span>`,
-    },
-    {
-      state: "work (⬠)",
-      html: `<span class="cr-sev cr-sev--work" role="img" aria-label="work"></span>`,
-    },
-    { state: "ok (⬡)", html: `<span class="cr-sev cr-sev--ok" role="img" aria-label="ok"></span>` },
-    {
-      state: "idle (●)",
-      html: `<span class="cr-sev cr-sev--idle" role="img" aria-label="idle"></span>`,
-    },
-  ],
-  hero: [
-    {
-      state: "wait",
-      html: `<div class="cr-hero cr-hero--wait"><div><div class="cr-hero__big">2 need you</div><div class="cr-hero__sub">awaiting input</div></div></div>`,
-    },
-    {
-      state: "err",
-      html: `<div class="cr-hero cr-hero--err"><div><div class="cr-hero__big">1 failing</div><div class="cr-hero__sub">SSE closed</div></div></div>`,
-    },
-    {
-      state: "calm",
-      html: `<div class="cr-hero cr-hero--calm"><div><div class="cr-hero__big">all nominal</div><div class="cr-hero__sub">14 sessions</div></div></div>`,
-    },
-  ],
-  masthead: [
-    {
-      state: "with marks",
-      html: `<header class="cr-masthead cr-mark"><p class="cr-masthead__eyebrow">DP Control Room</p><h1 class="cr-masthead__title">14 sessions</h1></header>`,
-    },
-  ],
-  breach: [
-    {
-      state: "err · alive",
-      html: `<div class="cr-breach cr-breach--err cr-breach--alive" style="padding:16px;max-width:360px"><div style="position:relative;z-index:1"><strong style="font-family:var(--font-display);text-transform:uppercase">build failing</strong><p style="font-family:var(--font-mono);font-size:12px;margin:6px 0 0">SSE closed · retry 3/5</p></div></div>`,
-    },
-  ],
-  drip: [
-    {
-      state: "error surface",
-      html: `<div class="cr-drip" style="max-width:340px"><div class="cr-drip__title">connection lost</div><div class="cr-drip__sub">SSE closed · retry 3/5</div></div>`,
-    },
-  ],
-  sigil: [
-    { state: "working", html: sig("nova-01", "working", 52) },
-    { state: "waiting", html: sig("ptl-757", "waiting", 52) },
-    { state: "error", html: sig("cr-1130", "error", 52) },
-    { state: "done", html: sig("rp-verify", "done", 52) },
-    { state: "idle", html: sig("ail-chat", "idle", 52) },
-  ],
-  chrome: [
-    {
-      state: "seeded strips",
-      html: `<div style="display:flex;flex-direction:column;gap:6px;min-width:320px"><canvas class="crchrome" width="380" height="24" data-seed="cr-00"></canvas><canvas class="crchrome" width="380" height="24" data-seed="nova-rack"></canvas></div>`,
-    },
-  ],
-  ascii: [
-    {
-      state: "braille field",
-      html: `<div class="cr-ascii cr-ascii--mask-edge" style="position:relative;width:240px;height:110px"><canvas class="crascii" width="240" height="110" data-seed="nova" data-variant="braille"></canvas></div>`,
-    },
-  ],
   "data-list": [
     {
       state: "key → value",
@@ -166,18 +96,6 @@ const EXAMPLES = {
     {
       state: "chev · notch · wedge",
       html: `<div style="display:flex;gap:16px;align-items:center"><span class="cr-chev" style="font-family:var(--font-mono);font-size:13px">route</span><span class="cr-notch" style="font-family:var(--font-mono);font-size:11px;font-weight:800;text-transform:uppercase">held</span><span class="cr-wedge cr-panel" style="padding:8px 20px 8px 12px;font-family:var(--font-mono);font-size:13px">active</span></div>`,
-    },
-  ],
-  bezel: [
-    {
-      state: "instrument screen",
-      html: `<div class="cr-bezel" style="max-width:280px"><div class="cr-bezel__rivets"><i></i><i></i></div><div class="cr-bezel__screen">SYS 0x7F · 41ms<br/>throughput 128/min</div></div>`,
-    },
-  ],
-  telemetry: [
-    {
-      state: "seeded string",
-      html: `<span class="cr-telemetry">SYS 0x7F · 41ms · ▁▂▃▅▇▅▃▂</span>`,
     },
   ],
 };
@@ -350,6 +268,16 @@ const ISLAND_IDS = new Set([
   "file-upload",
   "carousel",
   "calendar",
+  "hero",
+  "masthead",
+  "shape",
+  "breach",
+  "drip",
+  "bezel",
+  "sigil",
+  "chrome",
+  "ascii",
+  "telemetry",
 ]);
 
 function stageHtml(id) {

@@ -15,13 +15,17 @@
 import {
   CrAccordion,
   CrAlert,
+  CrAscii,
   CrAvatar,
   CrBarChart,
+  CrBezel,
+  CrBreach,
   CrBreadcrumb,
   CrButton,
   CrCalendar,
   CrCarousel,
   CrChip,
+  CrChrome,
   CrChoice,
   CrCombobox,
   CrCronField,
@@ -33,12 +37,14 @@ import {
   CrField,
   CrFileUpload,
   CrForm,
+  CrHero,
   CrHoverCard,
   CrIcon,
   CrInput,
   CrInputGroup,
   CrKbd,
   CrLineChart,
+  CrMasthead,
   CrMenu,
   CrMeter,
   CrModal,
@@ -56,6 +62,8 @@ import {
   CrSegmented,
   CrSelect,
   CrSessionRow,
+  CrShape,
+  CrSigil,
   CrSlider,
   CrSparkline,
   CrSpinner,
@@ -67,6 +75,7 @@ import {
   CrTabs,
   CrTag,
   CrTagsInput,
+  CrTelemetry,
   CrTextarea,
   CrTimeline,
   CrToast,
@@ -1490,6 +1499,103 @@ const DEMOS = {
         onSelect: (iso) => set("value", iso),
         onMonthChange: (m) => set("month", m),
       }),
+  },
+  // ── promoted from static HTML (no live island before) ────────────────────
+  hero: {
+    tag: "CrHero",
+    defs: [
+      T("text", "big", "2 need you"),
+      T("text", "sub", "awaiting input"),
+      T("enum", "state", "wait", { options: ["accent", "wait", "err", "calm"] }),
+    ],
+    render: (s) => h(CrHero, { big: s.big, sub: s.sub, state: s.state }),
+  },
+  masthead: {
+    tag: "CrMasthead",
+    defs: [T("text", "eyebrow", "DP Control Room"), T("text", "title", "14 sessions")],
+    render: (s) => h(CrMasthead, { eyebrow: s.eyebrow, title: s.title }),
+  },
+  shape: {
+    tag: "CrShape",
+    defs: [
+      T("enum", "severity", "crit", { options: ["crit", "warn", "work", "ok", "idle"] }),
+      T("text", "label", "critical"),
+    ],
+    render: (s) => h(CrShape, { severity: s.severity, label: s.label }),
+  },
+  breach: {
+    tag: "CrBreach",
+    defs: [
+      T("enum", "signal", "err", { options: ["work", "wait", "done", "err", "accent2"] }),
+      T("boolean", "wash", false),
+      T("boolean", "alive", true),
+    ],
+    render: (s) =>
+      h(
+        CrBreach,
+        { signal: s.signal, wash: s.wash, alive: s.alive },
+        h("strong", { style: { fontFamily: "var(--font-display)", textTransform: "uppercase" } }, "build failing"),
+        h("p", { style: { fontFamily: "var(--font-mono)", fontSize: "12px", margin: "6px 0 0" } }, "SSE closed · retry 3/5")
+      ),
+  },
+  drip: {
+    tag: "CrDrip",
+    defs: [
+      T("text", "title", "connection lost"),
+      T("text", "sub", "SSE closed · retry 3/5"),
+    ],
+    render: (s) => h(CrDrip, { title: s.title, sub: s.sub }),
+  },
+  bezel: {
+    tag: "CrBezel",
+    defs: [T("text", "children", "READOUT NOMINAL · 14 sessions · p95 210ms")],
+    render: (s) =>
+      h(CrBezel, null, h("div", { style: { fontFamily: "var(--font-mono)", fontSize: "13px" } }, s.children)),
+  },
+  // Seeded generators: same seed → same artwork, forever. Two copies of one seed
+  // prove determinism; a third seed proves it actually varies.
+  sigil: {
+    tag: "CrSigil",
+    defs: [
+      T("text", "seed", "nova-01"),
+      T("enum", "state", "working", { options: ["working", "waiting", "idle", "error", "done"] }),
+      T("number", "size", 52, { min: 24, max: 96, step: 4 }),
+    ],
+    render: (s) =>
+      h(
+        "div",
+        { style: { display: "flex", gap: "16px", alignItems: "flex-end", flexWrap: "wrap" } },
+        h(CrSigil, { seed: s.seed, state: s.state, size: s.size }),
+        h(CrSigil, { seed: s.seed, state: s.state, size: s.size }),
+        h(CrSigil, { seed: s.seed + "-b", state: s.state, size: s.size })
+      ),
+  },
+  chrome: {
+    tag: "CrChrome",
+    defs: [T("text", "seed", "cr-00"), T("number", "width", 380, { min: 160, max: 520, step: 20 })],
+    render: (s) =>
+      h(
+        "div",
+        { style: { display: "flex", flexDirection: "column", gap: "6px" } },
+        h(CrChrome, { seed: s.seed, width: s.width }),
+        h(CrChrome, { seed: s.seed, width: s.width }),
+        h(CrChrome, { seed: s.seed + "-rack", width: s.width })
+      ),
+  },
+  ascii: {
+    tag: "CrAscii",
+    defs: [
+      T("text", "seed", "nova"),
+      T("enum", "variant", "braille", { options: ["braille", "block", "ramp"] }),
+      T("number", "width", 240, { min: 120, max: 420, step: 20 }),
+      T("number", "height", 110, { min: 60, max: 200, step: 10 }),
+    ],
+    render: (s) => h(CrAscii, { seed: s.seed, variant: s.variant, width: s.width, height: s.height }),
+  },
+  telemetry: {
+    tag: "CrTelemetry",
+    defs: [T("text", "seed", "nova-01")],
+    render: (s) => h(CrTelemetry, { seed: s.seed }),
   },
 };
 
