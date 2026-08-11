@@ -6,6 +6,9 @@ export interface CrChoiceProps {
   label: string;
   checked?: boolean;
   disabled?: boolean;
+  /** Marks the control invalid for assistive tech (sets aria-invalid). Visual
+   *  error styling comes from a wrapping CrField — this is the a11y half only. */
+  invalid?: boolean;
   onChange?: (checked: boolean) => void;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "input" · "label". */
@@ -24,6 +27,7 @@ export default function CrChoice(props: CrChoiceProps) {
         name={props.name}
         checked={props.checked}
         disabled={props.disabled}
+        aria-invalid={props.invalid ? "true" : "false"}
         onChange={(event) => props.onChange && props.onChange(event.target.checked)}
       />
       <span {...ptAttrs(props.pt, "label")} data-part="label">{props.label}</span>

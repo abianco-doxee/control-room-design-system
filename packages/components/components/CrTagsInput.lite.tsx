@@ -7,6 +7,9 @@ export interface CrTagsInputProps {
   placeholder?: string;
   /** Accessible name for the group + entry field. */
   label?: string;
+  /** Marks the control invalid for assistive tech (sets aria-invalid). Visual
+   *  error styling comes from a wrapping CrField — this is the a11y half only. */
+  invalid?: boolean;
   onChange?: (tags: string[]) => void;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "list" · "tag" · "label" · "remove" · "input". */
@@ -81,6 +84,8 @@ export default function CrTagsInput(props: CrTagsInputProps) {
         value={state.draft}
         placeholder={props.placeholder}
         aria-label={props.label || "Add tag"}
+        aria-invalid={props.invalid ? "true" : "false"}
+        data-state={props.invalid ? "invalid" : "valid"}
         onInput={(event) => state.updateDraft((event.target as HTMLInputElement).value)}
         onKeyDown={(event) => state.onKeyDown(event)}
         onBlur={() => state.add()}

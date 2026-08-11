@@ -14,6 +14,9 @@ export interface CrInputGroupProps {
   /** Input type — text · email · url · number · search · tel. */
   type?: string;
   disabled?: boolean;
+  /** Marks the control invalid for assistive tech (sets aria-invalid). Visual
+   *  error styling comes from a wrapping CrField — this is the a11y half only. */
+  invalid?: boolean;
   onInput?: (value: string) => void;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "addon" · "input". */
@@ -48,6 +51,8 @@ export default function CrInputGroup(props: CrInputGroupProps) {
         placeholder={props.placeholder}
         disabled={props.disabled}
         aria-label={props.label}
+        aria-invalid={props.invalid ? "true" : "false"}
+        data-state={props.invalid ? "invalid" : "valid"}
         onInput={(event) => props.onInput && props.onInput((event.target as HTMLInputElement).value)}
       />
       <Show when={props.suffix}>

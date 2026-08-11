@@ -7,6 +7,9 @@ export interface CrSelectProps {
   options: string[];
   label?: string;
   disabled?: boolean;
+  /** Marks the control invalid for assistive tech (sets aria-invalid). Visual
+   *  error styling comes from a wrapping CrField — this is the a11y half only. */
+  invalid?: boolean;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "option". */
   unstyled?: boolean;
@@ -23,6 +26,8 @@ export default function CrSelect(props: CrSelectProps) {
       style={ptStyle(props.pt, props.dt, "root")}
       aria-label={props.label}
       disabled={props.disabled}
+      aria-invalid={props.invalid ? "true" : "false"}
+      data-state={props.invalid ? "invalid" : "valid"}
     >
       <For each={props.options}>{(opt: string) => <option {...ptAttrs(props.pt, "option")} data-part="option" value={opt}>{opt}</option>}</For>
     </select>

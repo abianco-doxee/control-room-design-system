@@ -4,6 +4,9 @@ export interface CrSwitchProps {
   checked?: boolean;
   label?: string;
   disabled?: boolean;
+  /** Marks the control invalid for assistive tech (sets aria-invalid). Visual
+   *  error styling comes from a wrapping CrField — this is the a11y half only. */
+  invalid?: boolean;
   onChange?: (next: boolean) => void;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "track". */
@@ -22,6 +25,7 @@ export default function CrSwitch(props: CrSwitchProps) {
       type="button"
       role="switch"
       aria-checked={props.checked ? "true" : "false"}
+      aria-invalid={props.invalid ? "true" : "false"}
       disabled={props.disabled}
       class={ptClass(props.pt, props.unstyled, "cr-switch", "root")}
       style={ptStyle(props.pt, props.dt, "root")}

@@ -8,6 +8,9 @@ export interface CrNumberFieldProps {
   step?: number;
   label?: string;
   disabled?: boolean;
+  /** Marks the control invalid for assistive tech (sets aria-invalid). Visual
+   *  error styling comes from a wrapping CrField — this is the a11y half only. */
+  invalid?: boolean;
   onChange?: (value: number) => void;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "btn" · "input". */
@@ -71,6 +74,8 @@ export default function CrNumberField(props: CrNumberFieldProps) {
         step={props.step || 1}
         disabled={props.disabled}
         aria-label={props.label || "number"}
+        aria-invalid={props.invalid ? "true" : "false"}
+        data-state={props.invalid ? "invalid" : "valid"}
         onInput={(event) => state.onInput((event.target as HTMLInputElement).value)}
       />
       <button

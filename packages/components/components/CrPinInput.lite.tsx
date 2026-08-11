@@ -10,6 +10,9 @@ export interface CrPinInputProps {
   onChange?: (code: string) => void;
   /** Fires once every cell is filled. */
   onComplete?: (code: string) => void;
+  /** Marks every cell invalid for assistive tech (sets aria-invalid). Visual
+   *  error styling comes from a wrapping CrField — this is the a11y half only. */
+  invalid?: boolean;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "cell". */
   unstyled?: boolean;
@@ -90,6 +93,8 @@ export default function CrPinInput(props: CrPinInputProps) {
             autocomplete={i === 0 ? "one-time-code" : "off"}
             maxLength={1}
             aria-label={"Digit " + (i + 1)}
+            aria-invalid={props.invalid ? "true" : "false"}
+            data-state={props.invalid ? "invalid" : "valid"}
             onInput={(event) => state.onInput(i, event)}
             onKeyDown={(event) => state.onKeyDown(i, event)}
           />

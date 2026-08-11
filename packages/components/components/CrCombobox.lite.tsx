@@ -17,6 +17,9 @@ export interface CrComboboxProps {
   placeholder?: string;
   /** Accessible name for the field. */
   label?: string;
+  /** Marks the control invalid for assistive tech (sets aria-invalid). Visual
+   *  error styling comes from a wrapping CrField — this is the a11y half only. */
+  invalid?: boolean;
   onChange?: (value: string) => void;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "input" · "scrim" · "list" · "empty" · "option". */
@@ -132,6 +135,7 @@ export default function CrCombobox(props: CrComboboxProps) {
         aria-activedescendant={state.open && state.results().length ? "cr-combo-" + state.active : undefined}
         aria-autocomplete="list"
         aria-label={props.label || props.placeholder || "Search"}
+        aria-invalid={props.invalid ? "true" : "false"}
         placeholder={props.placeholder || "Search…"}
         value={state.query}
         onInput={(event) => state.onQuery((event.target as HTMLInputElement).value)}
