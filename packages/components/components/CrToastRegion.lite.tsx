@@ -36,7 +36,15 @@ export interface CrToastRegionProps {
  * row carrying an aria-hidden ×N counter — the announced text never changes, so
  * a repeat updates the count instead of re-firing the live region. The group's
  * dismiss target is the NEWEST member's id. Styling via .cr-toast-region /
- * .cr-toast. */
+ * .cr-toast.
+ *
+ * DO NOT add `key={g.id}` to the group loop, however tempting React's
+ * "unique key" warning makes it. The no-re-announce guarantee depends on every
+ * target reconciling this list POSITIONALLY, so the row's DOM node survives a
+ * count bump. The group id is the NEWEST member's id and therefore changes on
+ * every duplicate — keying on it would remount the row, refiring the live
+ * region on each repeat. For `err` toasts (role=alert, assertive) that means
+ * spamming a screen reader, which is the exact defect this design prevents. */
 export default function CrToastRegion(props: CrToastRegionProps) {
   const state = useStore({
     /* Collapse runs of consecutive same-message/same-signal toasts. Only
