@@ -1685,9 +1685,21 @@ Each shape has a **fixed meaning**. Do not use a shape decoratively against its 
 
 Read `CrStepper.lite.tsx`. Add `cr-rail` semantics to the step list and mark the current step with the wedge, e.g. the step container gains `cr-rail`, each step `cr-rail__step`, and the active step `cr-rail__step--on`. Keep all existing ARIA (`aria-current`) intact — the shapes are visual reinforcement of state that is already announced, never a replacement for it.
 
-- [ ] **Step 3: Apply the focus + direction shapes to `CrTabs`**
+- [ ] **Step 3: Apply the focus shape to `CrTabs`**
 
-Read `CrTabs.lite.tsx`. Give the selected tab the wedge treatment and any overflow/scroll affordance the chevron. Preserve the existing `role="tab"`/`aria-selected` wiring exactly.
+Read `CrTabs.lite.tsx`. Give the selected tab the wedge treatment. Preserve the existing `role="tab"`/`aria-selected` wiring exactly.
+
+> **Plan correction (found during Task 22).** An earlier draft also asked for a
+> chevron on "any overflow/scroll affordance". There isn't one: `.cr-tabs` is a
+> plain flex row with no scroll container, no scroll state and no "more" control
+> (verified — zero `overflow`/`scroll` in `CrTabs.lite.tsx` or `parts/tabs.css`).
+> Adding a chevron would mean inventing an overflow feature to justify a shape,
+> which Law 4 forbids outright: *"NEVER add a decorative triangle. If it does not
+> encode direction, state, focus, or sequence, delete it."*
+>
+> This is an **open product question, not debt**: the chevron is the right
+> primitive for tab overflow if and when `CrTabs` gains real overflow behaviour.
+> Do not treat "chevron unused" as a gap to close in a later task.
 
 - [ ] **Step 4: Add any needed composition rules**
 
