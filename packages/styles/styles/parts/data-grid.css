@@ -54,20 +54,37 @@
 /* Selection checkbox — same treatment and same reasoning as .cr-table__sel
  * above. CrDataGrid renders a BARE `<input type="checkbox">` with no class at
  * all, so there is no class to hook and the element selector is the only
- * correct reach. Border is currentColor: measured in-browser against the
- * effective painted background it gives 15.58 / 18.98 / 15.32 / 16.81 on a body
- * row, and the head's select-all reads 8.69 / 3.33 / 9.66 / 12.67 — visible in
- * all four themes, where the inherited --border black measured 1.11 / 16.29 /
- * 1.11 / 1.06 and the --cr-check-bg fill was 1.00:1 against the grid's own
- * board (the unchecked control was literally invisible in three themes). */
+ * correct reach. Border is currentColor, which replaces the inherited --border
+ * black — that measured 1.11 / 16.29 / 1.11 / 1.06 against the field, and the
+ * --cr-check-bg fill was 1.00:1 against the grid's own board, so the unchecked
+ * control was literally invisible in three of four themes.
+ *
+ * `color: inherit` is LOAD-BEARING, not cosmetic. A form control does not
+ * inherit `color` from its parent by default, so without this line currentColor
+ * resolves to the UA color-scheme default — measured live as rgb(255,255,255)
+ * in phosphor while --ink is #43ff7a, i.e. legible only by coincidence and
+ * completely untethered from the theme. The table half of this pair gets the
+ * same thing for free because its input carries .cr-check, which sets
+ * `color: var(--ink)` ON THE ELEMENT; the grid's inputs have no class at all
+ * (see above), so they must be given it explicitly here. With it, the border
+ * tracks --ink in a body cell and --muted in the head cell. */
 .cr-grid__cell--check input[type="checkbox"] {
-  appearance: none; -webkit-appearance: none; margin: 0;
+  appearance: none; -webkit-appearance: none; margin: 0; color: inherit;
   width: var(--space-4); height: var(--space-4); flex-shrink: 0;
   border: var(--brd) solid currentColor; background: transparent;
   display: inline-grid; place-content: center; cursor: pointer;
 }
+/* Checked: flood the fill only, and KEEP the currentColor border. The shared
+ * --cr-check-checked (= --sig-work) measures just 2.86:1 against --board in the
+ * light theme — a pre-existing property of the token that .cr-check has always
+ * had, not something introduced here, and a token-layer decision to change. It
+ * does not matter, because the state never rests on the fill alone: the ink
+ * border holds at 15.21:1 and the mark at 5.33:1. Overriding border-color to
+ * the accent (as an earlier pass did) would have thrown away the one high-
+ * contrast edge in exactly the theme that needs it. Matches .cr-check
+ * input:checked, which likewise sets background only. */
 .cr-grid__cell--check input[type="checkbox"]:checked {
-  background: var(--cr-check-checked); border-color: var(--cr-check-checked);
+  background: var(--cr-check-checked);
 }
 .cr-grid__cell--check input[type="checkbox"]:checked::after {
   content: ""; width: var(--space-2); height: var(--space-2); background: var(--cr-check-mark);
