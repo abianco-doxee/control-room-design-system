@@ -1413,16 +1413,88 @@ body {
   display: inline-flex; align-items: center; gap: var(--space-2);
   font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); cursor: pointer;
 }
+/* Border is currentColor, not --cr-field-border (= --border, black). Black
+ * measured 1.21 / 20.34 / 1.21 / 1.01 against the surrounding panel
+ * (dark/light/extreme/phosphor) — invisible in three of four themes, and a harsh
+ * unmodulated outline in the fourth. That is the "unchecked is almost invisible
+ * in dark / very dark in light" report, and it is the same defect and the same
+ * fix already applied to .cr-table__sel and .cr-grid__cell--check. Inheriting
+ * gives 14.06 / 19.00 / 15.75 / 13.85 against the panel instead.
+ *
+ * `color: inherit` is LOAD-BEARING. A form control does not inherit `color` by
+ * default, so without it currentColor resolves to the UA color-scheme default
+ * (pure white/black) — legible only by coincidence and tracking no theme. This
+ * is redundant TODAY because .cr-check sets `color: var(--ink)` on the label and
+ * the input is its child, but stating it here keeps the treatment from silently
+ * depending on that, and matches the two selection-cell rules verbatim.
+ *
+ * The fill is transparent so the row's own ground reads through and the box
+ * never paints a lighter patch onto a dark panel (--cr-check-bg was 1.08 / 1.25
+ * / 1.10 / 1.04 against it — a smudge, not a control). The border asserts the
+ * control's presence; the mark asserts its state. */
 .cr-check input {
-  appearance: none; -webkit-appearance: none; margin: 0;
+  appearance: none; -webkit-appearance: none; margin: 0; color: inherit;
   width: var(--space-4); height: var(--space-4); flex-shrink: 0;
-  border: var(--brd) solid var(--cr-field-border); background: var(--cr-check-bg);
+  border: var(--brd) solid currentColor; background: transparent;
   display: inline-grid; place-content: center; cursor: pointer;
 }
-.cr-check input:checked { background: var(--cr-check-checked); }
-.cr-check input:checked::after {
-  content: ""; width: var(--space-2); height: var(--space-2); background: var(--cr-check-mark);
+/* The mark is present in BOTH states and only its opacity changes. This is what
+ * removes the vertical shift on toggle, and the mechanism is subtler than "the
+ * checked state is bigger": the box's own geometry never changed (border-box +
+ * a fixed --space-4 keep it 16x16 either way). .cr-check is an inline-flex whose
+ * baseline is taken from its first flex item — this input, a `display: grid`.
+ * An EMPTY grid has no in-flow child to take a baseline from, so the browser
+ * synthesises one from its margin box; inserting ::after on :checked gave it a
+ * real baseline, moving the whole inline-flex box relative to the text line.
+ * Measured: the label's top jumped 24 -> 26.81px (2.81px) on check, in all four
+ * themes. Keeping ::after in flow at all times pins that baseline: 0.000px.
+ * Do NOT collapse this back into a :checked-only ::after.
+ *
+ * SIZING is derived from the BORDER so a ring of the signal fill always survives
+ * around the mark. `extreme` scales border widths up (--brd 2->3px, --brd-heavy
+ * 3->4px) WITHOUT scaling this 16px box, so the fixed 8px mark this rule started
+ * with left a 0.00px fill ring there — measured — and a checked radio read as a
+ * dark square with the Law 2 signal fully occluded. Now 2px each side, always.
+ *
+ * Percentages CANNOT do this: `place-content: center` sizes the grid track to
+ * its item, so a percentage width resolves against a zero-width track and
+ * collapses to 0px (measured). The size must be stated in absolute terms. */
+.cr-check input::after {
+  content: "";
+  width: calc(var(--space-4) - 2 * var(--brd-heavy) - var(--space-1));
+  height: calc(var(--space-4) - 2 * var(--brd-heavy) - var(--space-1));
+  background: var(--cr-check-mark); opacity: 0;
 }
+.cr-check input:checked { background: var(--cr-check-checked); }
+.cr-check input:checked::after { opacity: 1; }
+/* Type differentiation (review: "the two control types look identical"). Since
+ * CrChoiceGroup renders CrChoice for BOTH types, one native input type is the
+ * only thing separating them, so the distinction has to be drawn here.
+ *
+ * The system is square-cornered (--radius: 0), so the radio is NOT rounded —
+ * that would import a vocabulary Law 1 does not use. The two differ by MARK and
+ * MASS instead, which survives phosphor's single hue and colour-blindness the
+ * same way the Law 4 severity shapes do:
+ *   checkbox — a tick, cut from its box by clip-path, over a --brd frame.
+ *   radio    — a solid inner square, inset on all sides, over a --brd-heavy frame.
+ * Same family (both square, both 16px, same border colour), unmistakably not the
+ * same control — and told apart in the UNCHECKED state too, by border weight
+ * alone, which is the state the "look identical" report was actually about.
+ * The checkbox's mark is deliberately the larger of the two so "many of these
+ * may be on" reads heavier than "exactly one of these is on". */
+.cr-check input[type="checkbox"]::after {
+  /* The tick runs two steps larger than the radio's solid square: it is a CUT
+   * shape, not a mass, so most of its box is transparent and it needs the room
+   * to read as line-work over the fill. Sized off --brd (the checkbox's own,
+   * lighter border) for the same theme-tracking reason as the base rule. */
+  width: calc(var(--space-4) - 2 * var(--brd));
+  height: calc(var(--space-4) - 2 * var(--brd));
+  clip-path: polygon(14% 46%, 0 60%, 38% 100%, 100% 22%, 86% 8%, 38% 72%);
+}
+/* The radio also carries a heavier border, so the two are told apart by their
+ * frame as well as their mark — legible even when neither is checked, which is
+ * exactly the state the "look identical" report was about. */
+.cr-check input[type="radio"] { border-width: var(--brd-heavy); }
 .cr-check input:disabled { opacity: 0.5; cursor: not-allowed; }
 /* Error state, derived from the wrapper (Law: the field owns the error, the
  * control only reflects it) — no per-control prop needed. .cr-check has no
