@@ -308,6 +308,9 @@ const ISLAND_IDS = new Set([
   "toggle-chip",
   "overflow",
   "relative-time",
+  // CSS-block demos (no single component): the shipped classes composed directly
+  "keyed-contact-sheet",
+  "decoration-utilities",
   "instrument",
   "rail",
   "key-hints",

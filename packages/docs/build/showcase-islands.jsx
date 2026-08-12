@@ -188,6 +188,37 @@ const SEG_OPTS = [
   { value: "1h", label: "1h" },
   { value: "24h", label: "24h" },
 ];
+// A truncated roster for the Overflow playground, so the "+N more" control has
+// the items it is summarising visibly behind it. Deterministic and long enough
+// to cover the control's `visible` + `count` maxima.
+const OVERFLOW_SIGNALS = ["work", "wait", "done", "err", "idle"];
+const OVERFLOW_REGIONS = ["eu-west", "us-east", "ap-south", "sa-east"];
+const OVERFLOW_ITEMS = Array.from({ length: 16 }, (_, i) => ({
+  id: "sess-" + String(4100 + i * 7),
+  signal: OVERFLOW_SIGNALS[i % OVERFLOW_SIGNALS.length],
+  region: OVERFLOW_REGIONS[i % OVERFLOW_REGIONS.length],
+}));
+// Tiles for the keyed contact sheet. `signal` picks the .cr-tile--* key class
+// (the CSS vocabulary: work/wait/done/err/idle); `state` is the sigil's own
+// longer-form vocabulary for the same machine state.
+const CONTACT_SHEET = [
+  { id: "nova-01", signal: "work", state: "working" },
+  { id: "nova-02", signal: "done", state: "done" },
+  { id: "orion-03", signal: "wait", state: "waiting" },
+  { id: "orion-04", signal: "err", state: "error" },
+  { id: "vega-05", signal: "idle", state: "idle" },
+  { id: "vega-06", signal: "work", state: "working" },
+  { id: "lyra-07", signal: "done", state: "done" },
+  { id: "lyra-08", signal: "wait", state: "waiting" },
+  { id: "atlas-09", signal: "work", state: "working" },
+  { id: "atlas-10", signal: "err", state: "error" },
+  { id: "rigel-11", signal: "idle", state: "idle" },
+  { id: "rigel-12", signal: "done", state: "done" },
+  { id: "mira-13", signal: "work", state: "working" },
+  { id: "mira-14", signal: "wait", state: "waiting" },
+  { id: "cygni-15", signal: "done", state: "done" },
+  { id: "cygni-16", signal: "idle", state: "idle" },
+];
 const CRON_PRESETS = [
   { label: "Hourly", cron: "0 * * * *" },
   { label: "Weekdays 9am", cron: "0 9 * * 1-5" },
@@ -600,7 +631,7 @@ const DEMOS = {
         h(
           "p",
           { style: { color: "var(--muted)", margin: 0 } },
-          "12 workers · 41 sessions · p95 210ms"
+          "12 workers · 41 sessions · 3 queued"
         )
       ),
   },
@@ -1605,7 +1636,7 @@ const DEMOS = {
   },
   bezel: {
     tag: "CrBezel",
-    defs: [T("text", "children", "READOUT NOMINAL · 14 sessions · p95 210ms")],
+    defs: [T("text", "children", "READOUT NOMINAL · 14 sessions · 3 queued")],
     render: (s) =>
       h(
         CrBezel,
@@ -1695,20 +1726,201 @@ const DEMOS = {
         onToggle: () => set("pressed", !s.pressed),
       }),
   },
+  // The control alone renders a bare "+N more" with nothing behind it, so the
+  // affordance had no visible referent (the review: "demo not very effective if
+  // it shows nothing"). Mount it doing its actual job: a truncated roster that
+  // shows `visible` items always, and reveals the remaining `count` inline when
+  // expanded. Toggling now visibly grows and shrinks the list.
   overflow: {
     tag: "CrOverflow",
     defs: [
+      T("number", "visible", 3, { min: 0, max: 8, step: 1 }),
       T("number", "count", 7, { min: 0, max: 99, step: 1 }),
       T("text", "noun", "session"),
       T("boolean", "expanded", false),
     ],
-    render: (s, set) =>
-      h(CrOverflow, {
-        count: s.count,
-        noun: s.noun,
-        expanded: s.expanded,
-        onToggle: () => set("expanded", !s.expanded),
-      }),
+    render: (s, set) => {
+      const shown = OVERFLOW_ITEMS.slice(0, s.visible);
+      const hidden = OVERFLOW_ITEMS.slice(s.visible, s.visible + s.count);
+      const row = (item) =>
+        h(
+          "li",
+          {
+            key: item.id,
+            style: {
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "5px 8px",
+              borderBottom: "var(--brd-hair) solid var(--border)",
+            },
+          },
+          h(CrStatusDot, { signal: item.signal, label: item.signal }),
+          h("span", { style: { fontFamily: "var(--font-mono)", fontSize: "12px" } }, item.id),
+          h(
+            "span",
+            {
+              style: {
+                fontFamily: "var(--font-mono)",
+                fontSize: "11px",
+                color: "var(--muted)",
+                marginInlineStart: "auto",
+              },
+            },
+            item.region
+          )
+        );
+      return h(
+        "div",
+        { style: { maxWidth: "320px" } },
+        h(
+          "ul",
+          {
+            style: {
+              listStyle: "none",
+              margin: 0,
+              padding: 0,
+              border: "var(--brd) solid var(--border)",
+              background: "var(--panel)",
+            },
+          },
+          ...shown.map(row),
+          ...(s.expanded ? hidden.map(row) : [])
+        ),
+        h(
+          "div",
+          { style: { marginTop: "8px" } },
+          h(CrOverflow, {
+            count: hidden.length,
+            noun: s.noun,
+            expanded: s.expanded,
+            onToggle: () => set("expanded", !s.expanded),
+          })
+        )
+      );
+    },
+  },
+  // Keyed contact sheet (Law 2) — a CSS block, not a component, so the demo
+  // composes the shipped .cr-tiles/.cr-tile classes directly. Each tile keys its
+  // background to one signal and carries the seeded sigil for that identity, so
+  // many keys read as ONE gridded instrument rather than competing stages.
+  "keyed-contact-sheet": {
+    tag: ".cr-tiles / .cr-tile",
+    defs: [T("number", "count", 8, { min: 2, max: 16, step: 1 }), T("boolean", "sigils", true)],
+    render: (s) =>
+      h(
+        "div",
+        { className: "cr-tiles", style: { maxWidth: "440px" } },
+        ...CONTACT_SHEET.slice(0, s.count).map((t) =>
+          h(
+            "div",
+            { key: t.id, className: "cr-tile cr-tile--" + t.signal },
+            // The sigil is the per-identity mark; the TILE already carries the
+            // state key as its background. Passing `state` to the sigil too paints
+            // it in that same signal hue, so it vanished into its own tile —
+            // instead let it use its seeded palette and blend to the tile's
+            // luminance, which reads on every key.
+            s.sigils
+              ? h(
+                  "span",
+                  {
+                    "aria-hidden": "true",
+                    style: {
+                      position: "absolute",
+                      inset: 0,
+                      opacity: 0.55,
+                      mixBlendMode: "luminosity",
+                    },
+                  },
+                  h(CrSigil, { seed: t.id, size: 104 })
+                )
+              : null,
+            h("span", { style: { position: "relative", zIndex: 1 } }, t.id)
+          )
+        )
+      ),
+  },
+  // Decoration utilities — the aria-hidden FUI layer. Shown on a realistic
+  // surface (a panel with a real readout) rather than as loose swatches, because
+  // the contract is about WHERE they go: dead space and chassis edges only,
+  // whisper contrast, never behind the content. The readout sits above at z-index 1.
+  "decoration-utilities": {
+    tag: ".cr-ruler / .cr-trim / .cr-bg--field / .cr-stripe / .cr-blob",
+    defs: [
+      T("boolean", "field", true),
+      T("boolean", "ruler", true),
+      T("boolean", "trim", true),
+      T("boolean", "stripe", true),
+      T("boolean", "blob", true),
+      T("text", "seed", "nova-01"),
+    ],
+    render: (s) =>
+      h(
+        "div",
+        {
+          className: [s.trim ? "cr-trim cr-trim--4" : "", s.field ? "cr-bg--field" : ""]
+            .filter(Boolean)
+            .join(" "),
+          style: {
+            position: "relative",
+            width: "340px",
+            maxWidth: "100%",
+            padding: "14px",
+            background: "var(--panel)",
+            border: "var(--brd) solid var(--border)",
+          },
+        },
+        // dead space behind the readout: seeded density field, masked clear of text
+        h(
+          "div",
+          { className: "cr-ascii cr-ascii--mask-l", "aria-hidden": "true" },
+          h(CrAscii, { seed: s.seed, variant: "braille", width: 340, height: 120 })
+        ),
+        h(
+          "div",
+          { style: { position: "relative", zIndex: 1 } },
+          h(
+            "div",
+            {
+              style: {
+                fontFamily: "var(--font-display)",
+                fontWeight: 900,
+                textTransform: "uppercase",
+                fontSize: "15px",
+              },
+            },
+            "eu-west-01"
+          ),
+          h(
+            "p",
+            {
+              style: {
+                fontFamily: "var(--font-mono)",
+                fontSize: "12px",
+                color: "var(--muted)",
+                margin: "4px 0 10px",
+              },
+            },
+            "12 workers · 41 sessions"
+          ),
+          s.ruler ? h("div", { className: "cr-ruler", "aria-hidden": "true" }) : null,
+          h("div", { style: { marginTop: "10px" } }, h(CrTelemetry, { seed: s.seed })),
+          s.stripe
+            ? h("div", {
+                className: "cr-stripe",
+                "aria-hidden": "true",
+                style: { marginTop: "10px" },
+              })
+            : null
+        ),
+        s.blob
+          ? h("div", {
+              className: "cr-blob",
+              "aria-hidden": "true",
+              style: { position: "absolute", right: "-10px", bottom: "-10px", zIndex: 0 },
+            })
+          : null
+      ),
   },
   "relative-time": {
     tag: "CrRelativeTime",
@@ -1727,7 +1939,7 @@ const DEMOS = {
   },
   instrument: {
     tag: "CrInstrument",
-    defs: [T("text", "children", "READOUT · 14 sessions · p95 210ms")],
+    defs: [T("text", "children", "READOUT · 14 sessions · 3 queued")],
     render: (s) =>
       h(
         CrInstrument,
