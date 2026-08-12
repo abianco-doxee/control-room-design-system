@@ -274,7 +274,7 @@
     "focus-w": {
       "$type": "dimension",
       "$value": "3px",
-      "$description": "keyboard focus-ring thickness (colour is --sig-work, themed)",
+      "$description": "keyboard focus-ring thickness (colour is --focus, themed)",
       "$extensions": {
         "com.doxee.cssVar": "--focus-w"
       }
@@ -1027,7 +1027,7 @@
       }
     },
     "cr-field-focus": {
-      "$value": "var(--sig-work)",
+      "$value": "var(--focus)",
       "$extensions": {
         "com.doxee.cssVar": "--cr-field-focus"
       }
@@ -1226,8 +1226,16 @@
     },
     "cr-accordion-border": {
       "$value": "var(--border)",
+      "$description": "outer chassis edge of the accordion (against --board); NOT the between-item seam",
       "$extensions": {
         "com.doxee.cssVar": "--cr-accordion-border"
+      }
+    },
+    "cr-accordion-seam": {
+      "$value": "var(--seam)",
+      "$description": "internal divider between items (against --cr-accordion-bg)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-accordion-seam"
       }
     },
     "cr-accordion-accent": {
@@ -1376,8 +1384,16 @@
     },
     "cr-datagrid-border": {
       "$value": "var(--border)",
+      "$description": "outer frame + head rule of the grid (chassis edge); NOT the row rule",
       "$extensions": {
         "com.doxee.cssVar": "--cr-datagrid-border"
+      }
+    },
+    "cr-datagrid-seam": {
+      "$value": "var(--seam)",
+      "$description": "internal row rule between body rows (against --cr-datagrid-bg)",
+      "$extensions": {
+        "com.doxee.cssVar": "--cr-datagrid-seam"
       }
     },
     "cr-masthead-bg": {

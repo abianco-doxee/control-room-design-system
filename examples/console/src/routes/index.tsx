@@ -478,7 +478,7 @@ export default component$(() => {
         </section>
 
         <footer style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
-          <CrChip tone="done">v1.0.0</CrChip>
+          <CrChip signal="done">v1.0.0</CrChip>
           <span class="cr-telemetry">SYS 0x7F · CH21 · ▁▂▃▅▇▅▃▂</span>
           <span style="flex:1"></span>
           <span class="cr-ruler" style="width:180px"></span>

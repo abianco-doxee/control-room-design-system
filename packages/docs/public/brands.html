@@ -164,7 +164,7 @@
   --cr-field-fg: var(--ink);
   --cr-field-border: var(--border);
   --cr-field-placeholder: var(--muted);
-  --cr-field-focus: var(--sig-work);
+  --cr-field-focus: var(--focus);
   --cr-field-error: var(--sig-err);
   --cr-check-bg: var(--board);
   --cr-check-checked: var(--sig-work);
@@ -198,6 +198,7 @@
   --cr-table-accent: var(--sig-work);
   --cr-accordion-bg: var(--panel);
   --cr-accordion-border: var(--border);
+  --cr-accordion-seam: var(--seam);
   --cr-accordion-accent: var(--sig-work);
   --cr-segmented-bg: var(--panel);
   --cr-segmented-border: var(--border);
@@ -223,6 +224,7 @@
   --cr-breadcrumb-current-fg: var(--ink);
   --cr-datagrid-bg: var(--board);
   --cr-datagrid-border: var(--border);
+  --cr-datagrid-seam: var(--seam);
   --cr-masthead-bg: var(--panel);
   --cr-masthead-border: var(--border);
   --cr-masthead-accent: var(--sig-accent);
@@ -267,8 +269,11 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
-/* Focus is a first-class signal, not an afterthought. */
-*:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
+/* Focus is a first-class signal, not an afterthought. It has its own --focus
+   colour rather than borrowing --sig-work: the ring must clear 3:1 against every
+   surface it can land on (WCAG 2.4.11), and in the light theme the working cyan
+   only reaches 2.86:1 on --board. --focus tracks --sig-work in the other three. */
+*:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
 /* Motion is opt-out at the system level. */
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
@@ -402,7 +407,15 @@ body {
   padding: var(--cr-chip-pad-y) var(--cr-chip-pad-x);
   background: var(--cr-chip-bg); color: var(--cr-chip-fg); border: var(--brd) solid var(--border);
 }
-.cr-chip--alt { --cr-chip-bg: var(--sig-work); }
+/* Chip carries the same signal vocabulary as Tag (Law 2). The default fill is
+ * --sig-done, so `signal="done"` is the bare .cr-chip and needs no modifier;
+ * the rest re-key --cr-chip-bg. The old `tone="alt"` was this same channel under
+ * a second name — `alt` meant --sig-work, i.e. `signal="work"`. */
+.cr-chip--work   { --cr-chip-bg: var(--sig-work); }
+.cr-chip--wait   { --cr-chip-bg: var(--sig-wait); }
+.cr-chip--err    { --cr-chip-bg: var(--sig-err);  --cr-chip-fg: var(--on-err); }
+.cr-chip--idle   { --cr-chip-bg: var(--sig-idle); --cr-chip-fg: var(--on-idle); }
+.cr-chip--accent { --cr-chip-bg: var(--sig-accent); --cr-chip-fg: var(--on-accent); }
 
 /* ── Tag (inline status) ───────────────────────────────────────────────── */
 .cr-tag {
@@ -1136,7 +1149,7 @@ body {
   content: ""; position: absolute; inset-block: 0; inset-inline-start: 0;
   width: var(--brd-hair); background: var(--cr-alert-border); pointer-events: none;
 }
-.cr-alert--info { --cr-alert-key: var(--sig-work); --cr-alert-sev: polygon(50% 0,98% 35%,79% 100%,21% 100%,2% 35%); }        /* 5 · working */
+.cr-alert--work { --cr-alert-key: var(--sig-work); --cr-alert-sev: polygon(50% 0,98% 35%,79% 100%,21% 100%,2% 35%); }        /* 5 · working */
 .cr-alert--wait { --cr-alert-key: var(--sig-wait); --cr-alert-sev: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }              /* 4 · attend  */
 .cr-alert--done { --cr-alert-key: var(--sig-done); --cr-alert-sev: polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%); }  /* 6 · nominal */
 .cr-alert--err  { --cr-alert-key: var(--sig-err);  --cr-alert-sev: polygon(50% 0, 100% 100%, 0 100%); }                      /* 3 · act now */
@@ -1314,8 +1327,15 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-dl__v { margin: 0; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); }
 
 /* ── Accordion (collapsible sections) ───────────────────────────────────── */
+/* Two different lines, two different tokens. --cr-accordion-border is the outer
+ * CHASSIS EDGE: it sits against --board, where --border is the correct near-black
+ * contour (Law 1). The between-item divider is an INTERNAL SEAM sitting against
+ * --cr-accordion-bg, where that same near-black measures 1.21 / 1.21 / 1.01 on
+ * dark / extreme / phosphor — an invisible rule on three of four themes. It gets
+ * --cr-accordion-seam (= --seam), which brackets between surface and ink in every
+ * theme by construction. Same reasoning the header seam below already used. */
 .cr-accordion { border: var(--brd) solid var(--cr-accordion-border); background: var(--cr-accordion-bg); }
-.cr-accordion__item + .cr-accordion__item { border-top: var(--brd) solid var(--cr-accordion-border); }
+.cr-accordion__item + .cr-accordion__item { border-top: var(--brd) solid var(--cr-accordion-seam); }
 /* Header chrome. The header carried none — flat text on the panel, with expansion
  * state announced only by the chevron. Two additions, both structural, no decoration:
  *
@@ -1323,21 +1343,19 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
  *    the body it reveals (the house head-vs-body pattern — .cr-modal__head and
  *    .cr-drawer__head do the same). The tone step alone would be a no-op: --panel-2
  *    against --panel measures only 1.07–1.13:1 across the four themes. The SEAM is
- *    what draws the boundary, and it is keyed to --muted rather than the house
- *    --cr-accordion-border: that token resolves to --border, which is pure/near
- *    black on dark, extreme AND phosphor, i.e. 1.21:1 / 1.21:1 / 1.01:1 against the
- *    panel — an invisible rule on three of the four themes. --muted brackets between
- *    surface and ink in all four by construction (4.65 / 6.55 / 6.58 / 5.73 against
- *    --panel-2). Still a hard edge, not a graded step (Law 1).
+ *    what draws the boundary, and it is keyed to --seam, the house internal-divider
+ *    role, rather than the chassis-edge --cr-accordion-border. --seam brackets
+ *    between surface and ink in all four themes by construction (4.65 / 6.55 / 6.58
+ *    / 5.73 against --panel-2). Still a hard edge, not a graded step (Law 1).
  * 2. An inline-start bar carrying expansion as a STATE channel (Law 2), not
- *    decoration: --muted while collapsed, flooding to --cr-accordion-accent when open.
+ *    decoration: --seam while collapsed, flooding to --cr-accordion-accent when open.
  *    It duplicates a reading the chevron already carries geometrically, so the state
  *    survives with colour removed. */
 .cr-accordion__header {
   width: 100%; display: flex; align-items: center; gap: var(--space-2); justify-content: space-between;
   background: var(--panel-2); border: 0; cursor: pointer;
   padding: var(--space-3) var(--space-4);
-  border-inline-start: var(--brd-heavy) solid var(--muted);
+  border-inline-start: var(--brd-heavy) solid var(--seam);
   /* reserved so toggling the seam on/off never changes the header's height */
   border-bottom: var(--brd) solid transparent;
   font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 700; color: var(--ink);
@@ -1347,7 +1365,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-accordion__header:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), var(--panel-2)); }
 .cr-accordion__header[aria-expanded="true"] {
   border-inline-start-color: var(--cr-accordion-accent);
-  border-bottom-color: var(--muted);
+  border-bottom-color: var(--seam);
 }
 @media (prefers-reduced-motion: reduce) { .cr-accordion__header { transition: none; } }
 .cr-accordion__chevron {
@@ -1368,7 +1386,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
   border: var(--brd) solid var(--cr-popover-border); box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
   padding: var(--space-3) var(--space-4);
 }
-.cr-popover__panel:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
+.cr-popover__panel:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
 
 /* ── Drawer / sheet (edge panel on native dialog) ───────────────────────── */
 .cr-drawer {
@@ -1525,7 +1543,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-tree__item { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-0-5) var(--space-2); cursor: pointer; color: var(--ink); }
 .cr-tree__item:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
 .cr-tree__item[aria-selected="true"] { background: color-mix(in srgb, var(--cr-tree-accent) 20%, transparent); }
-.cr-tree__item:focus-visible { outline: var(--focus-w) solid var(--cr-tree-accent); outline-offset: -3px; }
+.cr-tree__item:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: -3px; }
 .cr-tree__twist { width: 0; height: 0; flex-shrink: 0; border-inline-start: 6px solid var(--muted); border-top: 5px solid transparent; border-bottom: 5px solid transparent; transition: transform var(--dur-press); }
 .cr-tree__item[aria-expanded="true"] .cr-tree__twist { transform: rotate(90deg); border-inline-start-color: var(--cr-tree-accent); }
 .cr-tree__lead { width: 6px; flex-shrink: 0; color: color-mix(in srgb, var(--muted) 60%, transparent); text-align: center; }
@@ -2071,7 +2089,14 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-grid__viewport { overflow-y: auto; overflow-x: hidden; position: relative; }
 .cr-grid__sizer { position: relative; width: 100%; }
 .cr-grid__rows { position: absolute; inset-inline: 0; top: 0; }
-.cr-grid__row { display: grid; align-items: center; border-bottom: var(--brd-hair) solid color-mix(in srgb, var(--cr-datagrid-border) 55%, transparent); background: var(--cr-datagrid-bg); }
+/* The row rule is an INTERNAL seam, so it takes --cr-datagrid-seam, not the
+ * chassis-edge --cr-datagrid-border the frame and head rule keep. The old
+ * `color-mix(--cr-datagrid-border 55%, transparent)` was softening a line that was
+ * already invisible: --border on --board measures 1.11 / 1.11 / 1.06 on dark /
+ * extreme / phosphor, and diluting it toward the background only lowered that
+ * further (1.07 / 1.07 / 1.03). Mixing cannot rescue a value that starts below the
+ * floor — the thing being mixed had to change. --seam clears it in all four. */
+.cr-grid__row { display: grid; align-items: center; border-bottom: var(--brd-hair) solid var(--cr-datagrid-seam); background: var(--cr-datagrid-bg); }
 .cr-grid__row:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), var(--cr-datagrid-bg)); }
 .cr-grid__row[aria-selected="true"] { background: color-mix(in srgb, var(--sig-work) 16%, var(--cr-datagrid-bg)); }
 .cr-grid__cell { display: flex; align-items: center; min-width: 0; padding: 0 var(--space-3); font-size: var(--text-sm); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -2147,8 +2172,8 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
  * Offsetting by --focus-w lands it fully inside the frame, which also keeps it
  * clear of the showcase's `.cell--scroll > .cell__demo { overflow-x: auto }`
  * clip — an OUTWARD ring on a scroll-container child is what gets cut off. */
-.cr-grid:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: calc(-1 * var(--focus-w)); }
-.cr-grid__cell--active { outline: var(--focus-w) solid var(--sig-work); outline-offset: calc(-1 * var(--focus-w)); position: relative; z-index: 1; }
+.cr-grid:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: calc(-1 * var(--focus-w)); }
+.cr-grid__cell--active { outline: var(--focus-w) solid var(--focus); outline-offset: calc(-1 * var(--focus-w)); position: relative; z-index: 1; }
 
 /* ── Stepper ─────────────────────────────────────────────────────────────── */
 /* Law 4 — a stepper IS the "sequence / pipeline step" primitive, so it carries
@@ -2202,7 +2227,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-stepper__label { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: var(--text-xs); }
 .cr-stepper__item--upcoming .cr-stepper__label { color: var(--muted); }
 .cr-stepper__hint { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); }
-.cr-stepper__btn:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-stepper__btn:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
 
 /* ── Spinner ─────────────────────────────────────────────────────────────── */
 /* Four cells from the block shade ramp (░▒▓█, see references/decoration.md)
@@ -2333,7 +2358,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
 .cr-scroll::-webkit-scrollbar-track { background: var(--panel-2); }
 .cr-scroll::-webkit-scrollbar-thumb { background: var(--sig-work); border: 2px solid var(--panel-2); }
-.cr-scroll:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -2px; }
+.cr-scroll:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: -2px; }
 
 /* ── Resizable ───────────────────────────────────────────────────────────── */
 .cr-resizable { position: relative; display: grid; grid-template-columns: 50% 1fr; width: 100%; border: var(--brd) solid var(--border); overflow: hidden; }
@@ -2348,8 +2373,13 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-resizable__handle { position: absolute; z-index: 2; background: transparent; touch-action: none; }
 .cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle { top: 0; bottom: 0; width: var(--space-3); transform: translateX(-50%); cursor: col-resize; }
 .cr-resizable--vertical .cr-resizable__handle { left: 0; right: 0; height: var(--space-3); transform: translateY(-50%); cursor: row-resize; }
-/* the visible rule, centred in the target box */
-.cr-resizable__handle::before { content: ""; position: absolute; background: var(--border); }
+/* The visible rule, centred in the target box. Keyed to --seam, not --border: this
+ * is an INTERNAL seam between two panes, not the container's chassis edge, and
+ * --border against --panel measures 1.21 / 1.21 / 1.01 on dark / extreme /
+ * phosphor. The grip below is already on --seam via --muted; before this the rule
+ * vanished away from the grip on a tall pane, so the handle read as a floating
+ * 32px plate with no line connecting it. Same split as the accordion. */
+.cr-resizable__handle::before { content: ""; position: absolute; background: var(--seam); }
 .cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle::before {
   top: 0; bottom: 0; left: 50%; width: var(--brd-heavy); transform: translateX(-50%);
 }
@@ -2363,15 +2393,16 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
  * graded fill, so Law 1's two-tone rule holds). Hardware texture on a piece of
  * hardware (Law 6), square-cornered.
  *
- * The bars are keyed to --muted, NOT to the handle's own --border: --border is
- * pure/near black on dark, extreme AND phosphor, so a plate inheriting it sits at
- * 1.21:1 / 1.21:1 / 1.01:1 against the --panel pane behind — an invisible grip in
- * exactly the themes that need it most. --muted brackets between surface and ink in
- * all four themes by construction (5.19 / 7.02 / 7.45 / 6.26 against --panel), so
- * the grip reads everywhere. It goes to --sig-work with the handle on hover/drag. */
+ * The bars are keyed to --seam, the house internal-divider role, NOT to the
+ * chassis-edge --border: --border is pure/near black on dark, extreme AND phosphor,
+ * so a plate inheriting it sits at 1.21:1 / 1.21:1 / 1.01:1 against the --panel pane
+ * behind — an invisible grip in exactly the themes that need it most. --seam
+ * brackets between surface and ink in all four themes by construction (5.19 / 7.02
+ * / 7.45 / 6.26 against --panel), so the grip reads everywhere. It goes to
+ * --sig-work with the handle on hover/drag. */
 .cr-resizable__handle::after {
   content: ""; position: absolute; pointer-events: none;
-  --cr-resizable-grip: var(--muted);
+  --cr-resizable-grip: var(--seam);
 }
 .cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle::after {
   top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -2390,7 +2421,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 /* the rule (::before), not the transparent target box, carries the active state */
 .cr-resizable__handle:hover::before,
 .cr-resizable[data-dragging="true"] .cr-resizable__handle::before { background: var(--sig-work); }
-.cr-resizable__handle:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -2px; }
+.cr-resizable__handle:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: -2px; }
 
 /* ── ToggleChip (interactive multi-select filter pill; role=checkbox) ─────── */
 .cr-togglechip {
@@ -2450,7 +2481,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 }
 .cr-overflow:hover { color: var(--sig-work); }
 .cr-overflow--static { cursor: default; }
-.cr-overflow:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
+.cr-overflow:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
 
 /* ── RelativeTime (semantic <time> display) ──────────────────────────────── */
 .cr-reltime { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -2530,7 +2561,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-rating__star[data-state="on"] { color: var(--cr-rating-on); }
 .cr-rating__star:disabled { cursor: not-allowed; opacity: .5; }
 .cr-rating--readonly .cr-rating__star { cursor: default; }
-.cr-rating__star:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-rating__star:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
 
 /* ── Timeline ────────────────────────────────────────────────────────────────
  * An <ol> on a vertical rail; each node is signal-coloured (Law 2), the rail is
@@ -2575,7 +2606,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-fileupload--over { border-color: var(--cr-fileupload-active-border); border-style: solid; }
 .cr-fileupload__input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 .cr-fileupload__input:disabled { cursor: not-allowed; }
-.cr-fileupload__input:focus-visible + .cr-fileupload__prompt { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--space-2); }
+.cr-fileupload__input:focus-visible + .cr-fileupload__prompt { outline: var(--focus-w) solid var(--focus); outline-offset: var(--space-2); }
 .cr-fileupload__prompt { display: flex; flex-direction: column; gap: var(--space-0-5); pointer-events: none; }
 .cr-fileupload__title { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: var(--text-sm); color: var(--ink); }
 .cr-fileupload__hint { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); }
@@ -2592,11 +2623,11 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-carousel__caption { font-size: var(--text-xs); color: var(--muted); }
 .cr-carousel__nav { display: inline-flex; align-items: center; justify-content: center; min-width: var(--control-h-md); background: var(--panel-2); border: var(--brd) solid var(--border); color: var(--ink); cursor: pointer; font-size: var(--text-md); }
 .cr-carousel__nav:hover { background: var(--panel); }
-.cr-carousel__nav:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-carousel__nav:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
 .cr-carousel__dots { display: inline-flex; justify-content: center; gap: var(--space-1); }
 .cr-carousel__dot { display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; padding: var(--space-0-5); margin: 0; cursor: pointer; color: var(--cr-carousel-dot); font-size: var(--text-xs); line-height: 1; }
 .cr-carousel__dot[data-state="active"] { color: var(--cr-carousel-dot-active); }
-.cr-carousel__dot:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-carousel__dot:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
 
 /* ── Calendar ────────────────────────────────────────────────────────────────
  * A month grid; the selected day is the accent (a state), today is ringed. */
@@ -2609,12 +2640,12 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-calendar__switcher { display: flex; align-items: center; justify-content: center; gap: var(--space-1); min-width: 0; }
 .cr-calendar__select { min-width: 0; max-width: 100%; background: var(--panel-2); border: var(--brd) solid var(--border); color: var(--ink); font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: var(--text-2xs); padding: var(--space-px) var(--space-1); cursor: pointer; }
 .cr-calendar__select:hover { background: var(--panel); }
-.cr-calendar__select:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-calendar__select:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
 .cr-calendar__select--month { flex: 1 1 auto; }
 .cr-calendar__select--year { flex: 0 0 auto; }
 .cr-calendar__nav { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: var(--panel-2); border: var(--brd) solid var(--border); color: var(--ink); cursor: pointer; }
 .cr-calendar__nav:hover { background: var(--panel); }
-.cr-calendar__nav:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-calendar__nav:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
 .cr-calendar__row { display: grid; grid-template-columns: repeat(7, 1fr); }
 .cr-calendar__body { display: flex; flex-direction: column; gap: var(--space-px); }
 .cr-calendar__body .cr-calendar__row { gap: var(--space-px); }
@@ -2635,21 +2666,21 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
  * un-mixed accent so the chip edge keeps >=3:1 against the calendar bg. */
 .cr-calendar__day--selected:hover { background: color-mix(in srgb, var(--cr-calendar-selected-bg) 85%, var(--cr-calendar-bg)); color: var(--cr-calendar-selected-fg); border-color: var(--cr-calendar-selected-bg); }
 .cr-calendar__day:disabled { color: var(--muted); opacity: .4; cursor: not-allowed; }
-.cr-calendar__day:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -2px; }
+.cr-calendar__day:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: -2px; }
 
-.brand-dark{color-scheme:dark;--ground:#0f0327;--board:#15092f;--panel:#1d133a;--panel-2:#271d45;--ink:#e6e6f2;--muted:#8a8aa6;--border:#000000;--rail:#050509;--rail-ink:#c8c8de;--sig-work:#00d3fb;--sig-accent:#ff1a9d;--sig-accent-2:#9ad335;--sig-done:#00deaa;--sig-wait:#f9ad00;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
-.brand-light{color-scheme:light;--ground:#eaeaf2;--board:#e2e2e9;--panel:#fbfbff;--panel-2:#f2f3fa;--ink:#0b0b12;--muted:#55556b;--border:#000000;--rail:#0b0b12;--rail-ink:#ecebe3;--sig-work:#0891b2;--sig-accent:#cf007e;--sig-accent-2:#663e9e;--sig-done:#0d9488;--sig-wait:#d97706;--sig-err:#e11d48;--sig-idle:#7e7e94;--on-sig:#0b0b12;--on-err:#ffffff;--on-accent:#ffffff;--on-accent-2:#f4f2ff;--on-idle:#0b0b12;--shadow-col:#000000;--mass:#0b0b12;--stage:#00a344;--stage-ink:#04140a;--drip:#0a7f5c;--halftone:radial-gradient(circle at center, rgba(0,0,0,0.13) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(0,0,0,0.11) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(0,0,0,0.045) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
-.brand-extreme{color-scheme:dark;--ground:#150021;--board:#20012e;--panel:#2b0b3a;--panel-2:#361747;--ink:#fdf0ff;--muted:#c79ad6;--border:#000000;--rail:#ff2e97;--rail-ink:#0c0510;--sig-work:#5cddff;--sig-accent:#ff2fa0;--sig-accent-2:#a0e300;--sig-done:#00edb5;--sig-wait:#ffbd4f;--sig-err:#fc4351;--sig-idle:#8a80a0;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#0bf272;--stage-ink:#12061a;--drip:#00f0ff;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.18) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.15) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(0,240,255,0.12) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.05) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--brd-hair:2px;--brd:3px;--brd-heavy:4px;--brd-brush:6px;--shadow-off-sm:3px;--shadow-off:6px;--shadow-off-lg:9px;--extra-purple:#a855f7;--extra-orange:#ff6b35}
-.brand-phosphor{color-scheme:dark;--ground:#020a04;--board:#041207;--panel:#06180a;--panel-2:#0a2210;--ink:#43ff7a;--muted:#2fac55;--border:#031a08;--rail:#020a04;--rail-ink:#43ff7a;--sig-work:#43ff7a;--sig-accent:#b6ff00;--sig-accent-2:#00e6a8;--sig-done:#00e05a;--sig-wait:#a8ff3e;--sig-err:#eaff40;--sig-idle:#12602c;--on-sig:#020a04;--on-err:#020a04;--on-accent:#020a04;--on-accent-2:#06050c;--on-idle:#ffffff;--shadow-col:#031a08;--mass:#010603;--stage:#0d7a34;--stage-ink:#d9ffe6;--drip:#43ff7a;--halftone:radial-gradient(circle at center, rgba(67,255,122,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(67,255,122,0.14) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(67,255,122,0.13) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(67,255,122,0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(67,255,122,0.16) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(67,255,122,0.05) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
-.brand-aurora{color-scheme:dark;--ground:#0b0f18;--board:#141822;--panel:#1d212b;--panel-2:#292e38;--ink:#e9ecf6;--muted:#9aa0b8;--border:#000000;--rail:#040712;--rail-ink:#e3e6f2;--sig-work:#00d3fb;--sig-accent:#7c5cff;--sig-accent-2:#22d3ee;--sig-done:#00deaa;--sig-wait:#f9ad00;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
-.brand-aurora-light{color-scheme:light;--ground:#ebeef5;--board:#e3e6ed;--panel:#fdfdff;--panel-2:#f0f3fa;--ink:#161a26;--muted:#5a6076;--border:#000000;--rail:#0d0f15;--rail-ink:#eef1f8;--sig-work:#009cba;--sig-accent:#7c5cff;--sig-accent-2:#22d3ee;--sig-done:#00a57d;--sig-wait:#c18500;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
-.brand-boardroom{color-scheme:light;--ground:#edeef1;--board:#e5e6e9;--panel:#fdfdff;--panel-2:#f2f3f6;--ink:#181b22;--muted:#5c6472;--border:#000000;--rail:#181b22;--rail-ink:#eef1f6;--sig-work:#0891b2;--sig-accent:#2f5fe0;--sig-accent-2:#0f9d8c;--sig-done:#0d9488;--sig-wait:#d97706;--sig-err:#e11d48;--sig-idle:#7e7e94;--on-sig:#0b0b12;--on-err:#ffffff;--on-accent:#ffffff;--on-accent-2:#06050c;--on-idle:#0b0b12;--shadow-col:#000000;--mass:#0b0b12;--stage:#00a344;--stage-ink:#04140a;--drip:#0a7f5c;--halftone:radial-gradient(circle at center, rgba(0,0,0,0.13) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(0,0,0,0.11) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(0,0,0,0.045) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--radius:6px;--brd-hair:2px;--brd:3px;--brd-heavy:4px;--brd-brush:6px;--shadow-off-sm:3px;--shadow-off:6px;--shadow-off-lg:9px;--font-display:'Helvetica Neue', Arial, sans-serif;--font-sans:'Helvetica Neue', Arial, sans-serif;--type-display-transform:none;--type-display-tracking:-0.01em;--row-h:40px}
-.brand-control-room{color-scheme:dark;--ground:#0e0e18;--board:#171721;--panel:#20212b;--panel-2:#2c2d37;--ink:#e6e6f2;--muted:#8a8aa6;--border:#000000;--rail:#060611;--rail-ink:#c8c8de;--sig-work:#00d3fb;--sig-accent:#ff1a9d;--sig-accent-2:#9ad335;--sig-done:#00deaa;--sig-wait:#f9ad00;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
-.brand-control-room-light{color-scheme:light;--ground:#edeef1;--board:#e5e6e9;--panel:#fdfdff;--panel-2:#f2f3f6;--ink:#14161f;--muted:#585e70;--border:#000000;--rail:#0e0f12;--rail-ink:#f4f5f8;--sig-work:#009cba;--sig-accent:#ff1a9d;--sig-accent-2:#6e9e00;--sig-done:#00a57d;--sig-wait:#c18500;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
-.brand-ember{color-scheme:dark;--ground:#120e11;--board:#1b171a;--panel:#242023;--panel-2:#312c30;--ink:#f4ece9;--muted:#a3908a;--border:#000000;--rail:#0a0609;--rail-ink:#f0e2dc;--sig-work:#00d3fb;--sig-accent:#ff6a3d;--sig-accent-2:#ffb020;--sig-done:#00deaa;--sig-wait:#f9ad00;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
-.brand-harbor{color-scheme:dark;--ground:#0a1114;--board:#121a1d;--panel:#1c2326;--panel-2:#282f33;--ink:#e6eef0;--muted:#8aa0a6;--border:#000000;--rail:#02080c;--rail-ink:#dbe8ea;--sig-work:#81cbe0;--sig-accent:#3aa0b0;--sig-accent-2:#aacb81;--sig-done:#82d0b3;--sig-wait:#dfb679;--sig-err:#cd7674;--sig-idle:#85858f;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
-.brand-porcelain{color-scheme:light;--ground:#f4f5f7;--board:#eceef2;--panel:#ffffff;--panel-2:#f2f4f8;--ink:#14161c;--muted:#5b6270;--border:#000000;--rail:#14161c;--rail-ink:#eef1f6;--sig-work:#1d74d6;--sig-accent:#4338ca;--sig-accent-2:#0e7490;--sig-done:#0f8a5f;--sig-wait:#b8730a;--sig-err:#cc2b3d;--sig-idle:#6b7280;--on-sig:#06050c;--on-err:#ffffff;--on-accent:#ffffff;--on-accent-2:#ffffff;--on-idle:#ffffff;--shadow-col:#000000;--mass:#0b0b12;--stage:#128a52;--stage-ink:#ffffff;--drip:#0e7490;--halftone:radial-gradient(circle at center, rgba(0,0,0,0.13) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(0,0,0,0.11) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(0,0,0,0.045) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
-.brand-slate{color-scheme:dark;--ground:#0e1116;--board:#141922;--panel:#1b222d;--panel-2:#232c39;--ink:#e8edf4;--muted:#8a97a8;--border:#000000;--rail:#0a0d12;--rail-ink:#cdd6e2;--sig-work:#3b9eff;--sig-accent:#6d7cff;--sig-accent-2:#4db6c9;--sig-done:#35c98d;--sig-wait:#e0a54a;--sig-err:#e5484d;--sig-idle:#6b7688;--on-sig:#0b0e13;--on-err:#ffffff;--on-accent:#ffffff;--on-accent-2:#0b0e13;--on-idle:#ffffff;--shadow-col:#000000;--mass:#000000;--stage:#2f7d4f;--stage-ink:#eafff2;--drip:#4db6c9;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px}
+.brand-dark{color-scheme:dark;--ground:#0f0327;--board:#15092f;--panel:#1d133a;--panel-2:#271d45;--ink:#e6e6f2;--muted:#8a8aa6;--border:#000000;--rail:#050509;--rail-ink:#c8c8de;--sig-work:#00d3fb;--sig-accent:#ff1a9d;--sig-accent-2:#9ad335;--sig-done:#00deaa;--sig-wait:#f9ad00;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--focus:#00d3fb;--seam:#8a8aa6}
+.brand-light{color-scheme:light;--ground:#eaeaf2;--board:#e2e2e9;--panel:#fbfbff;--panel-2:#f2f3fa;--ink:#0b0b12;--muted:#55556b;--border:#000000;--rail:#0b0b12;--rail-ink:#ecebe3;--sig-work:#0891b2;--sig-accent:#cf007e;--sig-accent-2:#663e9e;--sig-done:#0d9488;--sig-wait:#d97706;--sig-err:#e11d48;--sig-idle:#7e7e94;--on-sig:#0b0b12;--on-err:#ffffff;--on-accent:#ffffff;--on-accent-2:#f4f2ff;--on-idle:#0b0b12;--shadow-col:#000000;--mass:#0b0b12;--stage:#00a344;--stage-ink:#04140a;--drip:#0a7f5c;--halftone:radial-gradient(circle at center, rgba(0,0,0,0.13) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(0,0,0,0.11) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(0,0,0,0.045) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--focus:#00627a;--seam:#55556b}
+.brand-extreme{color-scheme:dark;--ground:#150021;--board:#20012e;--panel:#2b0b3a;--panel-2:#361747;--ink:#fdf0ff;--muted:#c79ad6;--border:#000000;--rail:#ff2e97;--rail-ink:#0c0510;--sig-work:#5cddff;--sig-accent:#ff2fa0;--sig-accent-2:#a0e300;--sig-done:#00edb5;--sig-wait:#ffbd4f;--sig-err:#fc4351;--sig-idle:#8a80a0;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#0bf272;--stage-ink:#12061a;--drip:#00f0ff;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.18) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.15) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(0,240,255,0.12) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.05) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--brd-hair:2px;--brd:3px;--brd-heavy:4px;--brd-brush:6px;--shadow-off-sm:3px;--shadow-off:6px;--shadow-off-lg:9px;--focus:#5cddff;--seam:#c79ad6;--extra-purple:#a855f7;--extra-orange:#ff6b35}
+.brand-phosphor{color-scheme:dark;--ground:#020a04;--board:#041207;--panel:#06180a;--panel-2:#0a2210;--ink:#43ff7a;--muted:#2fac55;--border:#031a08;--rail:#020a04;--rail-ink:#43ff7a;--sig-work:#43ff7a;--sig-accent:#b6ff00;--sig-accent-2:#00e6a8;--sig-done:#00e05a;--sig-wait:#a8ff3e;--sig-err:#eaff40;--sig-idle:#12602c;--on-sig:#020a04;--on-err:#020a04;--on-accent:#020a04;--on-accent-2:#06050c;--on-idle:#ffffff;--shadow-col:#031a08;--mass:#010603;--stage:#0d7a34;--stage-ink:#d9ffe6;--drip:#43ff7a;--halftone:radial-gradient(circle at center, rgba(67,255,122,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(67,255,122,0.14) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(67,255,122,0.13) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(67,255,122,0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(67,255,122,0.16) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(67,255,122,0.05) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--focus:#43ff7a;--seam:#2fac55}
+.brand-aurora{color-scheme:dark;--ground:#0b0f18;--board:#141822;--panel:#1d212b;--panel-2:#292e38;--ink:#e9ecf6;--muted:#9aa0b8;--border:#000000;--rail:#040712;--rail-ink:#e3e6f2;--sig-work:#00d3fb;--sig-accent:#7c5cff;--sig-accent-2:#22d3ee;--sig-done:#00deaa;--sig-wait:#f9ad00;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--focus:#00d3fb;--seam:#8a8aa6}
+.brand-aurora-light{color-scheme:light;--ground:#ebeef5;--board:#e3e6ed;--panel:#fdfdff;--panel-2:#f0f3fa;--ink:#161a26;--muted:#5a6076;--border:#000000;--rail:#0d0f15;--rail-ink:#eef1f8;--sig-work:#009cba;--sig-accent:#7c5cff;--sig-accent-2:#22d3ee;--sig-done:#00a57d;--sig-wait:#c18500;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--focus:#00d3fb;--seam:#8a8aa6}
+.brand-boardroom{color-scheme:light;--ground:#edeef1;--board:#e5e6e9;--panel:#fdfdff;--panel-2:#f2f3f6;--ink:#181b22;--muted:#5c6472;--border:#000000;--rail:#181b22;--rail-ink:#eef1f6;--sig-work:#0891b2;--sig-accent:#2f5fe0;--sig-accent-2:#0f9d8c;--sig-done:#0d9488;--sig-wait:#d97706;--sig-err:#e11d48;--sig-idle:#7e7e94;--on-sig:#0b0b12;--on-err:#ffffff;--on-accent:#ffffff;--on-accent-2:#06050c;--on-idle:#0b0b12;--shadow-col:#000000;--mass:#0b0b12;--stage:#00a344;--stage-ink:#04140a;--drip:#0a7f5c;--halftone:radial-gradient(circle at center, rgba(0,0,0,0.13) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(0,0,0,0.11) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(0,0,0,0.045) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--radius:6px;--brd-hair:2px;--brd:3px;--brd-heavy:4px;--brd-brush:6px;--shadow-off-sm:3px;--shadow-off:6px;--shadow-off-lg:9px;--font-display:'Helvetica Neue', Arial, sans-serif;--font-sans:'Helvetica Neue', Arial, sans-serif;--type-display-transform:none;--type-display-tracking:-0.01em;--row-h:40px;--focus:#00627a;--seam:#55556b}
+.brand-control-room{color-scheme:dark;--ground:#0e0e18;--board:#171721;--panel:#20212b;--panel-2:#2c2d37;--ink:#e6e6f2;--muted:#8a8aa6;--border:#000000;--rail:#060611;--rail-ink:#c8c8de;--sig-work:#00d3fb;--sig-accent:#ff1a9d;--sig-accent-2:#9ad335;--sig-done:#00deaa;--sig-wait:#f9ad00;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--focus:#00d3fb;--seam:#8a8aa6}
+.brand-control-room-light{color-scheme:light;--ground:#edeef1;--board:#e5e6e9;--panel:#fdfdff;--panel-2:#f2f3f6;--ink:#14161f;--muted:#585e70;--border:#000000;--rail:#0e0f12;--rail-ink:#f4f5f8;--sig-work:#009cba;--sig-accent:#ff1a9d;--sig-accent-2:#6e9e00;--sig-done:#00a57d;--sig-wait:#c18500;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--focus:#00d3fb;--seam:#8a8aa6}
+.brand-ember{color-scheme:dark;--ground:#120e11;--board:#1b171a;--panel:#242023;--panel-2:#312c30;--ink:#f4ece9;--muted:#a3908a;--border:#000000;--rail:#0a0609;--rail-ink:#f0e2dc;--sig-work:#00d3fb;--sig-accent:#ff6a3d;--sig-accent-2:#ffb020;--sig-done:#00deaa;--sig-wait:#f9ad00;--sig-err:#f45058;--sig-idle:#848496;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--focus:#00d3fb;--seam:#8a8aa6}
+.brand-harbor{color-scheme:dark;--ground:#0a1114;--board:#121a1d;--panel:#1c2326;--panel-2:#282f33;--ink:#e6eef0;--muted:#8aa0a6;--border:#000000;--rail:#02080c;--rail-ink:#dbe8ea;--sig-work:#81cbe0;--sig-accent:#3aa0b0;--sig-accent-2:#aacb81;--sig-done:#82d0b3;--sig-wait:#dfb679;--sig-err:#cd7674;--sig-idle:#85858f;--on-sig:#06050c;--on-err:#06050c;--on-accent:#06050c;--on-accent-2:#06050c;--on-idle:#06050c;--shadow-col:#000000;--mass:#000000;--stage:#49de78;--stage-ink:#04140a;--drip:#4affc8;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--focus:#00d3fb;--seam:#8a8aa6}
+.brand-porcelain{color-scheme:light;--ground:#f4f5f7;--board:#eceef2;--panel:#ffffff;--panel-2:#f2f4f8;--ink:#14161c;--muted:#5b6270;--border:#000000;--rail:#14161c;--rail-ink:#eef1f6;--sig-work:#1d74d6;--sig-accent:#4338ca;--sig-accent-2:#0e7490;--sig-done:#0f8a5f;--sig-wait:#b8730a;--sig-err:#cc2b3d;--sig-idle:#6b7280;--on-sig:#06050c;--on-err:#ffffff;--on-accent:#ffffff;--on-accent-2:#ffffff;--on-idle:#ffffff;--shadow-col:#000000;--mass:#0b0b12;--stage:#128a52;--stage-ink:#ffffff;--drip:#0e7490;--halftone:radial-gradient(circle at center, rgba(0,0,0,0.13) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(0,0,0,0.11) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.12) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(0,0,0,0.045) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--focus:#00627a;--seam:#55556b}
+.brand-slate{color-scheme:dark;--ground:#0e1116;--board:#141922;--panel:#1b222d;--panel-2:#232c39;--ink:#e8edf4;--muted:#8a97a8;--border:#000000;--rail:#0a0d12;--rail-ink:#cdd6e2;--sig-work:#3b9eff;--sig-accent:#6d7cff;--sig-accent-2:#4db6c9;--sig-done:#35c98d;--sig-wait:#e0a54a;--sig-err:#e5484d;--sig-idle:#6b7688;--on-sig:#0b0e13;--on-err:#ffffff;--on-accent:#ffffff;--on-accent-2:#0b0e13;--on-idle:#ffffff;--shadow-col:#000000;--mass:#000000;--stage:#2f7d4f;--stage-ink:#eafff2;--drip:#4db6c9;--halftone:radial-gradient(circle at center, rgba(255,255,255,0.16) 1.7px, transparent 2.2px);--dither:repeating-conic-gradient(rgba(255,255,255,0.13) 0% 25%, transparent 0% 50%) 0 0 / 4px 4px;--scanline:repeating-linear-gradient(0deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 3px);--crosshatch:repeating-linear-gradient(45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.13) 0 1px, transparent 1px 6px);--field:repeating-conic-gradient(rgba(255,255,255,0.035) 0% 25%, transparent 0% 50%) 0 0 / 8px 8px;--focus:#00d3fb;--seam:#8a8aa6}
 
   body{margin:0;background:#0b0b12;color:#e6e6f2;font-family:var(--font-mono),monospace;padding:24px;display:grid;gap:20px}
   h1{font-family:var(--font-display,sans-serif);text-transform:uppercase;letter-spacing:-.02em;margin:0 0 4px}

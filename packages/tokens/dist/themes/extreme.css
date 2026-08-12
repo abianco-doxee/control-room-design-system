@@ -40,6 +40,8 @@
   --shadow-off-sm: 3px;
   --shadow-off: 6px;
   --shadow-off-lg: 9px;
+  --focus: #5cddff;
+  --seam: #c79ad6;
   --extra-purple: #a855f7;
   --extra-orange: #ff6b35;
 }

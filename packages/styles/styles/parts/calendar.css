@@ -11,12 +11,12 @@
 .cr-calendar__switcher { display: flex; align-items: center; justify-content: center; gap: var(--space-1); min-width: 0; }
 .cr-calendar__select { min-width: 0; max-width: 100%; background: var(--panel-2); border: var(--brd) solid var(--border); color: var(--ink); font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: var(--text-2xs); padding: var(--space-px) var(--space-1); cursor: pointer; }
 .cr-calendar__select:hover { background: var(--panel); }
-.cr-calendar__select:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-calendar__select:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
 .cr-calendar__select--month { flex: 1 1 auto; }
 .cr-calendar__select--year { flex: 0 0 auto; }
 .cr-calendar__nav { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: var(--panel-2); border: var(--brd) solid var(--border); color: var(--ink); cursor: pointer; }
 .cr-calendar__nav:hover { background: var(--panel); }
-.cr-calendar__nav:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-calendar__nav:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
 .cr-calendar__row { display: grid; grid-template-columns: repeat(7, 1fr); }
 .cr-calendar__body { display: flex; flex-direction: column; gap: var(--space-px); }
 .cr-calendar__body .cr-calendar__row { gap: var(--space-px); }
@@ -37,5 +37,5 @@
  * un-mixed accent so the chip edge keeps >=3:1 against the calendar bg. */
 .cr-calendar__day--selected:hover { background: color-mix(in srgb, var(--cr-calendar-selected-bg) 85%, var(--cr-calendar-bg)); color: var(--cr-calendar-selected-fg); border-color: var(--cr-calendar-selected-bg); }
 .cr-calendar__day:disabled { color: var(--muted); opacity: .4; cursor: not-allowed; }
-.cr-calendar__day:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -2px; }
+.cr-calendar__day:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: -2px; }
 

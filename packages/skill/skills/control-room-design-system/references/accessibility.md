@@ -35,8 +35,16 @@ Color carries state (Law 2), so it must be backed up:
 - **MUST** keep a visible focus indicator. The system default is already set in
   `control-room.css`:
   ```css
-  *:focus-visible { outline: 3px solid var(--sig-work); outline-offset: 2px; }
+  *:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
   ```
+- **MUST** draw the ring in `--focus`, never in `--sig-work` directly. The ring has
+  its own token precisely so it can be tuned for contrast independently of the
+  working state: WCAG **2.4.11 Focus Appearance** requires the indicator to clear
+  **3:1** against the *adjacent* surface, and in the light theme `--sig-work`
+  (`#0891b2`) reaches only **2.86:1** against `--board`. `--focus` tracks
+  `--sig-work` exactly in dark, extreme and phosphor, and darkens to `#00627a` in
+  light — same hue, **5.38:1** at its worst surface. A brand that re-keys
+  `--sig-work` therefore cannot silently break its own focus ring.
 - **NEVER** remove focus outlines. If a component needs a custom focus style, it
   must be at least as visible as the default and use a signal hue.
 - **MUST** keep a logical tab order and standard keyboard operation for all

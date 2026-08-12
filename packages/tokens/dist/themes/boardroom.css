@@ -47,4 +47,6 @@
   --type-display-transform: none;
   --type-display-tracking: -0.01em;
   --row-h: 40px;
+  --focus: #00627a;
+  --seam: #55556b;
 }

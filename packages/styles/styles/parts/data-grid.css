@@ -25,7 +25,14 @@
 .cr-grid__viewport { overflow-y: auto; overflow-x: hidden; position: relative; }
 .cr-grid__sizer { position: relative; width: 100%; }
 .cr-grid__rows { position: absolute; inset-inline: 0; top: 0; }
-.cr-grid__row { display: grid; align-items: center; border-bottom: var(--brd-hair) solid color-mix(in srgb, var(--cr-datagrid-border) 55%, transparent); background: var(--cr-datagrid-bg); }
+/* The row rule is an INTERNAL seam, so it takes --cr-datagrid-seam, not the
+ * chassis-edge --cr-datagrid-border the frame and head rule keep. The old
+ * `color-mix(--cr-datagrid-border 55%, transparent)` was softening a line that was
+ * already invisible: --border on --board measures 1.11 / 1.11 / 1.06 on dark /
+ * extreme / phosphor, and diluting it toward the background only lowered that
+ * further (1.07 / 1.07 / 1.03). Mixing cannot rescue a value that starts below the
+ * floor — the thing being mixed had to change. --seam clears it in all four. */
+.cr-grid__row { display: grid; align-items: center; border-bottom: var(--brd-hair) solid var(--cr-datagrid-seam); background: var(--cr-datagrid-bg); }
 .cr-grid__row:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), var(--cr-datagrid-bg)); }
 .cr-grid__row[aria-selected="true"] { background: color-mix(in srgb, var(--sig-work) 16%, var(--cr-datagrid-bg)); }
 .cr-grid__cell { display: flex; align-items: center; min-width: 0; padding: 0 var(--space-3); font-size: var(--text-sm); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -101,6 +108,6 @@
  * Offsetting by --focus-w lands it fully inside the frame, which also keeps it
  * clear of the showcase's `.cell--scroll > .cell__demo { overflow-x: auto }`
  * clip — an OUTWARD ring on a scroll-container child is what gets cut off. */
-.cr-grid:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: calc(-1 * var(--focus-w)); }
-.cr-grid__cell--active { outline: var(--focus-w) solid var(--sig-work); outline-offset: calc(-1 * var(--focus-w)); position: relative; z-index: 1; }
+.cr-grid:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: calc(-1 * var(--focus-w)); }
+.cr-grid__cell--active { outline: var(--focus-w) solid var(--focus); outline-offset: calc(-1 * var(--focus-w)); position: relative; z-index: 1; }
 

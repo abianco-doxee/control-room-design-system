@@ -233,6 +233,29 @@ Miller and Mike Mignola: black as a compositional mass.
   hard offset shadow (`box-shadow: var(--shadow-off) var(--shadow-off) 0
   var(--shadow-col)`) is the *only* shadow in the system.
 
+### Chassis edge vs internal seam — two lines, two tokens
+
+Line *weight* is hierarchy (above); line *colour* is a separate decision, and the
+two are easy to conflate. A line has one of two jobs:
+
+| Job | Token | Sits against | Why |
+| --- | --- | --- | --- |
+| **chassis edge** — the outer contour of a component | `--border` | `--board` / `--ground` | Law 1's near-black contour, the ink boundary around the mass |
+| **internal seam** — a divider *inside* a component | `--seam` | `--panel` / `--panel-2` | must stay visible on a dark panel, where near-black cannot |
+
+`--border` is pure or near-black in three of the four themes, so it measures
+**1.21 / 1.21 / 1.01** against `--panel` on dark / extreme / phosphor — an
+invisible rule. That is correct for a chassis edge (which sits on the lighter
+board) and wrong for anything drawn *inside* a panel. `--seam` brackets between
+surface and ink in every theme by construction (**5.19 / 7.02 / 7.45 / 6.26**
+against `--panel`).
+
+- **MUST** use `--seam`, not `--border`, for any divider drawn inside a panel:
+  row rules, between-item dividers, split-pane handles, head/body separators.
+- **NEVER** try to rescue an invisible seam with `color-mix`. Mixing a colour
+  toward the background it already matches lowers the ratio; if a line starts
+  below the floor, the value being mixed is what has to change.
+
 *Sources: Koike · Miller · Mignola · neobrutalism.*
 
 ---
@@ -278,6 +301,50 @@ lightness/chroma — vibrant on purpose, and AA-checked against its on-colour:
   action, never a mood; the state ramp above stays untouched.
 - **NEVER** key a region to a hue that does not correspond to real state.
 - **NEVER** put two full-bleed keys competing on one screen. One key per region.
+
+### The canonical signal vocabulary
+
+Copy these names verbatim when adding a component. **The prop is always called
+`signal`.** There is no `tone`, `variant`, `status`, `kind` or `severity` prop for
+this channel — one concept, one name.
+
+| Member | Token | Means |
+| --- | --- | --- |
+| `work` | `--sig-work` | working / in progress |
+| `wait` | `--sig-wait` | waiting / needs input |
+| `done` | `--sig-done` | done / merged |
+| `err` | `--sig-err` | error / failing |
+| `idle` | `--sig-idle` | idle — present but doing nothing |
+| `accent` | `--sig-accent` | attention / primary action (not a state) |
+| `accent2` | `--sig-accent-2` | secondary action (not a state) |
+
+The full union, in this order, is:
+
+```ts
+signal?: "work" | "wait" | "done" | "err" | "idle" | "accent" | "accent2";
+```
+
+**A component MAY ship a subset, but only by dropping members from the tail of
+that list — never by renaming one.** Two subsets are legitimate and both are in
+use:
+
+- **Drop `idle`** where the component only exists while something is happening,
+  so "idle" has no referent: a Toast, an Alert, a Timeline node. A transient
+  readout that says "idle" is reporting nothing at all.
+- **Drop `accent` / `accent2`** where the component is a pure *state* readout and
+  an action key would be a category error — a StatusDot, a SessionRow, a Spinner,
+  a Progress fill. Conversely a Button is an action, so it carries `accent` and
+  `accent2` but has no use for `idle`.
+
+`accent2` is spelled without the hyphen in the prop even though the token is
+`--sig-accent-2`; that is the established spelling across Button, Breach and the
+three chart components, so it stays.
+
+**Two historical divergences were removed** (see the W8 changeset): `CrAlert`'s
+`info` was `work` under another name — its `.cr-alert--info` rule already resolved
+to `var(--sig-work)` — and `CrChip`'s `tone?: "done" | "alt"` was this same channel
+under a second prop name, where `alt` meant `--sig-work`. Both now use `signal`
+with canonical members.
 
 *Sources: Yamashiro · Science SARU.*
 
@@ -377,6 +444,29 @@ accessibility contract demands. Shipped as `.cr-sev--crit/-warn/-work/-ok/-idle`
   adding motion lines.
 - **NEVER** add a decorative triangle. If it does not encode direction, state,
   focus, or sequence, delete it.
+
+### The direction glyphs
+
+The chevron primitive has exactly **one** glyph family: the solid triangles
+`◂ ▸` (`\25C2` / `\25B8`). They are used in two ways, and the *shape does not
+change* between them — only whether the thing is interactive:
+
+| Use | Glyph | Where |
+| --- | --- | --- |
+| static inline marker | `▸` | `.cr-list__item::before`, `.cr-combobox__opt::before`, `CrBreadcrumb` separator |
+| prev/next control | `◂` `▸` | `CrCalendar`, `CrCarousel`, `CrPagination` |
+
+The distinction between a marker and a control is already carried by the
+element — a `::before` on a list item versus a labelled `button` — so it does not
+also need a second glyph shape. Making the *button* glyphs differ from the
+*marker* glyph would encode "interactive" twice in the visual channel and zero
+times in the accessibility tree, which is backwards.
+
+- **MUST** use `◂ ▸` for direction. The light angle quotes `‹ ›` are **not** part
+  of the vocabulary; `CrPagination` used them alone and was brought into line.
+- **MUST** wrap a control's glyph in `aria-hidden="true"` and put the meaning on
+  the button's `aria-label` — the glyph is decoration over an already-named
+  control, never the accessible name.
 
 *Sources: Koike · Madhouse.*
 
@@ -841,9 +931,17 @@ from raw values.
 
 | Token | Role |
 | --- | --- |
-| `--border` | contour / outline (near-black) |
+| `--border` | contour / outline (near-black) — the **chassis edge**, against `--board` |
+| `--seam` | **internal divider** drawn inside a panel, against `--panel` |
 | `--mass` | black as a large fill area (Law 1) |
 | `--shadow-col` | hard offset shadow color |
+
+**`--border` vs `--seam`.** `--border` is near-black, so against `--panel` it
+measures 1.21 / 1.21 / 1.01 on dark / extreme / phosphor — right for an outer edge
+sitting on the lighter board, invisible for a rule drawn *inside* a panel. Use
+`--seam` for row rules, between-item dividers and split-pane handles; it brackets
+between surface and ink in every theme (5.19 / 7.02 / 7.45 / 6.26 against
+`--panel`). See Law 1 in `references/design-language.md`.
 
 **On pure black (a decision on the record).** In dark/light/extreme, `--border`,
 `--mass`, and `--shadow-col` are pure `#000000` — deliberately. Neobrutalism earns the
@@ -857,15 +955,23 @@ brutalist default.
 
 | Token | State / role |
 | --- | --- |
-| `--sig-work` | working (also the focus-outline color) |
+| `--sig-work` | working |
 | `--sig-wait` | waiting / needs input |
 | `--sig-done` | done / merged |
 | `--sig-err` | error / failing |
 | `--sig-idle` | idle |
 | `--sig-accent` | attention / primary action |
+| `--focus` | keyboard focus ring — **not** part of the state ramp |
 
 Text placed **on** any signal fill uses `--on-sig`. The pairing is contrast-safe
 per theme (see `references/accessibility.md`).
+
+**`--focus` is separate from `--sig-work` on purpose.** It matches `--sig-work`
+exactly in dark, extreme and phosphor, but the light theme's working cyan reaches
+only 2.86:1 against `--board` — below WCAG 2.4.11's 3:1 floor for a focus
+indicator — so light darkens it to `#00627a` (5.38:1 at its worst surface) while
+keeping the hue. Re-keying `--sig-work` in a brand therefore cannot break that
+brand's focus ring. Components MUST draw rings in `--focus`.
 
 ### Keyed & decay
 
@@ -1826,8 +1932,16 @@ Color carries state (Law 2), so it must be backed up:
 - **MUST** keep a visible focus indicator. The system default is already set in
   `control-room.css`:
   ```css
-  *:focus-visible { outline: 3px solid var(--sig-work); outline-offset: 2px; }
+  *:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
   ```
+- **MUST** draw the ring in `--focus`, never in `--sig-work` directly. The ring has
+  its own token precisely so it can be tuned for contrast independently of the
+  working state: WCAG **2.4.11 Focus Appearance** requires the indicator to clear
+  **3:1** against the *adjacent* surface, and in the light theme `--sig-work`
+  (`#0891b2`) reaches only **2.86:1** against `--board`. `--focus` tracks
+  `--sig-work` exactly in dark, extreme and phosphor, and darkens to `#00627a` in
+  light — same hue, **5.38:1** at its worst surface. A brand that re-keys
+  `--sig-work` therefore cannot silently break its own focus ring.
 - **NEVER** remove focus outlines. If a component needs a custom focus style, it
   must be at least as visible as the default and use a signal hue.
 - **MUST** keep a logical tab order and standard keyboard operation for all
@@ -2193,24 +2307,31 @@ rest; reacts only to a real event (Law 7).
 
 ## Chip
 
-**Purpose.** A compact tag/label. Default keys to `done`; `alt` to `work`.
+**Purpose.** A compact tag/label keyed to a signal (Law 2). `signal` takes the
+canonical vocabulary — `work · wait · done · err · idle · accent` — and defaults
+to `done`, so the bare chip needs no modifier.
 
 **States.** `stamp`: a one-shot stamp-in when added.
 
 ```html
 <span class="chip">PTL-757</span>
-<span class="chip alt">ui-kit</span>
+<span class="chip work">ui-kit</span>
 ```
 ```css
 .chip { font-family: var(--font-mono); font-size: 11px; font-weight: 700;
   padding: 3px 9px; background: var(--sig-done); color: var(--on-sig);
   border: var(--brd) solid var(--border); }
-.chip.alt { background: var(--sig-work); }
+.chip.work { background: var(--sig-work); }
 .chip.stamp { animation: stamp .18s ease-out 1; }
 @keyframes stamp { 0% { transform: scale(1.18); opacity: .4; } 100% { transform: scale(1); opacity: 1; } }
 ```
 
 - **SHOULD** reserve the chip color for a real category, not decoration.
+
+> **Renamed in 1.0.** Chip used to take `tone?: "done" | "alt"`. That was the
+> signal channel under a second prop name — `alt` resolved to `--sig-work` — so it
+> is now `signal`, with `alt` becoming `work`. See Law 2 in
+> `references/design-language.md` for the canonical vocabulary.
 
 ---
 
@@ -3010,7 +3131,7 @@ reading survives phosphor's single colour and colour-blind viewers.
 
 | `signal` | key | shape | severity |
 | --- | --- | --- | --- |
-| `info` | `--sig-work` | pentagon ⬠ (5) | working |
+| `work` | `--sig-work` | pentagon ⬠ (5) | working |
 | `wait` | `--sig-wait` | diamond ◆ (4) | attend |
 | `done` | `--sig-done` | hexagon ⬡ (6) | nominal |
 | `err` | `--sig-err` | triangle ▲ (3) | act now |

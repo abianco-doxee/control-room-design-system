@@ -52,5 +52,5 @@
 .cr-stepper__label { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: var(--text-xs); }
 .cr-stepper__item--upcoming .cr-stepper__label { color: var(--muted); }
 .cr-stepper__hint { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); }
-.cr-stepper__btn:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-stepper__btn:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
 

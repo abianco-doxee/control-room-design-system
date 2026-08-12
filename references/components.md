@@ -283,24 +283,31 @@ rest; reacts only to a real event (Law 7).
 
 ## Chip
 
-**Purpose.** A compact tag/label. Default keys to `done`; `alt` to `work`.
+**Purpose.** A compact tag/label keyed to a signal (Law 2). `signal` takes the
+canonical vocabulary — `work · wait · done · err · idle · accent` — and defaults
+to `done`, so the bare chip needs no modifier.
 
 **States.** `stamp`: a one-shot stamp-in when added.
 
 ```html
 <span class="chip">PTL-757</span>
-<span class="chip alt">ui-kit</span>
+<span class="chip work">ui-kit</span>
 ```
 ```css
 .chip { font-family: var(--font-mono); font-size: 11px; font-weight: 700;
   padding: 3px 9px; background: var(--sig-done); color: var(--on-sig);
   border: var(--brd) solid var(--border); }
-.chip.alt { background: var(--sig-work); }
+.chip.work { background: var(--sig-work); }
 .chip.stamp { animation: stamp .18s ease-out 1; }
 @keyframes stamp { 0% { transform: scale(1.18); opacity: .4; } 100% { transform: scale(1); opacity: 1; } }
 ```
 
 - **SHOULD** reserve the chip color for a real category, not decoration.
+
+> **Renamed in 1.0.** Chip used to take `tone?: "done" | "alt"`. That was the
+> signal channel under a second prop name — `alt` resolved to `--sig-work` — so it
+> is now `signal`, with `alt` becoming `work`. See Law 2 in
+> `references/design-language.md` for the canonical vocabulary.
 
 ---
 
@@ -1100,7 +1107,7 @@ reading survives phosphor's single colour and colour-blind viewers.
 
 | `signal` | key | shape | severity |
 | --- | --- | --- | --- |
-| `info` | `--sig-work` | pentagon ⬠ (5) | working |
+| `work` | `--sig-work` | pentagon ⬠ (5) | working |
 | `wait` | `--sig-wait` | diamond ◆ (4) | attend |
 | `done` | `--sig-done` | hexagon ⬡ (6) | nominal |
 | `err` | `--sig-err` | triangle ▲ (3) | act now |

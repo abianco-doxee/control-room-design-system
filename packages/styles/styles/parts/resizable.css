@@ -13,8 +13,13 @@
 .cr-resizable__handle { position: absolute; z-index: 2; background: transparent; touch-action: none; }
 .cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle { top: 0; bottom: 0; width: var(--space-3); transform: translateX(-50%); cursor: col-resize; }
 .cr-resizable--vertical .cr-resizable__handle { left: 0; right: 0; height: var(--space-3); transform: translateY(-50%); cursor: row-resize; }
-/* the visible rule, centred in the target box */
-.cr-resizable__handle::before { content: ""; position: absolute; background: var(--border); }
+/* The visible rule, centred in the target box. Keyed to --seam, not --border: this
+ * is an INTERNAL seam between two panes, not the container's chassis edge, and
+ * --border against --panel measures 1.21 / 1.21 / 1.01 on dark / extreme /
+ * phosphor. The grip below is already on --seam via --muted; before this the rule
+ * vanished away from the grip on a tall pane, so the handle read as a floating
+ * 32px plate with no line connecting it. Same split as the accordion. */
+.cr-resizable__handle::before { content: ""; position: absolute; background: var(--seam); }
 .cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle::before {
   top: 0; bottom: 0; left: 50%; width: var(--brd-heavy); transform: translateX(-50%);
 }
@@ -28,15 +33,16 @@
  * graded fill, so Law 1's two-tone rule holds). Hardware texture on a piece of
  * hardware (Law 6), square-cornered.
  *
- * The bars are keyed to --muted, NOT to the handle's own --border: --border is
- * pure/near black on dark, extreme AND phosphor, so a plate inheriting it sits at
- * 1.21:1 / 1.21:1 / 1.01:1 against the --panel pane behind — an invisible grip in
- * exactly the themes that need it most. --muted brackets between surface and ink in
- * all four themes by construction (5.19 / 7.02 / 7.45 / 6.26 against --panel), so
- * the grip reads everywhere. It goes to --sig-work with the handle on hover/drag. */
+ * The bars are keyed to --seam, the house internal-divider role, NOT to the
+ * chassis-edge --border: --border is pure/near black on dark, extreme AND phosphor,
+ * so a plate inheriting it sits at 1.21:1 / 1.21:1 / 1.01:1 against the --panel pane
+ * behind — an invisible grip in exactly the themes that need it most. --seam
+ * brackets between surface and ink in all four themes by construction (5.19 / 7.02
+ * / 7.45 / 6.26 against --panel), so the grip reads everywhere. It goes to
+ * --sig-work with the handle on hover/drag. */
 .cr-resizable__handle::after {
   content: ""; position: absolute; pointer-events: none;
-  --cr-resizable-grip: var(--muted);
+  --cr-resizable-grip: var(--seam);
 }
 .cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle::after {
   top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -55,5 +61,5 @@
 /* the rule (::before), not the transparent target box, carries the active state */
 .cr-resizable__handle:hover::before,
 .cr-resizable[data-dragging="true"] .cr-resizable__handle::before { background: var(--sig-work); }
-.cr-resizable__handle:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -2px; }
+.cr-resizable__handle:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: -2px; }
 

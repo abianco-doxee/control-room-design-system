@@ -35,7 +35,7 @@
   content: ""; position: absolute; inset-block: 0; inset-inline-start: 0;
   width: var(--brd-hair); background: var(--cr-alert-border); pointer-events: none;
 }
-.cr-alert--info { --cr-alert-key: var(--sig-work); --cr-alert-sev: polygon(50% 0,98% 35%,79% 100%,21% 100%,2% 35%); }        /* 5 · working */
+.cr-alert--work { --cr-alert-key: var(--sig-work); --cr-alert-sev: polygon(50% 0,98% 35%,79% 100%,21% 100%,2% 35%); }        /* 5 · working */
 .cr-alert--wait { --cr-alert-key: var(--sig-wait); --cr-alert-sev: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }              /* 4 · attend  */
 .cr-alert--done { --cr-alert-key: var(--sig-done); --cr-alert-sev: polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%); }  /* 6 · nominal */
 .cr-alert--err  { --cr-alert-key: var(--sig-err);  --cr-alert-sev: polygon(50% 0, 100% 100%, 0 100%); }                      /* 3 · act now */

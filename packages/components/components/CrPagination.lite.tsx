@@ -14,7 +14,10 @@ export interface CrPaginationProps {
   dt?: any;
 }
 
-/* Controlled pager: ‹ prev · windowed page numbers with ellipses · next ›.
+/* Controlled pager: ◂ prev · windowed page numbers with ellipses · next ▸.
+ * The nav glyphs are the house solid triangles, the same pair CrCalendar and
+ * CrCarousel use for their prev/next buttons; they were ‹ › here alone. Each is
+ * aria-hidden because the button already carries an aria-label.
  * Derived values live in useStore getters (Mitosis strips free consts in the
  * component body for some targets). Styling via .cr-pager. */
 export default function CrPagination(props: CrPaginationProps) {
@@ -59,7 +62,7 @@ export default function CrPagination(props: CrPaginationProps) {
         disabled={state.cur <= 1}
         onClick={() => state.go(state.cur - 1)}
       >
-        ‹
+        <span aria-hidden="true">◂</span>
       </button>
       <For each={state.items}>
         {(n: number) =>
@@ -90,7 +93,7 @@ export default function CrPagination(props: CrPaginationProps) {
         disabled={state.cur >= state.last}
         onClick={() => state.go(state.cur + 1)}
       >
-        ›
+        <span aria-hidden="true">▸</span>
       </button>
     </nav>
   );

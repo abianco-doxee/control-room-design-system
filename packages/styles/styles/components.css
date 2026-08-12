@@ -115,7 +115,15 @@
   padding: var(--cr-chip-pad-y) var(--cr-chip-pad-x);
   background: var(--cr-chip-bg); color: var(--cr-chip-fg); border: var(--brd) solid var(--border);
 }
-.cr-chip--alt { --cr-chip-bg: var(--sig-work); }
+/* Chip carries the same signal vocabulary as Tag (Law 2). The default fill is
+ * --sig-done, so `signal="done"` is the bare .cr-chip and needs no modifier;
+ * the rest re-key --cr-chip-bg. The old `tone="alt"` was this same channel under
+ * a second name — `alt` meant --sig-work, i.e. `signal="work"`. */
+.cr-chip--work   { --cr-chip-bg: var(--sig-work); }
+.cr-chip--wait   { --cr-chip-bg: var(--sig-wait); }
+.cr-chip--err    { --cr-chip-bg: var(--sig-err);  --cr-chip-fg: var(--on-err); }
+.cr-chip--idle   { --cr-chip-bg: var(--sig-idle); --cr-chip-fg: var(--on-idle); }
+.cr-chip--accent { --cr-chip-bg: var(--sig-accent); --cr-chip-fg: var(--on-accent); }
 
 /* ── Tag (inline status) ───────────────────────────────────────────────── */
 .cr-tag {
@@ -849,7 +857,7 @@
   content: ""; position: absolute; inset-block: 0; inset-inline-start: 0;
   width: var(--brd-hair); background: var(--cr-alert-border); pointer-events: none;
 }
-.cr-alert--info { --cr-alert-key: var(--sig-work); --cr-alert-sev: polygon(50% 0,98% 35%,79% 100%,21% 100%,2% 35%); }        /* 5 · working */
+.cr-alert--work { --cr-alert-key: var(--sig-work); --cr-alert-sev: polygon(50% 0,98% 35%,79% 100%,21% 100%,2% 35%); }        /* 5 · working */
 .cr-alert--wait { --cr-alert-key: var(--sig-wait); --cr-alert-sev: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }              /* 4 · attend  */
 .cr-alert--done { --cr-alert-key: var(--sig-done); --cr-alert-sev: polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%); }  /* 6 · nominal */
 .cr-alert--err  { --cr-alert-key: var(--sig-err);  --cr-alert-sev: polygon(50% 0, 100% 100%, 0 100%); }                      /* 3 · act now */
@@ -1027,8 +1035,15 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-dl__v { margin: 0; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink); }
 
 /* ── Accordion (collapsible sections) ───────────────────────────────────── */
+/* Two different lines, two different tokens. --cr-accordion-border is the outer
+ * CHASSIS EDGE: it sits against --board, where --border is the correct near-black
+ * contour (Law 1). The between-item divider is an INTERNAL SEAM sitting against
+ * --cr-accordion-bg, where that same near-black measures 1.21 / 1.21 / 1.01 on
+ * dark / extreme / phosphor — an invisible rule on three of four themes. It gets
+ * --cr-accordion-seam (= --seam), which brackets between surface and ink in every
+ * theme by construction. Same reasoning the header seam below already used. */
 .cr-accordion { border: var(--brd) solid var(--cr-accordion-border); background: var(--cr-accordion-bg); }
-.cr-accordion__item + .cr-accordion__item { border-top: var(--brd) solid var(--cr-accordion-border); }
+.cr-accordion__item + .cr-accordion__item { border-top: var(--brd) solid var(--cr-accordion-seam); }
 /* Header chrome. The header carried none — flat text on the panel, with expansion
  * state announced only by the chevron. Two additions, both structural, no decoration:
  *
@@ -1036,21 +1051,19 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
  *    the body it reveals (the house head-vs-body pattern — .cr-modal__head and
  *    .cr-drawer__head do the same). The tone step alone would be a no-op: --panel-2
  *    against --panel measures only 1.07–1.13:1 across the four themes. The SEAM is
- *    what draws the boundary, and it is keyed to --muted rather than the house
- *    --cr-accordion-border: that token resolves to --border, which is pure/near
- *    black on dark, extreme AND phosphor, i.e. 1.21:1 / 1.21:1 / 1.01:1 against the
- *    panel — an invisible rule on three of the four themes. --muted brackets between
- *    surface and ink in all four by construction (4.65 / 6.55 / 6.58 / 5.73 against
- *    --panel-2). Still a hard edge, not a graded step (Law 1).
+ *    what draws the boundary, and it is keyed to --seam, the house internal-divider
+ *    role, rather than the chassis-edge --cr-accordion-border. --seam brackets
+ *    between surface and ink in all four themes by construction (4.65 / 6.55 / 6.58
+ *    / 5.73 against --panel-2). Still a hard edge, not a graded step (Law 1).
  * 2. An inline-start bar carrying expansion as a STATE channel (Law 2), not
- *    decoration: --muted while collapsed, flooding to --cr-accordion-accent when open.
+ *    decoration: --seam while collapsed, flooding to --cr-accordion-accent when open.
  *    It duplicates a reading the chevron already carries geometrically, so the state
  *    survives with colour removed. */
 .cr-accordion__header {
   width: 100%; display: flex; align-items: center; gap: var(--space-2); justify-content: space-between;
   background: var(--panel-2); border: 0; cursor: pointer;
   padding: var(--space-3) var(--space-4);
-  border-inline-start: var(--brd-heavy) solid var(--muted);
+  border-inline-start: var(--brd-heavy) solid var(--seam);
   /* reserved so toggling the seam on/off never changes the header's height */
   border-bottom: var(--brd) solid transparent;
   font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 700; color: var(--ink);
@@ -1060,7 +1073,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-accordion__header:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), var(--panel-2)); }
 .cr-accordion__header[aria-expanded="true"] {
   border-inline-start-color: var(--cr-accordion-accent);
-  border-bottom-color: var(--muted);
+  border-bottom-color: var(--seam);
 }
 @media (prefers-reduced-motion: reduce) { .cr-accordion__header { transition: none; } }
 .cr-accordion__chevron {
@@ -1081,7 +1094,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
   border: var(--brd) solid var(--cr-popover-border); box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
   padding: var(--space-3) var(--space-4);
 }
-.cr-popover__panel:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
+.cr-popover__panel:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
 
 /* ── Drawer / sheet (edge panel on native dialog) ───────────────────────── */
 .cr-drawer {
@@ -1238,7 +1251,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-tree__item { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-0-5) var(--space-2); cursor: pointer; color: var(--ink); }
 .cr-tree__item:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
 .cr-tree__item[aria-selected="true"] { background: color-mix(in srgb, var(--cr-tree-accent) 20%, transparent); }
-.cr-tree__item:focus-visible { outline: var(--focus-w) solid var(--cr-tree-accent); outline-offset: -3px; }
+.cr-tree__item:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: -3px; }
 .cr-tree__twist { width: 0; height: 0; flex-shrink: 0; border-inline-start: 6px solid var(--muted); border-top: 5px solid transparent; border-bottom: 5px solid transparent; transition: transform var(--dur-press); }
 .cr-tree__item[aria-expanded="true"] .cr-tree__twist { transform: rotate(90deg); border-inline-start-color: var(--cr-tree-accent); }
 .cr-tree__lead { width: 6px; flex-shrink: 0; color: color-mix(in srgb, var(--muted) 60%, transparent); text-align: center; }
@@ -1784,7 +1797,14 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-grid__viewport { overflow-y: auto; overflow-x: hidden; position: relative; }
 .cr-grid__sizer { position: relative; width: 100%; }
 .cr-grid__rows { position: absolute; inset-inline: 0; top: 0; }
-.cr-grid__row { display: grid; align-items: center; border-bottom: var(--brd-hair) solid color-mix(in srgb, var(--cr-datagrid-border) 55%, transparent); background: var(--cr-datagrid-bg); }
+/* The row rule is an INTERNAL seam, so it takes --cr-datagrid-seam, not the
+ * chassis-edge --cr-datagrid-border the frame and head rule keep. The old
+ * `color-mix(--cr-datagrid-border 55%, transparent)` was softening a line that was
+ * already invisible: --border on --board measures 1.11 / 1.11 / 1.06 on dark /
+ * extreme / phosphor, and diluting it toward the background only lowered that
+ * further (1.07 / 1.07 / 1.03). Mixing cannot rescue a value that starts below the
+ * floor — the thing being mixed had to change. --seam clears it in all four. */
+.cr-grid__row { display: grid; align-items: center; border-bottom: var(--brd-hair) solid var(--cr-datagrid-seam); background: var(--cr-datagrid-bg); }
 .cr-grid__row:hover { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), var(--cr-datagrid-bg)); }
 .cr-grid__row[aria-selected="true"] { background: color-mix(in srgb, var(--sig-work) 16%, var(--cr-datagrid-bg)); }
 .cr-grid__cell { display: flex; align-items: center; min-width: 0; padding: 0 var(--space-3); font-size: var(--text-sm); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1860,8 +1880,8 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
  * Offsetting by --focus-w lands it fully inside the frame, which also keeps it
  * clear of the showcase's `.cell--scroll > .cell__demo { overflow-x: auto }`
  * clip — an OUTWARD ring on a scroll-container child is what gets cut off. */
-.cr-grid:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: calc(-1 * var(--focus-w)); }
-.cr-grid__cell--active { outline: var(--focus-w) solid var(--sig-work); outline-offset: calc(-1 * var(--focus-w)); position: relative; z-index: 1; }
+.cr-grid:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: calc(-1 * var(--focus-w)); }
+.cr-grid__cell--active { outline: var(--focus-w) solid var(--focus); outline-offset: calc(-1 * var(--focus-w)); position: relative; z-index: 1; }
 
 /* ── Stepper ─────────────────────────────────────────────────────────────── */
 /* Law 4 — a stepper IS the "sequence / pipeline step" primitive, so it carries
@@ -1915,7 +1935,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-stepper__label { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: var(--text-xs); }
 .cr-stepper__item--upcoming .cr-stepper__label { color: var(--muted); }
 .cr-stepper__hint { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); }
-.cr-stepper__btn:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-stepper__btn:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
 
 /* ── Spinner ─────────────────────────────────────────────────────────────── */
 /* Four cells from the block shade ramp (░▒▓█, see references/decoration.md)
@@ -2046,7 +2066,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
 .cr-scroll::-webkit-scrollbar-track { background: var(--panel-2); }
 .cr-scroll::-webkit-scrollbar-thumb { background: var(--sig-work); border: 2px solid var(--panel-2); }
-.cr-scroll:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -2px; }
+.cr-scroll:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: -2px; }
 
 /* ── Resizable ───────────────────────────────────────────────────────────── */
 .cr-resizable { position: relative; display: grid; grid-template-columns: 50% 1fr; width: 100%; border: var(--brd) solid var(--border); overflow: hidden; }
@@ -2061,8 +2081,13 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-resizable__handle { position: absolute; z-index: 2; background: transparent; touch-action: none; }
 .cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle { top: 0; bottom: 0; width: var(--space-3); transform: translateX(-50%); cursor: col-resize; }
 .cr-resizable--vertical .cr-resizable__handle { left: 0; right: 0; height: var(--space-3); transform: translateY(-50%); cursor: row-resize; }
-/* the visible rule, centred in the target box */
-.cr-resizable__handle::before { content: ""; position: absolute; background: var(--border); }
+/* The visible rule, centred in the target box. Keyed to --seam, not --border: this
+ * is an INTERNAL seam between two panes, not the container's chassis edge, and
+ * --border against --panel measures 1.21 / 1.21 / 1.01 on dark / extreme /
+ * phosphor. The grip below is already on --seam via --muted; before this the rule
+ * vanished away from the grip on a tall pane, so the handle read as a floating
+ * 32px plate with no line connecting it. Same split as the accordion. */
+.cr-resizable__handle::before { content: ""; position: absolute; background: var(--seam); }
 .cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle::before {
   top: 0; bottom: 0; left: 50%; width: var(--brd-heavy); transform: translateX(-50%);
 }
@@ -2076,15 +2101,16 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
  * graded fill, so Law 1's two-tone rule holds). Hardware texture on a piece of
  * hardware (Law 6), square-cornered.
  *
- * The bars are keyed to --muted, NOT to the handle's own --border: --border is
- * pure/near black on dark, extreme AND phosphor, so a plate inheriting it sits at
- * 1.21:1 / 1.21:1 / 1.01:1 against the --panel pane behind — an invisible grip in
- * exactly the themes that need it most. --muted brackets between surface and ink in
- * all four themes by construction (5.19 / 7.02 / 7.45 / 6.26 against --panel), so
- * the grip reads everywhere. It goes to --sig-work with the handle on hover/drag. */
+ * The bars are keyed to --seam, the house internal-divider role, NOT to the
+ * chassis-edge --border: --border is pure/near black on dark, extreme AND phosphor,
+ * so a plate inheriting it sits at 1.21:1 / 1.21:1 / 1.01:1 against the --panel pane
+ * behind — an invisible grip in exactly the themes that need it most. --seam
+ * brackets between surface and ink in all four themes by construction (5.19 / 7.02
+ * / 7.45 / 6.26 against --panel), so the grip reads everywhere. It goes to
+ * --sig-work with the handle on hover/drag. */
 .cr-resizable__handle::after {
   content: ""; position: absolute; pointer-events: none;
-  --cr-resizable-grip: var(--muted);
+  --cr-resizable-grip: var(--seam);
 }
 .cr-resizable:not(.cr-resizable--vertical) .cr-resizable__handle::after {
   top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -2103,7 +2129,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 /* the rule (::before), not the transparent target box, carries the active state */
 .cr-resizable__handle:hover::before,
 .cr-resizable[data-dragging="true"] .cr-resizable__handle::before { background: var(--sig-work); }
-.cr-resizable__handle:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -2px; }
+.cr-resizable__handle:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: -2px; }
 
 /* ── ToggleChip (interactive multi-select filter pill; role=checkbox) ─────── */
 .cr-togglechip {
@@ -2163,7 +2189,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 }
 .cr-overflow:hover { color: var(--sig-work); }
 .cr-overflow--static { cursor: default; }
-.cr-overflow:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
+.cr-overflow:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
 
 /* ── RelativeTime (semantic <time> display) ──────────────────────────────── */
 .cr-reltime { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -2243,7 +2269,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-rating__star[data-state="on"] { color: var(--cr-rating-on); }
 .cr-rating__star:disabled { cursor: not-allowed; opacity: .5; }
 .cr-rating--readonly .cr-rating__star { cursor: default; }
-.cr-rating__star:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-rating__star:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
 
 /* ── Timeline ────────────────────────────────────────────────────────────────
  * An <ol> on a vertical rail; each node is signal-coloured (Law 2), the rail is
@@ -2288,7 +2314,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-fileupload--over { border-color: var(--cr-fileupload-active-border); border-style: solid; }
 .cr-fileupload__input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 .cr-fileupload__input:disabled { cursor: not-allowed; }
-.cr-fileupload__input:focus-visible + .cr-fileupload__prompt { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--space-2); }
+.cr-fileupload__input:focus-visible + .cr-fileupload__prompt { outline: var(--focus-w) solid var(--focus); outline-offset: var(--space-2); }
 .cr-fileupload__prompt { display: flex; flex-direction: column; gap: var(--space-0-5); pointer-events: none; }
 .cr-fileupload__title { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: var(--text-sm); color: var(--ink); }
 .cr-fileupload__hint { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); }
@@ -2305,11 +2331,11 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-carousel__caption { font-size: var(--text-xs); color: var(--muted); }
 .cr-carousel__nav { display: inline-flex; align-items: center; justify-content: center; min-width: var(--control-h-md); background: var(--panel-2); border: var(--brd) solid var(--border); color: var(--ink); cursor: pointer; font-size: var(--text-md); }
 .cr-carousel__nav:hover { background: var(--panel); }
-.cr-carousel__nav:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-carousel__nav:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
 .cr-carousel__dots { display: inline-flex; justify-content: center; gap: var(--space-1); }
 .cr-carousel__dot { display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; padding: var(--space-0-5); margin: 0; cursor: pointer; color: var(--cr-carousel-dot); font-size: var(--text-xs); line-height: 1; }
 .cr-carousel__dot[data-state="active"] { color: var(--cr-carousel-dot-active); }
-.cr-carousel__dot:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-carousel__dot:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
 
 /* ── Calendar ────────────────────────────────────────────────────────────────
  * A month grid; the selected day is the accent (a state), today is ringed. */
@@ -2322,12 +2348,12 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-calendar__switcher { display: flex; align-items: center; justify-content: center; gap: var(--space-1); min-width: 0; }
 .cr-calendar__select { min-width: 0; max-width: 100%; background: var(--panel-2); border: var(--brd) solid var(--border); color: var(--ink); font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: var(--text-2xs); padding: var(--space-px) var(--space-1); cursor: pointer; }
 .cr-calendar__select:hover { background: var(--panel); }
-.cr-calendar__select:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-calendar__select:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
 .cr-calendar__select--month { flex: 1 1 auto; }
 .cr-calendar__select--year { flex: 0 0 auto; }
 .cr-calendar__nav { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; background: var(--panel-2); border: var(--brd) solid var(--border); color: var(--ink); cursor: pointer; }
 .cr-calendar__nav:hover { background: var(--panel); }
-.cr-calendar__nav:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-calendar__nav:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
 .cr-calendar__row { display: grid; grid-template-columns: repeat(7, 1fr); }
 .cr-calendar__body { display: flex; flex-direction: column; gap: var(--space-px); }
 .cr-calendar__body .cr-calendar__row { gap: var(--space-px); }
@@ -2348,4 +2374,4 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
  * un-mixed accent so the chip edge keeps >=3:1 against the calendar bg. */
 .cr-calendar__day--selected:hover { background: color-mix(in srgb, var(--cr-calendar-selected-bg) 85%, var(--cr-calendar-bg)); color: var(--cr-calendar-selected-fg); border-color: var(--cr-calendar-selected-bg); }
 .cr-calendar__day:disabled { color: var(--muted); opacity: .4; cursor: not-allowed; }
-.cr-calendar__day:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -2px; }
+.cr-calendar__day:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: -2px; }

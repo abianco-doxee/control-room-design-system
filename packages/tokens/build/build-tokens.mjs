@@ -115,8 +115,11 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
-/* Focus is a first-class signal, not an afterthought. */
-*:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
+/* Focus is a first-class signal, not an afterthought. It has its own --focus
+   colour rather than borrowing --sig-work: the ring must clear 3:1 against every
+   surface it can land on (WCAG 2.4.11), and in the light theme the working cyan
+   only reaches 2.86:1 on --board. --focus tracks --sig-work in the other three. */
+*:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
 /* Motion is opt-out at the system level. */
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
