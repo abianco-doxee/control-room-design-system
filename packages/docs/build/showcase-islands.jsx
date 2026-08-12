@@ -199,25 +199,26 @@ const OVERFLOW_ITEMS = Array.from({ length: 16 }, (_, i) => ({
   region: OVERFLOW_REGIONS[i % OVERFLOW_REGIONS.length],
 }));
 // Tiles for the keyed contact sheet. `signal` picks the .cr-tile--* key class
-// (the CSS vocabulary: work/wait/done/err/idle); `state` is the sigil's own
-// longer-form vocabulary for the same machine state.
+// (the CSS vocabulary: work/wait/done/err/idle). The sigil deliberately takes
+// NO state: hue-keying it would paint each mark in the same signal colour as
+// the tile beneath it, making it invisible. It rides on luminosity instead.
 const CONTACT_SHEET = [
-  { id: "nova-01", signal: "work", state: "working" },
-  { id: "nova-02", signal: "done", state: "done" },
-  { id: "orion-03", signal: "wait", state: "waiting" },
-  { id: "orion-04", signal: "err", state: "error" },
-  { id: "vega-05", signal: "idle", state: "idle" },
-  { id: "vega-06", signal: "work", state: "working" },
-  { id: "lyra-07", signal: "done", state: "done" },
-  { id: "lyra-08", signal: "wait", state: "waiting" },
-  { id: "atlas-09", signal: "work", state: "working" },
-  { id: "atlas-10", signal: "err", state: "error" },
-  { id: "rigel-11", signal: "idle", state: "idle" },
-  { id: "rigel-12", signal: "done", state: "done" },
-  { id: "mira-13", signal: "work", state: "working" },
-  { id: "mira-14", signal: "wait", state: "waiting" },
-  { id: "cygni-15", signal: "done", state: "done" },
-  { id: "cygni-16", signal: "idle", state: "idle" },
+  { id: "nova-01", signal: "work" },
+  { id: "nova-02", signal: "done" },
+  { id: "orion-03", signal: "wait" },
+  { id: "orion-04", signal: "err" },
+  { id: "vega-05", signal: "idle" },
+  { id: "vega-06", signal: "work" },
+  { id: "lyra-07", signal: "done" },
+  { id: "lyra-08", signal: "wait" },
+  { id: "atlas-09", signal: "work" },
+  { id: "atlas-10", signal: "err" },
+  { id: "rigel-11", signal: "idle" },
+  { id: "rigel-12", signal: "done" },
+  { id: "mira-13", signal: "work" },
+  { id: "mira-14", signal: "wait" },
+  { id: "cygni-15", signal: "done" },
+  { id: "cygni-16", signal: "idle" },
 ];
 const CRON_PRESETS = [
   { label: "Hourly", cron: "0 * * * *" },
