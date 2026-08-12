@@ -7,7 +7,7 @@ export interface CrTimelineItem {
   title: string;
   detail?: string;
   /** Signal for the node marker: work · done · wait · err (Law 2). Default neutral. */
-  signal?: "work" | "done" | "wait" | "err";
+  signal?: "work" | "wait" | "done" | "err";
 }
 
 export interface CrTimelineProps {
