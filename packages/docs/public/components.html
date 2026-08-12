@@ -907,6 +907,9 @@ body {
   box-shadow: none; transform: none; filter: saturate(0.5);
 }
 .cr-btn--sm { --cr-btn-pad-x: var(--space-3); --cr-btn-pad-y: var(--space-1); --cr-btn-size: var(--text-xs); }
+/* Kill the snap-press transition declared above. MUST live in this section: it
+ * is a Button rule, so a consumer importing only styles/button.css needs it. */
+@media (prefers-reduced-motion: reduce) { .cr-btn { transition: none; } }
 
 /* ── EMPHASIS (gravity) — form, not colour ─────────────────────────────────
  * solid (default, primary) is the filled+shadowed base above. */
@@ -1162,7 +1165,6 @@ body {
  * not animated. Per-tier rather than one switch, so a subtree can opt out of
  * exactly the tiers it uses. */
 @media (prefers-reduced-motion: reduce) {
-  .cr-btn { transition: none; }
   .cr-glitch-t1 { text-shadow: none; }
   .cr-glitch-t2::before, .cr-glitch-t2::after { display: none; }
 }
@@ -1709,6 +1711,12 @@ body {
   flex: 1; display: block; height: var(--space-2); background: var(--panel-2);
   border: var(--brd-hair) solid var(--border); overflow: hidden;
 }
+/* One rule per signal, INCLUDING work. `work` is already the inherited default,
+ * so this rule is redundant at runtime — but the component emits
+ * `cr-progress--work` unconditionally, and without a matching rule a consumer
+ * writing `.cr-progress--work { … }` for symmetry with the other four finds
+ * nothing to override. The vocabulary is only honest if it is complete. */
+.cr-progress--work { --cr-prog-c: var(--sig-work); }
 .cr-progress--wait { --cr-prog-c: var(--sig-wait); }
 .cr-progress--done { --cr-prog-c: var(--sig-done); }
 .cr-progress--err  { --cr-prog-c: var(--sig-err); }
@@ -2265,7 +2273,13 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 /* ── Texture utilities (hardware only — Law 6) ─────────────────────────────
  * Apply to a bezel/screen/hardware surface, NEVER a flat content field. All
  * three read as the neo-print / CRT grain; theme-keyed via the texture tokens. */
-/* All fill edge-to-edge (repeat, from the origin). Pair with a background-color. */
+/* All fill edge-to-edge (repeat, from the origin). Pair with a background-color.
+ * The `opacity` below is ON THE ELEMENT by design — it is the loudness dial, and
+ * these are decorative surfaces whose content is meant to fade with the grain.
+ * So apply them to the HARDWARE (a bezel/hero), never to a content-bearing
+ * readout: on `.cr-bezel__screen` they would both fade the text and stack a
+ * second texture UNDER it, while the screen already paints one above via
+ * ::after. To texture *over* content, copy that ::after overlay pattern. */
 .cr-tex--halftone, .cr-tex--dither, .cr-tex--scan, .cr-tex--cross, .cr-tex--glass {
   background-repeat: repeat; background-position: 0 0; background-attachment: local;
   /* Follows the loudness dial — 1 (default/showcase) is a no-op; the `calm` ops
@@ -2591,8 +2605,6 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 
 /* whisper drafting field for large dead background regions */
 .cr-bg--field { background-image: var(--field); background-repeat: repeat; }
-
-@media (prefers-reduced-motion: reduce) { .cr-breach--alive { animation: none; } }
 
 /* ── Data grid (virtualized) — dense table for large datasets ─────────────── */
 /* Chrome (the review: "has no chrome style at all"). The grid read as a bare
