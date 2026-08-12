@@ -887,6 +887,12 @@
   flex: 1; display: block; height: var(--space-2); background: var(--panel-2);
   border: var(--brd-hair) solid var(--border); overflow: hidden;
 }
+/* One rule per signal, INCLUDING work. `work` is already the inherited default,
+ * so this rule is redundant at runtime — but the component emits
+ * `cr-progress--work` unconditionally, and without a matching rule a consumer
+ * writing `.cr-progress--work { … }` for symmetry with the other four finds
+ * nothing to override. The vocabulary is only honest if it is complete. */
+.cr-progress--work { --cr-prog-c: var(--sig-work); }
 .cr-progress--wait { --cr-prog-c: var(--sig-wait); }
 .cr-progress--done { --cr-prog-c: var(--sig-done); }
 .cr-progress--err  { --cr-prog-c: var(--sig-err); }
