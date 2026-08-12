@@ -2946,7 +2946,21 @@ Expected: all PASS. Fix any failure before proceeding — this is the last gate 
 
 - [ ] **Step 3: Regenerate the visual baselines — the gate has been dark all along**
 
-The snapshot directory does not exist. Commit `44f3502` (pre-dating this branch) retargeted `visual.spec.mjs` from `gallery.html` to `components.html` and deleted the baselines without regenerating, so `test:visual` has been failing on **missing snapshots** — not pixel diffs — throughout this remediation. It has caught nothing.
+The snapshot directory does not exist — but that was only half the story, and
+the other half would have broken the CI run.
+
+**The real failure was a screenshot-stability timeout, not a missing baseline**
+(found in Task 40). `toHaveScreenshot` inherited Playwright's 5s default against
+a `fullPage: true` capture of a ~63,000px page costing ~1.2s and 1.8MB per frame.
+Playwright requires two byte-identical frames before comparing and could not fit
+them in the budget, so every run died with *"Failed to take two consecutive
+stable screenshots"* — **platform-independently**. Regenerating on Linux would
+have failed exactly the same way.
+
+Fixed in `1463306` by raising the timeout to 30s (measured: 5s fails, 30s
+passes). With that in place all four themes capture successfully and the only
+remaining error is the expected *"snapshot doesn't exist"*. So the baselines can
+now actually be generated — but only on Linux.
 
 So this is not "review the diffs and accept the intended ones": there is nothing to diff against. The baselines must be **created**, on **Linux**, against the finished branch:
 
