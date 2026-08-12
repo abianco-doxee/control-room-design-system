@@ -23,15 +23,22 @@ and the two combine.
 
 Chords and sequences are drawn **differently**, because that distinction is the
 whole point of the syntax: chord members sit tight around a `+` glyph, sequence
-steps are pushed apart by the italic word *then*. Parsing is forgiving —
-whitespace runs collapse, a dangling joiner is dropped (`"Ctrl+"` → `Ctrl`), and
-a lone `+` is read as the plus key (`"Ctrl++"` → `Ctrl` and `+`).
+steps are pushed apart by the italic word *then*. Parsing is forgiving — any
+whitespace run splits a sequence, a dangling joiner is dropped (`"Ctrl+"` →
+`Ctrl`), and a literal plus key is recovered at any position in a chord
+(`"Ctrl++K"` → `Ctrl` `+` `K`).
 
 Accessibility: every keycap and both separators are `aria-hidden`, so a screen
-reader never hears a run of unlabelled boxes. Each binding instead carries
-`aria-keyshortcuts` plus an `aria-label` of the spoken form and its description
-("Control plus K, then P: Palette, then pin"). The label sits per binding rather
-than on the list, so bindings stay separately navigable.
+reader never hears a run of unlabelled boxes. Each binding instead carries an
+`aria-label` of the spoken form and its description ("Control plus K, then P:
+Palette, then pin"). The label sits per binding rather than on the list, so
+bindings stay separately navigable.
+
+`aria-keyshortcuts` is emitted only for single-step bindings. WAI-ARIA defines
+that value as a space-separated list of **alternative** combinations pressed
+simultaneously, so putting a sequence in it would assert "g **or** p" — the
+opposite of this syntax's meaning. Sequences omit the attribute rather than
+state something false; the `aria-label` carries the meaning either way.
 
 This is additive: `revealKey` is unchanged, and with no `hints` the component
 still renders nothing visible and behaves exactly as before. The two features are

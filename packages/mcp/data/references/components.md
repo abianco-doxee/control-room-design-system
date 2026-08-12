@@ -1033,18 +1033,26 @@ the notation readers already know from editors and docs — `+` joins a **chord*
 
 The two joins are drawn **differently**, because that distinction is the whole
 point of the syntax: chord members sit tight around a `+` glyph, sequence steps
-are pushed apart by the word *then*. Whitespace is forgiving (`"g   p"` ==
-`"g p"`), a dangling joiner is dropped (`"Ctrl+"` → `Ctrl`), and a lone `+` is
-read as the plus key itself (`"Ctrl++"` → `Ctrl` + `+`).
+are pushed apart by the word *then*. Parsing is forgiving: any whitespace run
+splits a sequence (`"g   p"` == `"g\tp"` == `"g p"`), a dangling joiner is
+dropped (`"Ctrl+"` → `Ctrl`, `"+K"` → `K`), and a literal plus key is recovered
+at any position in a chord (`"Ctrl++K"` → `Ctrl` `+` `K`; a bare `"+"` is the
+plus key).
 
 - **MUST** pair the badge with `aria-keyshortcuts` on the actual control — the
   keycap is a visual, not the accessible name.
 - **MUST** keep the keycaps decorative. In the legend every keycap and both
-  separators are `aria-hidden`; each binding instead carries `aria-keyshortcuts`
-  plus an `aria-label` of the spoken form and its description ("Control plus K,
-  then P: Palette, then pin"), so a screen reader hears the meaning and not a run
-  of unlabelled boxes. The label sits **per binding**, not on the list, so the
-  bindings stay separately navigable.
+  separators are `aria-hidden`; each binding instead carries an `aria-label` of
+  the spoken form and its description ("Control plus K, then P: Palette, then
+  pin"), so a screen reader hears the meaning and not a run of unlabelled boxes.
+  The label sits **per binding**, not on the list, so the bindings stay
+  separately navigable.
+- **MUST NOT** put a *sequence* in `aria-keyshortcuts`. WAI-ARIA defines that
+  value as a space-separated list of **alternative** combinations, each pressed
+  simultaneously — so `"g p"` there asserts "g **or** p", the opposite of what
+  this syntax means. The legend therefore emits `aria-keyshortcuts` only for
+  single-step bindings (`"Ctrl+K"`) and omits it for sequences; the `aria-label`
+  carries the sequence meaning for the user either way.
 - **SHOULD** reserve always-on badges for the few primary actions; everything else
   is a hint, so the chrome stays quiet until asked.
 

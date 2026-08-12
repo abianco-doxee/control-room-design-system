@@ -61,36 +61,54 @@ const SPOKEN: { [k: string]: string } = {
 
 /** Parse a binding into sequence steps of chord members.
  *
- *  Edge cases, all of which must not throw and must not emit empty keycaps:
- *   ""          → []            (nothing to render)
- *   "   "       → []            (whitespace only)
- *   "g   p"     → [["g"],["p"]] (runs of space collapse)
- *   " g p "     → [["g"],["p"]] (leading/trailing space ignored)
- *   "Ctrl++"    → [["Ctrl","+"]](a trailing "+" is the PLUS KEY, not a dangling joiner)
- *   "+"         → [["+"]]       (a lone "+" is the plus key)
- *   "Ctrl+"     → [["Ctrl"]]    (a dangling joiner with nothing after it is dropped) */
+ *  Steps split on ANY whitespace run, so a stray tab or newline in authored
+ *  markup reads as a sequence break rather than becoming part of a key name.
+ *
+ *  The literal PLUS KEY. Splitting a chord on "+" turns a literal plus into an
+ *  empty slot, and the rule is positional-free: an empty slot BETWEEN two
+ *  separators is a literal "+", at any position. "Ctrl++K" splits to
+ *  ["Ctrl","","K"] — the middle empty is flanked by two "+" so it is the key.
+ *  A leading or trailing empty has a separator on one side only, so it is a
+ *  dangling joiner and is dropped.
+ *
+ *  Edge cases, none of which throw or emit an empty keycap:
+ *   ""          → []                 (nothing to render)
+ *   "   "       → []                 (whitespace only)
+ *   "g   p"     → [["g"],["p"]]      (runs of whitespace collapse)
+ *   " g p "     → [["g"],["p"]]      (leading/trailing whitespace ignored)
+ *   "g\tp"      → [["g"],["p"]]      (any whitespace splits a sequence)
+ *   "Ctrl+"     → [["Ctrl"]]         (dangling joiner, dropped)
+ *   "+K"        → [["K"]]            (dangling joiner, dropped)
+ *   "+"         → [["+"]]            (a lone "+" is the plus key)
+ *   "Ctrl++"    → [["Ctrl","+"]]     (trailing literal plus)
+ *   "Ctrl++K"   → [["Ctrl","+","K"]] (mid-chord literal plus)
+ *   "++"        → [["+"]]            (a step of only "+" is the one plus key)
+ *   "+++"       → [["+"]]            (likewise — nothing for it to join) */
 export function parseKeys(keys: string): string[][] {
   const src = typeof keys === "string" ? keys : "";
   const steps: string[][] = [];
-  const raw = src.split(" ");
+  const raw = src.split(/\s+/);
   for (let i = 0; i < raw.length; i++) {
-    const stepSrc = raw[i].trim();
+    const stepSrc = raw[i];
     if (!stepSrc) continue;
-    /* A step that is only "+" characters is the plus key itself, not a joiner. */
+    /* a step made only of "+" is the plus key itself: there is no other key it
+       could be joining, so every separator reading is vacuous. "+" and "++" and
+       "+++" all mean the one key. */
+    if (/^\++$/.test(stepSrc)) {
+      steps.push(["+"]);
+      continue;
+    }
     const members: string[] = [];
     const parts = stepSrc.split("+");
     for (let j = 0; j < parts.length; j++) {
       const p = parts[j].trim();
       if (p) {
         members.push(p);
-      } else if (j > 0 && j === parts.length - 1 && members.length > 0) {
-        /* "Ctrl++" → parts ["Ctrl","",""]: the final empty slot means the last
-           "+" was a literal key, not a separator. Only claim it once. */
-        if (parts[j - 1] === "") members.push("+");
+      } else if (j > 0 && j < parts.length - 1) {
+        /* an empty slot flanked by two separators is the literal plus key */
+        members.push("+");
       }
     }
-    /* "+" alone → parts ["",""] → nothing collected above; it is the plus key. */
-    if (members.length === 0 && stepSrc.indexOf("+") !== -1) members.push("+");
     if (members.length > 0) steps.push(members);
   }
   return steps;

@@ -35,9 +35,18 @@ export interface CrKeyHintsProps {
  * two read differently at a glance. See lib/keys.ts for the grammar.
  * ACCESSIBILITY: keycaps and both separators are decorative and aria-hidden, so
  * a screen reader never hears a row of unlabelled boxes. Each list item instead
- * carries aria-keyshortcuts plus an aria-label holding the spoken binding and
- * its description. The label sits per-binding, not on the list, so the bindings
- * stay separately navigable. Styling via .cr-keyhints. */
+ * carries an aria-label holding the spoken binding and its description. The
+ * label sits per-binding, not on the list, so the bindings stay separately
+ * navigable. Styling via .cr-keyhints.
+ * ARIA GRAMMAR: aria-keyshortcuts is emitted ONLY for a single-step binding.
+ * Its value is defined by WAI-ARIA as a space-separated list of ALTERNATIVE
+ * combinations, each pressed simultaneously — so space means "or" there, while
+ * in our syntax it means "then". Emitting a sequence raw would tell a
+ * programmatic consumer that "g p" fires on g OR p, the opposite of the truth.
+ * A conformant-but-absent attribute beats a present-and-wrong one, and the
+ * aria-label already carries the sequence meaning for the user. The value is
+ * the reparsed chord, not the author string, so forgiving input cannot leak
+ * malformed ARIA. */
 export default function CrKeyHints(props: CrKeyHintsProps) {
   const state = useStore({
     reveal() {
@@ -58,12 +67,18 @@ export default function CrKeyHints(props: CrKeyHintsProps) {
     /** [{ keys: raw, label, steps: string[][], spoken: string }] — parsed once per render. */
     rows() {
       const list = props.hints || [];
-      return list.map((h: CrKeyHint) => ({
-        keys: h.keys,
-        label: h.label,
-        steps: parseKeys(h.keys),
-        spoken: describeKeys(h.keys),
-      }));
+      return list.map((h: CrKeyHint) => {
+        const steps = parseKeys(h.keys);
+        return {
+          keys: h.keys,
+          label: h.label,
+          steps: steps,
+          spoken: describeKeys(h.keys),
+          /* see the ARIA note above: only a single-step binding can be stated
+             in aria-keyshortcuts without asserting the opposite of the truth. */
+          shortcuts: steps.length === 1 ? steps[0].join("+") : undefined,
+        };
+      });
     },
   });
 
@@ -102,12 +117,12 @@ export default function CrKeyHints(props: CrKeyHintsProps) {
         style={ptStyle(props.pt, props.dt, "root")}
       >
         <For each={state.rows()}>
-          {(row: { keys: string; label: string; steps: string[][]; spoken: string }) => (
+          {(row: { keys: string; label: string; steps: string[][]; spoken: string; shortcuts: string }) => (
             <li
               {...ptAttrs(props.pt, "item")}
               class={ptClass(props.pt, props.unstyled, "cr-keyhints__item", "item")}
               data-part="item"
-              aria-keyshortcuts={row.keys}
+              aria-keyshortcuts={row.shortcuts}
               aria-label={row.spoken + ": " + row.label}
             >
               <span
