@@ -1752,38 +1752,50 @@ const DEMOS = {
         ],
       }),
   },
-  // Headless: renders nothing itself, so pair it with the CrKbd hint badges it
-  // reveals. Hold the reveal key to see them fade in.
+  // Two registers in one component. The `hints` legend spells bindings out with
+  // the "+" (chord) / space (sequence) notation; the headless peek behavior is
+  // always on, so the CrKbd hint badges below fade in while the reveal key is held.
   "key-hints": {
     tag: "CrKeyHints",
     defs: [T("text", "revealKey", "Alt")],
     render: (s) =>
       h(
         "div",
-        { style: { display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" } },
-        h(CrKeyHints, { revealKey: s.revealKey }),
+        { style: { display: "flex", gap: "16px", flexDirection: "column" } },
+        h(CrKeyHints, {
+          revealKey: s.revealKey,
+          hints: [
+            { keys: "Ctrl+K", label: "Open the command palette" },
+            { keys: "g p", label: "Go to the sprint board" },
+            { keys: "Ctrl+K p", label: "Palette, then pin the result" },
+          ],
+        }),
         h(
-          "span",
-          { style: { fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--muted)" } },
-          "hold " + (s.revealKey || "Alt") + " →"
-        ),
-        h(
-          "button",
-          { className: "cr-btn cr-btn--outline cr-btn--sm" },
-          "Deploy ",
-          h(CrKbd, { keys: "D", hint: true })
-        ),
-        h(
-          "button",
-          { className: "cr-btn cr-btn--outline cr-btn--sm" },
-          "Scan ",
-          h(CrKbd, { keys: "S", hint: true })
-        ),
-        h(
-          "button",
-          { className: "cr-btn cr-btn--sig-err cr-btn--sm" },
-          "Kill ",
-          h(CrKbd, { keys: "K", hint: true, on: true })
+          "div",
+          { style: { display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" } },
+          h(
+            "span",
+            { style: { fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--muted)" } },
+            "hold " + (s.revealKey || "Alt") + " →"
+          ),
+          h(
+            "button",
+            { className: "cr-btn cr-btn--outline cr-btn--sm" },
+            "Deploy ",
+            h(CrKbd, { keys: "D", hint: true })
+          ),
+          h(
+            "button",
+            { className: "cr-btn cr-btn--outline cr-btn--sm" },
+            "Scan ",
+            h(CrKbd, { keys: "S", hint: true })
+          ),
+          h(
+            "button",
+            { className: "cr-btn cr-btn--sig-err cr-btn--sm" },
+            "Kill ",
+            h(CrKbd, { keys: "K", hint: true, on: true })
+          )
         )
       ),
   },

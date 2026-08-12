@@ -149,7 +149,7 @@
     "test:pkg": "node --test tests/pkg-react.test.mjs tests/pkg-qwik.test.mjs tests/pkg-vue.test.mjs tests/pkg-exports.test.mjs tests/reltime-parity.test.mjs",
     "pretest:frameworks": "pnpm run build:components",
     "test:frameworks": "node --test tests/pkg-frameworks.test.mjs tests/cross-fw-contract.test.mjs",
-    "test:contract": "node --test tests/styling-contract.test.mjs tests/responsive.test.mjs tests/utils-ports.test.mjs tests/position-port.test.mjs",
+    "test:contract": "node --test tests/styling-contract.test.mjs tests/responsive.test.mjs tests/utils-ports.test.mjs tests/position-port.test.mjs tests/key-notation.test.mjs",
     "test:tooling": "node --test tests/mcp.test.mjs tests/skill-install.test.mjs",
     "changeset": "changeset",
     "version": "changeset version",

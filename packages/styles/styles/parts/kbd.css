@@ -26,3 +26,33 @@
 :root[data-cr-keys="on"] .cr-kbd--hint { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .cr-kbd--hint { transition: none; } }
 
+/* CrKeyHints legend — the `hints` list. A chord and a sequence MUST NOT look
+ * alike: that distinction is the entire point of the "Ctrl+K p" notation, so it
+ * is carried by two different separators and by spacing.
+ *   CHORD   members are tight, joined by a small "+" glyph  →  [Ctrl]+[K]
+ *   SEQUENCE steps are pushed apart, joined by the word "then" →  [G] then [P]
+ * Both separators are aria-hidden in the markup; the spoken form rides an
+ * aria-label on the <li>. */
+.cr-keyhints--legend { display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.cr-keyhints__item { display: flex; align-items: baseline; gap: var(--space-3); }
+.cr-keyhints__keys { display: inline-flex; align-items: center; flex-wrap: wrap; }
+/* a chord is one tight cluster; the gap BEFORE a step is what separates steps */
+.cr-keyhints__chord { display: inline-flex; align-items: center; }
+.cr-keyhints__chord + .cr-keyhints__chord { margin-inline-start: var(--space-2); }
+.cr-keyhints__member { display: inline-flex; align-items: center; }
+/* the keycaps already carry their own inline-start margin — cancel it inside a
+   chord so "+" sits equidistant between the two caps it joins */
+.cr-keyhints__keys .cr-kbd { margin-inline-start: 0; }
+.cr-keyhints__plus {
+  font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 800; line-height: 1;
+  color: var(--muted); padding: 0 var(--space-1);
+}
+/* "then" is a WORD, not a glyph, and it is spaced and cased differently from the
+   "+" so the two separators are never confused at a glance */
+.cr-keyhints__then {
+  font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 700;
+  text-transform: lowercase; letter-spacing: var(--type-meta-tracking); font-style: italic;
+  color: var(--muted); padding-inline-end: var(--space-2);
+}
+.cr-keyhints__label { font-size: var(--text-xs); color: var(--ink); }
+

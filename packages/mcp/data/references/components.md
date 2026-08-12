@@ -1017,8 +1017,34 @@ registers, matching how prominent the action is:
 :root[data-cr-keys="on"] .cr-kbd--hint { opacity: 1; }   /* no layout shift */
 ```
 
+**Declaring bindings.** Pass `hints` to render a legend. The `keys` string uses
+the notation readers already know from editors and docs — `+` joins a **chord**
+(pressed together), a space joins a **sequence** (pressed in order):
+
+```tsx
+<CrKeyHints
+  hints={[
+    { keys: "Ctrl+K",   label: "Open the command palette" },  /* chord    */
+    { keys: "g p",      label: "Go to the sprint board" },    /* sequence */
+    { keys: "Ctrl+K p", label: "Palette, then pin" },         /* combined */
+  ]}
+/>
+```
+
+The two joins are drawn **differently**, because that distinction is the whole
+point of the syntax: chord members sit tight around a `+` glyph, sequence steps
+are pushed apart by the word *then*. Whitespace is forgiving (`"g   p"` ==
+`"g p"`), a dangling joiner is dropped (`"Ctrl+"` → `Ctrl`), and a lone `+` is
+read as the plus key itself (`"Ctrl++"` → `Ctrl` + `+`).
+
 - **MUST** pair the badge with `aria-keyshortcuts` on the actual control — the
   keycap is a visual, not the accessible name.
+- **MUST** keep the keycaps decorative. In the legend every keycap and both
+  separators are `aria-hidden`; each binding instead carries `aria-keyshortcuts`
+  plus an `aria-label` of the spoken form and its description ("Control plus K,
+  then P: Palette, then pin"), so a screen reader hears the meaning and not a run
+  of unlabelled boxes. The label sits **per binding**, not on the list, so the
+  bindings stay separately navigable.
 - **SHOULD** reserve always-on badges for the few primary actions; everything else
   is a hint, so the chrome stays quiet until asked.
 

@@ -123,16 +123,18 @@
     },
     {
       "id": "key-hints",
-      "name": "Key hints (peek)",
+      "name": "Key hints (peek + legend)",
       "kind": "component",
       "category": "behavior",
       "lifecycle": "stable",
       "origin": "control-room",
-      "description": "Headless behavior — while the reveal key (default Alt) is held, sets data-cr-keys on the root so every secondary key hint fades in at once (a peek-all-shortcuts gesture). Renders nothing visible.",
+      "description": "While the reveal key (default Alt) is held, sets data-cr-keys on the root so every secondary key hint fades in at once (a peek-all-shortcuts gesture). Pass `hints` to also render a shortcut legend: `+` joins a chord (\"Ctrl+K\"), a space joins a sequence (\"g p\"), and the two are drawn differently — a `+` glyph vs a \"then\" separator. Each binding carries aria-keyshortcuts and a spoken aria-label; the keycaps are aria-hidden. With no `hints` it renders nothing visible.",
       "spec": "references/components.md#key-hint",
       "variants": {
         "prop": [
-          "revealKey"
+          "hints",
+          "revealKey",
+          "label"
         ]
       },
       "tokens": [],
@@ -142,7 +144,11 @@
         "peek",
         "reveal",
         "headless",
-        "behavior"
+        "behavior",
+        "chord",
+        "sequence",
+        "combo",
+        "legend"
       ]
     },
     {
