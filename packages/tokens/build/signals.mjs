@@ -52,6 +52,45 @@ export function toneSignals(vars, tone = "neon", skip = new Set()) {
 }
 
 /**
+ * Nudge ONE colour's lightness (hue + chroma held) until it clears `min` against
+ * **every** surface in `against`. Used for the focus ring, which has to stay
+ * visible wherever it lands — WCAG 2.4.11 measures the indicator against its
+ * adjacent surface, and a ring inherited from a dark ramp will not clear 3:1 on a
+ * near-white board. Picks the lightness closest to the original that satisfies all
+ * surfaces; if none does, returns the one with the best worst-case. Returns the
+ * input unchanged when it already passes or isn't a flat colour.
+ */
+export function fitAgainstAll(hex, against, min = 3) {
+  const worst = (c) => Math.min(...against.map((s) => contrastRatio(c, s) || 0));
+  if (worst(hex) >= min) return hex; // already legible everywhere
+  const col = oklch(hex);
+  if (!col) return hex;
+  const origL = col.l ?? 0;
+  let best = hex,
+    bestWorst = worst(hex),
+    chosen = null,
+    chosenDelta = Infinity;
+  for (let l = 0.1; l <= 0.98; l += 0.01) {
+    const cand = formatHex(
+      clampChroma({ mode: "oklch", l, c: col.c || 0, h: col.h || 0 }, "oklch")
+    );
+    const w = worst(cand);
+    if (w > bestWorst) {
+      bestWorst = w;
+      best = cand;
+    }
+    if (w >= min) {
+      const d = Math.abs(l - origL);
+      if (d < chosenDelta) {
+        chosenDelta = d;
+        chosen = cand;
+      }
+    }
+  }
+  return chosen || best;
+}
+
+/**
  * Nudge signal **lightness** (hue + chroma held) until each clears a minimum
  * contrast against a reference surface — the fix for inheriting a dark-tuned neon
  * ramp onto light surfaces (or vice versa), where a bright signal vanishes on a

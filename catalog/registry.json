@@ -327,12 +327,16 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "A compact standalone tag/label; default keys to done, alt to work; stamp-in when added.",
+      "description": "A compact standalone tag/label keyed to a signal (Law 2); defaults to done; stamp-in when added.",
       "spec": "references/components.md#chip",
       "variants": {
-        "tone": [
+        "signal": [
+          "work",
+          "wait",
           "done",
-          "alt"
+          "err",
+          "idle",
+          "accent"
         ],
         "stamp": [
           "off",
@@ -1880,11 +1884,11 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Inline callout keyed to a signal (info/wait/done/err) \u2014 a left brush-bar in the signal hue, optional dismiss. err announces assertively (role=alert).",
+      "description": "Inline callout keyed to a signal (work/wait/done/err) \u2014 a left brush-bar in the signal hue, optional dismiss. err announces assertively (role=alert).",
       "spec": "references/components.md#alert",
       "variants": {
         "signal": [
-          "info",
+          "work",
           "wait",
           "done",
           "err"

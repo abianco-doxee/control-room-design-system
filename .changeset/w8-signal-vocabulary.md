@@ -2,6 +2,7 @@
 "@alebianco/cr-components": major
 "@alebianco/cr-tokens": minor
 "@alebianco/cr-styles": minor
+"@alebianco/cr-utils": minor
 ---
 
 One canonical signal vocabulary, and two token splits that stop a colour meaning
@@ -62,7 +63,14 @@ mean *chassis edge*, and the new `--cr-accordion-seam` / `--cr-datagrid-seam`
 mean *internal divider*. Both are per-component overridable as usual.
 
 `--seam` and `--focus` are theme values, not new required roles, so existing
-brands stay valid without changes.
+brands stay valid without changes. A brand that supplies neither now has them
+**derived**: `--focus` from `--sig-work` and `--seam` from `--muted`, re-derived
+whenever the source role (or the surface ramp) moves, and `--focus` additionally
+fitted so it clears 3:1 against every surface in that theme. Without this a brand
+whose `$modes.light` flips `$scheme` to light while still `$extends`-ing `dark`
+would inherit the dark ring onto a near-white board (1.44:1). A brand that sets
+either token by hand keeps its own value. New `@alebianco/cr-utils` exports:
+`DERIVED_ROLES` and `deriveDerivedRoles`.
 
 **`CrPagination` uses the house direction glyphs.** Its prev/next controls were
 `‹ ›`, the only place in the library those appeared; they are now `◂ ▸`, the same

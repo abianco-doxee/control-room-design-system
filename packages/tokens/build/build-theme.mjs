@@ -22,6 +22,7 @@ import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   checkThemeContrast,
+  deriveDerivedRoles,
   deriveOnColors,
   mergeTheme,
   themeCss,
@@ -29,7 +30,7 @@ import {
 } from "@alebianco/cr-utils/theme";
 import { chassisFrom } from "./chassis.mjs";
 import { surfaceRamp } from "./ramp.mjs";
-import { fitSignals, toneSignals } from "./signals.mjs";
+import { fitAgainstAll, fitSignals, toneSignals } from "./signals.mjs";
 import { typeFrom } from "./type.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -105,7 +106,16 @@ function resolveBrand(brand, seen = new Set()) {
     mergeTheme(mergeTheme(mergeTheme(mergeTheme(base, surfaces), chassis), type), signals),
     overrides
   );
-  const vars = deriveOnColors(merged, { changed });
+  /* --focus / --seam re-derive for anything whose SOURCE role moved. A brand's
+   * light `$mode` restates --muted and (via $ramp/$fitSignals) --sig-work while
+   * still $extends-ing the dark base, so without this the ring and the seam would
+   * inherit dark values onto near-white surfaces. Surfaces count as changed too:
+   * a $ramp flips the whole ladder without naming --focus. */
+  const derivedChanged = [...changed, ...Object.keys(surfaces)];
+  const vars = deriveOnColors(
+    deriveDerivedRoles(merged, { changed: derivedChanged, fit: fitAgainstAll }),
+    { changed }
+  );
   return { vars, meta: brand };
 }
 
