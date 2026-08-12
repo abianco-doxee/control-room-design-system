@@ -22,7 +22,6 @@
  * not animated. Per-tier rather than one switch, so a subtree can opt out of
  * exactly the tiers it uses. */
 @media (prefers-reduced-motion: reduce) {
-  .cr-btn { transition: none; }
   .cr-glitch-t1 { text-shadow: none; }
   .cr-glitch-t2::before, .cr-glitch-t2::after { display: none; }
 }

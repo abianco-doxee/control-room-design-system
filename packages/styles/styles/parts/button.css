@@ -18,6 +18,9 @@
   box-shadow: none; transform: none; filter: saturate(0.5);
 }
 .cr-btn--sm { --cr-btn-pad-x: var(--space-3); --cr-btn-pad-y: var(--space-1); --cr-btn-size: var(--text-xs); }
+/* Kill the snap-press transition declared above. MUST live in this section: it
+ * is a Button rule, so a consumer importing only styles/button.css needs it. */
+@media (prefers-reduced-motion: reduce) { .cr-btn { transition: none; } }
 
 /* ── EMPHASIS (gravity) — form, not colour ─────────────────────────────────
  * solid (default, primary) is the filled+shadowed base above. */

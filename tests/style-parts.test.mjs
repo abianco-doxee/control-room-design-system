@@ -7,40 +7,30 @@
 // placed under the wrong header, because such a rule is *losslessly* routed to
 // the wrong part and the check passes clean.
 //
-// This shipped a real bug twice: `.cr-modal__head/__title/__body` sat after the
-// Cron header (a modal-only consumer got an unstyled header), and a stray
+// This shipped real bugs three times: `.cr-modal__head/__title/__body` sat after
+// the Cron header (a modal-only consumer got an unstyled header); a stray
 // `@media (prefers-reduced-motion) { .cr-breach--alive }` sat under the ASCII
-// decoration header (a breach-only consumer kept animating under reduced
-// motion).
+// decoration header; and `@media (prefers-reduced-motion) { .cr-btn }` sat under
+// the glitch-tiers header (a button-only consumer kept transitioning).
 //
-// The guard: for every part file, each selector must be ANCHORED to that part —
-// either its SUBJECT (the rightmost compound, i.e. the element the rule actually
-// styles) belongs to the part's own `.cr-<slug>` family, or some ANCESTOR in the
-// selector does. The second case is what makes contextual rules legal:
-// `.cr-form__control .cr-input` belongs in form.css because it only applies
-// inside a form, so a form-only consumer needs it and an input-only consumer
-// must not get it. A selector anchored to NEITHER is misrouted by definition.
+// OWNERSHIP IS NOT SPELLING. An earlier version of this guard derived a class's
+// owning part from its name (`.cr-<slug>`), which silently skipped every family
+// whose class name differs from its slug — `.cr-btn` → `button`, `.cr-sev` →
+// `shape`, `.cr-row` → `session-row`, `.cr-grid` → `data-grid`. That was 25 of
+// 73 part files invisible, and the `.cr-btn` bug above was shipping inside the
+// gap. Ownership is therefore derived from the SOURCE: a class belongs to the
+// part that the section it is *defined* in routes to, using `targetFor` — the
+// same authoritative mapping (SLUG_MAP + GROUP) the build itself routes by.
 
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { segment, targetFor } from "../packages/styles/build/build-styles.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const PARTS_DIR = join(ROOT, "packages", "styles", "styles", "parts");
-
-// NOTE: shared chassis primitives (`.cr-dismiss`, `.cr-plate`, `.cr-tally`, the
-// tap-floor list …) need no allowlist. They are authored in base.css or in a
-// section whose name owns no part slug, so `ownerOf` returns null for them and
-// the check below skips them by construction. An allowlist would be dead code
-// today and would silently weaken the guard the day one of those names DID
-// become a part.
-
-const slugsOf = (dir) =>
-  readdirSync(dir)
-    .filter((f) => f.endsWith(".css"))
-    .map((f) => f.replace(/\.css$/, ""));
+const SRC = join(ROOT, "packages", "styles", "styles", "components.css");
 
 /** Selectors of every style rule, with at-rule preludes and comments removed. */
 function selectorsOf(css) {
@@ -75,42 +65,81 @@ function crClassesIn(compound) {
 }
 
 /**
- * Which part slug owns a class name. Longest match wins so `.cr-toggle-chip`
- * resolves to `toggle-chip`, not `chip`, and `.cr-ascii-bar` (authored in the
- * "ASCII rules" section) resolves to `ascii-rules` only if such a slug claims
- * it — a bare prefix like `cr-ascii-` must NOT steal it from `ascii-rules`.
+ * Build the authoritative class → owning-part map from the source itself.
+ *
+ * A class is OWNED by the part whose section styles it as a rule SUBJECT. Base
+ * sections do NOT confer ownership: the chassis layer (`__preamble__`,
+ * "Interaction states", "Sizing & touch targets" …) deliberately reaches across
+ * many families at once — `.cr-btn` is styled in four of them — so treating a
+ * base appearance as the definition would leave the class unowned and silently
+ * disable the check for it. Only a component section defines a family.
+ *
+ * A class styled solely by base sections is genuinely unowned: it is a
+ * cross-cutting primitive (`.cr-dismiss`, `.cr-tex--*`) reachable from any part.
+ *
+ * Where two component sections both style a family (Button + EMPHASIS + SIGNAL
+ * all route to `button`), they agree by construction, since ownership is keyed
+ * on the routed slug rather than on the section name.
  */
-function ownerOf(cls, slugs) {
-  let best = null;
-  for (const s of slugs) {
-    const stem = `cr-${s}`;
-    const owns = cls === stem || cls.startsWith(`${stem}__`) || cls.startsWith(`${stem}--`);
-    if (owns && (!best || s.length > best.length)) best = s;
+function buildOwnership(css) {
+  const owner = new Map();
+  for (const seg of segment(css)) {
+    const target = targetFor(seg.name);
+    if (target.kind === "base") continue; // chassis sections confer no ownership
+    for (const sel of selectorsOf(seg.body.join("\n"))) {
+      // Only an UNQUALIFIED rule defines a family. `.cr-form__control .cr-input`
+      // (in the Form section) styles an input *in a form context*; it does not
+      // define `.cr-input`, which the Input section owns. Counting contextual
+      // rules as definitions would hand ownership to whichever section merely
+      // mentioned the class first.
+      const subject = subjectOf(sel);
+      if (subject !== sel.replace(/\s*[>+~]\s*/g, " ").trim()) continue;
+      for (const cls of crClassesIn(subject)) {
+        if (!owner.has(cls)) owner.set(cls, target.slug);
+      }
+    }
   }
-  return best;
+  return owner;
 }
 
-test("every part file only styles its own .cr-<slug> family", () => {
-  const slugs = slugsOf(PARTS_DIR);
-  assert.ok(slugs.length > 50, `sanity: found ${slugs.length} part files`);
+test("every CSS rule is filed under the section header that owns it", () => {
+  const css = readFileSync(SRC, "utf8");
+  const owner = buildOwnership(css);
+
+  // Sanity: the ownership map must actually see the families whose class names
+  // do NOT match their slug. These are exactly the cases the old spelling-based
+  // check was blind to, so assert them explicitly — if this map ever silently
+  // stops resolving them, the guard has regressed to the old blind spot.
+  for (const [cls, expected] of [
+    ["cr-btn", "button"],
+    ["cr-sev", "shape"],
+    ["cr-row", "session-row"],
+    ["cr-grid", "data-grid"],
+  ]) {
+    assert.equal(owner.get(cls), expected, `ownership map resolves .${cls} → ${expected}`);
+  }
 
   const violations = [];
-  for (const slug of slugs) {
-    const css = readFileSync(join(PARTS_DIR, `${slug}.css`), "utf8");
-    for (const sel of selectorsOf(css)) {
+  for (const seg of segment(css)) {
+    const target = targetFor(seg.name);
+    if (target.kind === "base") continue; // base is the shared chassis layer
+    const slug = target.slug;
+
+    for (const sel of selectorsOf(seg.body.join("\n"))) {
       // Anchored via an ancestor? Then the rule only applies inside this part,
       // so it belongs here (e.g. `.cr-form__control .cr-input` in form.css).
-      const ancestorAnchored = crClassesIn(sel.replace(/\s*[>+~]\s*/g, " ")).some(
-        (cls) => ownerOf(cls, slugs) === slug
+      const anchored = crClassesIn(sel.replace(/\s*[>+~]\s*/g, " ")).some(
+        (cls) => owner.get(cls) === slug
       );
-      if (ancestorAnchored) continue;
+      if (anchored) continue;
 
       for (const cls of crClassesIn(subjectOf(sel))) {
-        const owner = ownerOf(cls, slugs);
-        // No owner => a family with no part of its own (shared primitive); fine.
-        if (owner && owner !== slug) {
+        const home = owner.get(cls);
+        // null/undefined => a shared chassis primitive with no owning part.
+        if (home && home !== slug) {
           violations.push(
-            `parts/${slug}.css styles .${cls} (belongs in parts/${owner}.css) — "${sel}"`
+            `section "${seg.name}" → parts/${slug}.css styles .${cls} ` +
+              `(defined in parts/${home}.css) — "${sel}"`
           );
         }
       }

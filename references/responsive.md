@@ -144,7 +144,8 @@ and more `@container` layouts can land incrementally on this foundation.
 ## Rollout (once direction is agreed)
 
 1. Land primitives + type group + `.cr-typo` container primitive + `.cr-tap` (token
-   + CSS), no component changes → pixel-neutral.
+   + CSS), no component changes → pixel-neutral. *(As shipped, `.cr-panel` became
+   the query container and no `.cr-typo` class exists.)*
 2. Add semantic spacing/sizing + density remap; migrate 2–3 exemplar components
    (Panel, a form control, a data row) as proof.
 3. Roll the density/container model across components in gated batches (like the
