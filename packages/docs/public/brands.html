@@ -1735,7 +1735,13 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 /* ── Texture utilities (hardware only — Law 6) ─────────────────────────────
  * Apply to a bezel/screen/hardware surface, NEVER a flat content field. All
  * three read as the neo-print / CRT grain; theme-keyed via the texture tokens. */
-/* All fill edge-to-edge (repeat, from the origin). Pair with a background-color. */
+/* All fill edge-to-edge (repeat, from the origin). Pair with a background-color.
+ * The `opacity` below is ON THE ELEMENT by design — it is the loudness dial, and
+ * these are decorative surfaces whose content is meant to fade with the grain.
+ * So apply them to the HARDWARE (a bezel/hero), never to a content-bearing
+ * readout: on `.cr-bezel__screen` they would both fade the text and stack a
+ * second texture UNDER it, while the screen already paints one above via
+ * ::after. To texture *over* content, copy that ::after overlay pattern. */
 .cr-tex--halftone, .cr-tex--dither, .cr-tex--scan, .cr-tex--cross, .cr-tex--glass {
   background-repeat: repeat; background-position: 0 0; background-attachment: local;
   /* Follows the loudness dial — 1 (default/showcase) is a no-op; the `calm` ops
@@ -2061,8 +2067,6 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 
 /* whisper drafting field for large dead background regions */
 .cr-bg--field { background-image: var(--field); background-repeat: repeat; }
-
-@media (prefers-reduced-motion: reduce) { .cr-breach--alive { animation: none; } }
 
 /* ── Data grid (virtualized) — dense table for large datasets ─────────────── */
 /* Chrome (the review: "has no chrome style at all"). The grid read as a bare

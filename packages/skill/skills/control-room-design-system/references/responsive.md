@@ -52,9 +52,9 @@ Eight roles, each carrying size + weight + leading + tracking:
 | Dense | `body` · `data` · `label` · `meta` | `clamp()` on **`cqi`** | panel text tracks the *panel* |
 | Micro | `chrome` | fixed (<11px) | sub-label chrome, never fluid |
 
-- A `.cr-typo` container primitive sets `container-type: inline-size` — **never
-  `size`** (that also containers the block axis and collapsed intrinsic heights in
-  dp-tooling; heed up front).
+- The `.cr-panel` surface is the query container: it sets `container-type:
+  inline-size` — **never `size`** (that also containers the block axis and
+  collapsed intrinsic heights in dp-tooling; heed up front).
 - Folds the existing `--text-*` px scale in as the fallback rung.
 
 ### 2. Spacing — dual-axis

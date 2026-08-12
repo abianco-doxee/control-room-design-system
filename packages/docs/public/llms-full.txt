@@ -1508,9 +1508,9 @@ Eight roles, each carrying size + weight + leading + tracking:
 | Dense | `body` · `data` · `label` · `meta` | `clamp()` on **`cqi`** | panel text tracks the *panel* |
 | Micro | `chrome` | fixed (<11px) | sub-label chrome, never fluid |
 
-- A `.cr-typo` container primitive sets `container-type: inline-size` — **never
-  `size`** (that also containers the block axis and collapsed intrinsic heights in
-  dp-tooling; heed up front).
+- The `.cr-panel` surface is the query container: it sets `container-type:
+  inline-size` — **never `size`** (that also containers the block axis and
+  collapsed intrinsic heights in dp-tooling; heed up front).
 - Folds the existing `--text-*` px scale in as the fallback rung.
 
 ### 2. Spacing — dual-axis
@@ -1851,7 +1851,7 @@ the global reduced-motion rule.
 
 ```html
 <div class="cr-bezel cr-anim-scan">
-  <div class="cr-bezel__screen cr-tex--glass">> streaming · 14 sessions</div>
+  <div class="cr-bezel__screen">> streaming · 14 sessions</div>
 </div>
 <span class="cr-dot cr-anim-pulse" style="--_pulse: var(--sig-err); background: var(--sig-err)"></span>
 ```
@@ -1912,18 +1912,17 @@ stays). Never animate layout properties; never loop motion on body text.
 | --- | --- | --- |
 | `.cr-glitch` (+ `data-text`) | RGB-split datamosh slices on hover; `--on` runs it continuously | a breach/alert headline — sparingly |
 | `.cr-glitch--chroma` | a faint always-on RGB fringe so an element reads as "signal" at rest; the slice still fires on hover / `--on` | a live/degraded readout that should feel unstable without moving |
-| `.cr-glitch-auto` | opt **into** the random driver: brief bursts fire on their own, **one element at a time**, every ~2.4–5s | ambient "the feed is alive" texture — tag a small handful, not everything |
 | `.cr-attention` | slow breathing glow (keys to `--cr-attn`) | draw the eye to the ONE primary / "needs you" action on a screen |
 | `.cr-keyed` | keyed edge-sweep underline on hover/focus | interactive rows, nav items, cards |
 | `.cr-tilt` / `--live` | perspective hover tilt; `--live` adds a slow idle float | a **sanctioned break of the flat plane** — one accent element, like the Law-9 breach |
 | `.cr-cursed` (+ optional `data-text` / `data-seed`) | **T3 decay (Law 3):** zalgo combining marks, capped at 2/glyph. The painter moves the clean string to `aria-label`, marks the element `role="img"`, and hides the corrupted glyphs (`aria-hidden`). Seeded → deterministic. Density follows `--decoration-intensity` | a corrupted/failed label — checksum fail, dead daemon — where the decay *is* the meaning |
 
-**The random glitch driver.** `.cr-glitch-auto` is the only thing the ambient driver
-touches. It picks one tagged element at a time, glitches it for ~0.2–0.5s, then rests
-2.4–5s before the next — so the screen is never glitching everywhere at once. It is off
-under `prefers-reduced-motion` and under the `calm` profile, and it never touches an element
-you didn't opt in. Cursed text is **not** motion — it renders once and holds — but it obeys
-the same restraint: it is a decay tier, not decoration to sprinkle.
+**Glitch is hover/`--on` only.** There is no ambient random driver: a glitch fires on
+hover, or continuously while you set `.cr-glitch--on`, and `.cr-glitch--chroma` holds a
+faint always-on fringe without moving. Drive `--on` yourself if you want bursts, and keep
+it to a small handful of elements so the screen is never glitching everywhere at once.
+Cursed text is **not** motion — it renders once and holds — but it obeys the same
+restraint: it is a decay tier, not decoration to sprinkle.
 
 **Restraint is the rule.** Glitch and 3D are rule-breaks: at most one of each per screen,
 on the exceptional element. Attention marks exactly one primary target — more than one and
@@ -2699,7 +2698,8 @@ contract, and the per-state poses.
 
 ## Composition — an operator's screen
 
-The whole vocabulary in one screen, using only the shipped `cr-` classes. It
+The whole vocabulary in one screen, using only the shipped `cr-` classes plus the
+two lines of page-level layout glue listed below the markup. It
 exercises the nine laws together: the condensed masthead with registration ticks
 (`.cr-mark`), a keyed `Hero`, the **severity shapes** beside colour, a seeded
 **Sigil** per session, the **arrow-rail**, a **texture + scanline** bezel with the
@@ -2755,7 +2755,7 @@ extreme / phosphor, in the **Live Gallery** (linked at the top of the sidebar).
         </div>
         <div class="cr-bezel cr-anim-scan">
           <div class="cr-bezel__rivets" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-          <div class="cr-bezel__screen cr-tex--glass">&gt; scan complete · 14 sessions · 2 flagged</div>
+          <div class="cr-bezel__screen">&gt; scan complete · 14 sessions · 2 flagged</div>
         </div>
         <div class="cr-hw-row"><span class="cr-plate">UNIT · CR-00 · REV.C</span><span class="cr-tally">▐▐▐ ▌ 14</span></div>
       </section>
@@ -3251,7 +3251,7 @@ capacity reading that the removed **Meter** used to serve.
 ```
 
 ```html
-<div class="cr-progress cr-progress--work">
+<div class="cr-progress">
   <span class="cr-progress__label">cpu</span>
   <span class="cr-progress__track" role="progressbar" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" aria-label="cpu">
     <span class="cr-progress__fill" style="width:72%"></span>
@@ -3814,12 +3814,22 @@ Neo-print / CRT grain for **hardware** surfaces (a bezel, screen, or hero) —
 | `.cr-tex--glass` | scanlines + halftone (the house "aged glass" wash) |
 
 ```html
-<div class="cr-bezel cr-anim-scan">
-  <div class="cr-bezel__screen cr-tex--glass">&gt; streaming · 14 sessions</div>
+<div class="cr-bezel cr-tex--glass cr-anim-scan">
+  <div class="cr-bezel__screen">&gt; streaming · 14 sessions</div>
 </div>
 ```
 
 - **MUST** apply only to hardware; a textured flat panel violates Law 6.
+- **NEVER** put a `.cr-tex--*` class on `.cr-bezel__screen`. The screen already
+  paints the house halftone itself, on the glass *above* the readout
+  (`.cr-bezel__screen::after`) — adding a utility stacks a **second** texture
+  layer *behind* the text, and because the utility carries `opacity` on the
+  element it fades the readout along with the grain. Texture the bezel (the
+  hardware) and leave the screen alone.
+- The utilities set `opacity` on the element, so apply them to a surface whose
+  own content should fade with the grain — a decorative hardware panel, not a
+  content-bearing readout. To texture *over* content, use an `::after` overlay
+  (`inset: 0; pointer-events: none;`) the way the screen does.
 - Ambient loop classes (`.cr-anim-scan/-pulse/-drift/-flick`) are documented in
   `references/motion.md` — low, slow, hardware-bound, reduced-motion-off.
 

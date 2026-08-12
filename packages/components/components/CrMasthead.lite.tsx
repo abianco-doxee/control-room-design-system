@@ -1,6 +1,10 @@
 import { Show } from "@builder.io/mitosis";
 import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
-export interface CrMastheadProps { eyebrow?: string; title: string; children?: any;
+export interface CrMastheadProps {
+  /** Short kicker above the title (the editorial "eyebrow") — a section,
+   * phase or category label. Rendered only when set. */
+  eyebrow?: string;
+  title: string; children?: any;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "eyebrow" · "title". */
   unstyled?: boolean;

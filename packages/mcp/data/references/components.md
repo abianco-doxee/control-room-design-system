@@ -638,7 +638,8 @@ contract, and the per-state poses.
 
 ## Composition — an operator's screen
 
-The whole vocabulary in one screen, using only the shipped `cr-` classes. It
+The whole vocabulary in one screen, using only the shipped `cr-` classes plus the
+two lines of page-level layout glue listed below the markup. It
 exercises the nine laws together: the condensed masthead with registration ticks
 (`.cr-mark`), a keyed `Hero`, the **severity shapes** beside colour, a seeded
 **Sigil** per session, the **arrow-rail**, a **texture + scanline** bezel with the
@@ -694,7 +695,7 @@ extreme / phosphor, in the **Live Gallery** (linked at the top of the sidebar).
         </div>
         <div class="cr-bezel cr-anim-scan">
           <div class="cr-bezel__rivets" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-          <div class="cr-bezel__screen cr-tex--glass">&gt; scan complete · 14 sessions · 2 flagged</div>
+          <div class="cr-bezel__screen">&gt; scan complete · 14 sessions · 2 flagged</div>
         </div>
         <div class="cr-hw-row"><span class="cr-plate">UNIT · CR-00 · REV.C</span><span class="cr-tally">▐▐▐ ▌ 14</span></div>
       </section>
@@ -1190,7 +1191,7 @@ capacity reading that the removed **Meter** used to serve.
 ```
 
 ```html
-<div class="cr-progress cr-progress--work">
+<div class="cr-progress">
   <span class="cr-progress__label">cpu</span>
   <span class="cr-progress__track" role="progressbar" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" aria-label="cpu">
     <span class="cr-progress__fill" style="width:72%"></span>
@@ -1753,12 +1754,22 @@ Neo-print / CRT grain for **hardware** surfaces (a bezel, screen, or hero) —
 | `.cr-tex--glass` | scanlines + halftone (the house "aged glass" wash) |
 
 ```html
-<div class="cr-bezel cr-anim-scan">
-  <div class="cr-bezel__screen cr-tex--glass">&gt; streaming · 14 sessions</div>
+<div class="cr-bezel cr-tex--glass cr-anim-scan">
+  <div class="cr-bezel__screen">&gt; streaming · 14 sessions</div>
 </div>
 ```
 
 - **MUST** apply only to hardware; a textured flat panel violates Law 6.
+- **NEVER** put a `.cr-tex--*` class on `.cr-bezel__screen`. The screen already
+  paints the house halftone itself, on the glass *above* the readout
+  (`.cr-bezel__screen::after`) — adding a utility stacks a **second** texture
+  layer *behind* the text, and because the utility carries `opacity` on the
+  element it fades the readout along with the grain. Texture the bezel (the
+  hardware) and leave the screen alone.
+- The utilities set `opacity` on the element, so apply them to a surface whose
+  own content should fade with the grain — a decorative hardware panel, not a
+  content-bearing readout. To texture *over* content, use an `::after` overlay
+  (`inset: 0; pointer-events: none;`) the way the screen does.
 - Ambient loop classes (`.cr-anim-scan/-pulse/-drift/-flick`) are documented in
   `references/motion.md` — low, slow, hardware-bound, reduced-motion-off.
 

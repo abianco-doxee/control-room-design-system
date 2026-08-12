@@ -58,5 +58,3 @@
 /* whisper drafting field for large dead background regions */
 .cr-bg--field { background-image: var(--field); background-repeat: repeat; }
 
-@media (prefers-reduced-motion: reduce) { .cr-breach--alive { animation: none; } }
-
