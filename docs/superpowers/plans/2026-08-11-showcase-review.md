@@ -1107,8 +1107,8 @@ grep -c 'idx__filter' /tmp/live.html           # expect >0
   `frameworks.md` and `forms.md` now state the app is source-only. Actually
   publishing it remains a separate decision (it would need its own build step in
   the Pages artifact).
-- **Visual-regression baselines.** *(Resolved 2026-08-13 — the mechanism exists;
-  one manual run is still required.)* Playwright baselines are platform-suffixed,
+- **Visual-regression baselines.** *(CLOSED 2026-08-13 — baselines committed,
+  gate is blocking.)* Playwright baselines are platform-suffixed,
   so a maintainer's macOS run produces `-chromium-darwin` files CI can never
   match. Two changes close this:
   1. `.github/workflows/visual-baselines.yml` — `workflow_dispatch` job that
@@ -1119,10 +1119,21 @@ grep -c 'idx__filter' /tmp/live.html           # expect >0
      which reported a green visual gate that had compared nothing — the precise
      failure this suite exists to catch.
 
-  **Remaining manual step:** run the "Visual baselines" workflow once on `main`
-  (Actions → Visual baselines → Run workflow), then remove
-  `continue-on-error: true` from the visual step in `deploy.yml`. It is left
-  non-blocking until then because the suite now fails loudly on a missing
-  baseline, and flipping both at once would red every build until that first run
-  lands.
+  **Done:** the workflow ran on `main` (`f4eb029` committed all four
+  `-chromium-linux` baselines) and `continue-on-error` is off — the visual gate
+  now blocks the build.
+
+  Two bugs the first real runs exposed, both fixed:
+  - The missing-baseline guard fired under `--update-snapshots` too, so the
+    workflow that exists to CREATE baselines failed on their absence — a
+    deadlock the set could never be bootstrapped out of. It now checks
+    `testInfo.config.updateSnapshots`.
+  - The 30s timeout was measured on macOS and is not enough on CI. Writing all
+    four baselines there took 50s, but COMPARING against an existing one is far
+    dearer (a ~1.8MB diff of a 64,000px image): 3 of 4 themes blew the budget
+    and the survivor took 2.2 minutes. Now 180s per test / 150s per assertion —
+    a ceiling, not a sleep; the local run still finishes in ~40s.
+
+  **After any intentional visual change:** re-run the "Visual baselines"
+  workflow, or CI will red on the diff.
 - **The `control-room` app extraction.** Tracked in `docs/superpowers/plans/2026-08-11-control-room-extraction.md`; unaffected by this work except that Task 6-8 change component APIs the app will consume.
