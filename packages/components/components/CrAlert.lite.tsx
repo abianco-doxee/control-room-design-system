@@ -2,8 +2,8 @@ import { Show, useStore } from "@builder.io/mitosis";
 import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrAlertProps {
-  /** Signal the alert carries: info (work) · wait · done · err. */
-  signal?: "info" | "wait" | "done" | "err";
+  /** Signal the alert carries (Law 2). Defaults to work. */
+  signal?: "work" | "wait" | "done" | "err";
   title?: string;
   message?: string;
   /** Show a dismiss ✕. */
@@ -33,9 +33,9 @@ export default function CrAlert(props: CrAlertProps) {
     <Show when={state.open}>
       <div
         {...ptAttrs(props.pt, "root")}
-        class={ptClass(props.pt, props.unstyled, "cr-alert cr-alert--" + (props.signal || "info"), "root")}
+        class={ptClass(props.pt, props.unstyled, "cr-alert cr-alert--" + (props.signal || "work"), "root")}
         data-part="root"
-        data-state={props.signal || "info"}
+        data-state={props.signal || "work"}
         style={ptStyle(props.pt, props.dt, "root")}
         role={props.signal === "err" ? "alert" : "status"}
         aria-live={props.signal === "err" ? "assertive" : "polite"}

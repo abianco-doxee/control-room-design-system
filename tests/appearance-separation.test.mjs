@@ -31,7 +31,7 @@ const brandHex = (src) => (src.match(/#[0-9a-fA-F]{3,8}\b/g) || []).filter((h) =
 const colorFuncs = (src) => src.match(/\b(?:rgb|rgba|hsl|hsla|hwb|lab|lch|oklch|oklab)\(/g) || [];
 
 // the ONLY component sources allowed to embed palette (as runtime-var fallbacks)
-const GENERATIVE = ["CrAscii", "CrCat", "CrChrome", "CrSigil"];
+const GENERATIVE = ["CrAscii", "CrCat", "CrChrome", "CrDither", "CrSigil"];
 
 test("components.css carries no brand colour (only physical black/white)", () => {
   const css = read("packages/styles/styles/components.css");

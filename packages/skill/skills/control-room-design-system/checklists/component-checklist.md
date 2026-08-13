@@ -25,8 +25,9 @@ A component is done when it passes every gate below in **all four themes**
 - [ ] **L4** — every diagonal encodes direction / state / focus / sequence; ≤15°
       off-axis; no decorative triangles.
 - [ ] **L5** — text is display or data register only; no 18–24px sans body.
-- [ ] **L6** — texture (halftone/scanline/grain) lives inside a bezel only; no
-      nested bezels.
+- [ ] **L6** — texture (halftone/scanline/grain) lives inside a bezel only, or
+      as a panel **edge bleed** whose mask clears the readout; no nested bezels,
+      and never more than one bled panel per screen.
 - [ ] **L7** — calm at rest, event-driven eruption, always settles.
 - [ ] **L8** — every string is machine voice: present tense, datum first, one
       line, no apology/cheer/emoji, never first-person.

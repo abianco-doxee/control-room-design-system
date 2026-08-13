@@ -181,7 +181,11 @@ test.describe("component browser — live islands", () => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
     const form = page.locator('[data-island="form"]');
-    const reset = form.locator('button[type="button"]', { hasText: "Reset" });
+    // Scoped to .pg__live (the real rendered CrForm) — the harness itself now
+    // renders an unrelated always-present "reset" control in .pg__panel, and
+    // Playwright's hasText match is case-insensitive, so an unscoped locator
+    // would pick up both buttons.
+    const reset = form.locator(".pg__live").locator('button[type="button"]', { hasText: "Reset" });
     const endpoint = form.locator("#cr-form-endpoint");
 
     // default mode is "blur": typing an invalid value into a pristine field does
@@ -548,6 +552,147 @@ test.describe("component browser — live islands", () => {
     expect(box.y, "top edge in view").toBeGreaterThanOrEqual(-1);
   });
 
+  test("menu is collision-positioned and stays within the viewport", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const menu = page.locator('[data-island="menu"]');
+    await menu.locator("[aria-haspopup]").click();
+    const panel = menu.locator(".cr-menu__panel");
+    await expect(panel).toBeVisible();
+
+    // the placer ran: fixed position + a resolved placement
+    await expect(panel).toHaveAttribute("data-placement", /^(top|bottom)-(start|end)$/);
+    expect(await panel.evaluate((el) => getComputedStyle(el).position)).toBe("fixed");
+
+    // and it doesn't clip off the viewport edges
+    const box = await panel.boundingBox();
+    const vp = page.viewportSize();
+    expect(box.x, "left edge in view").toBeGreaterThanOrEqual(-1);
+    expect(box.x + box.width, "right edge in view").toBeLessThanOrEqual(vp.width + 1);
+    expect(box.y, "top edge in view").toBeGreaterThanOrEqual(-1);
+  });
+
+  test("hover-card is collision-positioned on both hover and keyboard focus", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const hc = page.locator('[data-island="hover-card"]');
+    const trigger = hc.locator(".cr-hovercard__trigger");
+    const panel = hc.locator(".cr-hovercard__panel");
+
+    // pointer path: hovering the trigger reveals the panel (CSS :hover) and the
+    // placer must have run before/alongside that reveal.
+    await trigger.hover();
+    await expect(panel).toBeVisible();
+    await expect(panel).toHaveAttribute("data-placement", /^(top|bottom)-(start|end)$/);
+    expect(await panel.evaluate((el) => getComputedStyle(el).position)).toBe("fixed");
+
+    // reset the CSS reveal (:hover/:focus-within) between paths
+    await page.mouse.move(0, 0);
+    await expect(panel).toBeHidden();
+
+    // keyboard path: focusing the trigger reveals the panel (CSS :focus-within)
+    // via the same placer call.
+    await trigger.focus();
+    await expect(panel).toBeVisible();
+    await expect(panel).toHaveAttribute("data-placement", /^(top|bottom)-(start|end)$/);
+    expect(await panel.evaluate((el) => getComputedStyle(el).position)).toBe("fixed");
+
+    // and it doesn't clip off the viewport edges
+    const box = await panel.boundingBox();
+    const vp = page.viewportSize();
+    expect(box.x, "left edge in view").toBeGreaterThanOrEqual(-1);
+    expect(box.x + box.width, "right edge in view").toBeLessThanOrEqual(vp.width + 1);
+    expect(box.y, "top edge in view").toBeGreaterThanOrEqual(-1);
+
+    // reset before the third path
+    await trigger.blur();
+    await page.mouse.move(0, 0);
+    await expect(panel).toBeHidden();
+
+    // third reveal path: the panel has no focusable content in this playground
+    // demo (its children are a plain <p>), so a focusable child is injected for
+    // this assertion only — it is what components.md warns hover-card content
+    // normally shouldn't need, but the component must still cope with it. Hover
+    // to reveal (CSS :hover, which also runs place() via mouseenter), Tab from
+    // the trigger into that child (staying within the subtree keeps
+    // :focus-within true), then move the pointer away so only :focus-within
+    // holds the card open — the transition that had no place() call on it
+    // before onFocus moved from the trigger to the root.
+    await panel.evaluate((el) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = "inner";
+      btn.className = "cr-hovercard-test-inner";
+      el.appendChild(btn);
+    });
+    await trigger.hover();
+    await expect(panel).toBeVisible();
+    await page.keyboard.press("Tab"); // trigger -> inner button, still inside the card
+    await expect(panel.locator(".cr-hovercard-test-inner")).toBeFocused();
+    await page.mouse.move(0, 0); // pointer leaves; only :focus-within holds it open now
+    await expect(panel).toBeVisible();
+    await expect(panel).toHaveAttribute("data-placement", /^(top|bottom)-(start|end)$/);
+    expect(await panel.evaluate((el) => getComputedStyle(el).position)).toBe("fixed");
+  });
+
+  test("tooltip is collision-positioned on both hover and keyboard focus, and flips off the top edge", async ({
+    page,
+  }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const tt = page.locator('[data-island="tooltip"]');
+    const trigger = tt.locator(".cr-tooltip__trigger");
+    const bubble = tt.locator(".cr-tooltip__bubble");
+
+    // pointer path: hovering the trigger reveals the bubble (CSS :hover) and the
+    // placer must have run before/alongside that reveal. Default placement is
+    // "top", so with room above the trigger it should stay on top.
+    await trigger.hover();
+    await expect(bubble).toBeVisible();
+    await expect(bubble).toHaveAttribute("data-placement", /^(top|bottom)-(start|end)$/);
+    expect(await bubble.evaluate((el) => getComputedStyle(el).position)).toBe("fixed");
+
+    // reset the CSS reveal (:hover/:focus-within) between paths
+    await page.mouse.move(0, 0);
+    await expect(bubble).toBeHidden();
+
+    // keyboard path: focusing the trigger reveals the bubble (CSS :focus-within)
+    // via the same placer call.
+    await trigger.focus();
+    await expect(bubble).toBeVisible();
+    await expect(bubble).toHaveAttribute("data-placement", /^(top|bottom)-(start|end)$/);
+    expect(await bubble.evaluate((el) => getComputedStyle(el).position)).toBe("fixed");
+
+    // and it doesn't clip off the viewport edges
+    const box = await bubble.boundingBox();
+    const vp = page.viewportSize();
+    expect(box.x, "left edge in view").toBeGreaterThanOrEqual(-1);
+    expect(box.x + box.width, "right edge in view").toBeLessThanOrEqual(vp.width + 1);
+    expect(box.y, "top edge in view").toBeGreaterThanOrEqual(-1);
+
+    await trigger.blur();
+    await page.mouse.move(0, 0);
+    await expect(bubble).toBeHidden();
+
+    // flip case: pin the trigger flush against the top edge so there's no room
+    // above it for the default "top" placement — the placer must flip it to
+    // "bottom" rather than clipping off-screen. The page header is itself
+    // `position: sticky; top: 0`, so it always occupies the very top of the
+    // viewport and nothing under it is really hoverable — hide it for this one
+    // assertion so the trigger's top edge can reach y≈0 and still receive a
+    // genuine (non-occluded) hover.
+    await page.evaluate(() => {
+      document.querySelector(".top").style.display = "none";
+    });
+    await trigger.evaluate((el) => window.scrollBy(0, el.getBoundingClientRect().top - 2));
+    await trigger.hover();
+    await expect(bubble).toBeVisible();
+    await expect(bubble).toHaveAttribute("data-placement", "bottom-start");
+    expect(await bubble.evaluate((el) => getComputedStyle(el).position)).toBe("fixed");
+    const flippedBox = await bubble.boundingBox();
+    expect(flippedBox.y, "flipped bubble stays within the top edge").toBeGreaterThanOrEqual(-1);
+  });
+
   test("keyboard focus shows a visible ring", async ({ page }) => {
     await page.goto(SHOWCASE);
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
@@ -654,4 +799,133 @@ test.describe("component browser — live islands", () => {
     const overflows = await sa.evaluate((el) => el.scrollHeight > el.clientHeight + 1);
     expect(overflows, "content exceeds the capped height → scrolls").toBe(true);
   });
+
+  // CrChoiceGroup deliberately keeps two different keyboard models depending on
+  // `type`: radio inputs share ONE `name` so the browser supplies roving
+  // tabindex + arrow-key selection for free; checkbox inputs are independently
+  // tabbable and must NOT share a name (that would make the browser treat them
+  // as one mutually-exclusive group). This guards that difference: without it,
+  // a future refactor could silently drop the shared `name` (or reintroduce a
+  // hand-rolled roving-tabindex handler) and revert the radio branch to three
+  // independent tab stops with no regression test catching it.
+  test("choice-group: radio inputs share one name, checkbox inputs do not", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const cg = page.locator('[data-island="choice-group"]');
+    const inputs = cg.locator(".pg__live input");
+
+    // default demo state is type="radio": every input shares one non-empty name.
+    const radioNames = await inputs.evaluateAll((els) => els.map((el) => el.getAttribute("name")));
+    expect(radioNames.length).toBeGreaterThanOrEqual(2);
+    expect(radioNames.every((n) => !!n)).toBe(true);
+    expect(new Set(radioNames).size, "all radios share one name").toBe(1);
+
+    // switch the `type` control to checkbox → inputs must NOT share a name.
+    await cg.locator(".pg__controls select").first().selectOption("checkbox");
+    const checkboxNames = await inputs.evaluateAll((els) =>
+      els.map((el) => el.getAttribute("name"))
+    );
+    expect(checkboxNames.length).toBeGreaterThanOrEqual(2);
+    expect(
+      new Set(checkboxNames).size === 1 && checkboxNames[0],
+      "checkboxes must not collapse onto one shared name"
+    ).toBeFalsy();
+  });
+
+  // The calendar's whole SSR contract is that `month`/`today` are injected and
+  // the component never reads the clock. The month/year switcher is the easiest
+  // place to break that (an "and jump to today" convenience would do it), so
+  // this drives the switcher and asserts it moves the grid by emitting
+  // onMonthChange rather than by consulting `new Date()`.
+  test("calendar: month/year switcher steps the grid via onMonthChange", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const cal = page.locator('[data-island="calendar"]');
+    const monthSel = cal.locator('[data-part="monthSelect"]');
+    const yearSel = cal.locator('[data-part="yearSelect"]');
+
+    // island seeds month="2026-08" → August 2026.
+    await expect(monthSel).toHaveValue("7"); // 0-based August
+    await expect(yearSel).toHaveValue("2026");
+
+    // pick a month → the grid re-renders on the new YYYY-MM.
+    await monthSel.selectOption("0"); // January
+    await expect(monthSel).toHaveValue("0");
+    await expect(cal.locator(".cr-calendar__month")).toHaveText(/Jan 2026/);
+
+    // pick a year → same path, month preserved.
+    await yearSel.selectOption("2028");
+    await expect(yearSel).toHaveValue("2028");
+    await expect(cal.locator(".cr-calendar__month")).toHaveText(/Jan 2028/);
+
+    // prev/next stepping still works alongside the switcher.
+    await cal.locator('[data-part="prev"]').click();
+    await expect(cal.locator(".cr-calendar__month")).toHaveText(/Dec 2027/);
+    await expect(monthSel).toHaveValue("11");
+    await expect(yearSel).toHaveValue("2027");
+
+    // the year list is derived from the DISPLAYED year, never "now": with the
+    // grid on 2027 the options must be centred on 2027, not on the real year.
+    const years = await yearSel.locator("option").evaluateAll((o) => o.map((e) => +e.value));
+    expect(Math.min(...years)).toBe(2027 - 8);
+    expect(Math.max(...years)).toBe(2027 + 8);
+  });
+
+  test("calendar: weekStart enum reorders the weekday header", async ({ page }) => {
+    await page.goto(SHOWCASE);
+    await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+    const cal = page.locator('[data-island="calendar"]');
+    const heads = cal.locator(".cr-calendar__weekday");
+    await expect(heads.first()).toHaveText("Su"); // default "sunday"
+    await cal.locator(".pg__controls select").first().selectOption("monday");
+    await expect(heads.first()).toHaveText("Mo");
+  });
+
+  // axe (test:a11y) evaluates RESTING states only and never enters :hover, so it
+  // structurally cannot catch the reported bug: hovering a SELECTED day fell
+  // back to the plain hover fill because `.cr-calendar__day:hover` (two classes)
+  // outranks the single-class `--selected`, leaving the near-black selected-fg
+  // on --panel-2 (1.30:1 dark / 1.19:1 phosphor). This measures the real
+  // composited pixels under a real :hover in all four themes.
+  for (const theme of ["dark", "light", "extreme", "phosphor"]) {
+    test(`calendar: selected+hovered day keeps AA text contrast — ${theme}`, async ({ page }) => {
+      await page.goto(SHOWCASE);
+      await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
+      await page.evaluate((t) => document.documentElement.setAttribute("data-theme", t), theme);
+
+      const day = page.locator('[data-island="calendar"] .cr-calendar__day--selected').first();
+      await day.hover();
+
+      const ratio = await day.evaluate((el) => {
+        // color-mix() resolves to `color(srgb r g b)` with 0..1 channels, while
+        // plain colours come back as `rgb(r g b)` with 0..255 — parse both, or
+        // the measurement silently reads white and the assertion is worthless.
+        const parse = (c) => {
+          const n = (c.match(/[\d.]+/g) || []).map(Number);
+          if (/^color\(/.test(c)) return n.slice(0, 3).map((v) => v * 255);
+          return n.slice(0, 3);
+        };
+        const transparent = (c) => /rgba?\([^)]*,\s*0\s*\)$/.test(c) || c === "transparent";
+        const bgOf = (node) => {
+          for (let n = node; n; n = n.parentElement) {
+            const c = getComputedStyle(n).backgroundColor;
+            if (!transparent(c)) {
+              const p = parse(c);
+              if (p.length === 3) return p;
+            }
+          }
+          return [255, 255, 255];
+        };
+        const lin = (c) =>
+          c / 255 <= 0.04045 ? c / 255 / 12.92 : ((c / 255 + 0.055) / 1.055) ** 2.4;
+        const lum = ([r, g, b]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+        const L1 = lum(bgOf(el));
+        const L2 = lum(parse(getComputedStyle(el).color));
+        return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+      });
+
+      // Day numerals are small text (not >=18.66px bold), so 4.5:1 applies.
+      expect(ratio, `selected+hovered day in ${theme}`).toBeGreaterThanOrEqual(4.5);
+    });
+  }
 });

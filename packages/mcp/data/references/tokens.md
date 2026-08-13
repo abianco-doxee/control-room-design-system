@@ -79,7 +79,7 @@ Coverage is library-wide. Two conventions keep the surface small:
   `--cr-stepper-accent-bg`, `--cr-pager-accent-bg`, `--cr-nav-active-bg` follow the
   same shape.
 
-Signal-driven components (Tag, Tile, Meter, Progress, Toast) intentionally have no
+Signal-driven components (Tag, Tile, Progress, Toast) intentionally have no
 per-component tokens — their colour *is* the semantic signal, so retheme them via
 the signal tokens (`--sig-work`, `--sig-done`, …). Alert is the hybrid: a base
 surface (`--cr-alert-bg`/`--cr-alert-border`) plus a per-variant `--cr-alert-key`.
@@ -205,9 +205,17 @@ from raw values.
 
 | Token | Role |
 | --- | --- |
-| `--border` | contour / outline (near-black) |
+| `--border` | contour / outline (near-black) — the **chassis edge**, against `--board` |
+| `--seam` | **internal divider** drawn inside a panel, against `--panel` |
 | `--mass` | black as a large fill area (Law 1) |
 | `--shadow-col` | hard offset shadow color |
+
+**`--border` vs `--seam`.** `--border` is near-black, so against `--panel` it
+measures 1.21 / 1.21 / 1.01 on dark / extreme / phosphor — right for an outer edge
+sitting on the lighter board, invisible for a rule drawn *inside* a panel. Use
+`--seam` for row rules, between-item dividers and split-pane handles; it brackets
+between surface and ink in every theme (5.19 / 7.02 / 7.45 / 6.26 against
+`--panel`). See Law 1 in `references/design-language.md`.
 
 **On pure black (a decision on the record).** In dark/light/extreme, `--border`,
 `--mass`, and `--shadow-col` are pure `#000000` — deliberately. Neobrutalism earns the
@@ -221,15 +229,23 @@ brutalist default.
 
 | Token | State / role |
 | --- | --- |
-| `--sig-work` | working (also the focus-outline color) |
+| `--sig-work` | working |
 | `--sig-wait` | waiting / needs input |
 | `--sig-done` | done / merged |
 | `--sig-err` | error / failing |
 | `--sig-idle` | idle |
 | `--sig-accent` | attention / primary action |
+| `--focus` | keyboard focus ring — **not** part of the state ramp |
 
 Text placed **on** any signal fill uses `--on-sig`. The pairing is contrast-safe
 per theme (see `references/accessibility.md`).
+
+**`--focus` is separate from `--sig-work` on purpose.** It matches `--sig-work`
+exactly in dark, extreme and phosphor, but the light theme's working cyan reaches
+only 2.86:1 against `--board` — below WCAG 2.4.11's 3:1 floor for a focus
+indicator — so light darkens it to `#00627a` (5.38:1 at its worst surface) while
+keeping the hue. Re-keying `--sig-work` in a brand therefore cannot break that
+brand's focus ring. Components MUST draw rings in `--focus`.
 
 ### Keyed & decay
 

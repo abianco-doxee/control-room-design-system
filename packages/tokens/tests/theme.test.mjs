@@ -1,7 +1,7 @@
 // Unit tests for the theme / brand core (node:test). Run: npm run test:theme
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -11,6 +11,7 @@ import {
   checkThemeContrast,
   contrastRatio,
   defineTheme,
+  deriveDerivedRoles,
   deriveOnColors,
   mergeTheme,
   ON_PAIRS,
@@ -21,13 +22,23 @@ import {
 import { oklch } from "culori";
 import { chassisFrom } from "../build/chassis.mjs";
 import { surfaceRamp } from "../build/ramp.mjs";
-import { fitSignals, SIGNAL_KEYS, toneSignals } from "../build/signals.mjs";
+import { fitAgainstAll, fitSignals, SIGNAL_KEYS, toneSignals } from "../build/signals.mjs";
 import { typeFrom } from "../build/type.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => JSON.parse(readFileSync(join(ROOT, p), "utf8"));
 const tokens = read("tokens/tokens.json");
 const contract = read("dist/theme-contract.json");
+
+// Every theme the build emits: the four built-ins plus one file per brand
+// ($modes brands emit several). Read from disk so a NEW brand is covered the
+// moment it is added — the derived-role gates below must never be a fixed list.
+const BUILT_THEMES = readdirSync(join(ROOT, "dist/themes"))
+  .filter((f) => f.endsWith(".css"))
+  .map((f) => f.replace(/\.css$/, ""))
+  .sort();
+const pickVar = (css, name) =>
+  (css.match(new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{3,8})\\s*;`)) || [])[1];
 
 // The appearance surface, three ways: it must be identical across tokens.json's
 // semantic tier, @alebianco/cr-utils/theme's runtime copy, and the generated contract — or a
@@ -397,4 +408,113 @@ test("generated dist/themes/slate.css carries every merged role (build not stale
     );
   }
   assert.ok(onDisk.includes("--sig-accent: #6d7cff;"), "slate's own accent override is present");
+});
+
+/* ── Derived roles: --focus and --seam ─────────────────────────────────────
+ * These sit OUTSIDE THEME_ROLES on purpose (requiring them would invalidate
+ * every existing brands/*.json), which also puts them outside CONTRAST_PAIRS
+ * and outside fitSignals' SIGNAL_KEYS. So nothing above would notice them
+ * regressing. These tests are that gate. The failure they exist to catch: a
+ * brand whose $modes.light flips $scheme to light while still $extends-ing the
+ * dark base inherits the dark --focus onto a near-white board (1.44:1 — worse
+ * than the 2.86:1 the token was introduced to fix). */
+
+test("every built theme defines --focus and --seam", () => {
+  for (const name of BUILT_THEMES) {
+    const css = readFileSync(join(ROOT, `dist/themes/${name}.css`), "utf8");
+    assert.ok(pickVar(css, "focus"), `${name}.css must define --focus`);
+    assert.ok(pickVar(css, "seam"), `${name}.css must define --seam`);
+  }
+});
+
+test("--focus clears 3:1 against EVERY surface in every built theme (WCAG 2.4.11)", () => {
+  const failures = [];
+  for (const name of BUILT_THEMES) {
+    const css = readFileSync(join(ROOT, `dist/themes/${name}.css`), "utf8");
+    const focus = pickVar(css, "focus");
+    for (const surface of ["ground", "board", "panel", "panel-2"]) {
+      const bg = pickVar(css, surface);
+      if (!focus || !bg) continue;
+      const ratio = contrastRatio(focus, bg);
+      if (ratio < 3)
+        failures.push(`${name}: --focus ${focus} on --${surface} ${bg} = ${ratio.toFixed(2)}`);
+    }
+  }
+  assert.deepEqual(failures, [], `focus-ring contrast failures:\n${failures.join("\n")}`);
+});
+
+test("--seam clears 3:1 against the panel it divides in every built theme", () => {
+  const failures = [];
+  for (const name of BUILT_THEMES) {
+    const css = readFileSync(join(ROOT, `dist/themes/${name}.css`), "utf8");
+    const seam = pickVar(css, "seam");
+    for (const surface of ["panel", "panel-2"]) {
+      const bg = pickVar(css, surface);
+      if (!seam || !bg) continue;
+      const ratio = contrastRatio(seam, bg);
+      if (ratio < 3)
+        failures.push(`${name}: --seam ${seam} on --${surface} ${bg} = ${ratio.toFixed(2)}`);
+    }
+  }
+  assert.deepEqual(failures, [], `seam contrast failures:\n${failures.join("\n")}`);
+});
+
+test("a light $mode does not inherit its dark base's --focus/--seam", () => {
+  // aurora is the worked $modes brand: one file, dark + light, light $extends dark.
+  const dark = readFileSync(join(ROOT, "dist/themes/aurora.css"), "utf8");
+  const light = readFileSync(join(ROOT, "dist/themes/aurora-light.css"), "utf8");
+  assert.notEqual(
+    pickVar(light, "focus"),
+    pickVar(dark, "focus"),
+    "light mode must re-derive --focus, not inherit the dark ring"
+  );
+  assert.notEqual(
+    pickVar(light, "seam"),
+    pickVar(dark, "seam"),
+    "light mode must re-derive --seam, not inherit the dark seam"
+  );
+});
+
+test("deriveDerivedRoles: derives from source, respects explicit, re-derives on change", () => {
+  // missing -> derived from its source role
+  const a = deriveDerivedRoles({ "sig-work": "#00d3fb", muted: "#8a8aa6" }, {});
+  assert.equal(a.focus, "#00d3fb");
+  assert.equal(a.seam, "#8a8aa6");
+
+  // author set it by hand -> left alone
+  const b = deriveDerivedRoles(
+    { "sig-work": "#00d3fb", muted: "#8a8aa6", focus: "#ff0000" },
+    { changed: ["focus"] }
+  );
+  assert.equal(b.focus, "#ff0000", "explicit --focus is never overwritten");
+
+  // stale value + its source changed -> re-derived
+  const c = deriveDerivedRoles(
+    { "sig-work": "#0891b2", muted: "#55556b", focus: "#00d3fb", seam: "#8a8aa6" },
+    { changed: ["sig-work", "muted"] }
+  );
+  assert.equal(c.focus, "#0891b2", "--focus re-derives when --sig-work moves");
+  assert.equal(c.seam, "#55556b", "--seam re-derives when --muted moves");
+
+  // the fit hook is applied to a derived (not hand-set) focus
+  const d = deriveDerivedRoles(
+    { "sig-work": "#0891b2", muted: "#55556b", board: "#e2e2e9", panel: "#fbfbff" },
+    { changed: ["sig-work"], fit: () => "#00627a" }
+  );
+  assert.equal(d.focus, "#00627a", "fit() tightens a derived focus ring");
+});
+
+test("fitAgainstAll darkens a dark-tuned ring until it clears every light surface", () => {
+  const surfaces = ["#eaeaf2", "#e2e2e9", "#fbfbff", "#f2f3fa"];
+  const fitted = fitAgainstAll("#00d3fb", surfaces, 3);
+  for (const s of surfaces) {
+    assert.ok(
+      contrastRatio(fitted, s) >= 3,
+      `fitted ${fitted} should clear 3:1 on ${s} (got ${contrastRatio(fitted, s).toFixed(2)})`
+    );
+  }
+  // hue is preserved — it is still the work-cyan, just darker
+  assert.ok(Math.abs(oklch(fitted).h - oklch("#00d3fb").h) < 12, "fit holds the hue");
+  // already-legible input is returned untouched
+  assert.equal(fitAgainstAll("#00d3fb", ["#0f0327", "#15092f"], 3), "#00d3fb");
 });

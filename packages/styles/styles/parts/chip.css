@@ -6,5 +6,13 @@
   padding: var(--cr-chip-pad-y) var(--cr-chip-pad-x);
   background: var(--cr-chip-bg); color: var(--cr-chip-fg); border: var(--brd) solid var(--border);
 }
-.cr-chip--alt { --cr-chip-bg: var(--sig-work); }
+/* Chip carries the same signal vocabulary as Tag (Law 2). The default fill is
+ * --sig-done, so `signal="done"` is the bare .cr-chip and needs no modifier;
+ * the rest re-key --cr-chip-bg. The old `tone="alt"` was this same channel under
+ * a second name — `alt` meant --sig-work, i.e. `signal="work"`. */
+.cr-chip--work   { --cr-chip-bg: var(--sig-work); }
+.cr-chip--wait   { --cr-chip-bg: var(--sig-wait); }
+.cr-chip--err    { --cr-chip-bg: var(--sig-err);  --cr-chip-fg: var(--on-err); }
+.cr-chip--idle   { --cr-chip-bg: var(--sig-idle); --cr-chip-fg: var(--on-idle); }
+.cr-chip--accent { --cr-chip-bg: var(--sig-accent); --cr-chip-fg: var(--on-accent); }
 

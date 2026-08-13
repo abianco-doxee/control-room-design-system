@@ -17,7 +17,6 @@ import {
   CrChip,
   CrTable,
   CrTabs,
-  CrMeter,
   CrMenu,
   CrPagination,
   CrToastRegion,
@@ -25,7 +24,7 @@ import {
   CrKeyHints,
   CrPalette,
   CrAlert,
-  CrRadioGroup,
+  CrChoiceGroup,
   CrSlider,
   CrProgress,
   CrAccordion,
@@ -384,9 +383,9 @@ export default component$(() => {
             />
           </div>
           <div style="display:flex;flex-direction:column;gap:var(--space-2)">
-            <CrMeter label="cpu" value={72} signal="work" />
-            <CrMeter label="queue" value={40} signal="wait" />
-            <CrMeter label="errors" value={12} signal="err" />
+            <CrProgress label="cpu" value={72} signal="work" />
+            <CrProgress label="queue" value={40} signal="wait" />
+            <CrProgress label="errors" value={12} signal="err" />
           </div>
           <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
             <CrPagination page={ui.page} total={9} onChange={$((p: number) => (ui.page = p))} />
@@ -399,7 +398,8 @@ export default component$(() => {
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--space-4);align-items:start">
             <div>
               <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">density</p>
-              <CrRadioGroup
+              <CrChoiceGroup
+                type="radio"
                 label="Row density"
                 value={ui.density}
                 row
@@ -415,10 +415,9 @@ export default component$(() => {
               <CrSlider value={ui.refresh} min={5} max={120} step={5} label="Refresh interval seconds" onChange={$((v: number) => (ui.refresh = v))} />
             </div>
             <div>
-              <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">indexing</p>
-              <CrProgress value={64} label="Indexing 64%" />
+              <CrProgress value={64} label="indexing" />
               <div style="height:var(--space-2)"></div>
-              <CrProgress indeterminate signal="wait" label="Syncing" />
+              <CrProgress indeterminate signal="wait" label="syncing" />
             </div>
             <div>
               <p style="font-family:var(--font-mono);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 var(--space-2)">scope</p>
@@ -479,8 +478,8 @@ export default component$(() => {
         </section>
 
         <footer style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap">
-          <CrChip tone="done">v1.0.0</CrChip>
-          <span class="cr-telemetry">SYS 0x7F · 41ms · ▁▂▃▅▇▅▃▂</span>
+          <CrChip signal="done">v1.0.0</CrChip>
+          <span class="cr-telemetry">SYS 0x7F · CH21 · ▁▂▃▅▇▅▃▂</span>
           <span style="flex:1"></span>
           <span class="cr-ruler" style="width:180px"></span>
         </footer>

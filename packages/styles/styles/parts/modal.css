@@ -7,4 +7,11 @@
   padding: 0; max-width: min(92vw, 34rem); border-radius: var(--radius);
 }
 .cr-modal::backdrop { background: var(--cr-modal-backdrop); }
+.cr-modal__head {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--cr-modal-head-pad-y) var(--cr-modal-head-pad-x); border-bottom: var(--brd) solid var(--cr-modal-border);
+}
+.cr-modal__title { flex: 1; margin: 0; font-family: var(--font-display); font-weight: 900; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: -0.02em; }
+/* .cr-modal__close — see the shared "Dismiss control" rule in the base layer. */
+.cr-modal__body { padding: var(--cr-modal-body-pad); font-size: var(--text-base); }
 

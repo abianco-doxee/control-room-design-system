@@ -1,12 +1,17 @@
 import { useStore, useRef, Show } from "@builder.io/mitosis";
 import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { placeEl } from "../lib/position.ts";
 
 export interface CrPopoverProps {
   /** Trigger button text. */
   label: string;
   /** Accessible name for the panel. */
   title?: string;
-  align?: "left" | "right";
+  /** Preferred placement, `${side}` or `${side}-${align}` — e.g. "bottom-start"
+   *  (default), "top-end", "right". Sides: top · bottom · left · right;
+   *  aligns: start · end. Flips to the opposite side and shifts along the cross
+   *  axis as needed to stay within the viewport. */
+  placement?: string;
   children?: any;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "trigger" · "scrim" · "panel". */
@@ -45,39 +50,27 @@ export default function CrPopover(props: CrPopoverProps) {
       const root: any = rootRef;
       const panel = root ? root.querySelector(".cr-popover__panel") : null;
       if (panel) {
+        panel.style.visibility = "hidden";
         state.place();
         panel.focus();
         return;
       }
       if ((tries || 0) < 6) setTimeout(() => state.focusPanel((tries || 0) + 1), 16);
     },
-    /* Collision-aware placement: anchor the panel to the trigger, flip above when
-     * there's no room below, and shift horizontally to stay in the viewport (so the
-     * panel never clips off-screen). Same algorithm as @alebianco/cr-utils/position (exported
-     * for consumers); inlined here so the component carries no cross-target import.
-     * Static on open — for scroll-pinned placement use autoPlace() from ./position. */
+    /* Whatever hid the panel (focusPanel, above) is matched here: place() ALWAYS
+     * ends by revealing it, even when placement itself couldn't run (no window,
+     * no trigger). A panel that gets hidden but never shown again is a dead click
+     * behind a still-active scrim — worse than the pre-port fallback of showing
+     * it unplaced at its CSS position, which is what an early return now does. */
     place() {
       const root: any = rootRef;
-      if (!root || typeof window === "undefined") return;
-      const trigger = root.querySelector("[aria-haspopup]");
-      const panel = root.querySelector(".cr-popover__panel");
-      if (!trigger || !panel) return;
-      const a = trigger.getBoundingClientRect();
-      const f = panel.getBoundingClientRect();
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const offset = 6;
-      const pad = 8;
-      const below = vh - (a.top + a.height);
-      const onTop = below < f.height + offset && a.top > below;
-      const y = onTop ? a.top - f.height - offset : a.top + a.height + offset;
-      let x = props.align === "right" ? a.left + a.width - f.width : a.left;
-      x = Math.max(pad, Math.min(x, vw - f.width - pad));
-      panel.style.position = "fixed";
-      panel.style.margin = "0";
-      panel.style.left = x + "px";
-      panel.style.top = y + "px";
-      panel.setAttribute("data-placement", (onTop ? "top" : "bottom") + (props.align === "right" ? "-end" : "-start"));
+      const panel = root ? root.querySelector(".cr-popover__panel") : null;
+      if (!panel) return;
+      if (root && typeof window !== "undefined") {
+        const trigger = root.querySelector("[aria-haspopup]");
+        if (trigger) placeEl(trigger, panel, { placement: props.placement || "bottom-start" });
+      }
+      panel.style.visibility = "visible";
     },
     onKey(event: any) {
       if (event.key === "Escape") {
@@ -106,12 +99,16 @@ export default function CrPopover(props: CrPopoverProps) {
         <button {...ptAttrs(props.pt, "scrim")} type="button" class={ptClass(props.pt, props.unstyled, "cr-popover__scrim", "scrim")} data-part="scrim" aria-hidden="true" tabIndex={-1} onClick={() => state.close()}></button>
         <div
           {...ptAttrs(props.pt, "panel")}
-          class={ptClass(props.pt, props.unstyled, "cr-popover__panel" + (props.align === "right" ? " cr-popover__panel--right" : ""), "panel")}
+          class={ptClass(props.pt, props.unstyled, "cr-popover__panel", "panel")}
           data-part="panel"
           data-state={state.open ? "open" : "closed"}
           role="dialog"
           aria-label={props.title || props.label}
           tabIndex={-1}
+          /* Hidden at mount so it can never paint at its unplaced CSS position —
+           * place() reveals it once placeEl() has run. Not ptStyle-backed: this
+           * part carries no pt/dt style hook (see styling-contract.md). */
+          style={{ visibility: "hidden" }}
           onKeyDown={(event) => state.onKey(event)}
         >
           {props.children}

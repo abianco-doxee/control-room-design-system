@@ -43,7 +43,7 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 - [Toolbar](https://alebianco.github.io/control-room-design-system/components.html#c-toolbar): WAI-ARIA toolbar — a labelled group of controls with a single tab stop and roving-tabindex arrows. Two modes: wrap your own controls as children, or pass items[] and (with overflow) collapse the buttons that don't fit into a “⋯ more” menu (priority+, measured via ResizeObserver).
 
 ### Behavior
-- [Key hints (peek)](https://alebianco.github.io/control-room-design-system/components.html#c-key-hints): Headless behavior — while the reveal key (default Alt) is held, sets data-cr-keys on the root so every secondary key hint fades in at once (a peek-all-shortcuts gesture). Renders nothing visible.
+- [Key hints (peek + legend)](https://alebianco.github.io/control-room-design-system/components.html#c-key-hints): While the reveal key (default Alt) is held, sets data-cr-keys on the root so every secondary key hint fades in at once (a peek-all-shortcuts gesture). Pass `hints` to also render a shortcut legend: `+` joins a chord ("Ctrl+K"), a space joins a sequence ("g p"), and the two are drawn differently — a `+` glyph vs a "then" separator. Each binding carries a spoken aria-label and the keycaps are aria-hidden; aria-keyshortcuts is emitted only for single-step bindings, since ARIA reads a space there as "or" rather than "then". With no `hints` it renders nothing visible.
 
 ### Chart
 - [Bar chart](https://alebianco.github.io/control-room-design-system/components.html#c-bar-chart): Categorical bar chart — baseline-anchored bars with rounded data-ends, a 2px surface gap, optional dashed target line, monospace value/category labels.
@@ -54,6 +54,7 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 ### Forms
 - [Calendar](https://alebianco.github.io/control-room-design-system/components.html#c-calendar): Month calendar grid — role=grid with roving tabindex (arrows move day/week, PageUp/Down step months, Enter/Space select). Fully controlled, SSR-safe (month + today injected, never read from the clock).
 - [Checkbox / Radio](https://alebianco.github.io/control-room-design-system/components.html#c-checkbox): Square checkbox and radio (radius 0); checked fills to --sig-work with an --on-sig mark.
+- [Choice group](https://alebianco.github.io/control-room-design-system/components.html#c-choice-group): Grouped choices for both types, rendering CrChoice. type="radio" is a radiogroup of native radios sharing one name (browser-supplied roving tabindex + arrow selection); type="checkbox" is a group of independently tabbable boxes with arrows inert.
 - [Combobox](https://alebianco.github.io/control-room-design-system/components.html#c-combobox): Autocomplete — an input (role=combobox) filtering a listbox; ↑/↓ move the active option (aria-activedescendant), Enter selects, Esc closes. Active row shows an ascii ▸ marker.
 - [Cron field](https://alebianco.github.io/control-room-design-system/components.html#c-cron-field): A proper cron-expression form field: label + input + quick presets + a live human-readable readout. The translation is injected as `description` (compute with cronstrue in the host) so the design system stays dependency-free; validity is message-driven via `error` (no hand-set `invalid`), wired like CrField (aria-invalid + aria-describedby).
 - [Date-time](https://alebianco.github.io/control-room-design-system/components.html#c-datetime): A styled native date/time input (datetime-local / date / time) — the browser owns the picker, keyboard, and locale.
@@ -63,7 +64,6 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 - [InputGroup](https://alebianco.github.io/control-room-design-system/components.html#c-input-group): An input flanked by decorative prefix / suffix addons (protocol, currency, unit). Addons are aria-hidden; give the field a label. For a validated field use Field or Form.
 - [Number field](https://alebianco.github.io/control-room-design-system/components.html#c-number-field): Number input with −/+ steppers, clamped to min/max; the native input keeps its own keyboard.
 - [PinInput](https://alebianco.github.io/control-room-design-system/components.html#c-pin-input): One-time-code / PIN entry — N single-digit cells acting as one field; typing advances, Backspace steps back, arrows move, paste fills across. role=group with per-cell labels.
-- [Radio group](https://alebianco.github.io/control-room-design-system/components.html#c-radio-group): Single-choice group (role=radiogroup) with roving tabindex + arrow-key nav. Square radios (radius 0) — a filled inner square marks the choice.
 - [Rating](https://alebianco.github.io/control-room-design-system/components.html#c-rating): Star-rating control — a radiogroup with roving tabindex (interactive) or an inert score readout (readonly). Geometric-glyph marks (no icon font); fill encodes the value.
 - [Select](https://alebianco.github.io/control-room-design-system/components.html#c-select): Native select styled to the chassis.
 - [Slider](https://alebianco.github.io/control-room-design-system/components.html#c-slider): Styled native range input — square track + thumb, keyboard for free (arrows, Home/End, PageUp/Down).
@@ -85,7 +85,7 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 - [Data grid](https://alebianco.github.io/control-room-design-system/components.html#c-datagrid): A dense, VIRTUALIZED data grid for large datasets: only the rows in (or near) the viewport are in the DOM, so thousands of rows scroll smoothly. Fixed row height; sortable headers (asc → desc → none, stable); optional row selection (checkbox column + select-all + aria-selected); sticky header; grid a11y (role=grid/row/columnheader/gridcell, aria-sort, aria-rowcount). Div-grid (not a <table>) so virtualization offsets cleanly across all targets.
 - [Data list](https://alebianco.github.io/control-room-design-system/components.html#c-data-list): Key → value readout (dl/dt/dd) on a two-column grid — mono/label keys, data-register values. For detail panels.
 - [Instrument shell](https://alebianco.github.io/control-room-design-system/components.html#c-instrument): The dashboard chassis — composes the nav rail and a board (masthead/hero + panels).
-- [Panel](https://alebianco.github.io/control-room-design-system/components.html#c-panel): The default container for a group of related data — the system's workhorse surface.
+- [Panel](https://alebianco.github.io/control-room-design-system/components.html#c-panel): A composed instrument bay — eyebrow, ghost index, title, lede, body and a pinned footer; the system's workhorse surface.
 - [Resizable](https://alebianco.github.io/control-room-design-system/components.html#c-resizable): Two panes with a draggable divider. Panes are children (CSS-grid sized); the handle is a WAI-ARIA window splitter (role=separator, focusable, aria-valuenow, arrow/Home/End keys). Pointer-capture drag.
 - [ScrollArea](https://alebianco.github.io/control-room-design-system/components.html#c-scroll-area): A container with cross-browser styled scrollbars (thin, inked, neon thumb) that keep the Control Room look. Keyboard-scrollable; with a label it's a named role=group.
 - [Table](https://alebianco.github.io/control-room-design-system/components.html#c-table): Dense operator table on the same chassis as a panel; mono/label headers, data-register cells. Optional column sort, row selection (checkbox + aria-selected), and a sticky header.
@@ -94,15 +94,16 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 - [Ascii](https://alebianco.github.io/control-room-design-system/components.html#c-ascii): Seeded ASCII/Unicode density field (braille/block/ramp) for dead space — whisper contrast, aria-hidden, mask-faded off content.
 - [ASCII separators & lists](https://alebianco.github.io/control-room-design-system/components.html#c-ascii-detail): Character-flavored detail utilities: .cr-sep / .cr-sep-label box-rule separators (dashed/dotted, labeled), .cr-list ascii-marker lists (▸ · » +), and .cr-leader dot-leader rows (label ····· value).
 - [Carousel](https://alebianco.github.io/control-room-design-system/components.html#c-carousel): Slide carousel with the WAI-ARIA carousel pattern — labelled region, prev/next, dot indicators, aria-live viewport, ←/→ navigation. Controlled via index/onIndex.
-- [Chrome](https://alebianco.github.io/control-room-design-system/components.html#c-chrome): Seeded hardware chrome strip — a pixel-art metal bar with deterministically varied fasteners, panel seams, wear scratches, and an indicator LED.
+- [Chrome](https://alebianco.github.io/control-room-design-system/components.html#c-chrome): Seeded instrument chrome strip — a pixel-art metal bar with a deterministically varied graduated scale, panel seams, registration mark, wear scratches, and an indicator LED.
 - [Decoration utilities](https://alebianco.github.io/control-room-design-system/components.html#c-decoration-utilities): The FUI/decoration utility layer for dead space and chassis edges: styled scrollbar, tick-ruler edge, whisper drafting field, hazard stripe, and the Breach blur-blob. All aria-hidden, non-interactive, whisper contrast — never on a content field.
+- [Dither](https://alebianco.github.io/control-room-design-system/components.html#c-dither): Seeded Bayer 4×4 ordered dither / halftone field — hardware surfaces only (Law 6); the genuine texture the CSS tokens approximate.
 - [Icon](https://alebianco.github.io/control-room-design-system/components.html#c-icon): The house operational glyph set — 24×24, currentColor, single 2px stroke, square caps to match the neobrutalist geometry. Decorative by default; pass a label to name it.
 - [Seeded pixel-cat](https://alebianco.github.io/control-room-design-system/components.html#c-seeded-cat): Identity+state sprite: fur/markings from the session id, pose from state; deterministic paint() to canvas.
 - [Sigil](https://alebianco.github.io/control-room-design-system/components.html#c-sigil): Seeded cyber-sigil — a retro-futuristic pixel glyph generated from a seed; optional state keys the hue.
-- [Telemetry](https://alebianco.github.io/control-room-design-system/components.html#c-telemetry): Seeded NERV-style decorative telemetry string (hex id, byte, latency, mini bar) for a frame corner. Decoration, not data.
+- [Telemetry](https://alebianco.github.io/control-room-design-system/components.html#c-telemetry): Seeded NERV-style decorative telemetry string (hex id, byte, channel tag, mini bar) for a frame corner. Decoration, not data — every field is unitless so it cannot be mistaken for a real measurement.
 
 ### Navigation
-- [Breadcrumb](https://alebianco.github.io/control-room-design-system/components.html#c-breadcrumb): Navigation trail — ascii "/" separators from CSS; the last crumb is the current page (aria-current).
+- [Breadcrumb](https://alebianco.github.io/control-room-design-system/components.html#c-breadcrumb): Navigation trail — an aria-hidden "▸" separator between crumbs (override with `separator`); the last crumb is the current page (aria-current).
 - [Overflow](https://alebianco.github.io/control-room-design-system/components.html#c-overflow): An a11y-correct "+N more" disclosure for truncated lists; a button (aria-expanded) with onToggle, or an inert count. The accessible name always includes the noun.
 - [Pagination](https://alebianco.github.io/control-room-design-system/components.html#c-pagination): Controlled pager — prev/next plus a windowed run of page numbers with ellipses; current page keyed and aria-current.
 - [Rail + Nav](https://alebianco.github.io/control-room-design-system/components.html#c-rail): Primary navigation — persistent left chassis; active item keyed to accent, count badge to its state.
@@ -119,7 +120,7 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 - [Modal](https://alebianco.github.io/control-room-design-system/components.html#c-modal): Native <dialog> modal; browser owns focus-trap, Esc, and backdrop.
 - [Popover](https://alebianco.github.io/control-room-design-system/components.html#c-popover): Generic anchored overlay for arbitrary content — a trigger toggles a floating panel; scrim closes on outside click, Esc closes and returns focus. Use Menu for a list of actions.
 - [Toast](https://alebianco.github.io/control-room-design-system/components.html#c-toast): Transient status readout keyed to a machine signal; err announces assertively.
-- [Toast region](https://alebianco.github.io/control-room-design-system/components.html#c-toast-region): A fixed screen corner that stacks live toasts (parent owns the list). Each toast is its own live region — err announces assertively — so nothing double-announces. Bottom corners stack newest nearest the edge.
+- [Toast region](https://alebianco.github.io/control-room-design-system/components.html#c-toast-region): A fixed screen anchor that stacks live toasts (parent owns the list). Each row is its own live region — err announces assertively — so nothing double-announces. Consecutive toasts with the same message and signal pack into one row with an aria-hidden ×N counter, so a repeat updates the count instead of re-announcing. Bottom anchors stack newest nearest the edge.
 - [Tooltip](https://alebianco.github.io/control-room-design-system/components.html#c-tooltip): Hint bubble revealed on hover/focus; role=tooltip wired via aria-describedby, pure-CSS reveal.
 
 ### Primitives
@@ -127,18 +128,17 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 - [Key hint](https://alebianco.github.io/control-room-design-system/components.html#c-kbd): A keycap badge for a keyboard shortcut. Decorative (aria-hidden) — the real binding rides aria-keyshortcuts on the action. Main actions show it always; secondary use the hint variant, revealed on host hover/focus or a global peek.
 
 ### State
-- [Alert](https://alebianco.github.io/control-room-design-system/components.html#c-alert): Inline callout keyed to a signal (info/wait/done/err) — a left brush-bar in the signal hue, optional dismiss. err announces assertively (role=alert).
-- [Chip](https://alebianco.github.io/control-room-design-system/components.html#c-chip): A compact standalone tag/label; default keys to done, alt to work; stamp-in when added.
+- [Alert](https://alebianco.github.io/control-room-design-system/components.html#c-alert): Inline callout keyed to a signal (work/wait/done/err) — a left brush-bar in the signal hue, optional dismiss. err announces assertively (role=alert).
+- [Chip](https://alebianco.github.io/control-room-design-system/components.html#c-chip): A compact standalone tag/label keyed to a signal (Law 2); defaults to done; stamp-in when added.
 - [Drip / error surface](https://alebianco.github.io/control-room-design-system/components.html#c-drip): The house glitch for failure — vertical downward bleed in --drip over a --sig-err field. Errors only.
 - [EmptyState / ErrorState](https://alebianco.github.io/control-room-design-system/components.html#c-empty-error-state): Zero-data (calm) and failure (error keying + drip) fallbacks for any panel — must not look alike.
 - [Keyed contact sheet](https://alebianco.github.io/control-room-design-system/components.html#c-keyed-contact-sheet): A grid of uniform state-keyed tiles that reads as one instrument, not competing stages (Law 2).
-- [Meter](https://alebianco.github.io/control-room-design-system/components.html#c-meter): Token-driven capacity / utilisation bar (role=meter), square and hard-edged, keyed to a signal tone.
-- [Progress](https://alebianco.github.io/control-room-design-system/components.html#c-progress): Task progress (role=progressbar) — determinate fills to value/max; indeterminate runs an animated hazard sweep. Distinct from Meter (a static capacity reading).
+- [Progress](https://alebianco.github.io/control-room-design-system/components.html#c-progress): Task progress and capacity / utilisation (role=progressbar) — determinate fills to value/max; indeterminate runs an animated hazard sweep. An optional label renders inline before the track.
 - [RelativeTime](https://alebianco.github.io/control-room-design-system/components.html#c-relative-time): Relative-time display ("5m ago") as a semantic <time>; the clock is injected as a prop so SSR and client agree (no hydration flicker).
 - [SessionRow](https://alebianco.github.io/control-room-design-system/components.html#c-session-row): One row of a live list — the densest unit; calm at rest, one-shot glitch on a real state change.
 - [Shape](https://alebianco.github.io/control-room-design-system/components.html#c-shape): Severity glyph — polygon side-count encodes danger/focus (fewer sides = more urgent); a shape channel beside colour (Law 4).
 - [Skeleton](https://alebianco.github.io/control-room-design-system/components.html#c-skeleton): Loading placeholder — a blocky pulse (never rounded). Sizes: --line, --text, --block; give it a width inline.
-- [Spinner](https://alebianco.github.io/control-room-design-system/components.html#c-spinner): Indeterminate loading indicator — role=status with an accessible label; the ring is aria-hidden and honours reduced-motion. For a known fraction use Progress or Meter.
+- [Spinner](https://alebianco.github.io/control-room-design-system/components.html#c-spinner): Indeterminate loading indicator — role=status with an accessible label; the cells are aria-hidden and honour reduced-motion. `signal` keys the cells to the canonical vocabulary. For a known fraction, or a static capacity reading, use Progress.
 - [StatusDot](https://alebianco.github.io/control-room-design-system/components.html#c-status-dot): The smallest state readout — a square keyed to the signal ramp, with an aria-label naming the state.
 - [Tag](https://alebianco.github.io/control-room-design-system/components.html#c-tag): Inline status label inside dense content; variants map to the signal ramp.
 - [Timeline](https://alebianco.github.io/control-room-design-system/components.html#c-timeline): Vertical event timeline — an ordered list of moments on a rail, each with a signal-coloured node, machine time, title and optional detail. Presentational; node colour is the semantic signal.
@@ -234,6 +234,29 @@ Miller and Mike Mignola: black as a compositional mass.
   hard offset shadow (`box-shadow: var(--shadow-off) var(--shadow-off) 0
   var(--shadow-col)`) is the *only* shadow in the system.
 
+### Chassis edge vs internal seam — two lines, two tokens
+
+Line *weight* is hierarchy (above); line *colour* is a separate decision, and the
+two are easy to conflate. A line has one of two jobs:
+
+| Job | Token | Sits against | Why |
+| --- | --- | --- | --- |
+| **chassis edge** — the outer contour of a component | `--border` | `--board` / `--ground` | Law 1's near-black contour, the ink boundary around the mass |
+| **internal seam** — a divider *inside* a component | `--seam` | `--panel` / `--panel-2` | must stay visible on a dark panel, where near-black cannot |
+
+`--border` is pure or near-black in three of the four themes, so it measures
+**1.21 / 1.21 / 1.01** against `--panel` on dark / extreme / phosphor — an
+invisible rule. That is correct for a chassis edge (which sits on the lighter
+board) and wrong for anything drawn *inside* a panel. `--seam` brackets between
+surface and ink in every theme by construction (**5.19 / 7.02 / 7.45 / 6.26**
+against `--panel`).
+
+- **MUST** use `--seam`, not `--border`, for any divider drawn inside a panel:
+  row rules, between-item dividers, split-pane handles, head/body separators.
+- **NEVER** try to rescue an invisible seam with `color-mix`. Mixing a colour
+  toward the background it already matches lowers the ratio; if a line starts
+  below the floor, the value being mixed is what has to change.
+
 *Sources: Koike · Miller · Mignola · neobrutalism.*
 
 ---
@@ -279,6 +302,50 @@ lightness/chroma — vibrant on purpose, and AA-checked against its on-colour:
   action, never a mood; the state ramp above stays untouched.
 - **NEVER** key a region to a hue that does not correspond to real state.
 - **NEVER** put two full-bleed keys competing on one screen. One key per region.
+
+### The canonical signal vocabulary
+
+Copy these names verbatim when adding a component. **The prop is always called
+`signal`.** There is no `tone`, `variant`, `status`, `kind` or `severity` prop for
+this channel — one concept, one name.
+
+| Member | Token | Means |
+| --- | --- | --- |
+| `work` | `--sig-work` | working / in progress |
+| `wait` | `--sig-wait` | waiting / needs input |
+| `done` | `--sig-done` | done / merged |
+| `err` | `--sig-err` | error / failing |
+| `idle` | `--sig-idle` | idle — present but doing nothing |
+| `accent` | `--sig-accent` | attention / primary action (not a state) |
+| `accent2` | `--sig-accent-2` | secondary action (not a state) |
+
+The full union, in this order, is:
+
+```ts
+signal?: "work" | "wait" | "done" | "err" | "idle" | "accent" | "accent2";
+```
+
+**A component MAY ship a subset, but only by dropping members from the tail of
+that list — never by renaming one.** Two subsets are legitimate and both are in
+use:
+
+- **Drop `idle`** where the component only exists while something is happening,
+  so "idle" has no referent: a Toast, an Alert, a Timeline node. A transient
+  readout that says "idle" is reporting nothing at all.
+- **Drop `accent` / `accent2`** where the component is a pure *state* readout and
+  an action key would be a category error — a StatusDot, a SessionRow, a Spinner,
+  a Progress fill. Conversely a Button is an action, so it carries `accent` and
+  `accent2` but has no use for `idle`.
+
+`accent2` is spelled without the hyphen in the prop even though the token is
+`--sig-accent-2`; that is the established spelling across Button, Breach and the
+three chart components, so it stays.
+
+**Two historical divergences were removed** (see the W8 changeset): `CrAlert`'s
+`info` was `work` under another name — its `.cr-alert--info` rule already resolved
+to `var(--sig-work)` — and `CrChip`'s `tone?: "done" | "alt"` was this same channel
+under a second prop name, where `alt` meant `--sig-work`. Both now use `signal`
+with canonical members.
 
 *Sources: Yamashiro · Science SARU.*
 
@@ -379,6 +446,29 @@ accessibility contract demands. Shipped as `.cr-sev--crit/-warn/-work/-ok/-idle`
 - **NEVER** add a decorative triangle. If it does not encode direction, state,
   focus, or sequence, delete it.
 
+### The direction glyphs
+
+The chevron primitive has exactly **one** glyph family: the solid triangles
+`◂ ▸` (`\25C2` / `\25B8`). They are used in two ways, and the *shape does not
+change* between them — only whether the thing is interactive:
+
+| Use | Glyph | Where |
+| --- | --- | --- |
+| static inline marker | `▸` | `.cr-list__item::before`, `.cr-combobox__opt::before`, `CrBreadcrumb` separator |
+| prev/next control | `◂` `▸` | `CrCalendar`, `CrCarousel`, `CrPagination` |
+
+The distinction between a marker and a control is already carried by the
+element — a `::before` on a list item versus a labelled `button` — so it does not
+also need a second glyph shape. Making the *button* glyphs differ from the
+*marker* glyph would encode "interactive" twice in the visual channel and zero
+times in the accessibility tree, which is backwards.
+
+- **MUST** use `◂ ▸` for direction. The light angle quotes `‹ ›` are **not** part
+  of the vocabulary; `CrPagination` used them alone and was brought into line.
+- **MUST** wrap a control's glyph in `aria-hidden="true"` and put the meaning on
+  the button's `aria-label` — the glyph is decoration over an already-named
+  control, never the accessible name.
+
 *Sources: Koike · Madhouse.*
 
 ---
@@ -435,7 +525,15 @@ casing and the recessed screen; content stays flat per Law 1.
 - **MUST** build a bezel from the bezel vocabulary: `--brd-brush` casing, corner
   rivets, a visibly inset screen. One instrument per screen (mirrors Law 2's
   one-key discipline).
+- **MAY** carry an **edge bleed**: a masked texture that fades to full
+  transparency before it reaches the content area, on a panel's corner or edge
+  (`.cr-panel--bleed` / `CrPanel bleed=""`). The mask *is* the contract —
+  texture that touches a readout is not a bleed, it is a violation of the rule
+  above. The bleed lives on the panel's margin; the field it wraps stays clean.
 - **NEVER** put texture on a flat content field.
+- **NEVER** more than **one bled panel per screen** — the bleed is an accent on
+  the most exceptional surface, and a page of grain is the same noise a page of
+  bezels is (mirrors Law 2's one-key discipline and the one-instrument rule).
 - **NEVER** nest bezels or bezel every panel — a page of hardware is noise.
 
 *Sources: Pip-Boy · Apple II.*
@@ -716,7 +814,7 @@ Coverage is library-wide. Two conventions keep the surface small:
   `--cr-stepper-accent-bg`, `--cr-pager-accent-bg`, `--cr-nav-active-bg` follow the
   same shape.
 
-Signal-driven components (Tag, Tile, Meter, Progress, Toast) intentionally have no
+Signal-driven components (Tag, Tile, Progress, Toast) intentionally have no
 per-component tokens — their colour *is* the semantic signal, so retheme them via
 the signal tokens (`--sig-work`, `--sig-done`, …). Alert is the hybrid: a base
 surface (`--cr-alert-bg`/`--cr-alert-border`) plus a per-variant `--cr-alert-key`.
@@ -842,9 +940,17 @@ from raw values.
 
 | Token | Role |
 | --- | --- |
-| `--border` | contour / outline (near-black) |
+| `--border` | contour / outline (near-black) — the **chassis edge**, against `--board` |
+| `--seam` | **internal divider** drawn inside a panel, against `--panel` |
 | `--mass` | black as a large fill area (Law 1) |
 | `--shadow-col` | hard offset shadow color |
+
+**`--border` vs `--seam`.** `--border` is near-black, so against `--panel` it
+measures 1.21 / 1.21 / 1.01 on dark / extreme / phosphor — right for an outer edge
+sitting on the lighter board, invisible for a rule drawn *inside* a panel. Use
+`--seam` for row rules, between-item dividers and split-pane handles; it brackets
+between surface and ink in every theme (5.19 / 7.02 / 7.45 / 6.26 against
+`--panel`). See Law 1 in `references/design-language.md`.
 
 **On pure black (a decision on the record).** In dark/light/extreme, `--border`,
 `--mass`, and `--shadow-col` are pure `#000000` — deliberately. Neobrutalism earns the
@@ -858,15 +964,23 @@ brutalist default.
 
 | Token | State / role |
 | --- | --- |
-| `--sig-work` | working (also the focus-outline color) |
+| `--sig-work` | working |
 | `--sig-wait` | waiting / needs input |
 | `--sig-done` | done / merged |
 | `--sig-err` | error / failing |
 | `--sig-idle` | idle |
 | `--sig-accent` | attention / primary action |
+| `--focus` | keyboard focus ring — **not** part of the state ramp |
 
 Text placed **on** any signal fill uses `--on-sig`. The pairing is contrast-safe
 per theme (see `references/accessibility.md`).
+
+**`--focus` is separate from `--sig-work` on purpose.** It matches `--sig-work`
+exactly in dark, extreme and phosphor, but the light theme's working cyan reaches
+only 2.86:1 against `--board` — below WCAG 2.4.11's 3:1 floor for a focus
+indicator — so light darkens it to `#00627a` (5.38:1 at its worst surface) while
+keeping the hue. Re-keying `--sig-work` in a brand therefore cannot break that
+brand's focus ring. Components MUST draw rings in `--focus`.
 
 ### Keyed & decay
 
@@ -1104,6 +1218,43 @@ underneath it — so an inherited `--on-accent` can't go stale after you change
 Programmatically it's `deriveOnColors(vars, { changed })` (and `autoOnColor(fill)`),
 run automatically by `defineTheme` and `build:theme`; pass `deriveOnColors: false`
 to `defineTheme` to opt out.
+
+### Auto-derived `--focus` and `--seam`
+
+Two more roles work the same way, for the same reason. Neither is part of the
+theme contract (requiring them would invalidate every existing brand), so a brand
+that names neither gets them derived:
+
+| role | derived from | extra treatment |
+| --- | --- | --- |
+| `--focus` | `--sig-work` | fitted so it clears **3:1 against every surface** in the theme (WCAG 2.4.11) |
+| `--seam` | `--muted` | none — `--muted` already brackets surface and ink |
+
+They re-derive whenever their source role changes, and also whenever `$ramp`
+rebuilds the surfaces. **This matters most for `$modes`.** A brand's light mode
+typically sets `$scheme: "light"` while the brand still `$extends` a dark theme;
+without derivation the light mode would inherit the dark base's focus ring — a
+bright cyan on a near-white board, measuring **1.44:1**. Deriving from
+`--sig-work` (which `$fitSignals` has already adapted to the light surfaces) and
+then applying the contrast floor keeps the ring correct per mode for free:
+
+```jsonc
+{
+  "$extends": "dark",
+  "$modes": {
+    "dark":  {},
+    "light": { "$scheme": "light", "$ramp": "#eef1f8", "$fitSignals": true }
+    //         --focus and --seam are derived per mode — do not restate them
+  }
+}
+```
+
+Set either token explicitly and your value is kept, contrast floor and all. The
+gate lives in `packages/tokens/tests/theme.test.mjs`, which asserts the 3:1 floor
+for **every** theme the build emits, brands included.
+
+Programmatically it's `deriveDerivedRoles(vars, { changed, fit })` with
+`DERIVED_ROLES` naming the pairs.
 
 ### Surface ramp from one tone (`$ramp`)
 
@@ -1366,9 +1517,9 @@ Eight roles, each carrying size + weight + leading + tracking:
 | Dense | `body` · `data` · `label` · `meta` | `clamp()` on **`cqi`** | panel text tracks the *panel* |
 | Micro | `chrome` | fixed (<11px) | sub-label chrome, never fluid |
 
-- A `.cr-typo` container primitive sets `container-type: inline-size` — **never
-  `size`** (that also containers the block axis and collapsed intrinsic heights in
-  dp-tooling; heed up front).
+- The `.cr-panel` surface is the query container: it sets `container-type:
+  inline-size` — **never `size`** (that also containers the block axis and
+  collapsed intrinsic heights in dp-tooling; heed up front).
 - Folds the existing `--text-*` px scale in as the fallback rung.
 
 ### 2. Spacing — dual-axis
@@ -1458,7 +1609,8 @@ and more `@container` layouts can land incrementally on this foundation.
 ## Rollout (once direction is agreed)
 
 1. Land primitives + type group + `.cr-typo` container primitive + `.cr-tap` (token
-   + CSS), no component changes → pixel-neutral.
+   + CSS), no component changes → pixel-neutral. *(As shipped, `.cr-panel` became
+   the query container and no `.cr-typo` class exists.)*
 2. Add semantic spacing/sizing + density remap; migrate 2–3 exemplar components
    (Panel, a form control, a data row) as proof.
 3. Roll the density/container model across components in gated batches (like the
@@ -1709,7 +1861,7 @@ the global reduced-motion rule.
 
 ```html
 <div class="cr-bezel cr-anim-scan">
-  <div class="cr-bezel__screen cr-tex--glass">> streaming · 14 sessions</div>
+  <div class="cr-bezel__screen">> streaming · 14 sessions</div>
 </div>
 <span class="cr-dot cr-anim-pulse" style="--_pulse: var(--sig-err); background: var(--sig-err)"></span>
 ```
@@ -1770,18 +1922,17 @@ stays). Never animate layout properties; never loop motion on body text.
 | --- | --- | --- |
 | `.cr-glitch` (+ `data-text`) | RGB-split datamosh slices on hover; `--on` runs it continuously | a breach/alert headline — sparingly |
 | `.cr-glitch--chroma` | a faint always-on RGB fringe so an element reads as "signal" at rest; the slice still fires on hover / `--on` | a live/degraded readout that should feel unstable without moving |
-| `.cr-glitch-auto` | opt **into** the random driver: brief bursts fire on their own, **one element at a time**, every ~2.4–5s | ambient "the feed is alive" texture — tag a small handful, not everything |
 | `.cr-attention` | slow breathing glow (keys to `--cr-attn`) | draw the eye to the ONE primary / "needs you" action on a screen |
 | `.cr-keyed` | keyed edge-sweep underline on hover/focus | interactive rows, nav items, cards |
 | `.cr-tilt` / `--live` | perspective hover tilt; `--live` adds a slow idle float | a **sanctioned break of the flat plane** — one accent element, like the Law-9 breach |
 | `.cr-cursed` (+ optional `data-text` / `data-seed`) | **T3 decay (Law 3):** zalgo combining marks, capped at 2/glyph. The painter moves the clean string to `aria-label`, marks the element `role="img"`, and hides the corrupted glyphs (`aria-hidden`). Seeded → deterministic. Density follows `--decoration-intensity` | a corrupted/failed label — checksum fail, dead daemon — where the decay *is* the meaning |
 
-**The random glitch driver.** `.cr-glitch-auto` is the only thing the ambient driver
-touches. It picks one tagged element at a time, glitches it for ~0.2–0.5s, then rests
-2.4–5s before the next — so the screen is never glitching everywhere at once. It is off
-under `prefers-reduced-motion` and under the `calm` profile, and it never touches an element
-you didn't opt in. Cursed text is **not** motion — it renders once and holds — but it obeys
-the same restraint: it is a decay tier, not decoration to sprinkle.
+**Glitch is hover/`--on` only.** There is no ambient random driver: a glitch fires on
+hover, or continuously while you set `.cr-glitch--on`, and `.cr-glitch--chroma` holds a
+faint always-on fringe without moving. Drive `--on` yourself if you want bursts, and keep
+it to a small handful of elements so the screen is never glitching everywhere at once.
+Cursed text is **not** motion — it renders once and holds — but it obeys the same
+restraint: it is a decay tier, not decoration to sprinkle.
 
 **Restraint is the rule.** Glitch and 3D are rule-breaks: at most one of each per screen,
 on the exceptional element. Attention marks exactly one primary target — more than one and
@@ -1827,8 +1978,16 @@ Color carries state (Law 2), so it must be backed up:
 - **MUST** keep a visible focus indicator. The system default is already set in
   `control-room.css`:
   ```css
-  *:focus-visible { outline: 3px solid var(--sig-work); outline-offset: 2px; }
+  *:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
   ```
+- **MUST** draw the ring in `--focus`, never in `--sig-work` directly. The ring has
+  its own token precisely so it can be tuned for contrast independently of the
+  working state: WCAG **2.4.11 Focus Appearance** requires the indicator to clear
+  **3:1** against the *adjacent* surface, and in the light theme `--sig-work`
+  (`#0891b2`) reaches only **2.86:1** against `--board`. `--focus` tracks
+  `--sig-work` exactly in dark, extreme and phosphor, and darkens to `#00627a` in
+  light — same hue, **5.38:1** at its worst surface. A brand that re-keys
+  `--sig-work` therefore cannot silently break its own focus ring.
 - **NEVER** remove focus outlines. If a component needs a custom focus style, it
   must be at least as visible as the default and use a signal hue.
 - **MUST** keep a logical tab order and standard keyboard operation for all
@@ -1940,44 +2099,101 @@ border-radius: 0;                                          /* always          */
 
 ---
 
+## Dismiss control {#dismiss-control}
+
+**Purpose.** The one ✕ treatment, shared by every dismissible surface — Alert,
+Toast, Modal and Drawer. All four render the same markup, so they share **one
+rule** rather than four that drift:
+
+```html
+<button type="button" class="cr-alert__close" aria-label="Dismiss">✕</button>
+```
+
+```css
+.cr-alert__close, .cr-toast__close, .cr-modal__close, .cr-drawer__close { … }
+```
+
+It lives in the **base layer** (`styles/base.css`), not in any one part file — a
+per-part consumer imports `base` first, and duplicating the block per component
+section is exactly the drift being closed.
+
+- **MUST** keep `color: inherit` and `border-color: currentColor`. That is what
+  makes one treatment correct on every host: on a `--panel` surface it resolves
+  to `--ink`; on a flooded toast it resolves to `--on-sig` / `--on-err`. A fixed
+  `--panel`/`--border` chip cannot — its border measures **1.21:1** against its
+  own fill in dark/extreme/phosphor, and it would punch a hole in the toast's
+  Law 2 key.
+- **MUST** pin `font-size` / `line-height` rather than inheriting them. `.cr-alert`
+  sets no `font-size` while `.cr-toast` sets `--text-sm`; the two previously
+  agreed only by accident of their parents computing to the same value.
+- **MUST** carry an `aria-label` — the ✕ glyph is not an accessible name.
+- On coarse pointers the control takes the 44px floor on **both** axes (WCAG
+  2.5.5) — it is roughly square, so `min-height` alone would leave an ~18px-wide
+  target.
+
+---
+
 ## Panel
 
 **Purpose.** The default container for a group of related data. The system's
 workhorse surface.
 
-**Anatomy.** Bordered box · hard offset shadow · optional mono uppercase heading
-(`h4`) · body.
+**Anatomy.** A composed instrument bay, top to bottom: eyebrow · ghost index
+(top-right) · heading (`h4`) · lede · body · footer pinned to the bottom edge.
+Bordered box with the hard offset shadow throughout. Every part above the body
+is optional — a bare `<CrPanel>` is still just a box.
+
+```
+┌─ .cr-panel ────────────────────────┐
+│ EYEBROW · UNIT CR-00        ⌐ 01 ⌐ │  eyebrow (real text) + index (ghost)
+│ Display Heading                    │  title
+│ ▏ lede / standfirst                │  lede, second-key left rule
+│                                    │
+│ (children)                         │
+│                                    │
+│ LAW 6 · TEXTURE ON HARDWARE        │  footer, pinned
+└────────────────────────────────────┘
+```
+
+**Parts.** `root` · `bleed` · `index` · `eyebrow` · `title` · `lede` · `footer`.
 
 **Tokens.** `--panel` bg · `--border` + `--brd` · `--shadow-off`/`--shadow-col` ·
-`--ink` heading · `--font-mono` + `--type-label-tracking`.
+`--ink` heading · `--font-mono` + `--type-label-tracking` · `--sig-accent-2`
+lede rule · `--muted` eyebrow/footer.
 
 **Variants.** `weight`: `default` (`--brd`) | `major` (`--brd-heavy`). `inset`:
-swap bg to `--panel-2` for a recessed sub-region.
+swap bg to `--panel-2` for a recessed sub-region. `tone`: keys the eyebrow to a
+signal (`work`/`wait`/`done`/`err`/`idle`/`accent`). `marks`: adds the shipped
+`.cr-mark` registration ticks. `bleed`: a masked edge texture — see below.
+`ambient`: adds a shipped `.cr-anim-*` loop.
 
 ```html
-<section class="panel">
-  <h4>Sessions</h4>
+<section class="cr-panel cr-panel--major cr-panel--tone-err cr-mark">
+  <i class="cr-panel__bleed" data-bleed="halftone" aria-hidden="true"></i>
+  <span class="cr-panel__index" aria-hidden="true">01</span>
+  <p class="cr-panel__eyebrow">Critique · unit cr-00</p>
+  <h4 class="cr-panel__title">Sessions</h4>
+  <p class="cr-panel__lede">14 active, 2 failing.</p>
   <!-- rows / content -->
+  <p class="cr-panel__footer">Law 6 · texture on hardware</p>
 </section>
-```
-```css
-.panel {
-  background: var(--panel);
-  border: var(--brd) solid var(--border);
-  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
-  padding: 13px;
-}
-.panel h4 {
-  font-family: var(--font-mono); font-size: 11px; font-weight: 800;
-  text-transform: uppercase; letter-spacing: .1em;
-  color: var(--ink); margin: 0 0 10px;
-}
 ```
 
 - **MUST** use the hard offset shadow; **NEVER** blur it or round the corners.
 - **SHOULD** use `major` weight for a panel that is itself a top-level region.
 - **NEVER** nest more than one shadow depth visually — stacking hard shadows
   reads as noise. Use `inset` (`--panel-2`, no shadow) for sub-regions.
+- **MUST** keep `index` decorative — it is `aria-hidden`, a stamp on the casing
+  rather than a datum. A readable unit id goes in the `eyebrow`, which is real
+  text.
+- **MUST** key `tone` to an actual machine state (Law 2). A tone that means
+  nothing is decoration wearing a signal's clothes.
+- **NEVER** put more than **one bled panel on a screen** (Law 6). The `bleed`
+  mask fades the texture out before the readout; it is an accent on the most
+  exceptional surface, not a page-wide wash.
+
+The root is a **flex column** — that is what pins `footer` to the bottom edge.
+Content children are lifted above the bleed layer with `z-index: 1`.
 
 ---
 
@@ -2160,24 +2376,31 @@ rest; reacts only to a real event (Law 7).
 
 ## Chip
 
-**Purpose.** A compact tag/label. Default keys to `done`; `alt` to `work`.
+**Purpose.** A compact tag/label keyed to a signal (Law 2). `signal` takes the
+canonical vocabulary — `work · wait · done · err · idle · accent` — and defaults
+to `done`, so the bare chip needs no modifier.
 
 **States.** `stamp`: a one-shot stamp-in when added.
 
 ```html
 <span class="chip">PTL-757</span>
-<span class="chip alt">ui-kit</span>
+<span class="chip work">ui-kit</span>
 ```
 ```css
 .chip { font-family: var(--font-mono); font-size: 11px; font-weight: 700;
   padding: 3px 9px; background: var(--sig-done); color: var(--on-sig);
   border: var(--brd) solid var(--border); }
-.chip.alt { background: var(--sig-work); }
+.chip.work { background: var(--sig-work); }
 .chip.stamp { animation: stamp .18s ease-out 1; }
 @keyframes stamp { 0% { transform: scale(1.18); opacity: .4; } 100% { transform: scale(1); opacity: 1; } }
 ```
 
 - **SHOULD** reserve the chip color for a real category, not decoration.
+
+> **Renamed in 1.0.** Chip used to take `tone?: "done" | "alt"`. That was the
+> signal channel under a second prop name — `alt` resolved to `--sig-work` — so it
+> is now `signal`, with `alt` becoming `work`. See Law 2 in
+> `references/design-language.md` for the canonical vocabulary.
 
 ---
 
@@ -2355,25 +2578,6 @@ keyed underline on the active tab (scalar active-index state in `CrTabs`).
 
 ---
 
-## Meter {#meter}
-
-**Purpose.** Capacity / utilisation as a square, hard-edged bar keyed to a signal
-tone. `role=meter` with `aria-valuenow/min/max`.
-
-```html
-<div class="cr-meter cr-meter--work">
-  <span class="cr-meter__label">cpu</span>
-  <span class="cr-meter__track" role="meter" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" aria-label="cpu">
-    <span class="cr-meter__fill" style="width:72%"></span>
-  </span>
-</div>
-```
-
-- **MUST** carry the numeric value in ARIA — the fill width alone is not
-  accessible. Tone (`--work/--wait/--done/--err/--idle`) follows Law 2.
-
----
-
 ## Tag
 
 **Purpose.** Inline status label inside dense content (distinct from Chip, which
@@ -2527,7 +2731,8 @@ contract, and the per-state poses.
 
 ## Composition — an operator's screen
 
-The whole vocabulary in one screen, using only the shipped `cr-` classes. It
+The whole vocabulary in one screen, using only the shipped `cr-` classes plus the
+two lines of page-level layout glue listed below the markup. It
 exercises the nine laws together: the condensed masthead with registration ticks
 (`.cr-mark`), a keyed `Hero`, the **severity shapes** beside colour, a seeded
 **Sigil** per session, the **arrow-rail**, a **texture + scanline** bezel with the
@@ -2583,7 +2788,7 @@ extreme / phosphor, in the **Live Gallery** (linked at the top of the sidebar).
         </div>
         <div class="cr-bezel cr-anim-scan">
           <div class="cr-bezel__rivets" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-          <div class="cr-bezel__screen cr-tex--glass">&gt; scan complete · 14 sessions · 2 flagged</div>
+          <div class="cr-bezel__screen">&gt; scan complete · 14 sessions · 2 flagged</div>
         </div>
         <div class="cr-hw-row"><span class="cr-plate">UNIT · CR-00 · REV.C</span><span class="cr-tally">▐▐▐ ▌ 14</span></div>
       </section>
@@ -2649,6 +2854,32 @@ with a non-color `✗` marker as well as the `--sig-err` border (never color alo
 ```
 
 **Input / textarea / select** — `.cr-input`, `.cr-textarea`, `.cr-select`.
+
+`CrInput` takes two optional in-field affordances. `icon="search"` paints a glyph
+on the leading edge; `clearable` adds a real `<button type="button"
+aria-label="Clear">` on the trailing edge, shown only while the field has a
+value, firing `onClear` (and clearing through `onChange`). Either one wraps the
+input in `.cr-input-wrap` and pads that edge; with neither, the component still
+renders a bare `<input>`. Both edges use logical properties, so they mirror
+under RTL.
+
+```html
+<span class="cr-input-wrap">
+  <span class="cr-input__icon" aria-hidden="true"><!-- 16px icon --></span>
+  <input class="cr-input" data-icon="true" data-clearable="true" value="nova" />
+  <button type="button" class="cr-input__clear" aria-label="Clear"></button>
+</span>
+```
+
+`.cr-textarea` resizes on both axes and is capped at `max-width: 100%` so the
+drag handle cannot pull it outside its container.
+
+A native `<select>`'s open option list is drawn by the OS, not the page, so it
+takes none of our border, shadow, font, or padding. We set `option`
+background/colour — honoured by Chromium and Firefox on Windows/Linux, ignored
+on macOS and iOS. A fully styled popup would require abandoning the native
+element (and with it mobile pickers, type-ahead, and screen-reader semantics);
+use `CrCombobox` when that is genuinely needed.
 **Checkbox / radio** — square (radius 0); checked fills `--sig-work` with an
 `--on-sig` mark:
 
@@ -2762,20 +2993,50 @@ Hero. Errors announce assertively; everything else is polite.
 
 ## Toast region {#toast-region}
 
-**Purpose.** A fixed screen corner that **stacks** live toasts. The parent owns
-the list (`CrToastRegion` is presentational); each toast stays its own live region
-so nothing double-announces. Bottom corners stack newest nearest the edge.
+**Purpose.** A fixed screen anchor that **stacks** live toasts. The parent owns
+the list (`CrToastRegion` is presentational); each row stays its own live region
+so nothing double-announces. Bottom anchors stack newest nearest the edge.
+
+**Nine anchors.** `position` takes four corners (`tr` default · `br` · `tl` ·
+`bl`), the two horizontal centers (`tc` · `bc`), and the three vertical middles
+(`ml` · `mr` · `mc`). Centred anchors use `50%` + a `translate` rather than
+`left:0;right:0`, so the region keeps its shrink-to-fit width.
+
+**Packing.** Consecutive toasts sharing the same `message` **and** `signal`
+collapse into one row with a `×N` counter, so a retry storm costs one row instead
+of ten. Only *consecutive* runs pack — an unrelated toast in between keeps the
+occurrences separate and preserves arrival order.
+
+A packed row carries **two ids**, and keeping them apart is what makes the row
+safe inside a live region:
+
+| field | which toast | why |
+|---|---|---|
+| `id` | **oldest** (first) member | identity. Stable while the run grows, so the row is patched rather than remounted on a count bump. |
+| `newestId` | **newest** member | dismiss target. `onDismiss` receives this, so it removes the toast the user is looking at. |
+
+Collapsing them into one field is an accessibility bug: an identity that changes
+on every duplicate remounts the row, and a remounted `role="alert"` re-announces.
 
 ```tsx
-<CrToastRegion position="br" toasts={list} onDismiss={remove} />
+<CrToastRegion position="bc" toasts={list} onDismiss={remove} />
 ```
 ```css
 .cr-toast-region { position: fixed; display: flex; flex-direction: column; gap: var(--space-2); }
 .cr-toast-region--br { bottom: var(--space-4); right: var(--space-4); flex-direction: column-reverse; }
+.cr-toast-region--mc { top: 50%; left: 50%; transform: translate(-50%, -50%); align-items: center; }
 ```
 
-- **MUST** keep each toast's own `role`/`aria-live` (don't wrap the region in a
+- **MUST** keep each row's own `role`/`aria-live` (don't wrap the region in a
   second live region — that double-announces).
+- **MUST** keep the `×N` counter `aria-hidden`. It is the only thing that changes
+  when a duplicate arrives; leaving it inside the announced text would re-fire the
+  live region on every repeat, and `err` announces *assertively*. (`aria-atomic`
+  defaults to `false`, so an AT announces only the changed node — and that node is
+  hidden.)
+- **MUST NOT** key the row on `newestId`, in any target. It changes on every
+  duplicate, so it would remount the row and refire the live region. Guarded by
+  `tests/cross-fw-contract.test.mjs` across all six framework outputs.
 - **SHOULD** cap how many stack at once and drop oldest, so a burst can't bury the
   screen.
 
@@ -2787,8 +3048,14 @@ so nothing double-announces. Bottom corners stack newest nearest the edge.
 transparent full-viewport **scrim** closes it on outside click — no global
 listeners, so every framework target behaves the same.
 
+**Positioning.** Collision-aware, same algorithm as **Popover**: on open the
+panel anchors to the trigger via `placement` (`${side}` or `${side}-${align}`,
+default `"bottom-start"`), **flips** to the opposite side when there's no room,
+and **shifts** along the cross axis to stay in the viewport, tagging itself
+with `data-placement`.
+
 ```tsx
-<CrMenu label="actions ▾" align="right" onSelect={run}
+<CrMenu label="actions ▾" placement="bottom-end" onSelect={run}
   items={[{ label: "pause all" }, { label: "kill all", danger: true }]} />
 ```
 ```css
@@ -2851,8 +3118,42 @@ registers, matching how prominent the action is:
 :root[data-cr-keys="on"] .cr-kbd--hint { opacity: 1; }   /* no layout shift */
 ```
 
+**Declaring bindings.** Pass `hints` to render a legend. The `keys` string uses
+the notation readers already know from editors and docs — `+` joins a **chord**
+(pressed together), a space joins a **sequence** (pressed in order):
+
+```tsx
+<CrKeyHints
+  hints={[
+    { keys: "Ctrl+K",   label: "Open the command palette" },  /* chord    */
+    { keys: "g p",      label: "Go to the sprint board" },    /* sequence */
+    { keys: "Ctrl+K p", label: "Palette, then pin" },         /* combined */
+  ]}
+/>
+```
+
+The two joins are drawn **differently**, because that distinction is the whole
+point of the syntax: chord members sit tight around a `+` glyph, sequence steps
+are pushed apart by the word *then*. Parsing is forgiving: any whitespace run
+splits a sequence (`"g   p"` == `"g\tp"` == `"g p"`), a dangling joiner is
+dropped (`"Ctrl+"` → `Ctrl`, `"+K"` → `K`), and a literal plus key is recovered
+at any position in a chord (`"Ctrl++K"` → `Ctrl` `+` `K`; a bare `"+"` is the
+plus key).
+
 - **MUST** pair the badge with `aria-keyshortcuts` on the actual control — the
   keycap is a visual, not the accessible name.
+- **MUST** keep the keycaps decorative. In the legend every keycap and both
+  separators are `aria-hidden`; each binding instead carries an `aria-label` of
+  the spoken form and its description ("Control plus K, then P: Palette, then
+  pin"), so a screen reader hears the meaning and not a run of unlabelled boxes.
+  The label sits **per binding**, not on the list, so the bindings stay
+  separately navigable.
+- **MUST NOT** put a *sequence* in `aria-keyshortcuts`. WAI-ARIA defines that
+  value as a space-separated list of **alternative** combinations, each pressed
+  simultaneously — so `"g p"` there asserts "g **or** p", the opposite of what
+  this syntax means. The legend therefore emits `aria-keyshortcuts` only for
+  single-step bindings (`"Ctrl+K"`) and omits it for sequences; the `aria-label`
+  carries the sequence meaning for the user either way.
 - **SHOULD** reserve always-on badges for the few primary actions; everything else
   is a hint, so the chrome stays quiet until asked.
 
@@ -2890,7 +3191,20 @@ if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(
 ## Alert {#alert}
 
 **Purpose.** An inline callout keyed to a signal (Law 2) — a left brush-bar in the
-signal hue. `err` announces assertively (`role=alert`); the rest are polite.
+signal hue, parted from the lit field by a hard seam (Law 1) so the bar reads as
+inset into the casing. `err` announces assertively (`role=alert`); the rest are
+polite.
+
+The icon is a **severity shape** (Law 4), not a coloured square: side-count
+encodes how much the alert needs the operator, orthogonally to hue — so the
+reading survives phosphor's single colour and colour-blind viewers.
+
+| `signal` | key | shape | severity |
+| --- | --- | --- | --- |
+| `work` | `--sig-work` | pentagon ⬠ (5) | working |
+| `wait` | `--sig-wait` | diamond ◆ (4) | attend |
+| `done` | `--sig-done` | hexagon ⬡ (6) | nominal |
+| `err` | `--sig-err` | triangle ▲ (3) | act now |
 
 ```tsx
 <CrAlert signal="wait" title="Scheduled maintenance" message="Workers restart at 02:00 UTC." dismissible />
@@ -2900,23 +3214,44 @@ signal hue. `err` announces assertively (`role=alert`); the rest are polite.
 - **SHOULD** carry a title only when it adds information — a one-line notice is fine
   as `message` alone.
 
+The dismiss ✕ is the shared control described under
+[Dismiss control](#dismiss-control).
+
 ---
 
-## Radio group {#radio-group}
+## Choice group {#choice-group}
 
-**Purpose.** Single choice from a small set. `role=radiogroup` with roving
-tabindex: only the checked radio (or the first) is tabbable, `↑`/`↓`/`←`/`→` move
-selection. Square radios (radius 0) — a filled inner square marks the choice.
+**Purpose.** One grouped-choice control for BOTH types — single choice
+(`type="radio"`, the default) or multi-choice (`type="checkbox"`) — rendering
+`CrChoice` (native inputs) so each type gets the keyboard model its role
+requires. Square marks (radius 0) — a filled inner square, not a dot.
+
+| | `type="radio"` (default) | `type="checkbox"` |
+| --- | --- | --- |
+| roles | `radiogroup` / native radios | `group` / native checkboxes |
+| selection | `value: string` → `onChange` | `values: string[]` → `onChangeMany` |
+| keyboard | one tab stop; arrows move selection | each box tabbable; arrows inert |
 
 ```tsx
-<CrRadioGroup value={density} row
-  options={[{ value: "cozy", label: "cozy" }, { value: "compact", label: "compact" }]}
-  onChange={setDensity} />
+<CrChoiceGroup label="stage" value={stage}
+  options={[{ value: "queue", label: "queue" }, { value: "run", label: "run" }]}
+  onChange={setStage} />
+
+<CrChoiceGroup type="checkbox" label="signals" values={signals}
+  options={[{ value: "err", label: "err" }, { value: "warn", label: "warn" }]}
+  onChangeMany={setSignals} />
 ```
 
-- **MUST** keep it controlled (`value` in, `onChange` out) and set `aria-checked`
-  on each radio.
-- **NEVER** round it — the mark is a square, not a dot (Law: radius 0).
+- **MUST** keep it controlled — `value`/`onChange` for radio, `values`/`onChangeMany`
+  for checkbox.
+- **MUST** let the platform drive the radio keyboard model: the inputs share one
+  `name`, so the browser supplies roving tabindex and arrow selection. Do **NOT**
+  add a JS key handler — native `role="radio"` inputs already get this for free,
+  and a hand-rolled roving-tabindex port would be dead code here.
+- **NEVER** apply the radio arrow-key model to checkboxes — independent tabbing is
+  required, and arrow-key selection would be an accessibility defect.
+- `invalid` is **ARIA-only** (sets `aria-invalid`); visual error styling comes from
+  a wrapping `CrField`.
 
 ---
 
@@ -2936,17 +3271,31 @@ screen-reader support come for free.
 
 ## Progress {#progress}
 
-**Purpose.** Task progress. **Determinate** fills to `value/max`; **indeterminate**
-runs an animated hazard sweep and drops the numeric ARIA values. Distinct from
-**Meter** (a static capacity reading, not a running task).
+**Purpose.** Task progress **and** capacity / utilisation in one square,
+hard-edged bar keyed to a signal tone. **Determinate** fills to `value/max`;
+**indeterminate** runs an animated hazard sweep and drops the numeric ARIA
+values. An optional `label` renders inline before the track, which covers the
+capacity reading that the removed **Meter** used to serve.
 
 ```tsx
 <CrProgress value={64} label="Indexing" />
-<CrProgress indeterminate tone="wait" label="Syncing" />
+<CrProgress indeterminate signal="wait" label="Syncing" />
+<CrProgress value={72} signal="idle" label="cpu" />
+```
+
+```html
+<div class="cr-progress">
+  <span class="cr-progress__label">cpu</span>
+  <span class="cr-progress__track" role="progressbar" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" aria-label="cpu">
+    <span class="cr-progress__fill" style="width:72%"></span>
+  </span>
+</div>
 ```
 
 - **MUST** use `role="progressbar"`; set `aria-valuenow/min/max` only when
   determinate. Both stop animating under `prefers-reduced-motion`.
+- **MUST** carry the numeric value in ARIA — the fill width alone is not
+  accessible. Tone (`--work/--wait/--done/--err/--idle`) follows Law 2.
 
 ---
 
@@ -3247,15 +3596,22 @@ height. Controlled via `open` (like Modal).
 
 ## Breadcrumb {#breadcrumb}
 
-**Purpose.** A navigation trail. Separators are ascii `/` drawn from CSS; the last
-crumb is the current page (`aria-current="page"`).
+**Purpose.** A navigation trail. The last crumb is the current page
+(`aria-current="page"`).
+
+**Notes** — the separator is a real `aria-hidden` element between crumbs,
+defaulting to `▸` (the system's direction marker, shared with List bullets and the
+Calendar / Carousel next controls). Override it with `separator`.
 
 ```tsx
 <CrBreadcrumb items={[{ label: "control room", href: "#" }, { label: "sessions", href: "#" }, { label: "cr-1130" }]} />
+<CrBreadcrumb separator="//" items={[{ label: "hub", href: "#" }, { label: "worker-01" }]} />
 ```
 
 - **MUST** wrap it in `<nav aria-label>` and mark the last crumb `aria-current` (it
   is not a link).
+- **MUST** keep the separator `aria-hidden` — otherwise a screen reader announces
+  it between every crumb.
 
 ---
 
@@ -3341,8 +3697,14 @@ content (a stat block, a preview). CSS-driven with an open delay; the trigger is
 focusable so keyboard users get it too. For plain text use Tooltip; for actions use
 Menu.
 
+**Positioning.** Collision-aware, same algorithm as **Popover** and **Menu**: on
+reveal (pointer hover or keyboard focus) the panel anchors to the trigger via
+`placement` (`${side}` or `${side}-${align}`, default `"bottom-start"`), **flips**
+to the opposite side when there's no room, and **shifts** along the cross axis to
+stay in the viewport, tagging itself with `data-placement`.
+
 ```tsx
-<CrHoverCard label="health" title="Fleet health">
+<CrHoverCard label="health" title="Fleet health" placement="bottom-start">
   <dl class="cr-dl"><dt class="cr-dl__k">workers</dt><dd class="cr-dl__v">4 online</dd></dl>
 </CrHoverCard>
 ```
@@ -3430,7 +3792,8 @@ The interactive widgets follow the WAI-ARIA patterns, so they work without a mou
 | **Popover / Drawer** | `Esc` closes (drawer traps focus natively); popover returns focus to its trigger |
 | **Segmented control** | roving tabindex — `←`/`→`/`Home`/`End` move and select (radiogroup semantics) |
 | **Combobox** | `↑`/`↓` move the active option, `Enter` selects, `Esc` closes; focus stays in the input |
-| **Radio group** | roving tabindex — `↑`/`↓`/`←`/`→` move and select; only the checked radio is tabbable |
+| **Choice group** (`type="radio"`) | roving tabindex — `↑`/`↓`/`←`/`→` move and select; only the checked radio is tabbable |
+| **Choice group** (`type="checkbox"`) | no roving tabindex — every box is independently tabbable, arrows are inert |
 | **Slider** | native range — `←`/`→` step, `Home`/`End` to ends, `PageUp`/`PageDown` jump |
 | **Modal / Switch / Pagination** | native focus-trap (dialog), `Space` toggle, `Tab` between page buttons |
 
@@ -3440,8 +3803,17 @@ Focus is always visible (`*:focus-visible` → a `--sig-work` outline, system-wi
 
 A hint bubble revealed on hover **and** keyboard focus, wired to its trigger with
 `aria-describedby` so it's announced without stealing focus. The reveal is **pure
-CSS** (`:hover` / `:focus-within`) — no JS state, no positioning library — so it
-works in a server-rendered page with no component at all.
+CSS** (`:hover` / `:focus-within`) — no JS state — so the plain HTML markup below
+still works in a server-rendered page with no component at all; the CSS positions
+the bubble above the trigger as a fallback in that case.
+
+**Positioning.** When the component runs, collision-aware placement layers on top
+of that CSS fallback — same algorithm as **Popover**, **Menu** and **Hover card**:
+on reveal (pointer hover or keyboard focus) the bubble anchors to the trigger via
+`placement` (`${side}` or `${side}-${align}`, default `"top"` — tooltips
+conventionally sit above), **flips** to the opposite side when there's no room, and
+**shifts** along the cross axis to stay in the viewport, tagging itself with
+`data-placement`.
 
 ```html
 <span class="cr-tooltip">
@@ -3450,7 +3822,7 @@ works in a server-rendered page with no component at all.
 </span>
 ```
 ```tsx
-<CrTooltip id="tt-drift" label="latency > SLA for 3 turns">drifting</CrTooltip>
+<CrTooltip id="tt-drift" label="latency > SLA for 3 turns" placement="top">drifting</CrTooltip>
 ```
 
 - **MUST** give the trigger `tabindex="0"` (or use a natively focusable element) so
@@ -3475,12 +3847,22 @@ Neo-print / CRT grain for **hardware** surfaces (a bezel, screen, or hero) —
 | `.cr-tex--glass` | scanlines + halftone (the house "aged glass" wash) |
 
 ```html
-<div class="cr-bezel cr-anim-scan">
-  <div class="cr-bezel__screen cr-tex--glass">&gt; streaming · 14 sessions</div>
+<div class="cr-bezel cr-tex--glass cr-anim-scan">
+  <div class="cr-bezel__screen">&gt; streaming · 14 sessions</div>
 </div>
 ```
 
 - **MUST** apply only to hardware; a textured flat panel violates Law 6.
+- **NEVER** put a `.cr-tex--*` class on `.cr-bezel__screen`. The screen already
+  paints the house halftone itself, on the glass *above* the readout
+  (`.cr-bezel__screen::after`) — adding a utility stacks a **second** texture
+  layer *behind* the text, and because the utility carries `opacity` on the
+  element it fades the readout along with the grain. Texture the bezel (the
+  hardware) and leave the screen alone.
+- The utilities set `opacity` on the element, so apply them to a surface whose
+  own content should fade with the grain — a decorative hardware panel, not a
+  content-bearing readout. To texture *over* content, use an `::after` overlay
+  (`inset: 0; pointer-events: none;`) the way the screen does.
 - Ambient loop classes (`.cr-anim-scan/-pulse/-drift/-flick`) are documented in
   `references/motion.md` — low, slow, hardware-bound, reduced-motion-off.
 
@@ -3548,9 +3930,14 @@ rail, or masthead, **never** on a flat data field, and keep it `aria-hidden`
 ### Seeded chrome strip {#seeded-chrome}
 
 For a whole varied hardware bar, `CrChrome` paints a **seeded** pixel-art metal
-strip — a deterministic mix of fasteners (rivets / hex bolts / slot + phillips
-screws), panel seams, wear scratches, and one indicator LED. Same seed → same
-strip, so a rack/unit gets a stable, distinct face (like the seeded cat/sigil).
+strip — a deterministic graduated scale (minor index ticks with taller major
+graduations), panel seams, a registration mark, wear scratches, and one indicator
+LED. Same seed → same strip, so a rack/unit gets a stable, distinct face (like
+the seeded cat/sigil).
+
+The vocabulary is **measurement marks, not fixings**: it deliberately does not
+paint rivets, hex bolts or screw heads, which read as a novelty machine-panel
+skin rather than as an instrument face.
 
 ```tsx
 import { CrChrome } from "@alebianco/cr-design-system/react";
@@ -3734,17 +4121,22 @@ dot is a labelled `role="img"`. `size` is `sm` · `md` · `lg`.
 ## Spinner {#spinner}
 
 **Purpose** — signal an indeterminate wait (unknown duration). For a known
-fraction use **Progress**; for a static capacity reading use **Meter**.
+fraction, or a static capacity reading, use **Progress** with a `label`.
 
 **Notes** — the wrapper is `role="status"` with an accessible `label` (default
 "Loading") so assistive tech announces the wait; the ring is `aria-hidden` and its
-spin honours `prefers-reduced-motion`. `size` is `sm` · `md` · `lg`.
+spin honours `prefers-reduced-motion`. `size` is `sm` · `md` · `lg`. `signal` keys
+the cells to the canonical vocabulary — `work` · `wait` · `done` · `err` · `idle`,
+the same tone set as **Progress** — and defaults to `work`. Tone is a redundant
+cue: the accessible name carries the meaning.
 
 ```tsx
 <CrSpinner label="Provisioning session" />
+<CrSpinner label="Retrying upload" signal="err" />
 ```
 
-**Tokens** — `--sig-work` (ring sweep), `--panel-2` (ring track).
+**Tokens** — `--cr-spinner-accent` (cells, defaults to `--sig-work`),
+`--sig-work`/`--sig-wait`/`--sig-done`/`--sig-err`/`--sig-idle` (per `signal`).
 
 ## Scroll area {#scroll-area}
 
@@ -3793,7 +4185,11 @@ there are no global listeners and it can't get stuck. `orientation` is
 An interactive **multi-select filter pill** — several toggle independently (unlike
 the single-select [Segmented](#segmented) or the static [Chip](#chip)). It is a
 `role="checkbox"` button; on/off is announced via `aria-checked` and exposed as
-`data-state`. Props: `label`, `pressed`, `count?`, `onToggle`, `disabled`.
+`data-state`. Props: `label`, `pressed`, `badge?`, `onToggle`, `disabled`.
+`badge` is generic: `false`/omitted renders nothing, `true` renders a bare
+(decorative, `aria-hidden`) dot for "has matches, count irrelevant", and any
+string or number renders verbatim — `0` and `""` still render, because an
+explicit zero is a meaningful filter result.
 **Tokens** — `--cr-togglechip-on-bg` / `--cr-togglechip-on-fg` (the ON state).
 Per Law 2 the ON colour is the accent (a *state*), **not** a per-option identity
 hue; override `--cr-togglechip-on-bg` via `dt` only when a facet genuinely needs
@@ -3943,19 +4339,31 @@ buttons, **roving tabindex** (←/→ ±1 day, ↑/↓ ±1 week, Home/End to the
 PageUp/PageDown step months, Enter/Space select). Fully **controlled and SSR-safe**:
 the displayed `month` and `today` are **injected props**, never read from the clock,
 so server and client render the same grid. Props: `month` (`YYYY-MM`), `value?`
-(`YYYY-MM-DD`), `today?`, `min?`/`max?`, `weekStart?` (0 Sun · 1 Mon), `label`,
+(`YYYY-MM-DD`), `today?`, `min?`/`max?`, `weekStart?` (`"sunday"` default ·
+`"monday"`), `switcher?` (default true), `yearSpan?` (default 8), `label`,
 `onSelect`, `onMonthChange`.
+
+The header carries a **month/year switcher** — a month dropdown and a year
+dropdown beside the prev/next steppers. Every one of the four controls emits
+`onMonthChange` with the new `YYYY-MM`; none of them reads the clock. The year
+list is derived from the **displayed** year (`yearSpan` either side, clamped to
+`min`/`max`), which is what keeps the switcher SSR-safe — there is no "now" in
+it. Pass `switcher={false}` for the bare prev/next header.
 
 ```tsx
 <CrCalendar month="2026-08" value="2026-08-09" today="2026-08-09"
-  onSelect={setDate} onMonthChange={setMonth} label="run date" />
+  weekStart="monday" onSelect={setDate} onMonthChange={setMonth} label="run date" />
 ```
 
 **Tokens** — `--cr-calendar-selected-bg` (selected-day fill, a *state*) ·
 `--cr-calendar-today-ring` · `--cr-calendar-muted` (adjacent-month days) ·
 `--cr-calendar-bg`. **A11y** — grid semantics with `aria-selected`, `aria-current="date"`
 for today, `aria-disabled` outside `min`/`max`; one tab stop with full keyboard
-traversal.
+traversal. The month label stays in the a11y tree as an `aria-live` region behind
+the switcher, and the two selects are named `Month` and `Year`. Hovering the
+**selected** day keeps the accent fill (sunk 15% toward `--cr-calendar-bg`)
+rather than falling back to the plain hover surface, which is what keeps the
+selected+hovered numeral above 4.5:1 in all four themes.
 
 
 <!-- ==================== Styling Contract ==================== -->
@@ -4064,7 +4472,7 @@ Two conventions keep the token count small:
 is preserved; a per-instance `dt` override of the backdrop is best-effort — it
 relies on `::backdrop` inheriting from its `<dialog>`, modern browsers only.
 
-**Signal-driven components** (Tag, Tile, Meter, Progress, Toast) intentionally get
+**Signal-driven components** (Tag, Tile, Progress, Toast) intentionally get
 no per-component tokens — their colour *is* the semantic signal, so retheme them
 through the signal tokens (`--sig-work`, `--sig-done`, …).
 
@@ -4944,7 +5352,9 @@ modifier fades it off the content edge (`-l` toward left-aligned text, `-r`,
   surface (structure, not signal; `--cr-trim-c` re-colours).
 - `.cr-ruler` — a fine FUI tick-ruler edge (short ticks every 8px, tall every 40).
 - `CrTelemetry` / `.cr-telemetry` — a seeded NERV-style string
-  (`SEED 2E7A · 0x4F · 12ms ▮▮▮▯▯`) for a frame corner. **Decoration, not data.**
+  (`SEED 2E7A · 0x4F · CH12 ▮▮▮▯▯`) for a frame corner. **Decoration, not data.**
+  Every field is unitless on purpose: a `ms`-suffixed number would read as a real
+  latency measurement, which is exactly what this component must not be taken for.
 
 ```tsx
 import { CrTelemetry } from "@alebianco/cr-design-system/react";
@@ -4955,6 +5365,38 @@ import { CrTelemetry } from "@alebianco/cr-design-system/react";
 
 A whisper block-shade grid (`--field` token) for large dead background regions —
 an extension of the texture family, for behind panels rather than on hardware.
+
+### Panel edge bleed — `.cr-panel__bleed`
+
+A masked texture on a panel's margin, fading to full transparency before it
+reaches the content area. Law 6 sanctions this as the one way a panel — a flat
+content field — may carry grain, and caps it at **one bled panel per screen**.
+
+Pure CSS on purpose: it consumes the per-theme `--halftone` / `--dither` /
+`--scanline` tokens, so it survives a theme flip with no per-theme code, follows
+`--decoration-intensity`, and costs no script. The `105deg` mask stop *is* the
+contract — texture that touches a readout is not a bleed.
+
+```html
+<i class="cr-panel__bleed" data-bleed="halftone" aria-hidden="true"></i>
+```
+
+### Seeded dither field — `CrDither`
+
+A real Bayer 4×4 ordered dither, or variable-density halftone dots, painted from
+a seed — the genuine article the CSS texture tokens only approximate. Same
+engine as `CrSigil`: FNV hash → mulberry32, hues read from the live token
+values, so it re-keys on a theme flip.
+
+**Hardware only.** A hero, a masthead, a bezel — never a flat content field, and
+never as the default way a panel gets grain. `.cr-panel__bleed` is the panel
+path and stays script-free, matching the `CrDrip` precedent that the house
+glitch must render identically without JS.
+
+```tsx
+import { CrDither } from "@alebianco/cr-design-system/react";
+<CrDither seed="cr-1130" mode="bayer" state="working" />
+```
 
 ### Empty states
 

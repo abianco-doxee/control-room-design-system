@@ -103,7 +103,7 @@ Two conventions keep the token count small:
 is preserved; a per-instance `dt` override of the backdrop is best-effort — it
 relies on `::backdrop` inheriting from its `<dialog>`, modern browsers only.
 
-**Signal-driven components** (Tag, Tile, Meter, Progress, Toast) intentionally get
+**Signal-driven components** (Tag, Tile, Progress, Toast) intentionally get
 no per-component tokens — their colour *is* the semantic signal, so retheme them
 through the signal tokens (`--sig-work`, `--sig-done`, …).
 

@@ -7,5 +7,5 @@
 .cr-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
 .cr-scroll::-webkit-scrollbar-track { background: var(--panel-2); }
 .cr-scroll::-webkit-scrollbar-thumb { background: var(--sig-work); border: 2px solid var(--panel-2); }
-.cr-scroll:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: -2px; }
+.cr-scroll:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: -2px; }
 

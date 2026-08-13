@@ -1,9 +1,9 @@
 import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
-// A bare, controlled textarea. Pair with CrField for a *visible* label +
-// validation; standalone, pass `label` for an accessible name (maps to
-// aria-label). A placeholder is not a name. `invalid` is a low-level aria hook —
-// for real validation use CrField / CrForm.
+/* A bare, controlled textarea. Pair with CrField for a *visible* label +
+ * validation; standalone, pass `label` for an accessible name (maps to
+ * aria-label). A placeholder is not a name. `invalid` is a low-level aria hook —
+ * for real validation use CrField / CrForm. */
 export interface CrTextareaProps {
   id?: string;
   name?: string;

@@ -4,4 +4,6 @@
 .cr-pin { display: inline-flex; gap: var(--space-2); }
 .cr-pin__cell { width: 2.5rem; height: 2.75rem; text-align: center; font-family: var(--font-mono); font-size: var(--text-lg); font-weight: 700; color: var(--cr-field-fg); background: var(--panel-2); border: var(--brd) solid var(--cr-field-border); }
 .cr-pin__cell:focus { outline: none; border-color: var(--cr-field-focus); box-shadow: inset 0 -3px 0 var(--cr-field-focus); }
+/* Error state, derived from the wrapper — no per-control prop needed. */
+.cr-field--error .cr-pin__cell { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 

@@ -8,5 +8,5 @@
 }
 .cr-overflow:hover { color: var(--sig-work); }
 .cr-overflow--static { cursor: default; }
-.cr-overflow:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
+.cr-overflow:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
 

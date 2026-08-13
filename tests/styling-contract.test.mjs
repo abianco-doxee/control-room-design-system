@@ -57,6 +57,7 @@ test("pt/dt/unstyled contract covers every functional component", () => {
     "CrBreach",
     "CrCat",
     "CrChrome",
+    "CrDither",
     "CrDrip",
     "CrPalette",
     "CrShape",

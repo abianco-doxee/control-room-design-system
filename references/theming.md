@@ -144,6 +144,43 @@ Programmatically it's `deriveOnColors(vars, { changed })` (and `autoOnColor(fill
 run automatically by `defineTheme` and `build:theme`; pass `deriveOnColors: false`
 to `defineTheme` to opt out.
 
+### Auto-derived `--focus` and `--seam`
+
+Two more roles work the same way, for the same reason. Neither is part of the
+theme contract (requiring them would invalidate every existing brand), so a brand
+that names neither gets them derived:
+
+| role | derived from | extra treatment |
+| --- | --- | --- |
+| `--focus` | `--sig-work` | fitted so it clears **3:1 against every surface** in the theme (WCAG 2.4.11) |
+| `--seam` | `--muted` | none — `--muted` already brackets surface and ink |
+
+They re-derive whenever their source role changes, and also whenever `$ramp`
+rebuilds the surfaces. **This matters most for `$modes`.** A brand's light mode
+typically sets `$scheme: "light"` while the brand still `$extends` a dark theme;
+without derivation the light mode would inherit the dark base's focus ring — a
+bright cyan on a near-white board, measuring **1.44:1**. Deriving from
+`--sig-work` (which `$fitSignals` has already adapted to the light surfaces) and
+then applying the contrast floor keeps the ring correct per mode for free:
+
+```jsonc
+{
+  "$extends": "dark",
+  "$modes": {
+    "dark":  {},
+    "light": { "$scheme": "light", "$ramp": "#eef1f8", "$fitSignals": true }
+    //         --focus and --seam are derived per mode — do not restate them
+  }
+}
+```
+
+Set either token explicitly and your value is kept, contrast floor and all. The
+gate lives in `packages/tokens/tests/theme.test.mjs`, which asserts the 3:1 floor
+for **every** theme the build emits, brands included.
+
+Programmatically it's `deriveDerivedRoles(vars, { changed, fit })` with
+`DERIVED_ROLES` naming the pairs.
+
 ### Surface ramp from one tone (`$ramp`)
 
 Surfaces should read as one material at different depths, not five hand-tuned

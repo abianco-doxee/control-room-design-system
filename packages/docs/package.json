@@ -8,6 +8,7 @@
     "build:content": "node build/build-docs-content.mjs",
     "build:showcase": "node build/build-showcase.mjs",
     "build:brand-preview": "node build/build-brand-preview.mjs",
+    "verify:brand-preview": "node build/build-brand-preview.mjs --check",
     "build:llms": "node build/build-llms.mjs",
     "verify:llms": "node build/build-llms.mjs --check",
     "prebuild:site": "npm run build:content",

@@ -266,6 +266,54 @@ export const ON_PAIRS = {
 };
 
 /**
+ * Roles that are DERIVED from another role rather than authored. Each entry is
+ * `[role, source]`: if the author didn't set `role`, it takes `source`'s value.
+ *
+ * These are not part of `THEME_ROLES` on purpose — making them required would
+ * invalidate every existing `brands/*.json`. But they must never be *inherited*
+ * across a scheme flip either: a brand whose `$modes.light` sets `$scheme:
+ * "light"` while still `$extends`-ing `dark` would otherwise carry the dark
+ * base's `--focus` (a bright cyan) onto near-white surfaces. Deriving them from
+ * a role the brand DID re-state keeps them mode-appropriate for free.
+ */
+export const DERIVED_ROLES = [
+  ["focus", "sig-work"], // keyboard focus ring — fitted for contrast below
+  ["seam", "muted"], // internal divider inside a panel
+];
+
+/**
+ * Fill in the derived roles (`--focus`, `--seam`) for any theme that didn't set
+ * them by hand, and re-derive them whenever their source role changed — the same
+ * contract `deriveOnColors` uses for the `--on-*` family.
+ *
+ * `--focus` additionally gets a contrast floor: WCAG 2.4.11 wants a focus
+ * indicator at 3:1 against the surface it lands on, and a signal ramp tuned for
+ * dark surfaces will not clear that on a light board. `fit` (injected by the
+ * caller to keep this module dependency-free) nudges its lightness until it does.
+ *
+ * `opts.changed` — role names the author provided explicitly; those are left
+ * alone, and a source name appearing there forces its dependant to re-derive.
+ * `opts.fit` — optional `(hex, against, min) => hex` used to enforce the floor.
+ */
+export function deriveDerivedRoles(vars, opts = {}) {
+  const v = normalizeVars(vars);
+  const changed = new Set([...(opts.changed || [])].map((k) => String(k).replace(/^--/, "")));
+  for (const [role, source] of DERIVED_ROLES) {
+    if (changed.has(role)) continue; // author set it explicitly — leave it
+    const missing = v[role] == null || v[role] === "";
+    if (!missing && !changed.has(source)) continue; // present and its source held — keep
+    if (v[source]) v[role] = v[source];
+  }
+  /* The focus ring must clear 3:1 against every surface it can sit on or beside.
+   * Only applied when the author didn't hand-set --focus. */
+  if (!changed.has("focus") && opts.fit && v.focus) {
+    const against = ["ground", "board", "panel", "panel-2"].map((s) => v[s]).filter(Boolean);
+    if (against.length) v.focus = opts.fit(v.focus, against, 3);
+  }
+  return v;
+}
+
+/**
  * Auto-pick the legible ink for every `--on-*` role the author didn't set by hand.
  * An on-colour is (re)derived when it is **missing**, or when the theme **changed
  * the fill it sits on** — so a brand that recolours `--sig-accent` gets a matching

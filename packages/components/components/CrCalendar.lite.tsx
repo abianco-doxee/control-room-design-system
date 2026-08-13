@@ -1,4 +1,4 @@
-import { useStore, For } from "@builder.io/mitosis";
+import { useStore, For, Show } from "@builder.io/mitosis";
 import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 
 export interface CrCalendarDay {
@@ -19,14 +19,22 @@ export interface CrCalendarProps {
   /** Selectable range, inclusive, `YYYY-MM-DD`. */
   min?: string;
   max?: string;
-  /** 0 = Sunday (default) · 1 = Monday. */
-  weekStart?: number;
+  /** First day of the week. Default "sunday". */
+  weekStart?: "sunday" | "monday";
+  /** Show the month dropdown + year stepper in the header. Default true. Set
+   *  false for the bare prev/next header. */
+  switcher?: boolean;
+  /** Inclusive year range offered by the switcher, relative to the displayed
+   *  year (never the clock). Default 8 — so the displayed year ±8. */
+  yearSpan?: number;
   label?: string;
   onSelect?: (iso: string) => void;
-  /** Fires with the new `YYYY-MM` when the month is stepped. */
+  /** Fires with the new `YYYY-MM` when the month is stepped, or when the
+   *  switcher's month dropdown / year stepper changes it. */
   onMonthChange?: (month: string) => void;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
-   * Parts: "root" · "header" · "prev" · "next" · "grid" · "weekday" · "day".
+   * Parts: "root" · "header" · "prev" · "next" · "grid" · "weekday" · "day" ·
+   * "monthSelect" · "yearSelect".
    * The selected accent is `--cr-calendar-selected-bg` (a state, Law 2). */
   unstyled?: boolean;
   pt?: any;
@@ -35,12 +43,16 @@ export interface CrCalendarProps {
 
 const WD = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MON_FULL = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 /* A month calendar grid — WAI-ARIA `role="grid"` with weekday columnheaders and
  * day buttons, roving tabindex (←/→ ±1 day, ↑/↓ ±1 week, Home/End week ends,
  * PageUp/PageDown step months, Enter/Space select). Fully controlled and SSR-safe:
  * the displayed month and "today" are injected props, never read from the clock.
- * Styling via .cr-calendar; data-part per part. */
+ * The header's month/year switcher is the same story — its year list is derived
+ * from the DISPLAYED year, so it introduces no clock read either; every control
+ * (prev, next, month dropdown, year dropdown) funnels through state.goTo and
+ * emits onMonthChange with a `YYYY-MM`. Styling via .cr-calendar; data-part per part. */
 export default function CrCalendar(props: CrCalendarProps) {
   const state = useStore({
     pad(n: number): string {
@@ -59,8 +71,12 @@ export default function CrCalendar(props: CrCalendarProps) {
       const v = state.view;
       return MON[v[1]] + " " + v[0];
     },
+    // "monday" → 1, anything else (incl. undefined) → 0 = Sunday.
+    get firstDow(): number {
+      return props.weekStart === "monday" ? 1 : 0;
+    },
     get weekdays(): string[] {
-      const ws = props.weekStart === 1 ? 1 : 0;
+      const ws = state.firstDow;
       const out: string[] = [];
       for (let i = 0; i < 7; i++) out.push(WD[(i + ws) % 7]);
       return out;
@@ -76,7 +92,7 @@ export default function CrCalendar(props: CrCalendarProps) {
       const v = state.view;
       const y = v[0];
       const m = v[1];
-      const ws = props.weekStart === 1 ? 1 : 0;
+      const ws = state.firstDow;
       const first = new Date(y, m, 1);
       const lead = (first.getDay() - ws + 7) % 7;
       const rows: CrCalendarDay[][] = [];
@@ -97,11 +113,60 @@ export default function CrCalendar(props: CrCalendarProps) {
       if (props.value) return iso === props.value;
       return inMonth && day === 1;
     },
-    stepMonth(delta: number) {
-      const v = state.view;
-      const d = new Date(v[0], v[1] + delta, 1);
+    get showSwitcher(): boolean {
+      return props.switcher !== false;
+    },
+    get monthNames(): string[] {
+      return MON_FULL;
+    },
+    get viewYear(): number {
+      return state.view[0];
+    },
+    get viewMonth(): number {
+      return state.view[1];
+    },
+    // Years offered by the switcher, derived from the DISPLAYED year (never the
+    // clock) and clamped to min/max when those bound the range.
+    get years(): number[] {
+      const span = props.yearSpan === undefined || props.yearSpan === null ? 8 : props.yearSpan;
+      const y = state.viewYear;
+      let lo = y - span;
+      let hi = y + span;
+      if (props.min) {
+        const mn = parseInt(props.min.slice(0, 4), 10);
+        if (mn && mn > lo) lo = mn;
+      }
+      if (props.max) {
+        const mx = parseInt(props.max.slice(0, 4), 10);
+        if (mx && mx < hi) hi = mx;
+      }
+      if (lo > y) lo = y;
+      if (hi < y) hi = y;
+      const out: number[] = [];
+      for (let n = lo; n <= hi; n++) out.push(n);
+      return out;
+    },
+    // The single emit point: normalise (y, m0) and fire onMonthChange.
+    goTo(y: number, m0: number) {
+      const d = new Date(y, m0, 1);
       const next = d.getFullYear() + "-" + state.pad(d.getMonth() + 1);
       if (props.onMonthChange) props.onMonthChange(next);
+    },
+    stepMonth(delta: number) {
+      const v = state.view;
+      state.goTo(v[0], v[1] + delta);
+    },
+    pickMonth(event: any) {
+      const raw = event && event.target ? event.target.value : "";
+      const m0 = parseInt(raw, 10);
+      if (isNaN(m0)) return;
+      state.goTo(state.viewYear, m0);
+    },
+    pickYear(event: any) {
+      const raw = event && event.target ? event.target.value : "";
+      const y = parseInt(raw, 10);
+      if (isNaN(y)) return;
+      state.goTo(y, state.viewMonth);
     },
     pick(cell: CrCalendarDay) {
       if (cell.disabled) return;
@@ -154,7 +219,46 @@ export default function CrCalendar(props: CrCalendarProps) {
         >
           <span aria-hidden="true">◂</span>
         </button>
-        <span class="cr-calendar__month" aria-live="polite">{state.monthLabel}</span>
+        <Show when={state.showSwitcher}>
+          <span class="cr-calendar__switcher">
+            <select
+              {...ptAttrs(props.pt, "monthSelect")}
+              data-part="monthSelect"
+              class={ptClass(props.pt, props.unstyled, "cr-calendar__select cr-calendar__select--month", "monthSelect")}
+              aria-label="Month"
+              value={state.viewMonth}
+              onChange={(event) => state.pickMonth(event)}
+            >
+              <For each={state.monthNames}>
+                {(name: string, i: number) => (
+                  <option value={i} selected={i === state.viewMonth}>
+                    {name}
+                  </option>
+                )}
+              </For>
+            </select>
+            <select
+              {...ptAttrs(props.pt, "yearSelect")}
+              data-part="yearSelect"
+              class={ptClass(props.pt, props.unstyled, "cr-calendar__select cr-calendar__select--year", "yearSelect")}
+              aria-label="Year"
+              value={state.viewYear}
+              onChange={(event) => state.pickYear(event)}
+            >
+              <For each={state.years}>
+                {(y: number) => (
+                  <option value={y} selected={y === state.viewYear}>
+                    {y}
+                  </option>
+                )}
+              </For>
+            </select>
+            <span class="cr-calendar__month cr-calendar__month--sr" aria-live="polite">{state.monthLabel}</span>
+          </span>
+        </Show>
+        <Show when={!state.showSwitcher}>
+          <span class="cr-calendar__month" aria-live="polite">{state.monthLabel}</span>
+        </Show>
         <button
           {...ptAttrs(props.pt, "next")}
           type="button"

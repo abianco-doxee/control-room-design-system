@@ -6,4 +6,8 @@
 .cr-input-group__addon--prefix { border-inline-end: 0; }
 .cr-input-group__addon--suffix { border-inline-start: 0; }
 .cr-input-group__input { min-width: 0; }
+/* Error state, derived from the wrapper — no per-control prop needed. The
+ * inner input already inherits .cr-field--error .cr-input above; the addons
+ * are the other bordered part of this control and need it explicitly. */
+.cr-field--error .cr-input-group__addon { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 

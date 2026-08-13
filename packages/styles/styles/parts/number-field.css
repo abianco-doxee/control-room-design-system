@@ -15,4 +15,6 @@
 .cr-numberfield__btn:last-child { border-inline-start: var(--brd-hair) solid var(--cr-field-border); }
 .cr-numberfield__btn:hover:not([disabled]) { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
 .cr-numberfield__btn[disabled] { opacity: var(--state-disabled-op); cursor: not-allowed; }
+/* Error state, derived from the wrapper — no per-control prop needed. */
+.cr-field--error .cr-numberfield { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 

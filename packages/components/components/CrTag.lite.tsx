@@ -1,5 +1,5 @@
-// `signal` is the canonical state vocabulary shared across the system
-// (work·wait·done·err·idle·accent).
+/* `signal` is the canonical state vocabulary shared across the system
+ * (work·wait·done·err·idle·accent). */
 import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
 export interface CrTagProps {
   signal?: "work" | "wait" | "done" | "err" | "idle" | "accent";

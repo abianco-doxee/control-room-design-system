@@ -31,4 +31,52 @@
 .cr-table tbody tr:hover td { background: color-mix(in srgb, var(--ink) var(--state-hover-mix), transparent); }
 .cr-table tbody tr[aria-selected="true"] td { background: color-mix(in srgb, var(--cr-table-accent) 18%, transparent); }
 .cr-table__sel { width: var(--space-8); text-align: center; }
+/* Selection checkbox — the system box treatment, reached by ELEMENT not class.
+ * CrTable renders `<input type="checkbox" class="cr-check">`, i.e. .cr-check on
+ * the INPUT. The shared rule is `.cr-check input` (a descendant selector naming
+ * the wrapper <label>), so it never matched here and the control shipped as a
+ * raw native checkbox. Selecting on `.cr-table__sel input` fixes it without
+ * touching the Mitosis source (which would rebuild six framework targets) and
+ * without depending on a class the markup gets wrong.
+ *
+ * `currentColor` for the border, not --cr-field-border (= --border, black): the
+ * cell sits on --panel, where black measures 20.34:1 in light but 1.21 / 1.21 /
+ * 1.01 in dark / extreme / phosphor — invisible in three themes. This is the
+ * same defect and the same fix as the shared dismiss control above. Inheriting
+ * from the cell gives 14.06 / 19.00 / 15.75 / 13.85 against the effective
+ * painted background (measured in-browser, dark/light/extreme/phosphor), and
+ * computes to 9.89 / 15.38 / 10.96 / 8.73 on a selected row.
+ *
+ * The fill stays transparent so the row's own state colour (hover / selected)
+ * reads through the box; the border is what asserts the control's presence.
+ *
+ * `color: inherit` is required because a form control does not inherit `color`
+ * by default — currentColor would otherwise resolve to the UA color-scheme
+ * default. It happens to be redundant TODAY, since the input also carries
+ * .cr-check (which sets `color: var(--ink)` on the element), but that class is
+ * the very thing this rule exists to work around: it is on the wrong element
+ * and may well be corrected in the markup later. Stated here so the treatment
+ * does not silently depend on it. */
+.cr-table__sel input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none; margin: 0; vertical-align: middle; color: inherit;
+  width: var(--space-4); height: var(--space-4); flex-shrink: 0;
+  border: var(--brd) solid currentColor; background: transparent;
+  display: inline-grid; place-content: center; cursor: pointer;
+}
+/* Checked: flood the fill to the accent (Law 2 — selection is a real state) and
+ * stamp the mark in --on-sig, which is AA against its own fill by construction
+ * (11.32 / 5.33 / 12.80 / 15.10). The border is deliberately left as
+ * currentColor rather than overridden to the accent: --cr-check-checked is only
+ * 3.57:1 against the table field in light, so the ink boundary is what keeps
+ * the control's outline strong there. In phosphor --ink and --sig-work are the
+ * same hue, so the border does merge into the fill — harmless, since a solid
+ * filled block still reads at 13.85:1 against the field and the mark carries
+ * the state at 15.10:1. Nothing here depends on the border to say "checked". */
+.cr-table__sel input[type="checkbox"]:checked {
+  background: var(--cr-check-checked);
+}
+.cr-table__sel input[type="checkbox"]:checked::after {
+  content: ""; width: var(--space-2); height: var(--space-2); background: var(--cr-check-mark);
+}
+.cr-table__sel input[type="checkbox"]:disabled { opacity: var(--state-disabled-op); cursor: not-allowed; }
 

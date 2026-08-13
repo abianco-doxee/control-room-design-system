@@ -28,6 +28,33 @@
 .cr-well, .cr-card, .cr-badge, .cr-kbd, .cr-combobox__input, .cr-combobox__list,
 .cr-cron__input, .cr-cron__preset { border-radius: var(--radius); }
 
+/* ── Dismiss control (the one ✕ treatment, shared by every dismissible surface)
+ * Alert, Toast, Modal and Drawer all render the same markup — a bare
+ * <button class="cr-*__close" aria-label="…">✕</button> — so they get ONE rule,
+ * not four that drift. Lives in the base layer on purpose: a per-part consumer
+ * imports `base` first (references/styling-contract.md), and a rule duplicated
+ * per component section is exactly the drift being closed here.
+ *
+ * `color: inherit` + `border-color: currentColor` is what makes one treatment
+ * correct on every host: on a --panel surface it resolves to --ink, on a
+ * flooded toast it resolves to --on-sig / --on-err. A fixed --panel/--border
+ * chip cannot do this — its border measures 1.21:1 against its own fill in
+ * dark/extreme/phosphor, and it would punch a hole in the toast's Law 2 key.
+ *
+ * font-size/line-height are pinned rather than inherited: .cr-alert sets no
+ * font-size while .cr-toast sets --text-sm, so the two agreed only by accident
+ * of their parents computing to the same value. */
+.cr-alert__close,
+.cr-toast__close,
+.cr-modal__close,
+.cr-drawer__close {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: var(--text-sm); line-height: 1;
+  cursor: pointer; background: transparent; color: inherit;
+  border: var(--brd-hair) solid currentColor;
+  padding: var(--space-0-5) var(--space-1); flex-shrink: 0;
+}
+
 /* ── Diagonal primitives (Law 4 — shape carries meaning, never decoration) ──
  * Four shapes, four fixed meanings, max 15° off-axis. The arrow-rail below is
  * the fourth (sequence). See references/components.md#diagonal-primitives. */
@@ -86,7 +113,13 @@
 /* ── Texture utilities (hardware only — Law 6) ─────────────────────────────
  * Apply to a bezel/screen/hardware surface, NEVER a flat content field. All
  * three read as the neo-print / CRT grain; theme-keyed via the texture tokens. */
-/* All fill edge-to-edge (repeat, from the origin). Pair with a background-color. */
+/* All fill edge-to-edge (repeat, from the origin). Pair with a background-color.
+ * The `opacity` below is ON THE ELEMENT by design — it is the loudness dial, and
+ * these are decorative surfaces whose content is meant to fade with the grain.
+ * So apply them to the HARDWARE (a bezel/hero), never to a content-bearing
+ * readout: on `.cr-bezel__screen` they would both fade the text and stack a
+ * second texture UNDER it, while the screen already paints one above via
+ * ::after. To texture *over* content, copy that ::after overlay pattern. */
 .cr-tex--halftone, .cr-tex--dither, .cr-tex--scan, .cr-tex--cross, .cr-tex--glass {
   background-repeat: repeat; background-position: 0 0; background-attachment: local;
   /* Follows the loudness dial — 1 (default/showcase) is a no-op; the `calm` ops
@@ -271,7 +304,11 @@
   .cr-btn, .cr-input, .cr-select, .cr-textarea, .cr-datetime, .cr-tab, .cr-segmented__opt,
   .cr-togglechip, .cr-menu__item, .cr-pager__btn, .cr-overflow, .cr-tap,
   .cr-rating__star, .cr-carousel__nav, .cr-carousel__dot, .cr-calendar__nav { min-height: 44px; }
+  /* The ✕ dismiss control is roughly square, so it needs the floor on BOTH axes —
+   * min-height alone would leave an ~18px-wide target (WCAG 2.5.5). */
+  .cr-alert__close, .cr-toast__close, .cr-modal__close, .cr-drawer__close,
   .cr-rating__star, .cr-carousel__nav, .cr-carousel__dot, .cr-calendar__nav { min-width: 44px; }
+  .cr-alert__close, .cr-toast__close, .cr-modal__close, .cr-drawer__close { min-height: 44px; }
   .cr-calendar__day { min-width: 40px; min-height: 40px; }
 }
 

@@ -27,11 +27,13 @@ import {
   CrCat,
   CrChip,
   CrChoice,
+  CrChoiceGroup,
   CrChrome,
   CrCombobox,
   CrCronField,
   CrDataGrid,
   CrDateTime,
+  CrDither,
   CrDrawer,
   CrDrip,
   CrEmptyState,
@@ -49,7 +51,6 @@ import {
   CrLineChart,
   CrMasthead,
   CrMenu,
-  CrMeter,
   CrModal,
   CrNav,
   CrNumberField,
@@ -60,7 +61,6 @@ import {
   CrPinInput,
   CrPopover,
   CrProgress,
-  CrRadioGroup,
   CrRating,
   CrRelativeTime,
   CrResizable,
@@ -189,10 +189,37 @@ const SEG_OPTS = [
   { value: "1h", label: "1h" },
   { value: "24h", label: "24h" },
 ];
-const RADIO_OPTS = [
-  { value: "packed", label: "Bin-packed" },
-  { value: "balanced", label: "Balanced" },
-  { value: "spread", label: "Spread" },
+// A truncated roster for the Overflow playground, so the "+N more" control has
+// the items it is summarising visibly behind it. Deterministic and long enough
+// to cover the control's `visible` + `count` maxima.
+const OVERFLOW_SIGNALS = ["work", "wait", "done", "err", "idle"];
+const OVERFLOW_REGIONS = ["eu-west", "us-east", "ap-south", "sa-east"];
+const OVERFLOW_ITEMS = Array.from({ length: 16 }, (_, i) => ({
+  id: "sess-" + String(4100 + i * 7),
+  signal: OVERFLOW_SIGNALS[i % OVERFLOW_SIGNALS.length],
+  region: OVERFLOW_REGIONS[i % OVERFLOW_REGIONS.length],
+}));
+// Tiles for the keyed contact sheet. `signal` picks the .cr-tile--* key class
+// (the CSS vocabulary: work/wait/done/err/idle). The sigil deliberately takes
+// NO state: hue-keying it would paint each mark in the same signal colour as
+// the tile beneath it, making it invisible. It rides on luminosity instead.
+const CONTACT_SHEET = [
+  { id: "nova-01", signal: "work" },
+  { id: "nova-02", signal: "done" },
+  { id: "orion-03", signal: "wait" },
+  { id: "orion-04", signal: "err" },
+  { id: "vega-05", signal: "idle" },
+  { id: "vega-06", signal: "work" },
+  { id: "lyra-07", signal: "done" },
+  { id: "lyra-08", signal: "wait" },
+  { id: "atlas-09", signal: "work" },
+  { id: "atlas-10", signal: "err" },
+  { id: "rigel-11", signal: "idle" },
+  { id: "rigel-12", signal: "done" },
+  { id: "mira-13", signal: "work" },
+  { id: "mira-14", signal: "wait" },
+  { id: "cygni-15", signal: "done" },
+  { id: "cygni-16", signal: "idle" },
 ];
 const CRON_PRESETS = [
   { label: "Hourly", cron: "0 * * * *" },
@@ -288,11 +315,13 @@ function snippet(tag, defs, state) {
 }
 
 function Playground({ tag, defs, render, extra }) {
-  const [state, setState] = useState(() => ({
+  const initial = () => ({
     ...Object.fromEntries(defs.map((d) => [d.prop, d.default])),
     ...(extra || {}),
-  }));
+  });
+  const [state, setState] = useState(initial);
   const set = (k, v) => setState((s) => ({ ...s, [k]: v }));
+  const dirty = defs.some((d) => state[d.prop] !== d.default);
   return h(
     "div",
     { className: "pg" },
@@ -303,7 +332,17 @@ function Playground({ tag, defs, render, extra }) {
       h(
         "div",
         { className: "pg__controls" },
-        defs.map((d) => h(Field, { key: d.prop, def: d, value: state[d.prop], set }))
+        defs.map((d) => h(Field, { key: d.prop, def: d, value: state[d.prop], set })),
+        h(
+          "button",
+          {
+            type: "button",
+            className: "pg__reset",
+            disabled: !dirty,
+            onClick: () => setState(initial()),
+          },
+          "reset"
+        )
       ),
       h("pre", { className: "pg__code" }, snippet(tag, defs, state))
     )
@@ -495,9 +534,11 @@ const DEMOS = {
     tag: "CrMenu",
     defs: [
       T("text", "label", "Actions"),
-      T("enum", "align", "left", { options: ["left", "right"] }),
+      T("enum", "placement", "bottom-start", {
+        options: ["bottom-start", "bottom-end", "top-start", "top-end", "left", "right"],
+      }),
     ],
-    render: (s) => h(CrMenu, { label: s.label, align: s.align, items: MENU_ITEMS }),
+    render: (s) => h(CrMenu, { label: s.label, placement: s.placement, items: MENU_ITEMS }),
   },
   combobox: {
     tag: "CrCombobox",
@@ -561,12 +602,14 @@ const DEMOS = {
     defs: [
       T("text", "label", "Details"),
       T("text", "title", "Worker health"),
-      T("enum", "align", "left", { options: ["left", "right"] }),
+      T("enum", "placement", "bottom-start", {
+        options: ["bottom-start", "bottom-end", "top-start", "top-end", "left", "right"],
+      }),
     ],
     render: (s) =>
       h(
         CrPopover,
-        { label: s.label, title: s.title, align: s.align },
+        { label: s.label, title: s.title, placement: s.placement },
         h(
           "p",
           { style: { color: "var(--muted)", margin: 0 } },
@@ -579,16 +622,18 @@ const DEMOS = {
     defs: [
       T("text", "label", "eu-west-01"),
       T("text", "title", "Region status"),
-      T("enum", "align", "left", { options: ["left", "right"] }),
+      T("enum", "placement", "bottom-start", {
+        options: ["bottom-start", "bottom-end", "top-start", "top-end", "left", "right"],
+      }),
     ],
     render: (s) =>
       h(
         CrHoverCard,
-        { label: s.label, title: s.title, align: s.align },
+        { label: s.label, title: s.title, placement: s.placement },
         h(
           "p",
           { style: { color: "var(--muted)", margin: 0 } },
-          "12 workers · 41 sessions · p95 210ms"
+          "12 workers · 41 sessions · 3 queued"
         )
       ),
   },
@@ -603,20 +648,31 @@ const DEMOS = {
         onChange: (v) => set("value", v),
       }),
   },
-  "radio-group": {
-    tag: "CrRadioGroup",
+  "choice-group": {
+    tag: "CrChoiceGroup",
     defs: [
-      T("enum", "value", "balanced", { options: RADIO_OPTS }),
+      T("enum", "type", "radio", { options: ["radio", "checkbox"] }),
       T("boolean", "row", false),
-      T("text", "label", "Placement"),
+      T("boolean", "invalid", false),
+      T("boolean", "disabled", false),
     ],
+    extra: { value: "queue", values: ["queue"] },
     render: (s, set) =>
-      h(CrRadioGroup, {
-        options: RADIO_OPTS,
-        value: s.value,
+      h(CrChoiceGroup, {
+        type: s.type,
         row: s.row,
-        label: s.label,
+        invalid: s.invalid,
+        disabled: s.disabled,
+        label: "stage",
+        options: [
+          { value: "queue", label: "queue" },
+          { value: "run", label: "run" },
+          { value: "verify", label: "verify" },
+        ],
+        value: s.value,
+        values: s.values,
         onChange: (v) => set("value", v),
+        onChangeMany: (v) => set("values", v),
       }),
   },
   slider: {
@@ -724,9 +780,18 @@ const DEMOS = {
   },
   tooltip: {
     tag: "CrTooltip",
-    defs: [T("text", "label", "Reaps sessions idle > 30m")],
+    defs: [
+      T("text", "label", "Reaps sessions idle > 30m"),
+      T("enum", "placement", "top", {
+        options: ["top", "bottom-start", "bottom-end", "top-start", "top-end", "left", "right"],
+      }),
+    ],
     render: (s) =>
-      h(CrTooltip, { label: s.label }, h("button", { className: "cr-btn cr-btn--sm" }, "Hover me")),
+      h(
+        CrTooltip,
+        { label: s.label, placement: s.placement },
+        h("button", { className: "cr-btn cr-btn--sm" }, "Hover me")
+      ),
   },
   table: {
     tag: "CrTable",
@@ -746,11 +811,20 @@ const DEMOS = {
   },
   "toast-region": {
     tag: "CrToastRegion",
-    defs: [T("enum", "position", "br", { options: ["tr", "br", "tl", "bl"] })],
+    defs: [
+      T("enum", "position", "br", {
+        options: ["tr", "br", "tl", "bl", "tc", "bc", "ml", "mr", "mc"],
+      }),
+    ],
     extra: {
+      // ids 3/4/5 are the SAME message + signal, so they pack into one row
+      // reading "Retry 3/5 failed ×3" — dismissing it removes id 5, the newest.
       toasts: [
         { id: 1, signal: "done", message: "Deploy complete" },
         { id: 2, signal: "work", message: "Scanning 3 workers…" },
+        { id: 3, signal: "err", message: "Retry 3/5 failed" },
+        { id: 4, signal: "err", message: "Retry 3/5 failed" },
+        { id: 5, signal: "err", message: "Retry 3/5 failed" },
       ],
     },
     // `transform` makes this a containing block so the region's position:fixed
@@ -906,23 +980,13 @@ const DEMOS = {
     ],
     render: (s) => h(CrToast, { signal: s.signal, message: s.message }),
   },
-  meter: {
-    tag: "CrMeter",
-    defs: [
-      T("number", "value", 68, { min: 0, max: 100 }),
-      T("number", "max", 100),
-      T("enum", "signal", "work", { options: ["work", "wait", "done", "err", "idle"] }),
-      T("text", "label", "CPU"),
-    ],
-    render: (s) => h(CrMeter, { value: s.value, max: s.max, signal: s.signal, label: s.label }),
-  },
   progress: {
     tag: "CrProgress",
     defs: [
       T("number", "value", 40, { min: 0, max: 100 }),
       T("number", "max", 100),
       T("boolean", "indeterminate", false),
-      T("enum", "signal", "work", { options: ["work", "wait", "done", "err"] }),
+      T("enum", "signal", "work", { options: ["work", "wait", "done", "err", "idle"] }),
       T("text", "label", "Uploading"),
     ],
     render: (s) =>
@@ -1159,15 +1223,23 @@ const DEMOS = {
     defs: [
       T("text", "label", "Filter"),
       T("text", "placeholder", "search sessions…"),
+      T("text", "value", "nova-01"),
+      T("text", "icon", "search"),
+      T("boolean", "clearable", true),
       T("boolean", "disabled", false),
       T("boolean", "invalid", false),
     ],
-    render: (s) =>
+    render: (s, set) =>
       h(CrInput, {
         label: s.label,
         placeholder: s.placeholder,
+        value: s.value,
+        icon: s.icon,
+        clearable: s.clearable,
         disabled: s.disabled,
         invalid: s.invalid,
+        onChange: (v) => set("value", v),
+        onClear: () => set("value", ""),
       }),
   },
   textarea: {
@@ -1208,10 +1280,11 @@ const DEMOS = {
   },
   breadcrumb: {
     tag: "CrBreadcrumb",
-    defs: [T("text", "label", "Breadcrumb")],
+    defs: [T("text", "label", "Breadcrumb"), T("text", "separator", "▸")],
     render: (s) =>
       h(CrBreadcrumb, {
         label: s.label,
+        separator: s.separator,
         items: [{ label: "Hub", href: "#" }, { label: "Fleet", href: "#" }, { label: "worker-01" }],
       }),
   },
@@ -1363,8 +1436,9 @@ const DEMOS = {
     defs: [
       T("text", "label", "Provisioning"),
       T("enum", "size", "md", { options: ["sm", "md", "lg"] }),
+      T("enum", "signal", "work", { options: ["work", "wait", "done", "err", "idle"] }),
     ],
-    render: (s) => h(CrSpinner, { label: s.label, size: s.size }),
+    render: (s) => h(CrSpinner, { label: s.label, size: s.size, signal: s.signal }),
   },
   "scroll-area": {
     tag: "CrScrollArea",
@@ -1495,13 +1569,17 @@ const DEMOS = {
   },
   calendar: {
     tag: "CrCalendar",
-    defs: [T("enum", "weekStart", "0", { options: ["0", "1"] })],
+    defs: [
+      T("enum", "weekStart", "sunday", { options: ["sunday", "monday"] }),
+      T("boolean", "switcher", true),
+    ],
     render: (s, set) =>
       h(CrCalendar, {
         month: s.month || "2026-08",
         value: s.value || "2026-08-09",
         today: "2026-08-09",
-        weekStart: s.weekStart === "1" ? 1 : 0,
+        weekStart: s.weekStart,
+        switcher: s.switcher,
         label: "run date",
         onSelect: (iso) => set("value", iso),
         onMonthChange: (m) => set("month", m),
@@ -1560,7 +1638,7 @@ const DEMOS = {
   },
   bezel: {
     tag: "CrBezel",
-    defs: [T("text", "children", "READOUT NOMINAL · 14 sessions · p95 210ms")],
+    defs: [T("text", "children", "READOUT NOMINAL · 14 sessions · 3 queued")],
     render: (s) =>
       h(
         CrBezel,
@@ -1584,6 +1662,45 @@ const DEMOS = {
         h(CrSigil, { seed: s.seed, state: s.state, size: s.size }),
         h(CrSigil, { seed: s.seed, state: s.state, size: s.size }),
         h(CrSigil, { seed: s.seed + "-b", state: s.state, size: s.size })
+      ),
+  },
+  // The genuine ordered dither the CSS texture tokens only approximate. Two
+  // copies of one seed prove determinism; a third seed proves it varies — the
+  // same demo shape as the sigil, because it makes the same promise.
+  dither: {
+    tag: "CrDither",
+    defs: [
+      T("text", "seed", "cr-1130"),
+      T("enum", "mode", "bayer", { options: ["bayer", "halftone"] }),
+      T("enum", "state", "working", { options: ["working", "waiting", "idle", "error", "done"] }),
+      T("number", "width", 150, { min: 80, max: 320, step: 10 }),
+      T("number", "height", 90, { min: 48, max: 200, step: 6 }),
+    ],
+    render: (s) =>
+      h(
+        "div",
+        { style: { display: "flex", gap: "12px", alignItems: "flex-start", flexWrap: "wrap" } },
+        h(CrDither, {
+          seed: s.seed,
+          mode: s.mode,
+          state: s.state,
+          width: s.width,
+          height: s.height,
+        }),
+        h(CrDither, {
+          seed: s.seed,
+          mode: s.mode,
+          state: s.state,
+          width: s.width,
+          height: s.height,
+        }),
+        h(CrDither, {
+          seed: s.seed + "-b",
+          mode: s.mode,
+          state: s.state,
+          width: s.width,
+          height: s.height,
+        })
       ),
   },
   chrome: {
@@ -1638,32 +1755,213 @@ const DEMOS = {
     defs: [
       T("text", "label", "failing"),
       T("boolean", "pressed", true),
-      T("number", "count", 3, { min: 0, max: 99, step: 1 }),
+      T("text", "badge", "3"),
       T("boolean", "disabled", false),
     ],
     render: (s, set) =>
       h(CrToggleChip, {
         label: s.label,
         pressed: s.pressed,
-        count: s.count,
+        badge: s.badge,
         disabled: s.disabled,
         onToggle: () => set("pressed", !s.pressed),
       }),
   },
+  // The control alone renders a bare "+N more" with nothing behind it, so the
+  // affordance had no visible referent (the review: "demo not very effective if
+  // it shows nothing"). Mount it doing its actual job: a truncated roster that
+  // shows `visible` items always, and reveals the remaining `count` inline when
+  // expanded. Toggling now visibly grows and shrinks the list.
   overflow: {
     tag: "CrOverflow",
     defs: [
+      T("number", "visible", 3, { min: 0, max: 8, step: 1 }),
       T("number", "count", 7, { min: 0, max: 99, step: 1 }),
       T("text", "noun", "session"),
       T("boolean", "expanded", false),
     ],
-    render: (s, set) =>
-      h(CrOverflow, {
-        count: s.count,
-        noun: s.noun,
-        expanded: s.expanded,
-        onToggle: () => set("expanded", !s.expanded),
-      }),
+    render: (s, set) => {
+      const shown = OVERFLOW_ITEMS.slice(0, s.visible);
+      const hidden = OVERFLOW_ITEMS.slice(s.visible, s.visible + s.count);
+      const row = (item) =>
+        h(
+          "li",
+          {
+            key: item.id,
+            style: {
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "5px 8px",
+              borderBottom: "var(--brd-hair) solid var(--border)",
+            },
+          },
+          h(CrStatusDot, { signal: item.signal, label: item.signal }),
+          h("span", { style: { fontFamily: "var(--font-mono)", fontSize: "12px" } }, item.id),
+          h(
+            "span",
+            {
+              style: {
+                fontFamily: "var(--font-mono)",
+                fontSize: "11px",
+                color: "var(--muted)",
+                marginInlineStart: "auto",
+              },
+            },
+            item.region
+          )
+        );
+      return h(
+        "div",
+        { style: { maxWidth: "320px" } },
+        h(
+          "ul",
+          {
+            style: {
+              listStyle: "none",
+              margin: 0,
+              padding: 0,
+              border: "var(--brd) solid var(--border)",
+              background: "var(--panel)",
+            },
+          },
+          ...shown.map(row),
+          ...(s.expanded ? hidden.map(row) : [])
+        ),
+        h(
+          "div",
+          { style: { marginTop: "8px" } },
+          h(CrOverflow, {
+            count: hidden.length,
+            noun: s.noun,
+            expanded: s.expanded,
+            onToggle: () => set("expanded", !s.expanded),
+          })
+        )
+      );
+    },
+  },
+  // Keyed contact sheet (Law 2) — a CSS block, not a component, so the demo
+  // composes the shipped .cr-tiles/.cr-tile classes directly. Each tile keys its
+  // background to one signal and carries the seeded sigil for that identity, so
+  // many keys read as ONE gridded instrument rather than competing stages.
+  "keyed-contact-sheet": {
+    tag: ".cr-tiles / .cr-tile",
+    defs: [T("number", "count", 8, { min: 2, max: 16, step: 1 }), T("boolean", "sigils", true)],
+    render: (s) =>
+      h(
+        "div",
+        { className: "cr-tiles", style: { maxWidth: "440px" } },
+        ...CONTACT_SHEET.slice(0, s.count).map((t) =>
+          h(
+            "div",
+            { key: t.id, className: "cr-tile cr-tile--" + t.signal },
+            // The sigil is the per-identity mark; the TILE already carries the
+            // state key as its background. Passing `state` to the sigil too paints
+            // it in that same signal hue, so it vanished into its own tile —
+            // instead let it use its seeded palette and blend to the tile's
+            // luminance, which reads on every key.
+            s.sigils
+              ? h(
+                  "span",
+                  {
+                    "aria-hidden": "true",
+                    style: {
+                      position: "absolute",
+                      inset: 0,
+                      opacity: 0.55,
+                      mixBlendMode: "luminosity",
+                    },
+                  },
+                  h(CrSigil, { seed: t.id, size: 104 })
+                )
+              : null,
+            h("span", { style: { position: "relative", zIndex: 1 } }, t.id)
+          )
+        )
+      ),
+  },
+  // Decoration utilities — the aria-hidden FUI layer. Shown on a realistic
+  // surface (a panel with a real readout) rather than as loose swatches, because
+  // the contract is about WHERE they go: dead space and chassis edges only,
+  // whisper contrast, never behind the content. The readout sits above at z-index 1.
+  "decoration-utilities": {
+    tag: ".cr-ruler / .cr-trim / .cr-bg--field / .cr-stripe / .cr-blob",
+    defs: [
+      T("boolean", "field", true),
+      T("boolean", "ruler", true),
+      T("boolean", "trim", true),
+      T("boolean", "stripe", true),
+      T("boolean", "blob", true),
+      T("text", "seed", "nova-01"),
+    ],
+    render: (s) =>
+      h(
+        "div",
+        {
+          className: [s.trim ? "cr-trim cr-trim--4" : "", s.field ? "cr-bg--field" : ""]
+            .filter(Boolean)
+            .join(" "),
+          style: {
+            position: "relative",
+            width: "340px",
+            maxWidth: "100%",
+            padding: "14px",
+            background: "var(--panel)",
+            border: "var(--brd) solid var(--border)",
+          },
+        },
+        // dead space behind the readout: seeded density field, masked clear of text
+        h(
+          "div",
+          { className: "cr-ascii cr-ascii--mask-l", "aria-hidden": "true" },
+          h(CrAscii, { seed: s.seed, variant: "braille", width: 340, height: 120 })
+        ),
+        h(
+          "div",
+          { style: { position: "relative", zIndex: 1 } },
+          h(
+            "div",
+            {
+              style: {
+                fontFamily: "var(--font-display)",
+                fontWeight: 900,
+                textTransform: "uppercase",
+                fontSize: "15px",
+              },
+            },
+            "eu-west-01"
+          ),
+          h(
+            "p",
+            {
+              style: {
+                fontFamily: "var(--font-mono)",
+                fontSize: "12px",
+                color: "var(--muted)",
+                margin: "4px 0 10px",
+              },
+            },
+            "12 workers · 41 sessions"
+          ),
+          s.ruler ? h("div", { className: "cr-ruler", "aria-hidden": "true" }) : null,
+          h("div", { style: { marginTop: "10px" } }, h(CrTelemetry, { seed: s.seed })),
+          s.stripe
+            ? h("div", {
+                className: "cr-stripe",
+                "aria-hidden": "true",
+                style: { marginTop: "10px" },
+              })
+            : null
+        ),
+        s.blob
+          ? h("div", {
+              className: "cr-blob",
+              "aria-hidden": "true",
+              style: { position: "absolute", right: "-10px", bottom: "-10px", zIndex: 0 },
+            })
+          : null
+      ),
   },
   "relative-time": {
     tag: "CrRelativeTime",
@@ -1682,7 +1980,7 @@ const DEMOS = {
   },
   instrument: {
     tag: "CrInstrument",
-    defs: [T("text", "children", "READOUT · 14 sessions · p95 210ms")],
+    defs: [T("text", "children", "READOUT · 14 sessions · 3 queued")],
     render: (s) =>
       h(
         CrInstrument,
@@ -1707,38 +2005,50 @@ const DEMOS = {
         ],
       }),
   },
-  // Headless: renders nothing itself, so pair it with the CrKbd hint badges it
-  // reveals. Hold the reveal key to see them fade in.
+  // Two registers in one component. The `hints` legend spells bindings out with
+  // the "+" (chord) / space (sequence) notation; the headless peek behavior is
+  // always on, so the CrKbd hint badges below fade in while the reveal key is held.
   "key-hints": {
     tag: "CrKeyHints",
     defs: [T("text", "revealKey", "Alt")],
     render: (s) =>
       h(
         "div",
-        { style: { display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" } },
-        h(CrKeyHints, { revealKey: s.revealKey }),
+        { style: { display: "flex", gap: "16px", flexDirection: "column" } },
+        h(CrKeyHints, {
+          revealKey: s.revealKey,
+          hints: [
+            { keys: "Ctrl+K", label: "Open the command palette" },
+            { keys: "g p", label: "Go to the sprint board" },
+            { keys: "Ctrl+K p", label: "Palette, then pin the result" },
+          ],
+        }),
         h(
-          "span",
-          { style: { fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--muted)" } },
-          "hold " + (s.revealKey || "Alt") + " →"
-        ),
-        h(
-          "button",
-          { className: "cr-btn cr-btn--outline cr-btn--sm" },
-          "Deploy ",
-          h(CrKbd, { keys: "D", hint: true })
-        ),
-        h(
-          "button",
-          { className: "cr-btn cr-btn--outline cr-btn--sm" },
-          "Scan ",
-          h(CrKbd, { keys: "S", hint: true })
-        ),
-        h(
-          "button",
-          { className: "cr-btn cr-btn--sig-err cr-btn--sm" },
-          "Kill ",
-          h(CrKbd, { keys: "K", hint: true, on: true })
+          "div",
+          { style: { display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" } },
+          h(
+            "span",
+            { style: { fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--muted)" } },
+            "hold " + (s.revealKey || "Alt") + " →"
+          ),
+          h(
+            "button",
+            { className: "cr-btn cr-btn--outline cr-btn--sm" },
+            "Deploy ",
+            h(CrKbd, { keys: "D", hint: true })
+          ),
+          h(
+            "button",
+            { className: "cr-btn cr-btn--outline cr-btn--sm" },
+            "Scan ",
+            h(CrKbd, { keys: "S", hint: true })
+          ),
+          h(
+            "button",
+            { className: "cr-btn cr-btn--sig-err cr-btn--sm" },
+            "Kill ",
+            h(CrKbd, { keys: "K", hint: true, on: true })
+          )
         )
       ),
   },

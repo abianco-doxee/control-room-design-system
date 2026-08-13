@@ -69,6 +69,29 @@ Miller and Mike Mignola: black as a compositional mass.
   hard offset shadow (`box-shadow: var(--shadow-off) var(--shadow-off) 0
   var(--shadow-col)`) is the *only* shadow in the system.
 
+### Chassis edge vs internal seam — two lines, two tokens
+
+Line *weight* is hierarchy (above); line *colour* is a separate decision, and the
+two are easy to conflate. A line has one of two jobs:
+
+| Job | Token | Sits against | Why |
+| --- | --- | --- | --- |
+| **chassis edge** — the outer contour of a component | `--border` | `--board` / `--ground` | Law 1's near-black contour, the ink boundary around the mass |
+| **internal seam** — a divider *inside* a component | `--seam` | `--panel` / `--panel-2` | must stay visible on a dark panel, where near-black cannot |
+
+`--border` is pure or near-black in three of the four themes, so it measures
+**1.21 / 1.21 / 1.01** against `--panel` on dark / extreme / phosphor — an
+invisible rule. That is correct for a chassis edge (which sits on the lighter
+board) and wrong for anything drawn *inside* a panel. `--seam` brackets between
+surface and ink in every theme by construction (**5.19 / 7.02 / 7.45 / 6.26**
+against `--panel`).
+
+- **MUST** use `--seam`, not `--border`, for any divider drawn inside a panel:
+  row rules, between-item dividers, split-pane handles, head/body separators.
+- **NEVER** try to rescue an invisible seam with `color-mix`. Mixing a colour
+  toward the background it already matches lowers the ratio; if a line starts
+  below the floor, the value being mixed is what has to change.
+
 *Sources: Koike · Miller · Mignola · neobrutalism.*
 
 ---
@@ -114,6 +137,50 @@ lightness/chroma — vibrant on purpose, and AA-checked against its on-colour:
   action, never a mood; the state ramp above stays untouched.
 - **NEVER** key a region to a hue that does not correspond to real state.
 - **NEVER** put two full-bleed keys competing on one screen. One key per region.
+
+### The canonical signal vocabulary
+
+Copy these names verbatim when adding a component. **The prop is always called
+`signal`.** There is no `tone`, `variant`, `status`, `kind` or `severity` prop for
+this channel — one concept, one name.
+
+| Member | Token | Means |
+| --- | --- | --- |
+| `work` | `--sig-work` | working / in progress |
+| `wait` | `--sig-wait` | waiting / needs input |
+| `done` | `--sig-done` | done / merged |
+| `err` | `--sig-err` | error / failing |
+| `idle` | `--sig-idle` | idle — present but doing nothing |
+| `accent` | `--sig-accent` | attention / primary action (not a state) |
+| `accent2` | `--sig-accent-2` | secondary action (not a state) |
+
+The full union, in this order, is:
+
+```ts
+signal?: "work" | "wait" | "done" | "err" | "idle" | "accent" | "accent2";
+```
+
+**A component MAY ship a subset, but only by dropping members from the tail of
+that list — never by renaming one.** Two subsets are legitimate and both are in
+use:
+
+- **Drop `idle`** where the component only exists while something is happening,
+  so "idle" has no referent: a Toast, an Alert, a Timeline node. A transient
+  readout that says "idle" is reporting nothing at all.
+- **Drop `accent` / `accent2`** where the component is a pure *state* readout and
+  an action key would be a category error — a StatusDot, a SessionRow, a Spinner,
+  a Progress fill. Conversely a Button is an action, so it carries `accent` and
+  `accent2` but has no use for `idle`.
+
+`accent2` is spelled without the hyphen in the prop even though the token is
+`--sig-accent-2`; that is the established spelling across Button, Breach and the
+three chart components, so it stays.
+
+**Two historical divergences were removed** (see the W8 changeset): `CrAlert`'s
+`info` was `work` under another name — its `.cr-alert--info` rule already resolved
+to `var(--sig-work)` — and `CrChip`'s `tone?: "done" | "alt"` was this same channel
+under a second prop name, where `alt` meant `--sig-work`. Both now use `signal`
+with canonical members.
 
 *Sources: Yamashiro · Science SARU.*
 
@@ -214,6 +281,29 @@ accessibility contract demands. Shipped as `.cr-sev--crit/-warn/-work/-ok/-idle`
 - **NEVER** add a decorative triangle. If it does not encode direction, state,
   focus, or sequence, delete it.
 
+### The direction glyphs
+
+The chevron primitive has exactly **one** glyph family: the solid triangles
+`◂ ▸` (`\25C2` / `\25B8`). They are used in two ways, and the *shape does not
+change* between them — only whether the thing is interactive:
+
+| Use | Glyph | Where |
+| --- | --- | --- |
+| static inline marker | `▸` | `.cr-list__item::before`, `.cr-combobox__opt::before`, `CrBreadcrumb` separator |
+| prev/next control | `◂` `▸` | `CrCalendar`, `CrCarousel`, `CrPagination` |
+
+The distinction between a marker and a control is already carried by the
+element — a `::before` on a list item versus a labelled `button` — so it does not
+also need a second glyph shape. Making the *button* glyphs differ from the
+*marker* glyph would encode "interactive" twice in the visual channel and zero
+times in the accessibility tree, which is backwards.
+
+- **MUST** use `◂ ▸` for direction. The light angle quotes `‹ ›` are **not** part
+  of the vocabulary; `CrPagination` used them alone and was brought into line.
+- **MUST** wrap a control's glyph in `aria-hidden="true"` and put the meaning on
+  the button's `aria-label` — the glyph is decoration over an already-named
+  control, never the accessible name.
+
 *Sources: Koike · Madhouse.*
 
 ---
@@ -270,7 +360,15 @@ casing and the recessed screen; content stays flat per Law 1.
 - **MUST** build a bezel from the bezel vocabulary: `--brd-brush` casing, corner
   rivets, a visibly inset screen. One instrument per screen (mirrors Law 2's
   one-key discipline).
+- **MAY** carry an **edge bleed**: a masked texture that fades to full
+  transparency before it reaches the content area, on a panel's corner or edge
+  (`.cr-panel--bleed` / `CrPanel bleed=""`). The mask *is* the contract —
+  texture that touches a readout is not a bleed, it is a violation of the rule
+  above. The bleed lives on the panel's margin; the field it wraps stays clean.
 - **NEVER** put texture on a flat content field.
+- **NEVER** more than **one bled panel per screen** — the bleed is an accent on
+  the most exceptional surface, and a page of grain is the same noise a page of
+  bezels is (mirrors Law 2's one-key discipline and the one-instrument rule).
 - **NEVER** nest bezels or bezel every panel — a page of hardware is noise.
 
 *Sources: Pip-Boy · Apple II.*

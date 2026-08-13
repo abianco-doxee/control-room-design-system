@@ -6,16 +6,31 @@
   font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 700; color: var(--ink);
   background: none; border: none; padding: 0;
 }
+/* The track is wider than it is tall so the knob has visible travel. The knob is
+ * SQUARE and sized from the track's own inner height (border-box minus the two
+ * borders) rather than a fixed --space-*: `extreme` scales --brd 2px→3px without
+ * scaling --space-4, so a fixed 16px knob would overflow a 26px inner box there
+ * and the two states would look identical again. */
 .cr-switch__track {
-  position: relative; display: inline-block; width: var(--space-8); height: var(--space-4);
+  position: relative; display: inline-block; width: var(--space-10); height: var(--space-4);
   background: var(--cr-switch-track); border: var(--brd) solid var(--cr-field-border);
 }
 .cr-switch__track::after {
-  content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: var(--space-4);
-  background: var(--cr-switch-thumb); transition: left var(--dur-press), background var(--dur-press);
+  content: ""; position: absolute; top: 0; bottom: 0;
+  inset-inline-start: 0; width: calc(var(--space-4) - 2 * var(--brd));
+  background: var(--cr-switch-thumb);
+  transition: inset-inline-start var(--dur-press), background var(--dur-press);
 }
 .cr-switch[aria-checked="true"] .cr-switch__track { background: var(--cr-switch-track-on); }
-.cr-switch[aria-checked="true"] .cr-switch__track::after { left: calc(100% - var(--space-4)); background: var(--cr-switch-thumb-on); }
+/* Logical, not `left`: under dir="rtl" the knob must rest at the inline END when
+ * on, which `inset-inline-start: 100% - w` mirrors for free. A physical `left`
+ * put the OFF knob at the visual on-position in RTL. */
+.cr-switch[aria-checked="true"] .cr-switch__track::after {
+  inset-inline-start: calc(100% - (var(--space-4) - 2 * var(--brd)));
+  background: var(--cr-switch-thumb-on);
+}
+/* Error state, derived from the wrapper — no per-control prop needed. */
+.cr-field--error .cr-switch__track { border-color: var(--cr-field-error); border-width: var(--brd-heavy); }
 
 @media (prefers-reduced-motion: reduce) { .cr-switch__track::after { transition: none; } }
 

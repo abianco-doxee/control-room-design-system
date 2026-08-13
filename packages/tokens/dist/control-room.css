@@ -160,7 +160,7 @@
   --cr-field-fg: var(--ink);
   --cr-field-border: var(--border);
   --cr-field-placeholder: var(--muted);
-  --cr-field-focus: var(--sig-work);
+  --cr-field-focus: var(--focus);
   --cr-field-error: var(--sig-err);
   --cr-check-bg: var(--board);
   --cr-check-checked: var(--sig-work);
@@ -194,6 +194,7 @@
   --cr-table-accent: var(--sig-work);
   --cr-accordion-bg: var(--panel);
   --cr-accordion-border: var(--border);
+  --cr-accordion-seam: var(--seam);
   --cr-accordion-accent: var(--sig-work);
   --cr-segmented-bg: var(--panel);
   --cr-segmented-border: var(--border);
@@ -219,6 +220,7 @@
   --cr-breadcrumb-current-fg: var(--ink);
   --cr-datagrid-bg: var(--board);
   --cr-datagrid-border: var(--border);
+  --cr-datagrid-seam: var(--seam);
   --cr-masthead-bg: var(--panel);
   --cr-masthead-border: var(--border);
   --cr-masthead-accent: var(--sig-accent);
@@ -266,6 +268,8 @@
   --sig-wait: #f9ad00;
   --sig-err: #f45058;
   --sig-idle: #848496;
+  --focus: #00d3fb;
+  --seam: #8a8aa6;
   --on-sig: #06050c;
   --on-err: #06050c;
   --on-accent: #06050c;
@@ -301,6 +305,8 @@
   --sig-wait: #d97706;
   --sig-err: #e11d48;
   --sig-idle: #7e7e94;
+  --focus: #00627a;
+  --seam: #55556b;
   --on-sig: #0b0b12;
   --on-err: #ffffff;
   --on-accent: #ffffff;
@@ -336,6 +342,8 @@
   --sig-wait: #ffbd4f;
   --sig-err: #fc4351;
   --sig-idle: #8a80a0;
+  --focus: #5cddff;
+  --seam: #c79ad6;
   --on-sig: #06050c;
   --on-err: #06050c;
   --on-accent: #06050c;
@@ -380,6 +388,8 @@
   --sig-wait: #a8ff3e;
   --sig-err: #eaff40;
   --sig-idle: #12602c;
+  --focus: #43ff7a;
+  --seam: #2fac55;
   --on-sig: #020a04;
   --on-err: #020a04;
   --on-accent: #020a04;
@@ -408,8 +418,11 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
-/* Focus is a first-class signal, not an afterthought. */
-*:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--focus-offset); }
+/* Focus is a first-class signal, not an afterthought. It has its own --focus
+   colour rather than borrowing --sig-work: the ring must clear 3:1 against every
+   surface it can land on (WCAG 2.4.11), and in the light theme the working cyan
+   only reaches 2.86:1 on --board. --focus tracks --sig-work in the other three. */
+*:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
 /* Motion is opt-out at the system level. */
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }

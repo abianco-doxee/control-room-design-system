@@ -12,12 +12,18 @@
  * exactly what ships. Run after build:tokens + build:theme.
  *
  * Run: node build/build-brand-preview.mjs → public/brands.html
+ *      node build/build-brand-preview.mjs --check → fail if the committed page is stale
+ *
+ * brands.html INLINES components.css, so any change to the stylesheet silently
+ * staleness-rots this committed page unless it is rebuilt. --check wires that
+ * into `verify` so the gap can't reopen.
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { contrastRatio } from "@alebianco/cr-utils/theme";
 
+const CHECK = process.argv.includes("--check");
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const THEMES = join(ROOT, "..", "..", "packages", "tokens", "dist", "themes");
 const BRANDS = join(ROOT, "..", "..", "packages", "tokens", "brands");
@@ -168,7 +174,18 @@ const html = `<!doctype html>
 ${themes.map(section).join("\n")}
 </body></html>`;
 
-mkdirSync(join(ROOT, "public"), { recursive: true });
 const out = join(ROOT, "public", "brands.html");
+
+if (CHECK) {
+  const current = existsSync(out) ? readFileSync(out, "utf8") : null;
+  if (current !== html) {
+    console.error("✗ public/brands.html is stale — run `npm run build:brand-preview`");
+    process.exit(1);
+  }
+  console.log(`✓ brand preview is up to date (${themes.length} themes)`);
+  process.exit(0);
+}
+
+mkdirSync(join(ROOT, "public"), { recursive: true });
 writeFileSync(out, html);
 console.log(`wrote public/brands.html  (${themes.length} themes, ${html.length} bytes)`);

@@ -1,5 +1,6 @@
 import { useStore, useRef, Show, For } from "@builder.io/mitosis";
 import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { placeEl } from "../lib/position.ts";
 
 export interface CrMenuItem {
   label: string;
@@ -10,8 +11,11 @@ export interface CrMenuItem {
 export interface CrMenuProps {
   label: string;
   items: CrMenuItem[];
-  /** Panel edge alignment. */
-  align?: "left" | "right";
+  /** Preferred placement, `${side}` or `${side}-${align}` — e.g. "bottom-start"
+   *  (default), "top-end", "right". Sides: top · bottom · left · right;
+   *  aligns: start · end. Flips to the opposite side and shifts along the cross
+   *  axis as needed to stay within the viewport. */
+  placement?: string;
   /** Fires with the selected item index. */
   onSelect?: (index: number) => void;
   /* ── styling contract (portable pt/dt subset) ──
@@ -34,7 +38,11 @@ export default function CrMenu(props: CrMenuProps) {
     buffer: "",
     bufferAt: 0,
     toggle() {
-      state.open = !state.open;
+      /* compute the next value once — reading state.open right after setting it is
+       * a stale read once compiled to React (setState is async). */
+      const next = !state.open;
+      state.open = next;
+      if (next) state.focusFirst(0);
     },
     close() {
       state.open = false;
@@ -49,12 +57,30 @@ export default function CrMenu(props: CrMenuProps) {
     focusFirst(tries: number) {
       /* the panel renders a tick after open flips; retry briefly until it exists */
       const root: any = rootRef;
-      const first = root ? root.querySelector('[role="menuitem"]') : null;
-      if (first) {
+      const panel = root ? root.querySelector(".cr-menu__panel") : null;
+      const first = panel ? panel.querySelector('[role="menuitem"]') : null;
+      if (panel && first) {
+        panel.style.visibility = "hidden";
+        state.place();
         first.focus();
         return;
       }
       if ((tries || 0) < 6) setTimeout(() => state.focusFirst((tries || 0) + 1), 16);
+    },
+    /* Whatever hid the panel (focusFirst, above) is matched here: place() ALWAYS
+     * ends by revealing it, even when placement itself couldn't run (no window,
+     * no trigger). A panel that gets hidden but never shown again is a dead click
+     * behind a still-active scrim — worse than showing it unplaced at its CSS
+     * position, which is what an early return now does. */
+    place() {
+      const root: any = rootRef;
+      const panel = root ? root.querySelector(".cr-menu__panel") : null;
+      if (!panel) return;
+      if (root && typeof window !== "undefined") {
+        const trigger = root.querySelector('[aria-haspopup="menu"]');
+        if (trigger) placeEl(trigger, panel, { placement: props.placement || "bottom-start" });
+      }
+      panel.style.visibility = "visible";
     },
     pick(i: number) {
       state.open = false;
@@ -133,8 +159,13 @@ export default function CrMenu(props: CrMenuProps) {
         <div
           {...ptAttrs(props.pt, "panel")}
           data-part="panel"
-          class={ptClass(props.pt, props.unstyled, "cr-menu__panel" + (props.align === "right" ? " cr-menu__panel--right" : ""), "panel")}
+          class={ptClass(props.pt, props.unstyled, "cr-menu__panel", "panel")}
           role="menu"
+          /* Hidden at mount so it can never paint at its unplaced CSS position —
+           * place() (via focusFirst) reveals it once placeEl() has run. Not
+           * ptStyle-backed: this part carries no pt/dt style hook (see
+           * styling-contract.md). */
+          style={{ visibility: "hidden" }}
           onKeyDown={(event) => state.onPanelKey(event)}
         >
           <For each={props.items}>

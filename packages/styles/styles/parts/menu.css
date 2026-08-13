@@ -9,7 +9,6 @@
   box-shadow: var(--shadow-off-sm) var(--shadow-off-sm) 0 var(--shadow-col);
   display: flex; flex-direction: column; padding: var(--space-1);
 }
-.cr-menu__panel--right { left: auto; right: 0; }
 .cr-menu__item {
   font-family: var(--font-mono); font-size: var(--text-sm); text-align: start;
   background: transparent; border: 0; color: var(--cr-menu-item-fg); cursor: pointer;

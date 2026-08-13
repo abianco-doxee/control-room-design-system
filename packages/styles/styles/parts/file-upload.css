@@ -7,7 +7,7 @@
 .cr-fileupload--over { border-color: var(--cr-fileupload-active-border); border-style: solid; }
 .cr-fileupload__input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 .cr-fileupload__input:disabled { cursor: not-allowed; }
-.cr-fileupload__input:focus-visible + .cr-fileupload__prompt { outline: var(--focus-w) solid var(--sig-work); outline-offset: var(--space-2); }
+.cr-fileupload__input:focus-visible + .cr-fileupload__prompt { outline: var(--focus-w) solid var(--focus); outline-offset: var(--space-2); }
 .cr-fileupload__prompt { display: flex; flex-direction: column; gap: var(--space-0-5); pointer-events: none; }
 .cr-fileupload__title { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: var(--text-sm); color: var(--ink); }
 .cr-fileupload__hint { font-family: var(--font-mono); font-size: var(--text-2xs); color: var(--muted); }

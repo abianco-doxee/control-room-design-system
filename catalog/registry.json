@@ -8,7 +8,7 @@
       "category": "layout",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "The default container for a group of related data \u2014 the system's workhorse surface.",
+      "description": "A composed instrument bay \u2014 eyebrow, ghost index, title, lede, body and a pinned footer; the system's workhorse surface.",
       "spec": "references/components.md#panel",
       "variants": {
         "weight": [
@@ -18,6 +18,28 @@
         "inset": [
           "false",
           "true"
+        ],
+        "tone": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle",
+          "accent"
+        ],
+        "marks": [
+          "false",
+          "true"
+        ],
+        "bleed": [
+          "halftone",
+          "dither",
+          "scan",
+          "glass"
+        ],
+        "ambient": [
+          "scan",
+          "pulse"
         ]
       },
       "tokens": [
@@ -48,6 +70,30 @@
         {
           "cssVar": "--shadow-col",
           "description": "shadow color"
+        },
+        {
+          "cssVar": "--sig-accent-2",
+          "description": "lede rule (second key)"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "eyebrow + footer, and the ghost index mix"
+        },
+        {
+          "cssVar": "--halftone",
+          "description": "edge-bleed texture (Law 6)"
+        },
+        {
+          "cssVar": "--dither",
+          "description": "edge-bleed texture (Law 6)"
+        },
+        {
+          "cssVar": "--scanline",
+          "description": "edge-bleed texture (Law 6)"
+        },
+        {
+          "cssVar": "--decoration-intensity",
+          "description": "bleed loudness dial"
         }
       ],
       "keywords": [
@@ -55,7 +101,13 @@
         "card",
         "container",
         "surface",
-        "box"
+        "box",
+        "eyebrow",
+        "index",
+        "lede",
+        "footer",
+        "bleed",
+        "instrument bay"
       ]
     },
     {
@@ -327,12 +379,16 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "A compact standalone tag/label; default keys to done, alt to work; stamp-in when added.",
+      "description": "A compact standalone tag/label keyed to a signal (Law 2); defaults to done; stamp-in when added.",
       "spec": "references/components.md#chip",
       "variants": {
-        "tone": [
+        "signal": [
+          "work",
+          "wait",
           "done",
-          "alt"
+          "err",
+          "idle",
+          "accent"
         ],
         "stamp": [
           "off",
@@ -554,46 +610,6 @@
         "nav",
         "switcher",
         "segment"
-      ]
-    },
-    {
-      "id": "meter",
-      "name": "Meter",
-      "category": "state",
-      "kind": "component",
-      "lifecycle": "stable",
-      "description": "Token-driven capacity / utilisation bar (role=meter), square and hard-edged, keyed to a signal tone.",
-      "spec": "references/components.md#meter",
-      "variants": {
-        "signal": [
-          "work",
-          "wait",
-          "done",
-          "err",
-          "idle"
-        ]
-      },
-      "tokens": [
-        {
-          "cssVar": "--sig-work",
-          "description": "default fill"
-        },
-        {
-          "cssVar": "--panel-2",
-          "description": "track"
-        },
-        {
-          "cssVar": "--brd-hair",
-          "description": "track outline"
-        }
-      ],
-      "keywords": [
-        "meter",
-        "bar",
-        "gauge",
-        "capacity",
-        "utilisation",
-        "progress"
       ]
     },
     {
@@ -1393,9 +1409,13 @@
       "description": "Hint bubble revealed on hover/focus; role=tooltip wired via aria-describedby, pure-CSS reveal.",
       "spec": "references/components.md#tooltip",
       "variants": {
-        "state": [
-          "hidden",
-          "shown"
+        "placement": [
+          "bottom-start",
+          "bottom-end",
+          "top-start",
+          "top-end",
+          "left",
+          "right"
         ]
       },
       "tokens": [
@@ -1469,12 +1489,65 @@
       ]
     },
     {
+      "id": "dither",
+      "name": "Dither",
+      "category": "media",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Seeded Bayer 4\u00d74 ordered dither / halftone field \u2014 hardware surfaces only (Law 6); the genuine texture the CSS tokens approximate.",
+      "spec": "references/decoration.md",
+      "variants": {
+        "mode": [
+          "bayer",
+          "halftone"
+        ],
+        "state": [
+          "working",
+          "waiting",
+          "idle",
+          "error",
+          "done"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "field ground"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "working hue"
+        },
+        {
+          "cssVar": "--sig-accent",
+          "description": "default ink (seeded)"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error hue"
+        },
+        {
+          "cssVar": "--sig-accent-2",
+          "description": "done/acid hue"
+        }
+      ],
+      "keywords": [
+        "dither",
+        "bayer",
+        "halftone",
+        "texture",
+        "seeded",
+        "grain",
+        "neo-print"
+      ]
+    },
+    {
       "id": "chrome",
       "name": "Chrome",
       "category": "media",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Seeded hardware chrome strip \u2014 a pixel-art metal bar with deterministically varied fasteners, panel seams, wear scratches, and an indicator LED.",
+      "description": "Seeded instrument chrome strip \u2014 a pixel-art metal bar with a deterministically varied graduated scale, panel seams, registration mark, wear scratches, and an indicator LED.",
       "spec": "references/components.md#seeded-chrome",
       "variants": {
         "prop": [
@@ -1598,7 +1671,7 @@
       "category": "media",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Seeded NERV-style decorative telemetry string (hex id, byte, latency, mini bar) for a frame corner. Decoration, not data.",
+      "description": "Seeded NERV-style decorative telemetry string (hex id, byte, channel tag, mini bar) for a frame corner. Decoration, not data \u2014 every field is unitless so it cannot be mistaken for a real measurement.",
       "spec": "references/decoration.md",
       "variants": {
         "prop": [
@@ -1683,7 +1756,11 @@
       "description": "Dropdown menu \u2014 a trigger toggles a role=menu panel; a transparent full-viewport scrim closes it on outside click (no global listeners). Optional danger items.",
       "spec": "references/components.md#menu",
       "variants": {
-        "align": [
+        "placement": [
+          "bottom-start",
+          "bottom-end",
+          "top-start",
+          "top-end",
           "left",
           "right"
         ]
@@ -1762,14 +1839,19 @@
       "category": "overlay",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "A fixed screen corner that stacks live toasts (parent owns the list). Each toast is its own live region \u2014 err announces assertively \u2014 so nothing double-announces. Bottom corners stack newest nearest the edge.",
+      "description": "A fixed screen anchor that stacks live toasts (parent owns the list). Each row is its own live region \u2014 err announces assertively \u2014 so nothing double-announces. Consecutive toasts with the same message and signal pack into one row with an aria-hidden \u00d7N counter, so a repeat updates the count instead of re-announcing. Bottom anchors stack newest nearest the edge.",
       "spec": "references/components.md#toast-region",
       "variants": {
         "position": [
           "tr",
           "br",
           "tl",
-          "bl"
+          "bl",
+          "tc",
+          "bc",
+          "ml",
+          "mr",
+          "mc"
         ]
       },
       "tokens": [
@@ -1830,15 +1912,17 @@
     },
     {
       "id": "key-hints",
-      "name": "Key hints (peek)",
+      "name": "Key hints (peek + legend)",
       "category": "behavior",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Headless behavior \u2014 while the reveal key (default Alt) is held, sets data-cr-keys on the root so every secondary key hint fades in at once (a peek-all-shortcuts gesture). Renders nothing visible.",
+      "description": "While the reveal key (default Alt) is held, sets data-cr-keys on the root so every secondary key hint fades in at once (a peek-all-shortcuts gesture). Pass `hints` to also render a shortcut legend: `+` joins a chord (\"Ctrl+K\"), a space joins a sequence (\"g p\"), and the two are drawn differently \u2014 a `+` glyph vs a \"then\" separator. Each binding carries a spoken aria-label and the keycaps are aria-hidden; aria-keyshortcuts is emitted only for single-step bindings, since ARIA reads a space there as \"or\" rather than \"then\". With no `hints` it renders nothing visible.",
       "spec": "references/components.md#key-hint",
       "variants": {
         "prop": [
-          "revealKey"
+          "hints",
+          "revealKey",
+          "label"
         ]
       },
       "tokens": [],
@@ -1848,7 +1932,11 @@
         "peek",
         "reveal",
         "headless",
-        "behavior"
+        "behavior",
+        "chord",
+        "sequence",
+        "combo",
+        "legend"
       ]
     },
     {
@@ -1901,11 +1989,11 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Inline callout keyed to a signal (info/wait/done/err) \u2014 a left brush-bar in the signal hue, optional dismiss. err announces assertively (role=alert).",
+      "description": "Inline callout keyed to a signal (work/wait/done/err) \u2014 a left brush-bar in the signal hue, optional dismiss. err announces assertively (role=alert).",
       "spec": "references/components.md#alert",
       "variants": {
         "signal": [
-          "info",
+          "work",
           "wait",
           "done",
           "err"
@@ -1935,38 +2023,45 @@
       ]
     },
     {
-      "id": "radio-group",
-      "name": "Radio group",
+      "id": "choice-group",
+      "name": "Choice group",
       "category": "forms",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Single-choice group (role=radiogroup) with roving tabindex + arrow-key nav. Square radios (radius 0) \u2014 a filled inner square marks the choice.",
-      "spec": "references/components.md#radio-group",
+      "description": "Grouped choices for both types, rendering CrChoice. type=\"radio\" is a radiogroup of native radios sharing one name (browser-supplied roving tabindex + arrow selection); type=\"checkbox\" is a group of independently tabbable boxes with arrows inert.",
+      "spec": "references/components.md#choice-group",
       "variants": {
         "prop": [
+          "type",
           "value",
-          "row"
+          "values",
+          "row",
+          "invalid"
         ]
       },
       "tokens": [
         {
-          "cssVar": "--sig-work",
+          "cssVar": "--cr-check-checked",
+          "description": "checked fill"
+        },
+        {
+          "cssVar": "--cr-check-mark",
           "description": "checked mark"
         },
         {
-          "cssVar": "--panel-2",
-          "description": "box fill"
-        },
-        {
-          "cssVar": "--border",
+          "cssVar": "--cr-field-border",
           "description": "box border"
         }
       ],
       "keywords": [
-        "radio",
-        "radiogroup",
         "choice",
+        "choicegroup",
+        "radiogroup",
+        "checkbox group",
+        "radio",
+        "checkbox",
         "option",
+        "multi-select",
         "single-select",
         "form"
       ]
@@ -2016,24 +2111,29 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Task progress (role=progressbar) \u2014 determinate fills to value/max; indeterminate runs an animated hazard sweep. Distinct from Meter (a static capacity reading).",
+      "description": "Task progress and capacity / utilisation (role=progressbar) \u2014 determinate fills to value/max; indeterminate runs an animated hazard sweep. An optional label renders inline before the track.",
       "spec": "references/components.md#progress",
       "variants": {
         "signal": [
           "work",
           "wait",
           "done",
-          "err"
+          "err",
+          "idle"
         ]
       },
       "tokens": [
         {
           "cssVar": "--sig-work",
-          "description": "fill"
+          "description": "default fill"
         },
         {
           "cssVar": "--panel-2",
           "description": "track"
+        },
+        {
+          "cssVar": "--brd-hair",
+          "description": "track outline"
         }
       ],
       "keywords": [
@@ -2042,7 +2142,11 @@
         "loading",
         "task",
         "indeterminate",
-        "bar"
+        "bar",
+        "meter",
+        "gauge",
+        "capacity",
+        "utilisation"
       ]
     },
     {
@@ -2155,7 +2259,11 @@
       "description": "Generic anchored overlay for arbitrary content \u2014 a trigger toggles a floating panel; scrim closes on outside click, Esc closes and returns focus. Use Menu for a list of actions.",
       "spec": "references/components.md#popover",
       "variants": {
-        "align": [
+        "placement": [
+          "bottom-start",
+          "bottom-end",
+          "top-start",
+          "top-end",
           "left",
           "right"
         ]
@@ -2226,7 +2334,7 @@
       "category": "navigation",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Navigation trail \u2014 ascii \"/\" separators from CSS; the last crumb is the current page (aria-current).",
+      "description": "Navigation trail \u2014 an aria-hidden \"\u25b8\" separator between crumbs (override with `separator`); the last crumb is the current page (aria-current).",
       "spec": "references/components.md#breadcrumb",
       "variants": {
         "prop": [
@@ -2473,7 +2581,11 @@
       "description": "A rich hover/focus card for structured content (Tooltip is for plain text, Menu for actions). CSS-driven reveal with an open delay; the trigger is focusable so keyboard users get it too.",
       "spec": "references/components.md#hover-card",
       "variants": {
-        "align": [
+        "placement": [
+          "bottom-start",
+          "bottom-end",
+          "top-start",
+          "top-end",
           "left",
           "right"
         ]
@@ -2863,23 +2975,30 @@
       "category": "state",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Indeterminate loading indicator \u2014 role=status with an accessible label; the ring is aria-hidden and honours reduced-motion. For a known fraction use Progress or Meter.",
+      "description": "Indeterminate loading indicator \u2014 role=status with an accessible label; the cells are aria-hidden and honour reduced-motion. `signal` keys the cells to the canonical vocabulary. For a known fraction, or a static capacity reading, use Progress.",
       "spec": "references/components.md#spinner",
       "variants": {
         "size": [
           "sm",
           "md",
           "lg"
+        ],
+        "signal": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle"
         ]
       },
       "tokens": [
         {
-          "cssVar": "--sig-work",
-          "description": "ring sweep"
+          "cssVar": "--cr-spinner-accent",
+          "description": "cells (defaults to --sig-work)"
         },
         {
-          "cssVar": "--panel-2",
-          "description": "ring track"
+          "cssVar": "--sig-err",
+          "description": "cells when signal=err"
         }
       ],
       "keywords": [
@@ -3134,8 +3253,8 @@
       "spec": "references/components.md#calendar",
       "variants": {
         "weekStart": [
-          "0 (Sun)",
-          "1 (Mon)"
+          "sunday",
+          "monday"
         ]
       },
       "tokens": [

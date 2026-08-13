@@ -34,6 +34,16 @@
 .cr-spinner__ring:nth-child(4) { opacity: 0.22; animation-delay: calc(var(--dur-ambient) / -10 * 3); }
 .cr-spinner--sm { --cr-spinner-cell: 4px; --cr-spinner-gap: 2px; }
 .cr-spinner--lg { --cr-spinner-cell: 9px; --cr-spinner-gap: 4px; }
+/* Signal keying — same canonical vocabulary and same tone set as Progress
+ * (work · wait · done · err · idle). The cells are a redundant cue on top of the
+ * role=status accessible name, so tone carries no meaning on its own. Overriding
+ * --cr-spinner-accent (rather than `color`) keeps the single styling-contract
+ * hook authoritative for consumers who retint the spinner. */
+.cr-spinner--work { --cr-spinner-accent: var(--sig-work); }
+.cr-spinner--wait { --cr-spinner-accent: var(--sig-wait); }
+.cr-spinner--done { --cr-spinner-accent: var(--sig-done); }
+.cr-spinner--err  { --cr-spinner-accent: var(--sig-err); }
+.cr-spinner--idle { --cr-spinner-accent: var(--sig-idle); }
 @keyframes cr-spinner-track {
   0%, 100% { transform: translate(0, 0); }
   25% { transform: translate(calc(var(--cr-spinner-cell) * 2 + var(--cr-spinner-gap) * 2), 0); }

@@ -8,5 +8,5 @@
 .cr-rating__star[data-state="on"] { color: var(--cr-rating-on); }
 .cr-rating__star:disabled { cursor: not-allowed; opacity: .5; }
 .cr-rating--readonly .cr-rating__star { cursor: default; }
-.cr-rating__star:focus-visible { outline: var(--focus-w) solid var(--sig-work); outline-offset: 2px; }
+.cr-rating__star:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: 2px; }
 

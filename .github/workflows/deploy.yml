@@ -43,7 +43,7 @@ jobs:
         run: pnpm run test:pkg
       - name: Cross-framework runtime gate (Vue/Svelte/Solid SSR-render the output)
         run: pnpm run test:frameworks
-      - name: Styling-contract gate (pt/dt/unstyled coverage + finer tokens + util ports + responsive tokens)
+      - name: Styling-contract gate (pt/dt/unstyled coverage + finer tokens + util ports incl. position + responsive tokens)
         run: pnpm run test:contract
       - name: Forms core gate (ArkType ⇄ JSON Schema + validation)
         run: pnpm run test:forms
@@ -65,7 +65,12 @@ jobs:
         run: pnpm run test:islands
       - name: Responsiveness gate (no horizontal overflow @ 375/768/1024)
         run: pnpm run test:responsive
-      - name: Visual regression (informational — baselines are env-specific)
+      # Stays non-blocking until Linux baselines are committed: the suite now
+      # FAILS on a missing baseline rather than silently creating one, so making
+      # it blocking today would red every build until the "Visual baselines"
+      # workflow has been run once on main. Flip continue-on-error off in the
+      # same change that lands the first -chromium-linux baselines.
+      - name: Visual regression (non-blocking until Linux baselines land)
         run: pnpm run test:visual
         continue-on-error: true
       - name: Upload Pages artifact

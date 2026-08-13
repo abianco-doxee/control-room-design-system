@@ -46,15 +46,22 @@ for (const [target, { ext, index }] of Object.entries(TARGETS)) {
     console.warn(`⚠ ${target}: no components/ dir — run 'mitosis build' first`);
     continue;
   }
-  // Shared styling helpers (lib/pt.ts) are imported by components as
-  // `../lib/pt.ts`; copy the source into each target's output so the relative
-  // import resolves for bundlers, the type-check, and the packaged build (which
-  // rewrites the .ts specifier to .js). It's a plain pure-function module — the
-  // same file across every target.
+  // Shared pure-function helpers (lib/*.ts — pt.ts, position.ts, keys.ts, …) are
+  // imported by components as `../lib/<name>.ts`; copy the sources into each
+  // target's output so the relative import resolves for bundlers, the type-check,
+  // and the packaged build (which rewrites the .ts specifier to .js). They are
+  // framework-agnostic modules — the same files across every target.
+  //
+  // Copied by DIRECTORY SCAN, not a hardcoded list: a new lib/*.ts that was not
+  // vendored here would compile into all six targets as an import of a file that
+  // does not exist, and vue/svelte/solid/angular would only fail in the
+  // consumer's bundler. Globbing keeps that impossible.
   if (!check) {
     const libDir = join(dir, "lib");
     mkdirSync(libDir, { recursive: true });
-    copyFileSync(join(ROOT, "lib", "pt.ts"), join(libDir, "pt.ts"));
+    for (const f of readdirSync(join(ROOT, "lib")).filter((n) => n.endsWith(".ts"))) {
+      copyFileSync(join(ROOT, "lib", f), join(libDir, f));
+    }
     // CrIcon imports the pixel pack as `../lib/icons/pixel.ts` — vendor it from
     // @alebianco/cr-icons so the relative import resolves in every target's output tree.
     const iconsDir = join(libDir, "icons");

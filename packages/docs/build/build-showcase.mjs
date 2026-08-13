@@ -43,7 +43,7 @@ const brandThemeCss = brandThemes
 const brandButtons = brandThemes
   .map(
     (n) =>
-      `    <button data-set="${n}" aria-pressed="false" title="external brand — packages/tokens/brands/${n}.json">${n} ▸</button>`
+      `    <button data-set="${n}" aria-pressed="false" title="external brand — packages/tokens/brands/${n}.json">${n}</button>`
   )
   .join("\n");
 const catalog = JSON.parse(readFileSync(join(ROOT, "..", "..", "catalog", "catalog.json"), "utf8"));
@@ -68,11 +68,11 @@ try {
 }
 
 /* ── per-component state snippets ─────────────────────────────────────────
- * Each entry: [{ state: "label", html: "<markup/>" }]. Interactive components
- * are shown in their visual states via the shipped cr- classes (the same markup
- * the compiled components emit); the Live Gallery + Qwik example exercise the JS. */
-const sig = (seed, st, n) =>
-  `<canvas class="crsig" width="${n || 40}" height="${n || 40}" data-seed="${seed}" data-state="${st}"></canvas>`;
+ * Each entry: [{ state: "label", html: "<markup/>" }]. This is the FALLBACK
+ * path: anything in ISLAND_IDS mounts the real compiled component instead, and
+ * only a handful of pure-CSS vocabularies (no component to mount) still live
+ * here. The Live Gallery that used to exercise the JS is gone — it was a strict
+ * subset of this page and was folded into it. */
 const EXAMPLES = {
   "data-list": [
     {
@@ -177,6 +177,18 @@ function readProps(comp) {
       doc = "";
     }
   }
+  // Deterministic order: required first (callers must supply them), then optional
+  // props alphabetically, then the styling-contract trio last — it is boilerplate
+  // on every component and repeating it mid-table buries the real API.
+  const CONTRACT = { unstyled: 1, pt: 2, dt: 3 };
+  rows.sort((a, b) => {
+    const ca = CONTRACT[a.prop] || 0;
+    const cb = CONTRACT[b.prop] || 0;
+    if (ca !== cb) return ca - cb; // contract trio sinks to the bottom
+    if (ca) return ca - cb; // and keeps unstyled · pt · dt order
+    if (a.req !== b.req) return a.req ? -1 : 1; // required before optional
+    return a.prop.localeCompare(b.prop);
+  });
   return rows.length ? rows : null;
 }
 function propsHtml(e) {
@@ -227,7 +239,7 @@ const ISLAND_IDS = new Set([
   "popover",
   "hover-card",
   "segmented",
-  "radio-group",
+  "choice-group",
   "slider",
   "number-field",
   "pagination",
@@ -248,7 +260,6 @@ const ISLAND_IDS = new Set([
   "checkbox",
   "alert",
   "toast",
-  "meter",
   "progress",
   "input",
   "textarea",
@@ -290,6 +301,7 @@ const ISLAND_IDS = new Set([
   "drip",
   "bezel",
   "sigil",
+  "dither",
   "chrome",
   "ascii",
   "telemetry",
@@ -297,6 +309,9 @@ const ISLAND_IDS = new Set([
   "toggle-chip",
   "overflow",
   "relative-time",
+  // CSS-block demos (no single component): the shipped classes composed directly
+  "keyed-contact-sheet",
+  "decoration-utilities",
   "instrument",
   "rail",
   "key-hints",
@@ -447,24 +462,28 @@ body { margin: 0; }
 .top a.home { font-family: var(--font-mono); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
 .top a.home:hover { color: var(--sig-accent); }
 .top .brand { display: flex; flex-direction: column; gap: 2px; }
-.switch { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
-.switch button { font-family: var(--font-mono); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em;
-  padding: 5px 10px; background: var(--panel); color: var(--muted); border: var(--brd) solid var(--border); cursor: pointer; }
+.switch { display: flex; gap: 6px; margin-left: auto; flex-wrap: nowrap;
+  overflow-x: auto; max-width: min(52vw, 560px); scrollbar-width: thin; padding-bottom: 2px; }
+.switch button { flex: none; font-family: var(--font-mono); font-size: 11px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .06em; padding: 5px 10px; background: var(--panel);
+  color: var(--muted); border: var(--brd) solid var(--border); cursor: pointer; }
 .switch button[aria-pressed="true"] { background: var(--sig-accent); color: var(--on-accent); }
 .wrap { display: grid; grid-template-columns: 220px 1fr; gap: 0; align-items: start; }
 /* chrome surfaces track the theme — use --board/--ink (not the app's always-dark --rail). */
-.idx { position: sticky; top: 61px; align-self: start; max-height: calc(100vh - 61px); overflow: auto;
+.idx { position: sticky; top: 61px; align-self: start; height: calc(100vh - 61px);
+  display: flex; flex-direction: column; overflow: hidden;
   padding: 16px; border-right: var(--brd) solid var(--border); background: var(--board); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
   clip-path: inset(50%); white-space: nowrap; border: 0; }
 /* The index is 83 entries in a sticky column — filtering beats scrolling. */
-.idx__filter { display: block; margin-bottom: 12px; }
+.idx__filter { display: block; margin-bottom: 12px; flex: none; }
 .idx__filter input { width: 100%; box-sizing: border-box; padding: 6px 8px;
   font-family: var(--font-mono); font-size: 12px; color: var(--ink);
   background: var(--panel); border: var(--brd) solid var(--border); border-radius: var(--radius); }
 .idx__filter input::placeholder { color: var(--muted); }
 .idx__filter input:focus-visible { outline: var(--focus-w, 2px) solid var(--sig-work); outline-offset: 2px; }
-.idx__none { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin: 0 0 12px; }
+.idx__none { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin: 0 0 12px; flex: none; }
+.idx__list { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
 .idx__group { margin-bottom: 14px; }
 .idx__cat { font-family: var(--font-mono); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 4px; display: flex; justify-content: space-between; gap: 8px; }
 .idx__count { color: var(--muted); font-weight: 700; }
@@ -521,6 +540,12 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
   font-family: var(--font-mono); font-size: 12px; color: var(--ink); background: var(--panel);
   border: var(--brd-hair) solid var(--border); padding: 4px 6px; width: 100%; }
 .pg__ctl--bool input { width: 15px; height: 15px; accent-color: var(--sig-work); }
+.pg__reset { align-self: flex-start; margin-top: 2px; font-family: var(--font-mono); font-size: 10px;
+  font-weight: 800; text-transform: uppercase; letter-spacing: .06em; padding: 4px 9px;
+  background: var(--panel); color: var(--ink); border: var(--brd-hair) solid var(--border); cursor: pointer; }
+.pg__reset:disabled { opacity: .45; cursor: default; }
+.pg__reset:not(:disabled):hover { border-color: var(--sig-accent); color: var(--sig-accent); }
+.pg__reset:focus-visible { outline: var(--focus-w, 2px) solid var(--sig-work); outline-offset: 2px; }
 .pg__code { font-family: var(--font-mono); font-size: 11px; color: var(--ink); background: var(--board);
   border: var(--brd-hair) solid var(--border); padding: 8px 10px; margin: 0; white-space: pre-wrap; word-break: break-word; }
 .pg__note { font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin: 8px 0 0; }
@@ -539,7 +564,9 @@ main { padding: 20px; display: flex; flex-direction: column; gap: 18px; min-widt
 .vrow { display: flex; gap: 10px; font-family: var(--font-mono); font-size: 11px; padding: 1px 0; }
 .vrow code { color: var(--sig-accent); }
 .vrow span { color: var(--muted); }
-@media (max-width: 720px) { .wrap { grid-template-columns: 1fr; } .idx { position: static; max-height: none; border-right: 0; border-bottom: var(--brd) solid var(--border); } }
+@media (max-width: 720px) { .wrap { grid-template-columns: 1fr; }
+  .idx { position: static; height: auto; overflow: visible; border-right: 0; border-bottom: var(--brd) solid var(--border); }
+  .idx__list { overflow: visible; } }
 </style>
 </head>
 <body>
@@ -564,7 +591,7 @@ ${brandButtons}
       <input type="search" id="idx-filter" placeholder="filter…" autocomplete="off" spellcheck="false" />
     </label>
     <p class="idx__none" hidden role="status">no match</p>
-    ${indexHtml}
+    <div class="idx__list">${indexHtml}</div>
   </nav>
   <main>${cardsHtml}</main>
 </div>
