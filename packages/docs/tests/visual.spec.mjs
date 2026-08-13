@@ -8,9 +8,17 @@
 // under the default 5s budget it cannot fit enough frames — the run dies with
 // "Failed to take two consecutive stable screenshots" REGARDLESS of platform or
 // whether a baseline exists. That failure mode masqueraded as "missing
-// baselines" for this whole remediation and left the visual gate dark. Measured:
-// 5s fails, 30s passes. Do not trim it back without re-measuring against the
-// real page height.
+// baselines" for this whole remediation and left the visual gate dark.
+//
+// Sizing it, measured twice:
+//   - 5s fails, 30s passes — on a local macOS machine.
+//   - 30s is NOT enough on a GitHub ubuntu-latest runner. Writing baselines
+//     there took 50s for all four themes, but COMPARING against an existing
+//     one is far dearer (a ~1.8MB diff of a 64,000px image): 3 of 4 themes
+//     blew the 30s budget and the one that survived took 2.2 minutes.
+// Hence 180s — 2.2min observed plus headroom for a noisier runner. This is a
+// per-test ceiling, not a sleep: a fast local run still finishes in ~25s.
+// Do not trim it back without re-measuring ON CI, not just locally.
 
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -37,6 +45,12 @@ const platformSuffix =
 
 for (const theme of THEMES) {
   test(`component browser visual — ${theme}`, async ({ page }, testInfo) => {
+    // Per-test, not in playwright.config.mjs: the other suites in this project
+    // are fast and should keep failing quickly. Only this one pays the
+    // 64,000px-diff cost. Playwright's default is 30s, which is also the
+    // assertion timeout below — so an overrun reported "Test timeout of
+    // 30000ms" while the real ceiling being hit was ambiguous between the two.
+    test.setTimeout(180_000);
     const updating = testInfo.config.updateSnapshots !== "none";
     const baseline = join(SNAPSHOT_DIR, `components-${theme}-chromium-${platformSuffix}.png`);
     if (!updating) {
@@ -51,7 +65,9 @@ for (const theme of THEMES) {
     await expect(page).toHaveScreenshot(`components-${theme}.png`, {
       fullPage: true,
       animations: "disabled",
-      timeout: 30_000,
+      // Sits under the 180s test ceiling set above, so an overrun here reports
+      // as a screenshot failure rather than a bare test timeout.
+      timeout: 150_000,
     });
   });
 }
