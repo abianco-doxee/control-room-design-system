@@ -26,17 +26,25 @@ const THEMES = ["dark", "light", "extreme", "phosphor"];
 // loudly and names the workflow that produces it.
 // Baselines are platform-suffixed, so they must be generated on the platform the
 // gate runs on: `.github/workflows/visual-baselines.yml` (workflow_dispatch).
+//
+// EXCEPT under --update-snapshots, where writing the missing file is the whole
+// point. Guarding unconditionally deadlocks: the generator run fails on the
+// absent baseline it was invoked to create, so the set can never be bootstrapped.
+// `updateSnapshots` is "all"/"changed"/"missing" when updating, "none" otherwise.
 const SNAPSHOT_DIR = join(dirname(fileURLToPath(import.meta.url)), "visual.spec.mjs-snapshots");
 const platformSuffix =
   { darwin: "darwin", linux: "linux", win32: "win32" }[process.platform] ?? process.platform;
 
 for (const theme of THEMES) {
-  test(`component browser visual — ${theme}`, async ({ page }) => {
+  test(`component browser visual — ${theme}`, async ({ page }, testInfo) => {
+    const updating = testInfo.config.updateSnapshots !== "none";
     const baseline = join(SNAPSHOT_DIR, `components-${theme}-chromium-${platformSuffix}.png`);
-    expect(
-      existsSync(baseline),
-      `Missing baseline ${baseline}.\nPlaywright would silently create it and pass, leaving the visual gate dark.\nGenerate Linux baselines via the "Visual baselines" workflow (Actions → workflow_dispatch),\nor locally for this platform with: pnpm run test:visual:update`
-    ).toBe(true);
+    if (!updating) {
+      expect(
+        existsSync(baseline),
+        `Missing baseline ${baseline}.\nPlaywright would silently create it and pass, leaving the visual gate dark.\nGenerate Linux baselines via the "Visual baselines" workflow (Actions → workflow_dispatch),\nor locally for this platform with: pnpm run test:visual:update`
+      ).toBe(true);
+    }
     await page.goto(SHOWCASE);
     await page.evaluate((t) => document.documentElement.setAttribute("data-theme", t), theme);
     await page.evaluate(() => document.fonts?.ready);
