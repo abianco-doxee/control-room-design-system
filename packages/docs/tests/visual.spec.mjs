@@ -12,15 +12,31 @@
 // 5s fails, 30s passes. Do not trim it back without re-measuring against the
 // real page height.
 
-import { join } from "node:path";
-import { pathToFileURL } from "node:url";
+import { existsSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { expect, test } from "@playwright/test";
 
 const SHOWCASE = pathToFileURL(join(process.cwd(), "public", "components.html")).href;
 const THEMES = ["dark", "light", "extreme", "phosphor"];
 
+// Playwright WRITES a missing baseline and passes the run. On CI that reads as a
+// green visual gate that compared nothing — the exact failure this suite is
+// supposed to catch. Assert the baseline exists first so a missing one fails
+// loudly and names the workflow that produces it.
+// Baselines are platform-suffixed, so they must be generated on the platform the
+// gate runs on: `.github/workflows/visual-baselines.yml` (workflow_dispatch).
+const SNAPSHOT_DIR = join(dirname(fileURLToPath(import.meta.url)), "visual.spec.mjs-snapshots");
+const platformSuffix =
+  { darwin: "darwin", linux: "linux", win32: "win32" }[process.platform] ?? process.platform;
+
 for (const theme of THEMES) {
   test(`component browser visual — ${theme}`, async ({ page }) => {
+    const baseline = join(SNAPSHOT_DIR, `components-${theme}-chromium-${platformSuffix}.png`);
+    expect(
+      existsSync(baseline),
+      `Missing baseline ${baseline}.\nPlaywright would silently create it and pass, leaving the visual gate dark.\nGenerate Linux baselines via the "Visual baselines" workflow (Actions → workflow_dispatch),\nor locally for this platform with: pnpm run test:visual:update`
+    ).toBe(true);
     await page.goto(SHOWCASE);
     await page.evaluate((t) => document.documentElement.setAttribute("data-theme", t), theme);
     await page.evaluate(() => document.fonts?.ready);

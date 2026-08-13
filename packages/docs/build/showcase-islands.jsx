@@ -33,6 +33,7 @@ import {
   CrCronField,
   CrDataGrid,
   CrDateTime,
+  CrDither,
   CrDrawer,
   CrDrip,
   CrEmptyState,
@@ -1661,6 +1662,45 @@ const DEMOS = {
         h(CrSigil, { seed: s.seed, state: s.state, size: s.size }),
         h(CrSigil, { seed: s.seed, state: s.state, size: s.size }),
         h(CrSigil, { seed: s.seed + "-b", state: s.state, size: s.size })
+      ),
+  },
+  // The genuine ordered dither the CSS texture tokens only approximate. Two
+  // copies of one seed prove determinism; a third seed proves it varies — the
+  // same demo shape as the sigil, because it makes the same promise.
+  dither: {
+    tag: "CrDither",
+    defs: [
+      T("text", "seed", "cr-1130"),
+      T("enum", "mode", "bayer", { options: ["bayer", "halftone"] }),
+      T("enum", "state", "working", { options: ["working", "waiting", "idle", "error", "done"] }),
+      T("number", "width", 150, { min: 80, max: 320, step: 10 }),
+      T("number", "height", 90, { min: 48, max: 200, step: 6 }),
+    ],
+    render: (s) =>
+      h(
+        "div",
+        { style: { display: "flex", gap: "12px", alignItems: "flex-start", flexWrap: "wrap" } },
+        h(CrDither, {
+          seed: s.seed,
+          mode: s.mode,
+          state: s.state,
+          width: s.width,
+          height: s.height,
+        }),
+        h(CrDither, {
+          seed: s.seed,
+          mode: s.mode,
+          state: s.state,
+          width: s.width,
+          height: s.height,
+        }),
+        h(CrDither, {
+          seed: s.seed + "-b",
+          mode: s.mode,
+          state: s.state,
+          width: s.width,
+          height: s.height,
+        })
       ),
   },
   chrome: {

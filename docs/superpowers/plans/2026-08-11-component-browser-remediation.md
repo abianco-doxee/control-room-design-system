@@ -1,5 +1,36 @@
 # Control Room 1.0 — Component Browser Remediation Implementation Plan
 
+> **STATUS — 2026-08-13: Tasks 1–40 COMPLETE. Task 41 (deploy) is deliberately
+> still open.** The `- [ ]` boxes below were never ticked during execution — read
+> this header, not the boxes.
+>
+> - **91 commits** on `chore/1.0-browser-remediation` ahead of `main`.
+> - **Changesets landed for every phase:** W1 browser chrome · W2 seeded repaint ·
+>   W3 overlay placement · W4 form contract · W4b CrChoiceGroup · W5 diagonal
+>   primitives · W6 chrome & decoration · W7 control ergonomics · W8 (signal
+>   vocabulary, meter→progress, toast dedup, key-hint combos).
+> - **W9 verified against the built page:** 0 genuinely empty stages (the two
+>   `stage--empty` hits in `components.html` are the CSS rule definitions, not
+>   rendered cards), contact-sheet and decoration-utilities examples present,
+>   masthead eyebrow renamed, full `pnpm run build` clean.
+>
+> **Task 41 is a stop-and-ask gate by design** — deploying means merging this
+> branch to `main`, which publishes the docs site publicly. That decision is the
+> user's; do not merge autonomously.
+>
+> **Work landed after the plan was written** (not tracked as tasks here):
+> - Panel composition + the Law 6 edge bleed, and `CrDither` —
+>   `docs/superpowers/specs/2026-08-13-panel-composition-design.md`.
+> - The visual-baseline mechanism (see the showcase-review plan's Deferred
+>   section): baselines are platform-suffixed, so
+>   `.github/workflows/visual-baselines.yml` generates the `-chromium-linux` set
+>   on CI, and `tests/visual.spec.mjs` now fails on a missing baseline instead of
+>   silently creating one and reporting a green gate that compared nothing.
+>
+> **Known pre-existing failure, not from this branch:** `pnpm run test:separation`
+> fails one assertion on a `#43ff7a` hex inside a `components.css` comment. It
+> fails identically on `main` — verified by stashing.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Close ~65 component-browser review items across ten phases and cut a clean 1.0, ending with a docs deploy.

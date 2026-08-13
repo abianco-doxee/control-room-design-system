@@ -56,3 +56,11 @@ figma-token*
 /scratch-shot.mjs
 /*.png
 .mitosis-cache/
+
+# Playwright visual baselines for platforms other than CI's.
+# The gate runs on ubuntu-latest, so only -chromium-linux baselines belong in
+# git; a maintainer running test:visual:update locally produces darwin/win32
+# files that CI can never match. Generate the committed set with the
+# "Visual baselines" workflow (.github/workflows/visual-baselines.yml).
+packages/docs/tests/visual.spec.mjs-snapshots/*-chromium-darwin.png
+packages/docs/tests/visual.spec.mjs-snapshots/*-chromium-win32.png

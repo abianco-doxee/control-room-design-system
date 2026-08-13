@@ -1,5 +1,35 @@
 # Component Browser Review Implementation Plan
 
+> **STATUS — 2026-08-13: COMPLETE.** All 13 tasks are implemented and verified
+> against the code (the `- [ ]` boxes below were never ticked during execution,
+> so read this header, not the boxes). Audit method and evidence:
+>
+> | Task | Evidence |
+> | --- | --- |
+> | 1 sidebar filter | filter markup + script in `build-showcase.mjs` |
+> | 2 collapse double-cards | **0** components carry both a static example and an island |
+> | 3 promote static-only | 78 entries in `ISLAND_IDS`; only 5 static `EXAMPLES` remain, each a pure-CSS vocabulary strip with no component to mount |
+> | 4 dead cards | 0 registry ids without an example |
+> | 5 clipping | `overflow` rules present on the stage containers |
+> | 6 CrKeyHints combos | `+` = chord, space = sequence, rendered as "then" |
+> | 7 Select popup | `.cr-select option` / `option:disabled` styled |
+> | 8 validation contract | `CrCronField` on the shared `error`-driven contract, with a comment stating there is deliberately no `invalid` boolean |
+> | 9 diagonals + avatar | `avatar.css` uses a diagonal `clip-path` |
+> | 10 breadcrumb separator | configurable, defaults to `▸` |
+> | 11 diagonals elsewhere | `stepper.css` uses diagonal `clip-path` |
+> | 12 bezel halftone | painted on `::after`, **above** the readout, with the rationale in the CSS |
+> | 13 verification | see the gate list in the 2026-08-13 remediation commit |
+>
+> Two items the memory note `showcase-review-findings` still lists as open were
+> found already fixed and are **not** outstanding: the `examples/console` 404
+> (both `frameworks.md` and `forms.md` now say "source-only; the published site
+> does not host it") and the missing radio example (`CrChoice` has a
+> `type: checkbox | radio` control, and the broken `class="cr-check"`-on-`<input>`
+> demo is gone).
+>
+> **The one genuinely deferred item — visual baselines — is now actionable:** see
+> the "Deferred" section at the foot of this file.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Act on the 12-item review of the deployed Component Browser: make every card one live component with togglable props, fix the broken and missing examples, close three component-API gaps, and land four visual-design changes.
@@ -1073,6 +1103,26 @@ grep -c 'idx__filter' /tmp/live.html           # expect >0
 
 ## Deferred — not in this plan
 
-- **Deploying `examples/console`.** Task 4 removes the dead public pointer; actually publishing the app is a separate decision (it would need its own build step in the Pages artifact).
-- **Visual-regression baselines.** Still absent and platform-specific; must be generated on Linux. The step is informational in CI.
+- **Deploying `examples/console`.** Task 4 removed the dead public pointer and both
+  `frameworks.md` and `forms.md` now state the app is source-only. Actually
+  publishing it remains a separate decision (it would need its own build step in
+  the Pages artifact).
+- **Visual-regression baselines.** *(Resolved 2026-08-13 — the mechanism exists;
+  one manual run is still required.)* Playwright baselines are platform-suffixed,
+  so a maintainer's macOS run produces `-chromium-darwin` files CI can never
+  match. Two changes close this:
+  1. `.github/workflows/visual-baselines.yml` — `workflow_dispatch` job that
+     regenerates baselines on `ubuntu-latest`, re-runs the gate against them to
+     prove they are deterministic, and commits the `-chromium-linux` files.
+  2. `tests/visual.spec.mjs` now asserts the baseline **exists** before
+     comparing. Playwright's default is to write a missing baseline and pass,
+     which reported a green visual gate that had compared nothing — the precise
+     failure this suite exists to catch.
+
+  **Remaining manual step:** run the "Visual baselines" workflow once on `main`
+  (Actions → Visual baselines → Run workflow), then remove
+  `continue-on-error: true` from the visual step in `deploy.yml`. It is left
+  non-blocking until then because the suite now fails loudly on a missing
+  baseline, and flipping both at once would red every build until that first run
+  lands.
 - **The `control-room` app extraction.** Tracked in `docs/superpowers/plans/2026-08-11-control-room-extraction.md`; unaffected by this work except that Task 6-8 change component APIs the app will consume.

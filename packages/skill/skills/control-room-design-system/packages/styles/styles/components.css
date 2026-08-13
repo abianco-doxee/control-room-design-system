@@ -1950,9 +1950,12 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
  *
  * `color: inherit` is LOAD-BEARING, not cosmetic. A form control does not
  * inherit `color` from its parent by default, so without this line currentColor
- * resolves to the UA color-scheme default — measured live as rgb(255,255,255)
- * in phosphor while --ink is #43ff7a, i.e. legible only by coincidence and
- * completely untethered from the theme. The table half of this pair gets the
+ * resolves to the UA color-scheme default — measured live as pure white while
+ * phosphor's --ink is its green phosphor tone, i.e. legible only by coincidence
+ * and completely untethered from the theme. (The literal was spelled out here
+ * originally; it is named rather than quoted because the appearance-separation
+ * guard bans brand hex anywhere in this file and cannot tell code from a
+ * comment.) The table half of this pair gets the
  * same thing for free because its input carries .cr-check, which sets
  * `color: var(--ink)` ON THE ELEMENT; the grid's inputs have no class at all
  * (see above), so they must be given it explicitly here. With it, the border

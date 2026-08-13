@@ -68,11 +68,11 @@ try {
 }
 
 /* ── per-component state snippets ─────────────────────────────────────────
- * Each entry: [{ state: "label", html: "<markup/>" }]. Interactive components
- * are shown in their visual states via the shipped cr- classes (the same markup
- * the compiled components emit); the Live Gallery + Qwik example exercise the JS. */
-const sig = (seed, st, n) =>
-  `<canvas class="crsig" width="${n || 40}" height="${n || 40}" data-seed="${seed}" data-state="${st}"></canvas>`;
+ * Each entry: [{ state: "label", html: "<markup/>" }]. This is the FALLBACK
+ * path: anything in ISLAND_IDS mounts the real compiled component instead, and
+ * only a handful of pure-CSS vocabularies (no component to mount) still live
+ * here. The Live Gallery that used to exercise the JS is gone — it was a strict
+ * subset of this page and was folded into it. */
 const EXAMPLES = {
   "data-list": [
     {
@@ -301,6 +301,7 @@ const ISLAND_IDS = new Set([
   "drip",
   "bezel",
   "sigil",
+  "dither",
   "chrome",
   "ascii",
   "telemetry",
