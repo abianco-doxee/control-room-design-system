@@ -8,7 +8,7 @@
       "category": "layout",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "The default container for a group of related data \u2014 the system's workhorse surface.",
+      "description": "A composed instrument bay \u2014 eyebrow, ghost index, title, lede, body and a pinned footer; the system's workhorse surface.",
       "spec": "references/components.md#panel",
       "variants": {
         "weight": [
@@ -18,6 +18,28 @@
         "inset": [
           "false",
           "true"
+        ],
+        "tone": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle",
+          "accent"
+        ],
+        "marks": [
+          "false",
+          "true"
+        ],
+        "bleed": [
+          "halftone",
+          "dither",
+          "scan",
+          "glass"
+        ],
+        "ambient": [
+          "scan",
+          "pulse"
         ]
       },
       "tokens": [
@@ -48,6 +70,30 @@
         {
           "cssVar": "--shadow-col",
           "description": "shadow color"
+        },
+        {
+          "cssVar": "--sig-accent-2",
+          "description": "lede rule (second key)"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "eyebrow + footer, and the ghost index mix"
+        },
+        {
+          "cssVar": "--halftone",
+          "description": "edge-bleed texture (Law 6)"
+        },
+        {
+          "cssVar": "--dither",
+          "description": "edge-bleed texture (Law 6)"
+        },
+        {
+          "cssVar": "--scanline",
+          "description": "edge-bleed texture (Law 6)"
+        },
+        {
+          "cssVar": "--decoration-intensity",
+          "description": "bleed loudness dial"
         }
       ],
       "keywords": [
@@ -55,7 +101,13 @@
         "card",
         "container",
         "surface",
-        "box"
+        "box",
+        "eyebrow",
+        "index",
+        "lede",
+        "footer",
+        "bleed",
+        "instrument bay"
       ]
     },
     {
@@ -1437,6 +1489,59 @@
       ]
     },
     {
+      "id": "dither",
+      "name": "Dither",
+      "category": "media",
+      "kind": "component",
+      "lifecycle": "stable",
+      "description": "Seeded Bayer 4\u00d74 ordered dither / halftone field \u2014 hardware surfaces only (Law 6); the genuine texture the CSS tokens approximate.",
+      "spec": "references/decoration.md",
+      "variants": {
+        "mode": [
+          "bayer",
+          "halftone"
+        ],
+        "state": [
+          "working",
+          "waiting",
+          "idle",
+          "error",
+          "done"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "field ground"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "working hue"
+        },
+        {
+          "cssVar": "--sig-accent",
+          "description": "default ink (seeded)"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error hue"
+        },
+        {
+          "cssVar": "--sig-accent-2",
+          "description": "done/acid hue"
+        }
+      ],
+      "keywords": [
+        "dither",
+        "bayer",
+        "halftone",
+        "texture",
+        "seeded",
+        "grain",
+        "neo-print"
+      ]
+    },
+    {
       "id": "chrome",
       "name": "Chrome",
       "category": "media",
@@ -1566,7 +1671,7 @@
       "category": "media",
       "kind": "component",
       "lifecycle": "stable",
-      "description": "Seeded NERV-style decorative telemetry string (hex id, byte, channel tag, mini bar) for a frame corner. Decoration, not data — every field is unitless so it cannot be mistaken for a real measurement.",
+      "description": "Seeded NERV-style decorative telemetry string (hex id, byte, channel tag, mini bar) for a frame corner. Decoration, not data \u2014 every field is unitless so it cannot be mistaken for a real measurement.",
       "spec": "references/decoration.md",
       "variants": {
         "prop": [

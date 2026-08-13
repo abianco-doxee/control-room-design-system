@@ -68,39 +68,62 @@ section is exactly the drift being closed.
 **Purpose.** The default container for a group of related data. The system's
 workhorse surface.
 
-**Anatomy.** Bordered box · hard offset shadow · optional mono uppercase heading
-(`h4`) · body.
+**Anatomy.** A composed instrument bay, top to bottom: eyebrow · ghost index
+(top-right) · heading (`h4`) · lede · body · footer pinned to the bottom edge.
+Bordered box with the hard offset shadow throughout. Every part above the body
+is optional — a bare `<CrPanel>` is still just a box.
+
+```
+┌─ .cr-panel ────────────────────────┐
+│ EYEBROW · UNIT CR-00        ⌐ 01 ⌐ │  eyebrow (real text) + index (ghost)
+│ Display Heading                    │  title
+│ ▏ lede / standfirst                │  lede, second-key left rule
+│                                    │
+│ (children)                         │
+│                                    │
+│ LAW 6 · TEXTURE ON HARDWARE        │  footer, pinned
+└────────────────────────────────────┘
+```
+
+**Parts.** `root` · `bleed` · `index` · `eyebrow` · `title` · `lede` · `footer`.
 
 **Tokens.** `--panel` bg · `--border` + `--brd` · `--shadow-off`/`--shadow-col` ·
-`--ink` heading · `--font-mono` + `--type-label-tracking`.
+`--ink` heading · `--font-mono` + `--type-label-tracking` · `--sig-accent-2`
+lede rule · `--muted` eyebrow/footer.
 
 **Variants.** `weight`: `default` (`--brd`) | `major` (`--brd-heavy`). `inset`:
-swap bg to `--panel-2` for a recessed sub-region.
+swap bg to `--panel-2` for a recessed sub-region. `tone`: keys the eyebrow to a
+signal (`work`/`wait`/`done`/`err`/`idle`/`accent`). `marks`: adds the shipped
+`.cr-mark` registration ticks. `bleed`: a masked edge texture — see below.
+`ambient`: adds a shipped `.cr-anim-*` loop.
 
 ```html
-<section class="panel">
-  <h4>Sessions</h4>
+<section class="cr-panel cr-panel--major cr-panel--tone-err cr-mark">
+  <i class="cr-panel__bleed" data-bleed="halftone" aria-hidden="true"></i>
+  <span class="cr-panel__index" aria-hidden="true">01</span>
+  <p class="cr-panel__eyebrow">Critique · unit cr-00</p>
+  <h4 class="cr-panel__title">Sessions</h4>
+  <p class="cr-panel__lede">14 active, 2 failing.</p>
   <!-- rows / content -->
+  <p class="cr-panel__footer">Law 6 · texture on hardware</p>
 </section>
-```
-```css
-.panel {
-  background: var(--panel);
-  border: var(--brd) solid var(--border);
-  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
-  padding: 13px;
-}
-.panel h4 {
-  font-family: var(--font-mono); font-size: 11px; font-weight: 800;
-  text-transform: uppercase; letter-spacing: .1em;
-  color: var(--ink); margin: 0 0 10px;
-}
 ```
 
 - **MUST** use the hard offset shadow; **NEVER** blur it or round the corners.
 - **SHOULD** use `major` weight for a panel that is itself a top-level region.
 - **NEVER** nest more than one shadow depth visually — stacking hard shadows
   reads as noise. Use `inset` (`--panel-2`, no shadow) for sub-regions.
+- **MUST** keep `index` decorative — it is `aria-hidden`, a stamp on the casing
+  rather than a datum. A readable unit id goes in the `eyebrow`, which is real
+  text.
+- **MUST** key `tone` to an actual machine state (Law 2). A tone that means
+  nothing is decoration wearing a signal's clothes.
+- **NEVER** put more than **one bled panel on a screen** (Law 6). The `bleed`
+  mask fades the texture out before the readout; it is an accent on the most
+  exceptional surface, not a page-wide wash.
+
+The root is a **flex column** — that is what pins `footer` to the bottom edge.
+Content children are lifted above the bleed layer with `z-index: 1`.
 
 ---
 

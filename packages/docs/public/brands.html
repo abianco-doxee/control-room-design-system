@@ -346,7 +346,19 @@ body {
 }
 
 /* ── Panel ─────────────────────────────────────────────────────────────── */
+/* A composed instrument bay, not a card: eyebrow · ghost index · title · lede,
+ * then content, then a footer pinned to the bottom edge. The flex column is
+ * what makes that pin work (`margin-top:auto` on the footer) — a block root
+ * cannot do it, which is why this is a breaking layout change.
+ * `position:relative` hosts the absolute index + bleed. */
 .cr-panel {
+  /* Gutter the eyebrow and title reserve so neither runs under the ghost
+   * numeral. On the root because a custom property does not inherit sideways
+   * from .cr-panel__index to its siblings; override it per-panel if a caller
+   * ships a wider index than the default two glyphs. */
+  --cr-panel-index-gutter: var(--space-10);
+  position: relative;
+  display: flex; flex-direction: column;
   background: var(--cr-panel-bg);
   border: var(--brd) solid var(--border);
   box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
@@ -358,6 +370,92 @@ body {
   font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 800;
   text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink); margin: 0 0 var(--space-2);
 }
+/* Stamped unit numeral. Decorative by contract (aria-hidden in the component):
+ * it is a mark on the casing, not a datum. A caller who needs a READABLE unit
+ * id puts it in the eyebrow.
+ *
+ * The colour is a MIX toward the panel ground, not a raw token, because every
+ * candidate token fails at one end of the theme range. Measured against
+ * --panel: --rail-ink is 10.59 in dark and 13.85 in phosphor (a screaming
+ * numeral, not a ghost) but 1.16 in light and extreme (invisible — the same
+ * --rail-ink inversion bezel.css documents). --muted is consistent (5.19–7.45)
+ * but reads as real content at ~6:1, inviting exactly the misreading this part
+ * must avoid.
+ * Mixing --muted 22% into --panel keeps the mark barely-there in ALL four
+ * themes by construction: it is defined relative to the ground it sits on, so
+ * it cannot invert when the ground does. */
+.cr-panel__index {
+  position: absolute; top: var(--space-3); right: var(--space-3);
+  font-family: var(--font-display); font-weight: 900; font-size: var(--text-xl);
+  line-height: 1; pointer-events: none;
+  color: color-mix(in srgb, var(--muted) 22%, var(--panel));
+}
+/* Mono label above the title. Matches the house label shape (.cr-sep-label,
+ * .cr-plate): 2xs, wide tracking, uppercase. --cr-panel-eyebrow is the tone
+ * hook — a signal keys it per Law 2, and it defaults to --muted (structure). */
+.cr-panel__eyebrow {
+  font-family: var(--font-mono); font-size: var(--text-2xs); font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--cr-panel-eyebrow, var(--muted)); margin: 0 0 var(--space-2);
+  /* Reserve the numeral's gutter (declared on the root) so a long eyebrow
+   * wraps instead of running under the ghost. */
+  padding-inline-end: var(--cr-panel-index-gutter);
+}
+/* The title clears it too — a long title would otherwise run under the numeral. */
+.cr-panel__index ~ .cr-panel__title { padding-inline-end: var(--cr-panel-index-gutter); }
+.cr-panel--tone-work   { --cr-panel-eyebrow: var(--sig-work); }
+.cr-panel--tone-wait   { --cr-panel-eyebrow: var(--sig-wait); }
+.cr-panel--tone-done   { --cr-panel-eyebrow: var(--sig-done); }
+.cr-panel--tone-err    { --cr-panel-eyebrow: var(--sig-err); }
+.cr-panel--tone-idle   { --cr-panel-eyebrow: var(--sig-idle); }
+.cr-panel--tone-accent { --cr-panel-eyebrow: var(--sig-accent); }
+/* Lede — a standfirst under the title, ruled off with a second-key edge. */
+.cr-panel__lede {
+  border-inline-start: var(--brd) solid var(--sig-accent-2);
+  padding-inline-start: var(--space-2); margin: 0 0 var(--space-3);
+  font-size: var(--text-xs); color: var(--muted);
+}
+/* Pinned to the bottom by the root's flex column — the stamped plate line. */
+.cr-panel__footer {
+  margin-top: auto; padding-top: var(--space-3);
+  font-family: var(--font-mono); font-size: var(--text-2xs);
+  text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);
+}
+/* Panel edge bleed (Law 6 — texture fades out BEFORE the readout).
+ * Deliberately NOT its own `── ── ` section header: the part splitter keys off
+ * those, and a separate `panel-edge-bleed` part made of `.cr-panel__*`
+ * selectors would let an import-on-use consumer take the panel and silently
+ * lose its bleed. It belongs to the panel family, so it ships in panel.css.
+ *
+ * A masked texture on the panel's margin. The mask IS the contract: the
+ * 105deg stop clears the content area, so this never becomes texture on a
+ * flat content field. Law 6 caps it at ONE bled panel per screen.
+ *
+ * A real element, not a ::before on the root: .cr-mark already owns both
+ * pseudo-elements for its corner ticks, so a pseudo here would make `marks`
+ * and `bleed` mutually exclusive. As a child they compose freely.
+ *
+ * pointer-events:none is mandatory — an inset overlay without it eats every
+ * click inside the panel (same note, same reason, as .cr-bezel__screen::after). */
+.cr-panel__bleed {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-repeat: repeat; background-position: 0 0;
+  opacity: calc(0.5 * var(--decoration-intensity, 1));
+  -webkit-mask-image: linear-gradient(105deg, transparent 38%, #000 100%);
+          mask-image: linear-gradient(105deg, transparent 38%, #000 100%);
+}
+.cr-panel__bleed[data-bleed="halftone"] { background-image: var(--halftone); background-size: var(--halftone-size) var(--halftone-size); }
+.cr-panel__bleed[data-bleed="dither"]   { background-image: var(--dither); }
+.cr-panel__bleed[data-bleed="scan"]     { background-image: var(--scanline); }
+.cr-panel__bleed[data-bleed="glass"]    { background-image: var(--scanline), var(--halftone); background-size: auto, var(--halftone-size) var(--halftone-size); }
+/* Content clears the bleed layer. Only the direct children are lifted, so a
+ * nested absolute child still stacks against its own parent.
+ * .cr-panel__index is excluded: it is absolutely positioned, and this rule
+ * would otherwise override that (same specificity, declared later) and drop
+ * the numeral into the flow as a full-width block. It gets its z-index below
+ * instead. */
+.cr-panel > *:not(.cr-panel__bleed, .cr-panel__index) { position: relative; z-index: 1; }
+.cr-panel__index { z-index: 1; }
 
 /* ── Button (snap-press) ───────────────────────────────────────────────── */
 .cr-btn {

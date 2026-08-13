@@ -360,7 +360,15 @@ casing and the recessed screen; content stays flat per Law 1.
 - **MUST** build a bezel from the bezel vocabulary: `--brd-brush` casing, corner
   rivets, a visibly inset screen. One instrument per screen (mirrors Law 2's
   one-key discipline).
+- **MAY** carry an **edge bleed**: a masked texture that fades to full
+  transparency before it reaches the content area, on a panel's corner or edge
+  (`.cr-panel--bleed` / `CrPanel bleed=""`). The mask *is* the contract —
+  texture that touches a readout is not a bleed, it is a violation of the rule
+  above. The bleed lives on the panel's margin; the field it wraps stays clean.
 - **NEVER** put texture on a flat content field.
+- **NEVER** more than **one bled panel per screen** — the bleed is an accent on
+  the most exceptional surface, and a page of grain is the same noise a page of
+  bezels is (mirrors Law 2's one-key discipline and the one-instrument rule).
 - **NEVER** nest bezels or bezel every panel — a page of hardware is noise.
 
 *Sources: Pip-Boy · Apple II.*

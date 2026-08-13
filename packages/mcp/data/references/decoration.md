@@ -68,6 +68,38 @@ import { CrTelemetry } from "@alebianco/cr-design-system/react";
 A whisper block-shade grid (`--field` token) for large dead background regions —
 an extension of the texture family, for behind panels rather than on hardware.
 
+### Panel edge bleed — `.cr-panel__bleed`
+
+A masked texture on a panel's margin, fading to full transparency before it
+reaches the content area. Law 6 sanctions this as the one way a panel — a flat
+content field — may carry grain, and caps it at **one bled panel per screen**.
+
+Pure CSS on purpose: it consumes the per-theme `--halftone` / `--dither` /
+`--scanline` tokens, so it survives a theme flip with no per-theme code, follows
+`--decoration-intensity`, and costs no script. The `105deg` mask stop *is* the
+contract — texture that touches a readout is not a bleed.
+
+```html
+<i class="cr-panel__bleed" data-bleed="halftone" aria-hidden="true"></i>
+```
+
+### Seeded dither field — `CrDither`
+
+A real Bayer 4×4 ordered dither, or variable-density halftone dots, painted from
+a seed — the genuine article the CSS texture tokens only approximate. Same
+engine as `CrSigil`: FNV hash → mulberry32, hues read from the live token
+values, so it re-keys on a theme flip.
+
+**Hardware only.** A hero, a masthead, a bezel — never a flat content field, and
+never as the default way a panel gets grain. `.cr-panel__bleed` is the panel
+path and stays script-free, matching the `CrDrip` precedent that the house
+glitch must render identically without JS.
+
+```tsx
+import { CrDither } from "@alebianco/cr-design-system/react";
+<CrDither seed="cr-1130" mode="bayer" state="working" />
+```
+
 ### Empty states
 
 Replace a blank "no data" region with an aria-hidden `CrAscii` field behind a

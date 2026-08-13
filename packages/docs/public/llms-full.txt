@@ -34,7 +34,7 @@ Set the theme on the root: `<html data-theme="dark|light|extreme|phosphor">`.
 
 ## Components
 Every component is catalogued with its variants, design tokens, and keywords in
-[catalog.json](https://alebianco.github.io/control-room-design-system/catalog.json) (82 entries). Rendered and
+[catalog.json](https://alebianco.github.io/control-room-design-system/catalog.json) (83 entries). Rendered and
 exercised in all four themes in the [Component Browser](https://alebianco.github.io/control-room-design-system/components.html); see them
 live in the [Component Browser](https://alebianco.github.io/control-room-design-system/components.html).
 
@@ -85,7 +85,7 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 - [Data grid](https://alebianco.github.io/control-room-design-system/components.html#c-datagrid): A dense, VIRTUALIZED data grid for large datasets: only the rows in (or near) the viewport are in the DOM, so thousands of rows scroll smoothly. Fixed row height; sortable headers (asc → desc → none, stable); optional row selection (checkbox column + select-all + aria-selected); sticky header; grid a11y (role=grid/row/columnheader/gridcell, aria-sort, aria-rowcount). Div-grid (not a <table>) so virtualization offsets cleanly across all targets.
 - [Data list](https://alebianco.github.io/control-room-design-system/components.html#c-data-list): Key → value readout (dl/dt/dd) on a two-column grid — mono/label keys, data-register values. For detail panels.
 - [Instrument shell](https://alebianco.github.io/control-room-design-system/components.html#c-instrument): The dashboard chassis — composes the nav rail and a board (masthead/hero + panels).
-- [Panel](https://alebianco.github.io/control-room-design-system/components.html#c-panel): The default container for a group of related data — the system's workhorse surface.
+- [Panel](https://alebianco.github.io/control-room-design-system/components.html#c-panel): A composed instrument bay — eyebrow, ghost index, title, lede, body and a pinned footer; the system's workhorse surface.
 - [Resizable](https://alebianco.github.io/control-room-design-system/components.html#c-resizable): Two panes with a draggable divider. Panes are children (CSS-grid sized); the handle is a WAI-ARIA window splitter (role=separator, focusable, aria-valuenow, arrow/Home/End keys). Pointer-capture drag.
 - [ScrollArea](https://alebianco.github.io/control-room-design-system/components.html#c-scroll-area): A container with cross-browser styled scrollbars (thin, inked, neon thumb) that keep the Control Room look. Keyboard-scrollable; with a label it's a named role=group.
 - [Table](https://alebianco.github.io/control-room-design-system/components.html#c-table): Dense operator table on the same chassis as a panel; mono/label headers, data-register cells. Optional column sort, row selection (checkbox + aria-selected), and a sticky header.
@@ -96,6 +96,7 @@ live in the [Component Browser](https://alebianco.github.io/control-room-design-
 - [Carousel](https://alebianco.github.io/control-room-design-system/components.html#c-carousel): Slide carousel with the WAI-ARIA carousel pattern — labelled region, prev/next, dot indicators, aria-live viewport, ←/→ navigation. Controlled via index/onIndex.
 - [Chrome](https://alebianco.github.io/control-room-design-system/components.html#c-chrome): Seeded instrument chrome strip — a pixel-art metal bar with a deterministically varied graduated scale, panel seams, registration mark, wear scratches, and an indicator LED.
 - [Decoration utilities](https://alebianco.github.io/control-room-design-system/components.html#c-decoration-utilities): The FUI/decoration utility layer for dead space and chassis edges: styled scrollbar, tick-ruler edge, whisper drafting field, hazard stripe, and the Breach blur-blob. All aria-hidden, non-interactive, whisper contrast — never on a content field.
+- [Dither](https://alebianco.github.io/control-room-design-system/components.html#c-dither): Seeded Bayer 4×4 ordered dither / halftone field — hardware surfaces only (Law 6); the genuine texture the CSS tokens approximate.
 - [Icon](https://alebianco.github.io/control-room-design-system/components.html#c-icon): The house operational glyph set — 24×24, currentColor, single 2px stroke, square caps to match the neobrutalist geometry. Decorative by default; pass a label to name it.
 - [Seeded pixel-cat](https://alebianco.github.io/control-room-design-system/components.html#c-seeded-cat): Identity+state sprite: fur/markings from the session id, pose from state; deterministic paint() to canvas.
 - [Sigil](https://alebianco.github.io/control-room-design-system/components.html#c-sigil): Seeded cyber-sigil — a retro-futuristic pixel glyph generated from a seed; optional state keys the hue.
@@ -524,7 +525,15 @@ casing and the recessed screen; content stays flat per Law 1.
 - **MUST** build a bezel from the bezel vocabulary: `--brd-brush` casing, corner
   rivets, a visibly inset screen. One instrument per screen (mirrors Law 2's
   one-key discipline).
+- **MAY** carry an **edge bleed**: a masked texture that fades to full
+  transparency before it reaches the content area, on a panel's corner or edge
+  (`.cr-panel--bleed` / `CrPanel bleed=""`). The mask *is* the contract —
+  texture that touches a readout is not a bleed, it is a violation of the rule
+  above. The bleed lives on the panel's margin; the field it wraps stays clean.
 - **NEVER** put texture on a flat content field.
+- **NEVER** more than **one bled panel per screen** — the bleed is an accent on
+  the most exceptional surface, and a page of grain is the same noise a page of
+  bezels is (mirrors Law 2's one-key discipline and the one-instrument rule).
 - **NEVER** nest bezels or bezel every panel — a page of hardware is noise.
 
 *Sources: Pip-Boy · Apple II.*
@@ -2129,39 +2138,62 @@ section is exactly the drift being closed.
 **Purpose.** The default container for a group of related data. The system's
 workhorse surface.
 
-**Anatomy.** Bordered box · hard offset shadow · optional mono uppercase heading
-(`h4`) · body.
+**Anatomy.** A composed instrument bay, top to bottom: eyebrow · ghost index
+(top-right) · heading (`h4`) · lede · body · footer pinned to the bottom edge.
+Bordered box with the hard offset shadow throughout. Every part above the body
+is optional — a bare `<CrPanel>` is still just a box.
+
+```
+┌─ .cr-panel ────────────────────────┐
+│ EYEBROW · UNIT CR-00        ⌐ 01 ⌐ │  eyebrow (real text) + index (ghost)
+│ Display Heading                    │  title
+│ ▏ lede / standfirst                │  lede, second-key left rule
+│                                    │
+│ (children)                         │
+│                                    │
+│ LAW 6 · TEXTURE ON HARDWARE        │  footer, pinned
+└────────────────────────────────────┘
+```
+
+**Parts.** `root` · `bleed` · `index` · `eyebrow` · `title` · `lede` · `footer`.
 
 **Tokens.** `--panel` bg · `--border` + `--brd` · `--shadow-off`/`--shadow-col` ·
-`--ink` heading · `--font-mono` + `--type-label-tracking`.
+`--ink` heading · `--font-mono` + `--type-label-tracking` · `--sig-accent-2`
+lede rule · `--muted` eyebrow/footer.
 
 **Variants.** `weight`: `default` (`--brd`) | `major` (`--brd-heavy`). `inset`:
-swap bg to `--panel-2` for a recessed sub-region.
+swap bg to `--panel-2` for a recessed sub-region. `tone`: keys the eyebrow to a
+signal (`work`/`wait`/`done`/`err`/`idle`/`accent`). `marks`: adds the shipped
+`.cr-mark` registration ticks. `bleed`: a masked edge texture — see below.
+`ambient`: adds a shipped `.cr-anim-*` loop.
 
 ```html
-<section class="panel">
-  <h4>Sessions</h4>
+<section class="cr-panel cr-panel--major cr-panel--tone-err cr-mark">
+  <i class="cr-panel__bleed" data-bleed="halftone" aria-hidden="true"></i>
+  <span class="cr-panel__index" aria-hidden="true">01</span>
+  <p class="cr-panel__eyebrow">Critique · unit cr-00</p>
+  <h4 class="cr-panel__title">Sessions</h4>
+  <p class="cr-panel__lede">14 active, 2 failing.</p>
   <!-- rows / content -->
+  <p class="cr-panel__footer">Law 6 · texture on hardware</p>
 </section>
-```
-```css
-.panel {
-  background: var(--panel);
-  border: var(--brd) solid var(--border);
-  box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
-  padding: 13px;
-}
-.panel h4 {
-  font-family: var(--font-mono); font-size: 11px; font-weight: 800;
-  text-transform: uppercase; letter-spacing: .1em;
-  color: var(--ink); margin: 0 0 10px;
-}
 ```
 
 - **MUST** use the hard offset shadow; **NEVER** blur it or round the corners.
 - **SHOULD** use `major` weight for a panel that is itself a top-level region.
 - **NEVER** nest more than one shadow depth visually — stacking hard shadows
   reads as noise. Use `inset` (`--panel-2`, no shadow) for sub-regions.
+- **MUST** keep `index` decorative — it is `aria-hidden`, a stamp on the casing
+  rather than a datum. A readable unit id goes in the `eyebrow`, which is real
+  text.
+- **MUST** key `tone` to an actual machine state (Law 2). A tone that means
+  nothing is decoration wearing a signal's clothes.
+- **NEVER** put more than **one bled panel on a screen** (Law 6). The `bleed`
+  mask fades the texture out before the readout; it is an accent on the most
+  exceptional surface, not a page-wide wash.
+
+The root is a **flex column** — that is what pins `footer` to the bottom edge.
+Content children are lifted above the bleed layer with `z-index: 1`.
 
 ---
 
@@ -5333,6 +5365,38 @@ import { CrTelemetry } from "@alebianco/cr-design-system/react";
 
 A whisper block-shade grid (`--field` token) for large dead background regions —
 an extension of the texture family, for behind panels rather than on hardware.
+
+### Panel edge bleed — `.cr-panel__bleed`
+
+A masked texture on a panel's margin, fading to full transparency before it
+reaches the content area. Law 6 sanctions this as the one way a panel — a flat
+content field — may carry grain, and caps it at **one bled panel per screen**.
+
+Pure CSS on purpose: it consumes the per-theme `--halftone` / `--dither` /
+`--scanline` tokens, so it survives a theme flip with no per-theme code, follows
+`--decoration-intensity`, and costs no script. The `105deg` mask stop *is* the
+contract — texture that touches a readout is not a bleed.
+
+```html
+<i class="cr-panel__bleed" data-bleed="halftone" aria-hidden="true"></i>
+```
+
+### Seeded dither field — `CrDither`
+
+A real Bayer 4×4 ordered dither, or variable-density halftone dots, painted from
+a seed — the genuine article the CSS texture tokens only approximate. Same
+engine as `CrSigil`: FNV hash → mulberry32, hues read from the live token
+values, so it re-keys on a theme flip.
+
+**Hardware only.** A hero, a masthead, a bezel — never a flat content field, and
+never as the default way a panel gets grain. `.cr-panel__bleed` is the panel
+path and stays script-free, matching the `CrDrip` precedent that the house
+glitch must render identically without JS.
+
+```tsx
+import { CrDither } from "@alebianco/cr-design-system/react";
+<CrDither seed="cr-1130" mode="bayer" state="working" />
+```
 
 ### Empty states
 

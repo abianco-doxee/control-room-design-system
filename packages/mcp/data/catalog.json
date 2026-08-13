@@ -5,7 +5,7 @@
     "name": "Control Room",
     "version": "1.0.0",
     "origin": "control-room",
-    "count": 82,
+    "count": 83,
     "categories": {
       "action": 2,
       "behavior": 1,
@@ -13,14 +13,14 @@
       "forms": 20,
       "identity": 3,
       "layout": 10,
-      "media": 9,
+      "media": 10,
       "navigation": 8,
       "overlay": 9,
       "primitives": 2,
       "state": 14
     },
     "lifecycles": {
-      "stable": 81,
+      "stable": 82,
       "experimental": 1
     }
   },
@@ -1446,7 +1446,7 @@
       "category": "layout",
       "lifecycle": "stable",
       "origin": "control-room",
-      "description": "The default container for a group of related data — the system's workhorse surface.",
+      "description": "A composed instrument bay — eyebrow, ghost index, title, lede, body and a pinned footer; the system's workhorse surface.",
       "spec": "references/components.md#panel",
       "variants": {
         "weight": [
@@ -1456,6 +1456,28 @@
         "inset": [
           "false",
           "true"
+        ],
+        "tone": [
+          "work",
+          "wait",
+          "done",
+          "err",
+          "idle",
+          "accent"
+        ],
+        "marks": [
+          "false",
+          "true"
+        ],
+        "bleed": [
+          "halftone",
+          "dither",
+          "scan",
+          "glass"
+        ],
+        "ambient": [
+          "scan",
+          "pulse"
         ]
       },
       "tokens": [
@@ -1486,6 +1508,30 @@
         {
           "cssVar": "--shadow-col",
           "description": "shadow color"
+        },
+        {
+          "cssVar": "--sig-accent-2",
+          "description": "lede rule (second key)"
+        },
+        {
+          "cssVar": "--muted",
+          "description": "eyebrow + footer, and the ghost index mix"
+        },
+        {
+          "cssVar": "--halftone",
+          "description": "edge-bleed texture (Law 6)"
+        },
+        {
+          "cssVar": "--dither",
+          "description": "edge-bleed texture (Law 6)"
+        },
+        {
+          "cssVar": "--scanline",
+          "description": "edge-bleed texture (Law 6)"
+        },
+        {
+          "cssVar": "--decoration-intensity",
+          "description": "bleed loudness dial"
         }
       ],
       "keywords": [
@@ -1493,7 +1539,13 @@
         "card",
         "container",
         "surface",
-        "box"
+        "box",
+        "eyebrow",
+        "index",
+        "lede",
+        "footer",
+        "bleed",
+        "instrument bay"
       ]
     },
     {
@@ -1811,6 +1863,60 @@
         "fui",
         "decoration",
         "dead-space"
+      ]
+    },
+    {
+      "id": "dither",
+      "name": "Dither",
+      "kind": "component",
+      "category": "media",
+      "lifecycle": "stable",
+      "origin": "control-room",
+      "description": "Seeded Bayer 4×4 ordered dither / halftone field — hardware surfaces only (Law 6); the genuine texture the CSS tokens approximate.",
+      "spec": "references/decoration.md",
+      "variants": {
+        "mode": [
+          "bayer",
+          "halftone"
+        ],
+        "state": [
+          "working",
+          "waiting",
+          "idle",
+          "error",
+          "done"
+        ]
+      },
+      "tokens": [
+        {
+          "cssVar": "--board",
+          "description": "field ground"
+        },
+        {
+          "cssVar": "--sig-work",
+          "description": "working hue"
+        },
+        {
+          "cssVar": "--sig-accent",
+          "description": "default ink (seeded)"
+        },
+        {
+          "cssVar": "--sig-err",
+          "description": "error hue"
+        },
+        {
+          "cssVar": "--sig-accent-2",
+          "description": "done/acid hue"
+        }
+      ],
+      "keywords": [
+        "dither",
+        "bayer",
+        "halftone",
+        "texture",
+        "seeded",
+        "grain",
+        "neo-print"
       ]
     },
     {
