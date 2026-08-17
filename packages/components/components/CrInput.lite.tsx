@@ -1,6 +1,6 @@
 import { Show, useStore, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
 import CrIcon from "./CrIcon.lite.tsx";
-import { ptAttrs, ptClass, ptHandler, ptNested, ptResolve, ptStyle, resolveMessage } from "../lib/pt.ts";
+import { ptAttrs, ptClass, ptHandler, ptNested, ptResolve, ptStyle, resolveMessage, ptHooks } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 
@@ -43,20 +43,26 @@ export interface CrInputProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "icon" · "clear". */
   unstyled?: boolean;
-  pt?: CrPassThrough<"clear" | "icon" | "root" | "wrap">;
+  /** `iconGlyph` / `clearGlyph` are NESTED SECTIONS: each value is a `pt` for the
+   *  inner CrIcon, distinct from `icon`/`clear`, which style the wrapping elements
+   *  (`pt={{ clear: { class: "…" }, clearGlyph: { root: { "aria-hidden": "true" } } }}`). */
+  pt?: CrPassThrough<"clear" | "clearGlyph" | "icon" | "iconGlyph" | "root" | "wrap">;
   dt?: CrDesignTokens;
 }
 export default function CrInput(props: CrInputProps) {
   const cr = useContext(CrContext);
 
   onMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrInput"));
+    if (h && h.onMounted) h.onMounted();
   });
   onUpdate(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
-  }, []);
+    const h = ptHooks(ptResolve(cr, props.pt, "CrInput"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
   onUnMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrInput"));
+    if (h && h.onUnmounted) h.onUnmounted();
   });
 
   const state = useStore({

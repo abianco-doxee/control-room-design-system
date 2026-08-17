@@ -1,5 +1,5 @@
 import { For, Show, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle, ptResolve, resolveMessage } from "../lib/pt.ts";
+import { ptClass, ptAttrs, ptStyle, ptResolve, resolveMessage, ptHooks } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 export interface CrNavItem { label: string; href?: string; active?: boolean; badge?: string; }
@@ -24,13 +24,16 @@ export default function CrNav(props: CrNavProps) {
   const cr = useContext(CrContext);
 
   onMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrNav"));
+    if (h && h.onMounted) h.onMounted();
   });
   onUpdate(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
-  }, []);
+    const h = ptHooks(ptResolve(cr, props.pt, "CrNav"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
   onUnMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrNav"));
+    if (h && h.onUnmounted) h.onUnmounted();
   });
 
   return (

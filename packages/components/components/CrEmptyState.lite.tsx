@@ -1,5 +1,5 @@
 import { Show, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle, ptResolve } from "../lib/pt.ts";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHooks } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 export interface CrEmptyStateProps { message: string; children?: any;
@@ -14,13 +14,16 @@ export default function CrEmptyState(props: CrEmptyStateProps) {
   const cr = useContext(CrContext);
 
   onMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrEmptyState"));
+    if (h && h.onMounted) h.onMounted();
   });
   onUpdate(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
-  }, []);
+    const h = ptHooks(ptResolve(cr, props.pt, "CrEmptyState"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
   onUnMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrEmptyState"));
+    if (h && h.onUnmounted) h.onUnmounted();
   });
 
   return (

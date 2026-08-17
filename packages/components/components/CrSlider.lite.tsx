@@ -1,5 +1,5 @@
 import { useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler } from "../lib/pt.ts";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler, ptHooks } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 
@@ -24,13 +24,16 @@ export default function CrSlider(props: CrSliderProps) {
   const cr = useContext(CrContext);
 
   onMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrSlider"));
+    if (h && h.onMounted) h.onMounted();
   });
   onUpdate(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
-  }, []);
+    const h = ptHooks(ptResolve(cr, props.pt, "CrSlider"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
   onUnMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrSlider"));
+    if (h && h.onUnmounted) h.onUnmounted();
   });
 
   return (

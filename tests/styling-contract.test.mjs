@@ -80,7 +80,12 @@ test("pt/dt/unstyled contract covers every functional component", () => {
     const src = readFileSync(join(COMPONENTS, f), "utf8");
     const gaps = [];
     if (!/from "\.\.\/lib\/pt\.ts"/.test(src)) gaps.push("pt.ts import");
-    if (!/data-part="root"/.test(src)) gaps.push('data-part="root"');
+    // A nestable component may let its PARENT name the part it occupies (CrCheckbox
+    // reports data-part="check" inside CrTable, preserving the hook the inline input
+    // had before extraction), so accept the `props.part || "root"` form too. The
+    // default must still be "root".
+    if (!/data-part="root"|data-part=\{props\.part \|\| "root"\}/.test(src))
+      gaps.push('data-part="root"');
     if (!/\bunstyled\?\s*:/.test(src)) gaps.push("unstyled?:");
     if (!/\bpt\?\s*:/.test(src)) gaps.push("pt?:");
     if (!/\bdt\?\s*:/.test(src)) gaps.push("dt?:");
@@ -92,6 +97,18 @@ test("pt/dt/unstyled contract covers every functional component", () => {
     // a `state.` receiver inside a JSX spread — see references/styling-contract.md.)
     if (!/ptStyle\((props\.pt|ptResolve\([^)]*\)),\s*props\.dt,\s*"root"\)/.test(src))
       gaps.push('ptStyle(pt, dt, "root")');
+    // Every ptResolve must name THIS component. The argument list used to be
+    // unconstrained (`ptResolve\([^)]*\)`), so a copy-pasted `"CrChip"` inside
+    // CrTag — or any other wrong key — passed green while silently disabling the
+    // global tier for that component: `cr.pt.CrTag` would never be consulted.
+    const wrongKeys = [
+      ...new Set(
+        [...src.matchAll(/ptResolve\(\s*cr\s*,\s*props\.pt\s*,\s*["']([A-Za-z0-9_]+)["']/g)]
+          .map((m) => m[1])
+          .filter((k) => k !== name)
+      ),
+    ];
+    if (wrongKeys.length) gaps.push(`ptResolve keyed "${wrongKeys.join('", "')}" not "${name}"`);
     if (gaps.length) missing.push(`${name} (${gaps.join(", ")})`);
   }
   assert.deepEqual(

@@ -1,6 +1,6 @@
 import { useStore, Show, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
 import CrFormRow from "./CrFormRow.lite";
-import { ptAttrs, ptClass, ptHandler, ptNested, ptResolve, ptStyle } from "../lib/pt.ts";
+import { ptAttrs, ptClass, ptHandler, ptNested, ptResolve, ptStyle, ptHooks } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 
@@ -72,7 +72,9 @@ export interface CrFormProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" (form) · "title" · "actions". Rows are CrFormRow (own contract). */
   unstyled?: boolean;
-  pt?: CrPassThrough<"actions" | "root" | "title">;
+  /** `row` is a NESTED SECTION: its value is a `pt` for each inner CrFormRow
+   *  (`pt={{ row: { root: { "data-dense": "" } } }}`), not an attribute bag. */
+  pt?: CrPassThrough<"actions" | "root" | "row" | "title">;
   dt?: CrDesignTokens;
 }
 
@@ -93,13 +95,16 @@ export default function CrForm(props: CrFormProps) {
   const cr = useContext(CrContext);
 
   onMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrForm"));
+    if (h && h.onMounted) h.onMounted();
   });
   onUpdate(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
-  }, []);
+    const h = ptHooks(ptResolve(cr, props.pt, "CrForm"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
   onUnMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrForm"));
+    if (h && h.onUnmounted) h.onUnmounted();
   });
 
   const state = useStore({
@@ -596,6 +601,12 @@ export default function CrForm(props: CrFormProps) {
         {(row: any) => (
           <CrFormRow
             pt={ptNested(ptResolve(cr, props.pt, "CrForm"), "row")}
+            /* `unstyled` has to travel with `pt`: CrFormRow puts the `cr-form__row`
+             * class on its own root and on the controls it renders (input, select,
+             * textarea, the nested checkbox), so without this `<CrForm unstyled />`
+             * still emits every one of them and the opt-out is a no-op on the rows —
+             * which is the whole surface of a form. */
+            unstyled={props.unstyled}
             rowType={row.t}
             field={row.field}
             pathKey={state.key(row.path)}

@@ -1,5 +1,5 @@
 import { useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler } from "../lib/pt.ts";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler, ptHooks } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 
@@ -18,6 +18,17 @@ export interface CrCheckboxProps {
    *  a checkbox with no name is unusable with a screen reader. */
   label?: string;
   onChange?: (checked: boolean) => void;
+  /** The `data-part` this input reports, when nested inside another component.
+   *
+   *  A parent that used to render its own inline `<input data-part="check">` keeps
+   *  that hook by passing `part="check"`, so CSS and test locators written against
+   *  the pre-extraction markup keep matching. Defaults to "root" — the correct
+   *  value when CrCheckbox is used directly.
+   *
+   *  Only the DOM hook moves; the `pt` PART NAME is always "root" here, because pt
+   *  is resolved against this component's own parts (the parent reaches it through
+   *  its own nested section, e.g. `{ check: { root: … } }`). */
+  part?: string;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Single part: "root" (the input itself). */
   unstyled?: boolean;
@@ -41,20 +52,23 @@ export default function CrCheckbox(props: CrCheckboxProps) {
   const cr = useContext(CrContext);
 
   onMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrCheckbox"));
+    if (h && h.onMounted) h.onMounted();
   });
   onUpdate(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
-  }, []);
+    const h = ptHooks(ptResolve(cr, props.pt, "CrCheckbox"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
   onUnMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrCheckbox"));
+    if (h && h.onUnmounted) h.onUnmounted();
   });
 
   return (
     <input
       {...ptAttrs(ptResolve(cr, props.pt, "CrCheckbox"), "root")}
       type="checkbox"
-      data-part="root"
+      data-part={props.part || "root"}
       data-state={props.indeterminate ? "mixed" : props.checked ? "on" : "off"}
       id={props.id}
       name={props.name}

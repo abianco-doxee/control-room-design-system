@@ -1,5 +1,5 @@
 import { useStore, onMount, onUnMount, For, Show, useContext, onUpdate } from "@builder.io/mitosis";
-import { ptAttrs, ptClass, ptNested, ptResolve, ptStyle } from "../lib/pt.ts";
+import { ptAttrs, ptClass, ptNested, ptResolve, ptStyle, ptHooks } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 import { parseKeys, describeKeys } from "../lib/keys.ts";
@@ -23,7 +23,11 @@ export interface CrKeyHintsProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "item" · "keys" · "chord" · "plus" · "then" · "label". */
   unstyled?: boolean;
-  pt?: CrPassThrough<"chord" | "item" | "keys" | "label" | "plus" | "root" | "then">;
+  /** `kbd` is a NESTED SECTION: its value is a `pt` for each inner CrKbd
+   *  (`pt={{ kbd: { root: { class: "…" } } }}`), not an attribute bag. */
+  pt?: CrPassThrough<
+    "chord" | "item" | "kbd" | "keys" | "label" | "plus" | "root" | "then"
+  >;
   dt?: CrDesignTokens;
 }
 
@@ -52,14 +56,12 @@ export interface CrKeyHintsProps {
 export default function CrKeyHints(props: CrKeyHintsProps) {
   const cr = useContext(CrContext);
 
-  onMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
-  });
+  /* onMounted/onUnmounted are wired further down, merged with this component's own
+   * window listeners — see the note there. Only onUpdated stands alone, because
+   * CrKeyHints has no update work of its own to merge with. */
   onUpdate(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
-  }, []);
-  onUnMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrKeyHints"));
+    if (h && h.onUpdated) h.onUpdated();
   });
 
   const state = useStore({
@@ -96,13 +98,23 @@ export default function CrKeyHints(props: CrKeyHintsProps) {
     },
   });
 
+  /* The window listeners live in the SAME onMount/onUnMount as the pt lifecycle
+   * hooks ON PURPOSE. Mitosis keeps only the LAST onMount/onUnMount per component
+   * and silently drops the earlier ones, so a second pair here would discard
+   * `pt.hooks.onMounted`/`onUnmounted` for this component alone — which is exactly
+   * what happened before they were merged. CrKeyHints is the only component with
+   * its own lifecycle work, so it is the only one affected. */
   onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrKeyHints"));
+    if (h && h.onMounted) h.onMounted();
     window.addEventListener("keydown", state.onDown);
     window.addEventListener("keyup", state.onUp);
     window.addEventListener("blur", state.hide);
   });
 
   onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrKeyHints"));
+    if (h && h.onUnmounted) h.onUnmounted();
     window.removeEventListener("keydown", state.onDown);
     window.removeEventListener("keyup", state.onUp);
     window.removeEventListener("blur", state.hide);
