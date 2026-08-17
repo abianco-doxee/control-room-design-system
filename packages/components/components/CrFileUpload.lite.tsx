@@ -1,5 +1,7 @@
-import { useStore, For, Show } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, For, Show, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrFileUploadProps {
   label: string;
@@ -17,8 +19,8 @@ export interface CrFileUploadProps {
    * Parts: "root" · "input" · "prompt" · "list" · "file". State: idle · dragover.
    * The dragover accent is `--cr-fileupload-active-border` (a state, Law 2). */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"file" | "input" | "list" | "prompt" | "root">;
+  dt?: CrDesignTokens;
 }
 
 /* A file dropzone with a real native <input type=file> underneath — click or
@@ -28,6 +30,18 @@ export interface CrFileUploadProps {
  * native experience; the styled surface is aria-hidden decoration. Styling via
  * .cr-fileupload; data-part per part. */
 export default function CrFileUpload(props: CrFileUploadProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   const state = useStore({
     over: false,
     onChange(event: any) {
@@ -51,37 +65,37 @@ export default function CrFileUpload(props: CrFileUploadProps) {
 
   return (
     <label
-      {...ptAttrs(props.pt, "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrFileUpload"), "root")}
       data-part="root"
       data-state={state.over ? "dragover" : "idle"}
-      class={ptClass(props.pt, props.unstyled, "cr-fileupload" + (state.over ? " cr-fileupload--over" : ""), "root")}
-      style={ptStyle(props.pt, props.dt, "root")}
-      onDragOver={(event) => state.onDragOver(event)}
-      onDragLeave={() => state.onDragLeave()}
-      onDrop={(event) => state.onDrop(event)}
+      class={ptClass(ptResolve(cr, props.pt, "CrFileUpload"), props.unstyled, "cr-fileupload" + (state.over ? " cr-fileupload--over" : ""), "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrFileUpload"), props.dt, "root")}
+      onDragOver={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrFileUpload'), 'root', 'onDragOver', event); state.onDragOver(event); }}
+      onDragLeave={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrFileUpload'), 'root', 'onDragLeave', event); state.onDragLeave(); }}
+      onDrop={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrFileUpload'), 'root', 'onDrop', event); state.onDrop(event); }}
     >
       <input
-        {...ptAttrs(props.pt, "input")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrFileUpload"), "input")}
         data-part="input"
-        class={ptClass(props.pt, props.unstyled, "cr-fileupload__input", "input")}
+        class={ptClass(ptResolve(cr, props.pt, "CrFileUpload"), props.unstyled, "cr-fileupload__input", "input")}
         type="file"
         aria-label={props.label}
         accept={props.accept}
         multiple={props.multiple}
         disabled={props.disabled}
-        onChange={(event) => state.onChange(event)}
+        onChange={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrFileUpload'), 'input', 'onChange', event); state.onChange(event); }}
       />
-      <span {...ptAttrs(props.pt, "prompt")} data-part="prompt" class={ptClass(props.pt, props.unstyled, "cr-fileupload__prompt", "prompt")} aria-hidden="true">
+      <span {...ptAttrs(ptResolve(cr, props.pt, "CrFileUpload"), "prompt")} data-part="prompt" class={ptClass(ptResolve(cr, props.pt, "CrFileUpload"), props.unstyled, "cr-fileupload__prompt", "prompt")} aria-hidden="true">
         <span class="cr-fileupload__title">{props.label}</span>
         <Show when={props.hint}>
           <span class="cr-fileupload__hint">{props.hint}</span>
         </Show>
       </span>
       <Show when={props.files && props.files.length > 0}>
-        <ul {...ptAttrs(props.pt, "list")} data-part="list" class={ptClass(props.pt, props.unstyled, "cr-fileupload__list", "list")}>
+        <ul {...ptAttrs(ptResolve(cr, props.pt, "CrFileUpload"), "list")} data-part="list" class={ptClass(ptResolve(cr, props.pt, "CrFileUpload"), props.unstyled, "cr-fileupload__list", "list")}>
           <For each={props.files}>
             {(name: string) => (
-              <li {...ptAttrs(props.pt, "file")} data-part="file" class={ptClass(props.pt, props.unstyled, "cr-fileupload__file", "file")}>
+              <li {...ptAttrs(ptResolve(cr, props.pt, "CrFileUpload"), "file")} data-part="file" class={ptClass(ptResolve(cr, props.pt, "CrFileUpload"), props.unstyled, "cr-fileupload__file", "file")}>
                 {name}
               </li>
             )}

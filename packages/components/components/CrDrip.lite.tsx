@@ -1,5 +1,7 @@
-import { Show } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { Show, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 /** Control Room error surface — the one place besides the masthead where Law 3's
  *  house glitch is allowed. The surface floods with `--sig-err` (Law 2 makes hue
@@ -20,14 +22,26 @@ export interface CrDripProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "title" · "sub". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"root" | "sub" | "title">;
+  dt?: CrDesignTokens;
 }
 export default function CrDrip(props: CrDripProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   return (
-    <div {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-drip", "root")} data-part="root" style={ptStyle(props.pt, props.dt, "root")}>
-      <div {...ptAttrs(props.pt, "title")} class={ptClass(props.pt, props.unstyled, "cr-drip__title", "title")} data-part="title">{props.title}</div>
-      <Show when={props.sub}><div {...ptAttrs(props.pt, "sub")} class={ptClass(props.pt, props.unstyled, "cr-drip__sub", "sub")} data-part="sub">{props.sub}</div></Show>
+    <div {...ptAttrs(ptResolve(cr, props.pt, "CrDrip"), "root")} class={ptClass(ptResolve(cr, props.pt, "CrDrip"), props.unstyled, "cr-drip", "root")} data-part="root" style={ptStyle(ptResolve(cr, props.pt, "CrDrip"), props.dt, "root")}>
+      <div {...ptAttrs(ptResolve(cr, props.pt, "CrDrip"), "title")} class={ptClass(ptResolve(cr, props.pt, "CrDrip"), props.unstyled, "cr-drip__title", "title")} data-part="title">{props.title}</div>
+      <Show when={props.sub}><div {...ptAttrs(ptResolve(cr, props.pt, "CrDrip"), "sub")} class={ptClass(ptResolve(cr, props.pt, "CrDrip"), props.unstyled, "cr-drip__sub", "sub")} data-part="sub">{props.sub}</div></Show>
     </div>
   );
 }

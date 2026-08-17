@@ -1,4 +1,7 @@
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrSpinnerProps {
   /** Accessible label announced by screen readers. Defaults to "Loading". */
@@ -10,8 +13,8 @@ export interface CrSpinnerProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "ring". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"ring" | "root">;
+  dt?: CrDesignTokens;
 }
 
 /* Spinner — an indeterminate loading indicator. Four cells from the block shade
@@ -30,12 +33,24 @@ export interface CrSpinnerProps {
  * For a known fraction, or a static capacity reading, use Progress instead.
  * Styling via .cr-spinner. */
 export default function CrSpinner(props: CrSpinnerProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   return (
-    <span {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-spinner" + (props.size ? " cr-spinner--" + props.size : "") + (props.signal ? " cr-spinner--" + props.signal : ""), "root")} data-part="root" data-state={props.signal} style={ptStyle(props.pt, props.dt, "root")} role="status" aria-label={props.label || "Loading"}>
-      <span {...ptAttrs(props.pt, "ring")} class={ptClass(props.pt, props.unstyled, "cr-spinner__ring", "ring")} data-part="ring" aria-hidden="true"></span>
-      <span class={ptClass(props.pt, props.unstyled, "cr-spinner__ring", "ring")} data-part="ring" aria-hidden="true"></span>
-      <span class={ptClass(props.pt, props.unstyled, "cr-spinner__ring", "ring")} data-part="ring" aria-hidden="true"></span>
-      <span class={ptClass(props.pt, props.unstyled, "cr-spinner__ring", "ring")} data-part="ring" aria-hidden="true"></span>
+    <span {...ptAttrs(ptResolve(cr, props.pt, "CrSpinner"), "root")} class={ptClass(ptResolve(cr, props.pt, "CrSpinner"), props.unstyled, "cr-spinner" + (props.size ? " cr-spinner--" + props.size : "") + (props.signal ? " cr-spinner--" + props.signal : ""), "root")} data-part="root" data-state={props.signal} style={ptStyle(ptResolve(cr, props.pt, "CrSpinner"), props.dt, "root")} role="status" aria-label={props.label || "Loading"}>
+      <span {...ptAttrs(ptResolve(cr, props.pt, "CrSpinner"), "ring")} class={ptClass(ptResolve(cr, props.pt, "CrSpinner"), props.unstyled, "cr-spinner__ring", "ring")} data-part="ring" aria-hidden="true"></span>
+      <span class={ptClass(ptResolve(cr, props.pt, "CrSpinner"), props.unstyled, "cr-spinner__ring", "ring")} data-part="ring" aria-hidden="true"></span>
+      <span class={ptClass(ptResolve(cr, props.pt, "CrSpinner"), props.unstyled, "cr-spinner__ring", "ring")} data-part="ring" aria-hidden="true"></span>
+      <span class={ptClass(ptResolve(cr, props.pt, "CrSpinner"), props.unstyled, "cr-spinner__ring", "ring")} data-part="ring" aria-hidden="true"></span>
     </span>
   );
 }

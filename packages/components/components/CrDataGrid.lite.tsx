@@ -1,5 +1,8 @@
-import { useStore, useRef, Show, For } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, useRef, Show, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import CrCheckbox from "./CrCheckbox.lite.tsx";
+import { ptAttrs, ptClass, ptHandler, ptNested, ptResolve, ptStyle, resolveMessage } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrGridColumn {
   key: string;
@@ -29,11 +32,15 @@ export interface CrDataGridProps {
   emptyLabel?: string;
   onSortChange?: (key: string, dir: string) => void;
   onSelectionChange?: (keys: string[]) => void;
+  /** Override this component's built-in English strings. Any key you omit falls
+   *  back to the app-level `messages` from context, then to the built-in default.
+   *  See lib/messages.ts for the keys. */
+  labels?: Record<string, any>;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "head" · "cell" · "sort" · "glyph" · "viewport" · "empty" · "sizer" · "rows" · "row". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"cell" | "empty" | "glyph" | "head" | "root" | "row" | "rows" | "sizer" | "sort" | "viewport">;
+  dt?: CrDesignTokens;
 }
 
 /* Control Room data grid — a dense, virtualized table for large datasets.
@@ -45,6 +52,18 @@ export interface CrDataGridProps {
  * - **Sticky header**, grid a11y (role=grid/row/columnheader/gridcell, aria-sort,
  *   aria-rowcount, aria-selected). Styling via .cr-grid. */
 export default function CrDataGrid(props: CrDataGridProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   const vpRef = useRef(null);
 
   const state = useStore({
@@ -278,23 +297,24 @@ export default function CrDataGrid(props: CrDataGridProps) {
 
   return (
     <div
-      {...ptAttrs(props.pt, "root")}
-      class={ptClass(props.pt, props.unstyled, "cr-grid", "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrDataGrid"), "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrDataGrid"), props.unstyled, "cr-grid", "root")}
       role="grid"
       aria-rowcount={props.rows.length}
       tabIndex={0}
       aria-activedescendant={state.activeId()}
       data-part="root"
-      style={ptStyle(props.pt, props.dt, "root")}
-      onFocus={() => state.onGridFocus()}
-      onKeyDown={(event) => state.onGridKey(event)}
+      style={ptStyle(ptResolve(cr, props.pt, "CrDataGrid"), props.dt, "root")}
+      onFocus={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrDataGrid'), 'root', 'onFocus', event); state.onGridFocus(); }}
+      onKeyDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrDataGrid'), 'root', 'onKeyDown', event); state.onGridKey(event); }}
     >
-      <div {...ptAttrs(props.pt, "head")} class={ptClass(props.pt, props.unstyled, "cr-grid__head", "head")} data-part="head" role="row" style={{ gridTemplateColumns: state.template() }}>
+      <div {...ptAttrs(ptResolve(cr, props.pt, "CrDataGrid"), "head")} class={ptClass(ptResolve(cr, props.pt, "CrDataGrid"), props.unstyled, "cr-grid__head", "head")} data-part="head" role="row" style={{ gridTemplateColumns: state.template() }}>
         <Show when={props.selectable}>
-          <div {...ptAttrs(props.pt, "cell")} class={ptClass(props.pt, props.unstyled, "cr-grid__cell cr-grid__cell--check", "cell")} data-part="cell" role="columnheader">
-            <input
-              type="checkbox"
-              aria-label="Select all rows"
+          <div {...ptAttrs(ptResolve(cr, props.pt, "CrDataGrid"), "cell")} class={ptClass(ptResolve(cr, props.pt, "CrDataGrid"), props.unstyled, "cr-grid__cell cr-grid__cell--check", "cell")} data-part="cell" role="columnheader">
+            <CrCheckbox
+              pt={ptNested(ptResolve(cr, props.pt, "CrDataGrid"), "check")}
+              unstyled={props.unstyled}
+              label={resolveMessage(cr, props.labels, "CrDataGrid", "selectAllRows")}
               checked={state.allChecked()}
               onChange={() => state.toggleAll()}
             />
@@ -303,16 +323,16 @@ export default function CrDataGrid(props: CrDataGridProps) {
         <For each={props.columns}>
           {(col: CrGridColumn) => (
             <div
-              {...ptAttrs(props.pt, "cell")}
-              class={ptClass(props.pt, props.unstyled, "cr-grid__cell cr-grid__cell--" + state.align(col), "cell")}
+              {...ptAttrs(ptResolve(cr, props.pt, "CrDataGrid"), "cell")}
+              class={ptClass(ptResolve(cr, props.pt, "CrDataGrid"), props.unstyled, "cr-grid__cell cr-grid__cell--" + state.align(col), "cell")}
               data-part="cell"
               role="columnheader"
               aria-sort={col.sortable ? state.ariaSort(col) : undefined}
             >
               <Show when={col.sortable}>
-                <button {...ptAttrs(props.pt, "sort")} type="button" class={ptClass(props.pt, props.unstyled, "cr-grid__sort", "sort")} data-part="sort" onClick={() => state.toggleSort(col)}>
+                <button {...ptAttrs(ptResolve(cr, props.pt, "CrDataGrid"), "sort")} type="button" class={ptClass(ptResolve(cr, props.pt, "CrDataGrid"), props.unstyled, "cr-grid__sort", "sort")} data-part="sort" onClick={() => state.toggleSort(col)}>
                   {col.label}
-                  <span {...ptAttrs(props.pt, "glyph")} class={ptClass(props.pt, props.unstyled, "cr-grid__glyph", "glyph")} data-part="glyph" aria-hidden="true">{state.sortGlyph(col)}</span>
+                  <span {...ptAttrs(ptResolve(cr, props.pt, "CrDataGrid"), "glyph")} class={ptClass(ptResolve(cr, props.pt, "CrDataGrid"), props.unstyled, "cr-grid__glyph", "glyph")} data-part="glyph" aria-hidden="true">{state.sortGlyph(col)}</span>
                 </button>
               </Show>
               <Show when={!col.sortable}>
@@ -323,17 +343,17 @@ export default function CrDataGrid(props: CrDataGridProps) {
         </For>
       </div>
 
-      <div {...ptAttrs(props.pt, "viewport")} class={ptClass(props.pt, props.unstyled, "cr-grid__viewport", "viewport")} data-part="viewport" ref={vpRef} style={{ height: state.viewportH() + "px" }} onScroll={(event) => state.onScroll(event)}>
+      <div {...ptAttrs(ptResolve(cr, props.pt, "CrDataGrid"), "viewport")} class={ptClass(ptResolve(cr, props.pt, "CrDataGrid"), props.unstyled, "cr-grid__viewport", "viewport")} data-part="viewport" ref={vpRef} style={{ height: state.viewportH() + "px" }} onScroll={(event) => state.onScroll(event)}>
         <Show when={props.rows.length === 0}>
-          <div {...ptAttrs(props.pt, "empty")} class={ptClass(props.pt, props.unstyled, "cr-grid__empty", "empty")} data-part="empty">{props.emptyLabel || "No rows"}</div>
+          <div {...ptAttrs(ptResolve(cr, props.pt, "CrDataGrid"), "empty")} class={ptClass(ptResolve(cr, props.pt, "CrDataGrid"), props.unstyled, "cr-grid__empty", "empty")} data-part="empty">{props.emptyLabel || "No rows"}</div>
         </Show>
-        <div {...ptAttrs(props.pt, "sizer")} class={ptClass(props.pt, props.unstyled, "cr-grid__sizer", "sizer")} data-part="sizer" style={{ height: state.totalH() + "px" }}>
-          <div {...ptAttrs(props.pt, "rows")} class={ptClass(props.pt, props.unstyled, "cr-grid__rows", "rows")} data-part="rows" style={{ transform: "translateY(" + state.offsetY() + "px)" }}>
+        <div {...ptAttrs(ptResolve(cr, props.pt, "CrDataGrid"), "sizer")} class={ptClass(ptResolve(cr, props.pt, "CrDataGrid"), props.unstyled, "cr-grid__sizer", "sizer")} data-part="sizer" style={{ height: state.totalH() + "px" }}>
+          <div {...ptAttrs(ptResolve(cr, props.pt, "CrDataGrid"), "rows")} class={ptClass(ptResolve(cr, props.pt, "CrDataGrid"), props.unstyled, "cr-grid__rows", "rows")} data-part="rows" style={{ transform: "translateY(" + state.offsetY() + "px)" }}>
             <For each={state.windowRows()}>
               {(row: any, i: number) => (
                 <div
-                  {...ptAttrs(props.pt, "row")}
-                  class={ptClass(props.pt, props.unstyled, "cr-grid__row", "row")}
+                  {...ptAttrs(ptResolve(cr, props.pt, "CrDataGrid"), "row")}
+                  class={ptClass(ptResolve(cr, props.pt, "CrDataGrid"), props.unstyled, "cr-grid__row", "row")}
                   data-part="row"
                   role="row"
                   aria-rowindex={state.absIndex(i) + 1}
@@ -343,16 +363,17 @@ export default function CrDataGrid(props: CrDataGridProps) {
                 >
                   <Show when={props.selectable}>
                     <div
-                      {...ptAttrs(props.pt, "cell")}
-                      class={ptClass(props.pt, props.unstyled, "cr-grid__cell cr-grid__cell--check" + (state.isActive(state.absIndex(i), 0) ? " cr-grid__cell--active" : ""), "cell")}
+                      {...ptAttrs(ptResolve(cr, props.pt, "CrDataGrid"), "cell")}
+                      class={ptClass(ptResolve(cr, props.pt, "CrDataGrid"), props.unstyled, "cr-grid__cell cr-grid__cell--check" + (state.isActive(state.absIndex(i), 0) ? " cr-grid__cell--active" : ""), "cell")}
                       data-part="cell"
                       data-state={state.isActive(state.absIndex(i), 0) ? "active" : "inactive"}
                       role="gridcell"
                       id={state.cellId(state.absIndex(i), 0)}
                     >
-                      <input
-                        type="checkbox"
-                        aria-label="Select row"
+                      <CrCheckbox
+                        pt={ptNested(ptResolve(cr, props.pt, "CrDataGrid"), "check")}
+                        unstyled={props.unstyled}
+                        label={resolveMessage(cr, props.labels, "CrDataGrid", "selectRow")}
                         checked={state.isSelected(row, state.absIndex(i))}
                         onChange={() => state.toggleRow(row, state.absIndex(i))}
                       />
@@ -361,8 +382,8 @@ export default function CrDataGrid(props: CrDataGridProps) {
                   <For each={props.columns}>
                     {(col: CrGridColumn, ci: number) => (
                       <div
-                        {...ptAttrs(props.pt, "cell")}
-                        class={ptClass(props.pt, props.unstyled, "cr-grid__cell cr-grid__cell--" + state.align(col) + (state.isActive(state.absIndex(i), (props.selectable ? 1 : 0) + ci) ? " cr-grid__cell--active" : ""), "cell")}
+                        {...ptAttrs(ptResolve(cr, props.pt, "CrDataGrid"), "cell")}
+                        class={ptClass(ptResolve(cr, props.pt, "CrDataGrid"), props.unstyled, "cr-grid__cell cr-grid__cell--" + state.align(col) + (state.isActive(state.absIndex(i), (props.selectable ? 1 : 0) + ci) ? " cr-grid__cell--active" : ""), "cell")}
                         data-part="cell"
                         data-state={state.isActive(state.absIndex(i), (props.selectable ? 1 : 0) + ci) ? "active" : "inactive"}
                         role="gridcell"

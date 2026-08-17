@@ -1,5 +1,8 @@
-import { Show, For, onUpdate } from "@builder.io/mitosis";
-import { ptClass, ptAttrs } from "../lib/pt.ts";
+import { Show, For, onUpdate, useContext, onMount, onUnMount } from "@builder.io/mitosis";
+import CrCheckbox from "./CrCheckbox.lite.tsx";
+import { ptClass, ptAttrs, ptStyle, ptResolve } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrFormRowProps {
   /** "group" · "array" · "item" · "field" — the render-list row kind. */
@@ -39,8 +42,8 @@ export interface CrFormRowProps {
    * row wrapper). This is CrForm's internal presentational row, so pt/unstyled
    * apply at the row level; the row keeps its computed paddingLeft style. */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"root">;
+  dt?: CrDesignTokens;
 }
 
 /* CrFormRow — the presentational half of CrForm. One render-list row (a field, a
@@ -60,6 +63,18 @@ export interface CrFormRowProps {
  * controlled `value` with no change handler, and the real update flows through the
  * form's delegated listener, not this handler. See references/forms.md. */
 export default function CrFormRow(props: CrFormRowProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   /* Render probe (guarded, zero-cost unless a test opts in). Compiles to a React
    * effect that runs on every COMMIT of this row — so if React.memo bails a row
    * out (its props didn't change), no commit fires and its counter stays put.
@@ -76,10 +91,10 @@ export default function CrFormRow(props: CrFormRowProps) {
 
   return (
     <div
-      {...ptAttrs(props.pt, "root")}
-      class={ptClass(props.pt, props.unstyled, "cr-form__row cr-form__row--" + props.rowType + (props.rowType === "field" && props.error ? " cr-field--error" : ""), "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrFormRow"), "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrFormRow"), props.unstyled, "cr-form__row cr-form__row--" + props.rowType + (props.rowType === "field" && props.error ? " cr-field--error" : ""), "root")}
       data-part="root"
-      style={{ paddingLeft: props.padLeft }}
+      style={{ paddingLeft: props.padLeft, ...ptStyle(ptResolve(cr, props.pt, "CrFormRow"), props.dt, "root") }}
     >
       {/* group header */}
       <Show when={props.rowType === "group"}>
@@ -110,13 +125,17 @@ export default function CrFormRow(props: CrFormRowProps) {
       <Show when={props.rowType === "field"}>
         <Show when={props.field.kind === "checkbox"}>
           <label class="cr-check">
-            <input
-              type="checkbox"
+            {/* data-path / data-kind are what CrForm's DELEGATED listener reads off
+              * the event target (el.dataset.kind), so they must reach the real DOM —
+              * they ride through `pt`, which spreads plain attributes onto the part.
+              * The no-op onChange stays for the same reason as before: React warns
+              * about a controlled `checked` with no handler, and the real update
+              * flows through the form's delegated listener. */}
+            <CrCheckbox
+              pt={{ root: { "data-path": props.pathKey, "data-kind": "checkbox", "aria-describedby": props.descId } }}
+              unstyled={props.unstyled}
               checked={props.value === true}
               disabled={props.disabled}
-              aria-describedby={props.descId}
-              data-path={props.pathKey}
-              data-kind="checkbox"
               onChange={() => {}}
             />
             {props.field.label}

@@ -1,5 +1,7 @@
-import { useStore, Show, For } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, Show, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrBarDatum {
   label: string;
@@ -27,8 +29,8 @@ export interface CrBarChartProps {
   /* ── styling contract (portable pt/dt subset). Part: "root" (the SVG plot is
    * aria-hidden viz and stays on the cr-chart/cr-barchart classes). */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"root">;
+  dt?: CrDesignTokens;
 }
 
 /* A categorical bar chart: baseline-anchored bars with rounded data-ends, a 2px
@@ -40,6 +42,18 @@ export interface CrBarChartProps {
  * Static layout is the `geo` getter (reads props only); the hover-reading helpers
  * are METHODS (a getter would run before the store initialises on Qwik). */
 export default function CrBarChart(props: CrBarChartProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   const state = useStore({
     hovering: false,
     at: 0,
@@ -154,7 +168,7 @@ export default function CrBarChart(props: CrBarChartProps) {
   });
 
   return (
-    <figure {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-chart cr-barchart", "root")} data-part="root" style={ptStyle(props.pt, props.dt, "root")} role="img" aria-label={state.summary()}>
+    <figure {...ptAttrs(ptResolve(cr, props.pt, "CrBarChart"), "root")} class={ptClass(ptResolve(cr, props.pt, "CrBarChart"), props.unstyled, "cr-chart cr-barchart", "root")} data-part="root" style={ptStyle(ptResolve(cr, props.pt, "CrBarChart"), props.dt, "root")} role="img" aria-label={state.summary()}>
       <svg
         class="cr-barchart__plot"
         viewBox={"0 0 " + state.geo().W + " " + state.geo().H}

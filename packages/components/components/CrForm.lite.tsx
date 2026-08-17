@@ -1,6 +1,8 @@
-import { useStore, Show, For } from "@builder.io/mitosis";
+import { useStore, Show, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
 import CrFormRow from "./CrFormRow.lite";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrFormField {
   name: string;
@@ -70,8 +72,8 @@ export interface CrFormProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" (form) · "title" · "actions". Rows are CrFormRow (own contract). */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"actions" | "root" | "title">;
+  dt?: CrDesignTokens;
 }
 
 /* CrForm — a schema-driven form. Feed it a Form Model (which may nest: `group`
@@ -88,6 +90,18 @@ export interface CrFormProps {
  * + helpers are METHODS (a getter would run before the store initialises on
  * Qwik). See references/forms.md. */
 export default function CrForm(props: CrFormProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   const state = useStore({
     vals: props.values || {},
     /* the seed values — `dirty()` compares against this, `reset()` restores it */
@@ -547,24 +561,24 @@ export default function CrForm(props: CrFormProps) {
 
   return (
     <form
-      {...ptAttrs(props.pt, "root")}
-      class={ptClass(props.pt, props.unstyled, "cr-form", "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrForm"), "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrForm"), props.unstyled, "cr-form", "root")}
       data-part="root"
-      style={ptStyle(props.pt, props.dt, "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrForm"), props.dt, "root")}
       noValidate
-      onSubmit={(event) => state.submit(event)}
-      onInput={(event) => state.onFormInput(event)}
-      onChange={(event) => state.onFormChange(event)}
-      onKeyDown={(event) => state.onFormKeyDown(event)}
-      onMouseDown={(event) => state.onFormMouseDown(event)}
-      onClick={(event) => state.onFormClick(event)}
-      onBlur={(event) => state.onFormLeave(event)}
-      onFocusOut={(event) => state.onFormLeave(event)}
-      onFocus={(event) => state.onFormEnter(event)}
-      onFocusIn={(event) => state.onFormEnter(event)}
+      onSubmit={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onSubmit', event); state.submit(event); }}
+      onInput={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onInput', event); state.onFormInput(event); }}
+      onChange={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onChange', event); state.onFormChange(event); }}
+      onKeyDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onKeyDown', event); state.onFormKeyDown(event); }}
+      onMouseDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onMouseDown', event); state.onFormMouseDown(event); }}
+      onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onClick', event); state.onFormClick(event); }}
+      onBlur={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onBlur', event); state.onFormLeave(event); }}
+      onFocusOut={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onFocusOut', event); state.onFormLeave(event); }}
+      onFocus={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onFocus', event); state.onFormEnter(event); }}
+      onFocusIn={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onFocusIn', event); state.onFormEnter(event); }}
     >
       <Show when={props.title}>
-        <h3 {...ptAttrs(props.pt, "title")} class={ptClass(props.pt, props.unstyled, "cr-form__title", "title")} data-part="title">{props.title}</h3>
+        <h3 {...ptAttrs(ptResolve(cr, props.pt, "CrForm"), "title")} class={ptClass(ptResolve(cr, props.pt, "CrForm"), props.unstyled, "cr-form__title", "title")} data-part="title">{props.title}</h3>
       </Show>
       <Show when={state.hasSummary()}>
         <div class="cr-form__summary" role="alert">
@@ -601,7 +615,7 @@ export default function CrForm(props: CrFormProps) {
           />
         )}
       </For>
-      <div {...ptAttrs(props.pt, "actions")} class={ptClass(props.pt, props.unstyled, "cr-form__actions", "actions")} data-part="actions">
+      <div {...ptAttrs(ptResolve(cr, props.pt, "CrForm"), "actions")} class={ptClass(ptResolve(cr, props.pt, "CrForm"), props.unstyled, "cr-form__actions", "actions")} data-part="actions">
         <button type="submit" class="cr-btn" disabled={props.disabled || state.submitting} aria-busy={state.submitting ? "true" : undefined}>
           {state.submitBtnLabel()}
         </button>

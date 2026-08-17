@@ -1,4 +1,7 @@
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 /* A bare, controlled textarea. Pair with CrField for a *visible* label +
  * validation; standalone, pass `label` for an accessible name (maps to
@@ -18,18 +21,30 @@ export interface CrTextareaProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"root">;
+  dt?: CrDesignTokens;
 }
 export default function CrTextarea(props: CrTextareaProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   return (
     <textarea
-      {...ptAttrs(props.pt, "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrTextarea"), "root")}
       data-part="root"
       id={props.id}
       name={props.name}
-      class={ptClass(props.pt, props.unstyled, "cr-textarea", "root")}
-      style={ptStyle(props.pt, props.dt, "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrTextarea"), props.unstyled, "cr-textarea", "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrTextarea"), props.dt, "root")}
       value={props.value}
       placeholder={props.placeholder}
       aria-label={props.label}
@@ -38,8 +53,8 @@ export default function CrTextarea(props: CrTextareaProps) {
       disabled={props.disabled}
       aria-invalid={props.invalid ? "true" : "false"}
       data-state={props.invalid ? "invalid" : "valid"}
-      onInput={(event) => props.onChange && props.onChange((event.target as HTMLTextAreaElement).value)}
-      onBlur={() => props.onBlur && props.onBlur()}
+      onInput={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrTextarea'), 'root', 'onInput', event); props.onChange && props.onChange((event.target as HTMLTextAreaElement).value); }}
+      onBlur={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrTextarea'), 'root', 'onBlur', event); props.onBlur && props.onBlur(); }}
     ></textarea>
   );
 }
