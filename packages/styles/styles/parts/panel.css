@@ -14,6 +14,10 @@
   --cr-panel-index-gutter: var(--space-10);
   position: relative;
   display: flex; flex-direction: column;
+  /* Defaults to 0, not --gap: the panel's children carry their own margins, so a
+   * non-zero default would re-space every existing panel. It is exposed so a
+   * caller composing bare children can set flow spacing in one place. */
+  gap: var(--cr-panel-gap);
   background: var(--cr-panel-bg);
   border: var(--brd) solid var(--border);
   box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);

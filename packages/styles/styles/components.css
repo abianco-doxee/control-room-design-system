@@ -67,6 +67,10 @@
   --cr-panel-index-gutter: var(--space-10);
   position: relative;
   display: flex; flex-direction: column;
+  /* Defaults to 0, not --gap: the panel's children carry their own margins, so a
+   * non-zero default would re-space every existing panel. It is exposed so a
+   * caller composing bare children can set flow spacing in one place. */
+  gap: var(--cr-panel-gap);
   background: var(--cr-panel-bg);
   border: var(--brd) solid var(--border);
   box-shadow: var(--shadow-off) var(--shadow-off) 0 var(--shadow-col);
@@ -549,7 +553,7 @@
 .cr-table__sel input[type="checkbox"] {
   appearance: none; -webkit-appearance: none; margin: 0; vertical-align: middle; color: inherit;
   width: var(--space-4); height: var(--space-4); flex-shrink: 0;
-  border: var(--brd) solid currentColor; background: transparent;
+  border: var(--brd) solid currentColor; background: var(--cr-check-bg);
   display: inline-grid; place-content: center; cursor: pointer;
 }
 /* Checked: flood the fill to the accent (Law 2 — selection is a real state) and
@@ -776,7 +780,7 @@
 .cr-check input {
   appearance: none; -webkit-appearance: none; margin: 0; color: inherit;
   width: var(--space-4); height: var(--space-4); flex-shrink: 0;
-  border: var(--brd) solid currentColor; background: transparent;
+  border: var(--brd) solid currentColor; background: var(--cr-check-bg);
   display: inline-grid; place-content: center; cursor: pointer;
 }
 /* The mark is present in BOTH states and only its opacity changes. This is what
@@ -1335,6 +1339,10 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
   background: color-mix(in srgb, var(--muted) 45%, transparent);
   -webkit-mask: var(--cr-braille) 0 0 / 72px 54px repeat; mask: var(--cr-braille) 0 0 / 72px 54px repeat;
   opacity: calc(0.5 * var(--decoration-intensity, 1)); }
+/* The zero-data line. Was inline styles on the <p>, which no consumer stylesheet
+ * or `pt` entry could reach; as a class it takes the data register from tokens
+ * and stays overridable like every other part. */
+.cr-empty__message { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--muted); margin: 0; }
 
 /* ── Hover card (rich hover/focus reveal) ───────────────────────────────── */
 .cr-hovercard { position: relative; display: inline-flex; }
@@ -1963,7 +1971,7 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 .cr-grid__cell--check input[type="checkbox"] {
   appearance: none; -webkit-appearance: none; margin: 0; color: inherit;
   width: var(--space-4); height: var(--space-4); flex-shrink: 0;
-  border: var(--brd) solid currentColor; background: transparent;
+  border: var(--brd) solid currentColor; background: var(--cr-check-bg);
   display: inline-grid; place-content: center; cursor: pointer;
 }
 /* Checked: flood the fill only, and KEEP the currentColor border. The shared
@@ -2297,10 +2305,10 @@ button.cr-chart__key:focus-visible { outline: var(--focus-w) solid var(--focus);
 /* ── Overflow ("+N more" disclosure) ─────────────────────────────────────── */
 .cr-overflow {
   font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--cr-overflow-fg);
   background: transparent; border: 0; cursor: pointer; padding: var(--space-0-5) var(--space-1);
 }
-.cr-overflow:hover { color: var(--sig-work); }
+.cr-overflow:hover { color: var(--cr-overflow-hover-fg); }
 .cr-overflow--static { cursor: default; }
 .cr-overflow:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
 
