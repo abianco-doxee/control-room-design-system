@@ -421,14 +421,16 @@ three-codebases cost, scoped.
 | Capability | Portable (one source) | Notes |
 | --- | --- | --- |
 | `data-part` / `data-state` hooks | ✅ | every part, every target |
-| `unstyled` (global + per-instance) | ✅ | |
+| `unstyled` (global + per-instance) | ✅ | a composing component must FORWARD it to its children, or the opt-out is a no-op on the parts they render (`CrForm` → `CrFormRow` did not, so `cr-form__row`/`cr-check`/`cr-input` survived) |
 | `pt`: merge class, set style, inject attrs | ✅ | class merged; attrs spread |
 | `pt`: inject handlers | ✅ | one JSX-cased key (`onClick`) on every target |
 | `pt`/`dt`: **typed** part names | ✅ **beyond PrimeVue** | `CrPassThrough<"root"\|"tab">`; PrimeVue uses `any` |
 | `pt`: handler **chaining** (both run) | ✅ **beyond PrimeVue** | via `ptHandler()`; PrimeVue's `mergeProps` defaults to `false` |
+| `pt.hooks` lifecycle | ✅ | `onMounted`/`onUpdated`/`onUnmounted`, all six targets; two need a build-level restore (see above) |
+| `pt`: nested sections (parent tier) | ✅ | `ptNested`; the section is the child's `pt`, named for the child (`checkbox`, `kbd`, …) |
 | `dt`: instance token override | ✅ (React/Vue/Svelte/Solid/Qwik) | Angular needs scoped-`<style>` runtime |
 | `pt` function-form (state-reactive attrs) | ❌ portable → ✅ via override | Qwik async blocks it from one source |
-| global pt (app-level defaults) | ✅ | context tier, `ptResolve(cr, props.pt, "CrX")` |
+| global pt / locale / messages (app-level) | ✅ | context tier via the exported `CrContext`; `ptResolve(cr, props.pt, "CrX")` |
 
 Net: the ~90%-by-usage (hooks, unstyled, class/style/attr merge, instance tokens)
 is one portable source; the reactive/native corners are a budgeted per-target

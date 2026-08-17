@@ -4790,14 +4790,16 @@ three-codebases cost, scoped.
 | Capability | Portable (one source) | Notes |
 | --- | --- | --- |
 | `data-part` / `data-state` hooks | ✅ | every part, every target |
-| `unstyled` (global + per-instance) | ✅ | |
+| `unstyled` (global + per-instance) | ✅ | a composing component must FORWARD it to its children, or the opt-out is a no-op on the parts they render (`CrForm` → `CrFormRow` did not, so `cr-form__row`/`cr-check`/`cr-input` survived) |
 | `pt`: merge class, set style, inject attrs | ✅ | class merged; attrs spread |
 | `pt`: inject handlers | ✅ | one JSX-cased key (`onClick`) on every target |
 | `pt`/`dt`: **typed** part names | ✅ **beyond PrimeVue** | `CrPassThrough<"root"\|"tab">`; PrimeVue uses `any` |
 | `pt`: handler **chaining** (both run) | ✅ **beyond PrimeVue** | via `ptHandler()`; PrimeVue's `mergeProps` defaults to `false` |
+| `pt.hooks` lifecycle | ✅ | `onMounted`/`onUpdated`/`onUnmounted`, all six targets; two need a build-level restore (see above) |
+| `pt`: nested sections (parent tier) | ✅ | `ptNested`; the section is the child's `pt`, named for the child (`checkbox`, `kbd`, …) |
 | `dt`: instance token override | ✅ (React/Vue/Svelte/Solid/Qwik) | Angular needs scoped-`<style>` runtime |
 | `pt` function-form (state-reactive attrs) | ❌ portable → ✅ via override | Qwik async blocks it from one source |
-| global pt (app-level defaults) | ✅ | context tier, `ptResolve(cr, props.pt, "CrX")` |
+| global pt / locale / messages (app-level) | ✅ | context tier via the exported `CrContext`; `ptResolve(cr, props.pt, "CrX")` |
 
 Net: the ~90%-by-usage (hooks, unstyled, class/style/attr merge, instance tokens)
 is one portable source; the reactive/native corners are a budgeted per-target
@@ -5114,6 +5116,12 @@ instead:
   to the `<form>`; each control carries `data-path` / `data-kind` / `data-action`.
   The handlers live in the component body, recreated each render, so they always
   read the latest state — no stale closures.
+
+  Those three keys are why the checkbox row is the one place a forwarded `pt` is
+  **merged under** the component's own attributes rather than layered over them: a
+  consumer's `pt={{ checkbox: { root: … } }}` reaches the nested `CrCheckbox`, but
+  `data-path`/`data-kind` win on collision, because the delegated listener stops
+  finding the control without them. Everything else in the section passes through.
 - **The fine-grained targets get it for free.** Solid/Vue/Svelte/Qwik already
   update per-binding; the delegation is inert there. (blur/focus don't bubble on
   those five, so the `<form>` also carries `onFocusOut`/`onFocusIn` alongside
@@ -5167,6 +5175,13 @@ import { CrButton } from "@alebianco/cr-design-system/qwik";
 import { CrButton } from "@alebianco/cr-design-system/vue";
 ```
 
+Every entry also exports **`CrContext`** — the app-level tier for global `pt`,
+`locale` and `messages`. It is the one non-component export, and its shape is that
+framework's own context primitive (React/Solid a context object, Vue/Svelte a
+`{ cr, key }` pair, Qwik a `ContextId`, Angular an injectable), so how you provide
+it differs per target. Typed as `CrGlobalConfig`; see
+[styling-contract.md](styling-contract.md) for the per-target provider examples.
+
 How each entry is distributed reflects what that framework needs — the package is
 private, but every entry is a genuine, consumable package:
 
@@ -5182,9 +5197,13 @@ Qwik are TSX, so `tsc` emits full declarations. For Vue/Svelte/Solid/Angular
 (non-TSX source), `build/build-pkg-types.mjs` generates an `index.d.ts` from the
 shared, framework-agnostic prop interfaces — every component's `<Name>Props` is
 re-exported, and the component value is typed per framework (Vue `DefineComponent`,
-Solid render fn, Svelte component constructor, Angular class). Peer deps cover all
-six frameworks, each marked `optional` so installing for one target doesn't pull
-the rest. Guarded by `verify:pkg-types` (drift) and `tests/pkg-exports.test.mjs`.
+Solid render fn, Svelte component constructor, Angular class). The shared styling
+types (`CrPassThrough`, `CrDesignTokens`, `CrHooks`, `CrGlobalConfig`, …) are
+**inlined** from `lib/pt-types.ts` into each `index.d.ts`, because a type merely
+imported from `lib/` would be referenced but never declared; `CrContext` is declared
+per target alongside them. Peer deps cover all six frameworks, each marked
+`optional` so installing for one target doesn't pull the rest. Guarded by
+`verify:pkg-types` (drift) and `tests/pkg-exports.test.mjs`.
 
 The build compiles the typed packages with `pnpm run build:pkg` (relative import
 extensions rewritten `.tsx → .js` so the emit resolves in Node ESM and bundlers);

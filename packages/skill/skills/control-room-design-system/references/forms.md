@@ -307,6 +307,12 @@ instead:
   to the `<form>`; each control carries `data-path` / `data-kind` / `data-action`.
   The handlers live in the component body, recreated each render, so they always
   read the latest state — no stale closures.
+
+  Those three keys are why the checkbox row is the one place a forwarded `pt` is
+  **merged under** the component's own attributes rather than layered over them: a
+  consumer's `pt={{ checkbox: { root: … } }}` reaches the nested `CrCheckbox`, but
+  `data-path`/`data-kind` win on collision, because the delegated listener stops
+  finding the control without them. Everything else in the section passes through.
 - **The fine-grained targets get it for free.** Solid/Vue/Svelte/Qwik already
   update per-binding; the delegation is inert there. (blur/focus don't bubble on
   those five, so the `<form>` also carries `onFocusOut`/`onFocusIn` alongside
