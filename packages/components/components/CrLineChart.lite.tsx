@@ -1,5 +1,5 @@
 import { useStore, Show, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle, ptResolve } from "../lib/pt.ts";
+import { ptAttrs, ptClass, ptResolve, ptStyle, resolveLocale } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 
@@ -24,6 +24,10 @@ export interface CrLineChartProps {
   /** IANA time zone for the calendar x-axis (e.g. "Europe/Rome"). Default "UTC". */
   xZone?: string;
   /** Month-name language for calendar ticks: "en" (default) or "it". */
+  /** BCP-47 tag for the axis's month/weekday names. This is the per-instance
+   *  override on the shared locale cascade: it falls back to the app-level
+   *  `locale` from context, then "en". (Distinct from `xZone`, which is the IANA
+   *  time zone — language and zone are orthogonal.) */
   xLocale?: string;
   /** Weekly ticks as dates ("3 Mar", default) or ISO week numbers ("W10"). */
   xWeek?: string;
@@ -388,7 +392,7 @@ export default function CrLineChart(props: CrLineChartProps) {
         const xspan = (xhi - xlo) || 1;
         const xf = props.xFormat;
         if (props.xTime) {
-          const tt = state.timeTicks(xlo, xhi, props.xZone || "UTC", 6, props.xLocale || "en", props.xWeek || "date", props.xFiscalStart || 1);
+          const tt = state.timeTicks(xlo, xhi, props.xZone || "UTC", 6, resolveLocale(props.xLocale, cr && cr.locale), props.xWeek || "date", props.xFiscalStart || 1);
           for (const t of tt) if (t.value >= xlo - xspan * 1e-6 && t.value <= xhi + xspan * 1e-6) xticks.push({ v: t.value, label: xf ? xf(t.value) : t.label });
         } else {
           for (const t of state.niceScale(xlo, xhi, 5).ticks) if (t >= xlo - xspan * 1e-6 && t <= xhi + xspan * 1e-6) xticks.push({ v: t, label: xf ? xf(t) : state.fmtTick(t) });
@@ -405,7 +409,7 @@ export default function CrLineChart(props: CrLineChartProps) {
       if (xs && props.xBreak && xs.length > 1) {
         broken = true;
         const zone = props.xZone || "UTC";
-        const locale = props.xLocale || "en";
+        const locale = resolveLocale(props.xLocale, cr && cr.locale);
         const gaps: number[] = [];
         for (let i = 1; i < xs.length; i++) gaps.push(xs[i] - xs[i - 1]);
         const sortedG = gaps.slice().sort((a: number, b: number) => a - b);
@@ -548,7 +552,7 @@ export default function CrLineChart(props: CrLineChartProps) {
       if (leftPct > 88) leftPct = 88;
       const label = m.continuous
         ? (idx < xs.length
-            ? (props.xFormat ? props.xFormat(xs[idx]) : (props.xTime ? state.fmtStamp(xs[idx], props.xZone || "UTC", props.xLocale || "en") : state.fmtTick(xs[idx])))
+            ? (props.xFormat ? props.xFormat(xs[idx]) : (props.xTime ? state.fmtStamp(xs[idx], props.xZone || "UTC", resolveLocale(props.xLocale, cr && cr.locale)) : state.fmtTick(xs[idx])))
             : "")
         : ((props.labels || [])[idx] || "");
       return { cx, top: m.T, bot: m.T + m.plotH, leftPct, label, rows };

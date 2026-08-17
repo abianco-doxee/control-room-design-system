@@ -259,3 +259,36 @@ test("resolveLocale: per-instance → context → en", () => {
   assert.equal(pt.resolveLocale(undefined, "it"), "it");
   assert.equal(pt.resolveLocale("en-GB", "it"), "en-GB", "instance wins, like pt and messages");
 });
+
+// The parent tier is only real if every nesting site actually forwards. Without
+// this, a nested component is unreachable through the parent's `pt` and nothing
+// fails — which is exactly how four sites (CrChoiceGroup→CrChoice,
+// CrForm→CrFormRow, CrInput→CrIcon, CrKeyHints→CrKbd) were missed on the first
+// pass. Scans the sources so a NEW nesting is covered the moment it is written.
+test("every nested Cr* component receives a forwarded pt", () => {
+  const DIR = join(ROOT, "packages", "components", "components");
+  const files = readdirSync(DIR).filter((n) => n.endsWith(".lite.tsx"));
+  const known = new Set(files.map((n) => n.replace(/\.lite\.tsx$/, "")));
+  const gaps = [];
+  for (const f of files) {
+    const name = f.replace(/\.lite\.tsx$/, "");
+    // Strip comments first: a doc comment may legitimately mention a component
+    // in prose ("Place <CrNav/> inside"), which is not a render site.
+    const src = readFileSync(join(DIR, f), "utf8")
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/^\s*\/\/.*$/gm, "");
+    // Each opening tag of a real component, with the props up to its close.
+    for (const m of src.matchAll(/<(Cr[A-Z][A-Za-z0-9]*)\b([^>]*)>/g)) {
+      const [, child, propsBlob] = m;
+      if (child === name) continue; // self-reference in a doc comment
+      if (!known.has(child)) continue; // a type name, not a component
+      if (/\bpt=\{/.test(propsBlob)) continue;
+      gaps.push(`${name} → ${child}`);
+    }
+  }
+  assert.deepEqual(
+    gaps,
+    [],
+    `nested components unreachable through the parent's pt:\n${gaps.join("\n")}`
+  );
+});
