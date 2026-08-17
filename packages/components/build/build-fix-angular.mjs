@@ -43,6 +43,23 @@ if (!existsSync(DIR)) {
 const files = readdirSync(DIR).filter((f) => f.endsWith(".js"));
 let touched = 0;
 
+// Nested components: the generator lists a child's NgModule in the @NgModule
+// `imports: [CommonModule, CrIconModule]` but never imports the symbol, so the
+// module reference is a bare undefined identifier — `ReferenceError:
+// CrIconModule is not defined` the moment the module is evaluated. Pre-existing
+// for CrInput→CrIcon; adding CrCheckbox to CrTable/CrDataGrid surfaced it. Add the
+// missing import for every Cr*Module the file references but does not import.
+function addMissingModuleImports(code, file) {
+  const referenced = [...new Set([...code.matchAll(/\b(Cr[A-Za-z0-9]+)Module\b/g)].map((m) => m[1]))];
+  const self = file.replace(/\.js$/, "");
+  const missing = referenced.filter(
+    (n) => n !== self && !new RegExp(`import\\s*\\{[^}]*\\b${n}Module\\b`).test(code)
+  );
+  if (!missing.length) return code;
+  const lines = missing.map((n) => `import { ${n}Module } from "./${n}";`).join("\n");
+  return lines + "\n" + code;
+}
+
 for (const f of files) {
   const path = join(DIR, f);
   const src = readFileSync(path, "utf8");
@@ -52,12 +69,22 @@ for (const f of files) {
       if (!isSpreadLine(line)) return line;
       let fixed = line;
       for (const [re, ch] of ENTITIES) fixed = fixed.replace(re, ch);
+      // Same class of bug, second symptom. A component that reads the app-level
+      // context (`const cr = useContext(CrContext)`) becomes a constructor
+      // parameter — `constructor(public cr: CrContext, …)` — so inside the class
+      // body it is `this.cr`. But the generator copies the JSX expression
+      // verbatim into these synthesized calls, emitting a BARE `cr`
+      // (`ptAttrs(this.ptOf(cr), "root")`), which throws "cr is not defined" at
+      // runtime. In the template a bare `cr` is correct (Angular resolves it
+      // against the instance), which is why only these lines need qualifying.
+      fixed = fixed.replace(/(?<![.\w$])cr(?![\w$])/g, "this.cr");
       return fixed;
     })
     .join("\n");
-  if (out !== src) {
+  const withImports = addMissingModuleImports(out, f);
+  if (withImports !== src) {
     touched++;
-    if (!CHECK) writeFileSync(path, out);
+    if (!CHECK) writeFileSync(path, withImports);
   }
 }
 

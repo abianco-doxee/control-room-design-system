@@ -16,7 +16,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
  * force a full rebuild (used by the parity check).
  */
 import { createRequire } from "node:module";
-import { dirname, join, relative } from "node:path";
+import { basename, dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
@@ -33,6 +33,19 @@ const MITOSIS_PKG = MITOSIS_MAIN.slice(
 );
 const mitosis = require("@builder.io/mitosis");
 const { parseJsx, targets: GENERATORS, renameComponentFile, checkShouldOutputTypeScript } = mitosis;
+// Context modules (`*.context.lite.ts`) are NOT components: they parse with
+// parseContext and render through a per-target contextTo<Target> generator. The
+// component parser chokes on one (`JSON5: invalid character`), so they are
+// discovered and emitted separately below.
+const { parseContext } = mitosis;
+const CONTEXT_GENERATORS = {
+  react: mitosis.contextToReact,
+  vue: mitosis.contextToVue,
+  svelte: mitosis.contextToSvelte,
+  angular: mitosis.contextToAngular,
+  solid: mitosis.contextToSolid,
+  qwik: mitosis.contextToQwik,
+};
 const { transformImports } = require("@builder.io/mitosis-cli/dist/build/helpers/transpile.js");
 const { getOverrideFile } = require("@builder.io/mitosis-cli/dist/build/helpers/overrides.js");
 
@@ -50,6 +63,15 @@ const optionsFor = (target) => ({ ...(config.options?.[target] || {}), plugins: 
 // Discover the component sources (components/**/*.lite.tsx).
 const componentPaths = readdirSync(join(ROOT, "components"))
   .filter((f) => f.endsWith(".lite.tsx"))
+  .map((f) => join("components", f))
+  .sort();
+
+// Context sources (components/**/*.context.lite.ts) — the app-level `pt` / locale
+// / messages tier. Kept in components/ because mitosis.config globs `components/**`;
+// a context anywhere else compiles silently and is never emitted, leaving consumers
+// with an unresolvable import.
+const contextPaths = readdirSync(join(ROOT, "components"))
+  .filter((f) => f.endsWith(".context.lite.ts"))
   .map((f) => join("components", f))
   .sort();
 
@@ -108,11 +130,51 @@ async function emit(path) {
       path: overrideFilePath,
       target: o.target,
     });
-    let code =
-      override ??
-      GENERATORS[o.target](o.options.options[o.target])({ path, component: o.component });
+    let code = override ?? undefined;
+    if (code === undefined) {
+      const genOpts = o.options.options[o.target];
+      try {
+        code = GENERATORS[o.target](genOpts)({ path, component: o.component });
+      } catch (err) {
+        // Angular-only: the generator HTML-escapes the string args of the
+        // `setAttributes(el, ptAttrs(this.pt, "root"))` calls it synthesizes from
+        // a JSX spread (`&quot;root&quot;`), then runs prettier over the result,
+        // which throws on the stray `&` — before build-fix-angular.mjs can
+        // unescape it. Retry that one component unformatted so the fixer gets its
+        // chance. Every other target (and every other Angular component) keeps the
+        // generator's formatting, so this cannot silently degrade the output.
+        if (o.target !== "angular") throw err;
+        code = GENERATORS[o.target]({ ...genOpts, prettier: false })({
+          path,
+          component: o.component,
+        });
+      }
+    }
     code = transformImports({ target: o.target, options: o.options })(code);
     const dest = join(DEST, o.target, o.outputFilePath);
+    mkdirSync(dirname(dest), { recursive: true });
+    writeFileSync(dest, code);
+    written.push(relative(ROOT, dest));
+  }
+  return written;
+}
+
+// Emit one context module to every target, in that framework's own idiom (React
+// createContext, Vue InjectionKey, Svelte context key, Angular injectable, …).
+function emitContext(path) {
+  const source = readFileSync(join(ROOT, path), "utf8");
+  const parsed = parseContext(source, { name: basename(path).replace(/\.context\.lite\.ts$/, "") });
+  if (!parsed) throw new Error(`${path}: parseContext returned nothing`);
+  const written = [];
+  for (const target of TARGET_LIST) {
+    const gen = CONTEXT_GENERATORS[target];
+    if (!gen) continue;
+    const options = { ...config, options: { ...config.options, [target]: optionsFor(target) } };
+    const ts = checkShouldOutputTypeScript({ options, target });
+    let code = gen({ contextOptions: {} })({ context: parsed, options: optionsFor(target) });
+    code = transformImports({ target, options })(code);
+    const out = path.replace(/\.lite\.ts$/, ts ? ".ts" : ".js");
+    const dest = join(DEST, target, out);
     mkdirSync(dirname(dest), { recursive: true });
     writeFileSync(dest, code);
     written.push(relative(ROOT, dest));
@@ -149,6 +211,7 @@ async function main() {
 
   const current = {};
   for (const p of componentPaths) current[p] = sha(readFileSync(join(ROOT, p), "utf8"));
+  for (const p of contextPaths) current[p] = sha(readFileSync(join(ROOT, p), "utf8"));
 
   // Drop outputs for components that no longer exist (the CLI's clean()).
   for (const p of Object.keys(manifest.files)) if (!current[p]) removeOutputs(p);
@@ -164,6 +227,10 @@ async function main() {
     await emit(p);
     built++;
   }
+
+  // Contexts are few and cheap; emit unconditionally so a stale one can never
+  // survive a cache hit on the components that consume it.
+  for (const p of contextPaths) emitContext(p);
 
   mkdirSync(CACHE_DIR, { recursive: true });
   writeFileSync(MANIFEST, JSON.stringify({ globalKey: gkey, files: current }, null, 0));
