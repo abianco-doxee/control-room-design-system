@@ -65,3 +65,28 @@ export type CrPassThrough<Part extends string = string> = {
   /** Component-level lifecycle callbacks. Never spread onto an element. */
   hooks?: CrHooks;
 };
+
+/** App-level defaults for the whole library — the GLOBAL tier of the resolution
+ *  chain (global → component), provided once through `CrContext`.
+ *
+ *  `pt` is keyed by COMPONENT NAME, and each value is that component's own `pt`
+ *  object, so the part names are per component:
+ *
+ *    { pt: { CrTabs: { tab: { class: "px-3" } }, CrModal: { hooks: { onMounted } } } }
+ *
+ *  Deliberately `CrPassThrough` (loose `Part`) per component rather than a mapped
+ *  type over every component's own union: the union lives in each component's own
+ *  declaration, and this type is inlined into all six targets' `index.d.ts` without
+ *  them. A typo in a part name here is therefore NOT a compile error, unlike the
+ *  per-instance `pt` prop — the trade that keeps this one type framework-agnostic. */
+export interface CrGlobalConfig {
+  /** Per-component-type pass-through defaults, keyed by component name. */
+  pt?: Record<string, CrPassThrough>;
+  /** BCP-47 tag for Intl formatting (dates, numbers, relative time). Explicit,
+   *  never navigator.language — see the SSR note in references/styling-contract.md. */
+  locale?: string;
+  /** Overrides for the UI copy Intl cannot derive, keyed "<Component>.<key>":
+   *  `{ "CrModal.close": "Chiudi" }`. A value may be a function of one argument
+   *  for the counted/interpolated keys, matching the built-in's shape. */
+  messages?: Record<string, string | ((value: any) => string)>;
+}
