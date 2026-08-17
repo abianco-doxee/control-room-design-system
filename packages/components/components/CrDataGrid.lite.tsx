@@ -39,12 +39,12 @@ export interface CrDataGridProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "head" · "cell" · "sort" · "glyph" · "viewport" · "empty" · "sizer" · "rows" · "row". */
   unstyled?: boolean;
-  /** `check` is a NESTED SECTION: its value is a `pt` for the inner CrCheckbox
-   *  (`pt={{ check: { root: { "data-testid": "row-select" } } }}`), not an
+  /** `checkbox` is a NESTED SECTION: its value is a `pt` for the inner CrCheckbox
+   *  (`pt={{ checkbox: { root: { "data-testid": "row-select" } } }}`), not an
    *  attribute bag for an element. */
   pt?: CrPassThrough<
     | "cell"
-    | "check"
+    | "checkbox"
     | "empty"
     | "glyph"
     | "head"
@@ -330,7 +330,7 @@ export default function CrDataGrid(props: CrDataGridProps) {
         <Show when={props.selectable}>
           <div {...ptAttrs(ptResolve(cr, props.pt, "CrDataGrid"), "cell")} class={ptClass(ptResolve(cr, props.pt, "CrDataGrid"), props.unstyled, "cr-grid__cell cr-grid__cell--check", "cell")} data-part="cell" role="columnheader">
             <CrCheckbox
-              pt={ptNested(ptResolve(cr, props.pt, "CrDataGrid"), "check")}
+              pt={ptNested(ptResolve(cr, props.pt, "CrDataGrid"), "checkbox")}
               unstyled={props.unstyled}
               label={resolveMessage(cr, props.labels, "CrDataGrid", "selectAllRows")}
               checked={state.allChecked()}
@@ -389,7 +389,7 @@ export default function CrDataGrid(props: CrDataGridProps) {
                       id={state.cellId(state.absIndex(i), 0)}
                     >
                       <CrCheckbox
-                        pt={ptNested(ptResolve(cr, props.pt, "CrDataGrid"), "check")}
+                        pt={ptNested(ptResolve(cr, props.pt, "CrDataGrid"), "checkbox")}
                         unstyled={props.unstyled}
                         label={resolveMessage(cr, props.labels, "CrDataGrid", "selectRow")}
                         checked={state.isSelected(row, state.absIndex(i))}

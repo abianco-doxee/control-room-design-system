@@ -42,10 +42,10 @@ export interface CrFormRowProps {
    * row wrapper). This is CrForm's internal presentational row, so pt/unstyled
    * apply at the row level; the row keeps its computed paddingLeft style. */
   unstyled?: boolean;
-  /** `check` is a NESTED SECTION: its value is a `pt` for the inner CrCheckbox on a
-   *  checkbox row (`pt={{ check: { root: { "data-testid": "agree" } } }}`). The row's
+  /** `checkbox` is a NESTED SECTION: its value is a `pt` for the inner CrCheckbox on a
+   *  checkbox row (`pt={{ checkbox: { root: { "data-testid": "agree" } } }}`). The row's
    *  own delegation attributes still win on collision — see the note at the call. */
-  pt?: CrPassThrough<"check" | "root">;
+  pt?: CrPassThrough<"checkbox" | "root">;
   dt?: CrDesignTokens;
 }
 
@@ -145,7 +145,7 @@ export default function CrFormRow(props: CrFormRowProps) {
               * stops working without them. */}
             <CrCheckbox
               pt={ptResolve(
-                { pt: { CrCheckbox: ptNested(ptResolve(cr, props.pt, "CrFormRow"), "check") } },
+                { pt: { CrCheckbox: ptNested(ptResolve(cr, props.pt, "CrFormRow"), "checkbox") } },
                 { root: { "data-path": props.pathKey, "data-kind": "checkbox", "aria-describedby": props.descId } },
                 "CrCheckbox"
               )}

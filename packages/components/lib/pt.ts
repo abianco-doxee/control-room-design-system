@@ -170,14 +170,14 @@ export function ptHooks(pt: any): any {
  *  tier (their `pcBadge` convention), which is what makes an inner component
  *  reachable at all:
  *
- *    <CrTable pt={{ check: { root: { "data-testid": "row-select" } } }} />
+ *    <CrTable pt={{ checkbox: { root: { "data-testid": "row-select" } } }} />
  *    // …inside CrTable:
- *    <CrCheckbox pt={ptNested(pt, "check")} />
+ *    <CrCheckbox pt={ptNested(pt, "checkbox")} />
  *
  *  The section's value is a `pt` OBJECT for the child (parts of the child), not an
  *  attribute bag for an element — which is exactly why such sections must never be
  *  spread onto the DOM. `ptAttrs` drops any key whose value is a plain object for
- *  that reason, so a nested section cannot leak out as `check="[object Object]"`.
+ *  that reason, so a nested section cannot leak out as `checkbox="[object Object]"`.
  *
  *  Returns undefined when the parent said nothing, so the child sees no `pt` at all
  *  rather than an empty object. */
