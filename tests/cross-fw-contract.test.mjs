@@ -70,7 +70,14 @@ test("angular: dt is applied via [ngStyle] (custom props reach setProperty)", ()
   const src = fw("angular/components/CrTabs.js");
   // NgStyle._setStyle flags any key containing '-' as DashCase → renderer uses
   // el.style.setProperty(), which is the correct path for --custom properties.
-  assert.match(src, /\[ngStyle\]='ptStyle\(pt, dt, "root"\)'/, "root binds dt through [ngStyle]");
+  // The first argument is the effective pt — `pt` on its own, or
+  // `ptResolve(cr, pt, "…")` once the component joins the global→component cascade.
+  // What matters here is that `dt` reaches [ngStyle] at all.
+  assert.match(
+    src,
+    /\[ngStyle\]='ptStyle\((pt|ptResolve\([^)]*\)), dt, "root"\)'/,
+    "root binds dt through [ngStyle]"
+  );
 });
 
 // CrToastRegion packs consecutive same-message/same-signal toasts into one row
