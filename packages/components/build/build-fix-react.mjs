@@ -34,6 +34,14 @@ const NEEDS_SEMI = /(=\s*useState\(\(\)\s*=>\s*\([^)]*\)\))(?!\s*;)/g;
 // The `}, )` close is the distinctive deps-less-hook shape; add the semicolon.
 const NEEDS_SEMI_EFFECT = /(\},\s*\))(\s*return\b)/g;
 
+// A WITH-deps effect (`useEffect(() => {...}, [a, b])`) has the same missing
+// semicolon, and collapsed onto one line it runs straight into whatever follows —
+// `}, []) useEffect(…)` or `}, [x]) const …` — which is a parse error. Mitosis
+// emits one of these per onMount/onUpdate/onUnMount, so any component using the
+// PT lifecycle hooks hits it. Add the separator when the next thing on the line is
+// another statement rather than an existing `;`.
+const NEEDS_SEMI_EFFECT_DEPS = /(useEffect\([\s\S]*?\},\s*\[[^\]]*\]\))(?!\s*[;,)])/g;
+
 // Presentational children wrapped in React.memo so a parent re-render only
 // re-renders the child whose props actually changed. Safe ONLY for components
 // with pure data props (no function props) — CrFormRow is delegation-driven and
@@ -83,6 +91,7 @@ for (const f of files) {
   let patched = src
     .replace(NEEDS_SEMI, "$1;")
     .replace(NEEDS_SEMI_EFFECT, "$1;$2")
+    .replace(NEEDS_SEMI_EFFECT_DEPS, "$1;")
     .replace(/from (["'])(\.\/Cr[A-Za-z0-9]+)\1/g, "from $1$2.tsx$1");
   if (MEMOIZE.has(f)) patched = wrapInMemo(patched, f);
   let formatted;

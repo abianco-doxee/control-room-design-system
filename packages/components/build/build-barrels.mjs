@@ -71,6 +71,10 @@ for (const [target, { ext, index }] of Object.entries(TARGETS)) {
 
   const names = readdirSync(compDir)
     .filter((f) => f.endsWith("." + ext))
+    // Context modules (cr.context.*) live alongside the components but are not
+    // exported as components — they are imported directly by the components that
+    // consume them, and `cr.context` is not a legal identifier for a barrel export.
+    .filter((f) => !f.includes(".context."))
     .map((f) => f.slice(0, -(ext.length + 1)))
     .sort();
 
