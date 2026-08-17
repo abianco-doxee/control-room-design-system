@@ -1,5 +1,7 @@
-import { useStore, Show, For } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, Show, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrLineSeries {
   name: string;
@@ -58,8 +60,8 @@ export interface CrLineChartProps {
   /* ── styling contract (portable pt/dt subset). Part: "root" (the SVG plot is
    * aria-hidden viz and stays on the cr-chart/cr-linechart classes). */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"root">;
+  dt?: CrDesignTokens;
 }
 
 /* A time-series line chart: recessive gridlines, crisp non-scaling 2px lines,
@@ -78,6 +80,18 @@ export interface CrLineChartProps {
  * or the next hue in a FIXED categorical order (never cycled) — colour follows
  * the entity, not its rank. */
 export default function CrLineChart(props: CrLineChartProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   const state = useStore({
     hovering: false,
     at: 0,
@@ -185,9 +199,18 @@ export default function CrLineChart(props: CrLineChartProps) {
       const p = state.zoneParts(ms, zone);
       return state.z2(p.hour) + ":" + state.z2(p.minute) + (withSec ? ":" + state.z2(p.second) : "");
     },
+    /* Abbreviated month names for the axis, from Intl — every locale, no table.
+     * This is the DISPLAY path and takes the user's locale.
+     *
+     * NOT to be confused with zoneParts/zWeekday below, which pin "en-US" on
+     * purpose: those use Intl as a TIMEZONE CALCULATOR and read numeric parts via
+     * formatToParts, where a locale-dependent string would be a bug. Only this
+     * function may vary by locale. */
     monNames(locale: string): string[] {
-      if (locale === "it") return ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"];
-      return ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const fmt = new Intl.DateTimeFormat(locale || "en", { month: "short", timeZone: "UTC" });
+      const out: string[] = [];
+      for (let i = 0; i < 12; i++) out.push(fmt.format(new Date(Date.UTC(2021, i, 1))));
+      return out;
     },
     fyEnd(year: number, month: number, start: number): number { return month >= start ? year + 1 : year; },
     quarterOf(month: number, start: number): number { return Math.floor(((month - 1 - (start - 1) + 12) % 12) / 3) + 1; },
@@ -533,7 +556,7 @@ export default function CrLineChart(props: CrLineChartProps) {
   });
 
   return (
-    <figure {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-chart cr-linechart", "root")} data-part="root" style={ptStyle(props.pt, props.dt, "root")}>
+    <figure {...ptAttrs(ptResolve(cr, props.pt, "CrLineChart"), "root")} class={ptClass(ptResolve(cr, props.pt, "CrLineChart"), props.unstyled, "cr-chart cr-linechart", "root")} data-part="root" style={ptStyle(ptResolve(cr, props.pt, "CrLineChart"), props.dt, "root")}>
       <div class="cr-linechart__graphic" role="img" aria-label={state.summary()}>
       <svg
         class="cr-linechart__plot"

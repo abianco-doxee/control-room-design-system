@@ -1,5 +1,7 @@
-import { useStore, Show, For } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, Show, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler, resolveMessage } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrToastItem {
   id: string | number;
@@ -33,11 +35,15 @@ export interface CrToastRegionProps {
    * anchors stack newest nearest the edge. */
   position?: "tr" | "br" | "tl" | "bl" | "tc" | "bc" | "ml" | "mr" | "mc";
   onDismiss?: (id: string | number) => void;
+  /** Override this component's built-in English strings. Any key you omit falls
+   *  back to the app-level `messages` from context, then to the built-in default.
+   *  See lib/messages.ts for the keys. */
+  labels?: Record<string, any>;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "toast" · "msg" · "count" · "close". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"close" | "count" | "msg" | "root" | "toast">;
+  dt?: CrDesignTokens;
 }
 
 /* A fixed anchor that stacks live toasts. The parent owns the list; each row is
@@ -60,6 +66,18 @@ export interface CrToastRegionProps {
  * loop on `newestId`, and never reassign `id` when a duplicate merges. Guarded
  * by tests/cross-fw-contract.test.mjs across all six targets. */
 export default function CrToastRegion(props: CrToastRegionProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   const state = useStore({
     /* Collapse runs of consecutive same-message/same-signal toasts. Only
      * CONSECUTIVE ones pack, so an unrelated toast in between keeps the two
@@ -94,42 +112,42 @@ export default function CrToastRegion(props: CrToastRegionProps) {
 
   return (
     <div
-      {...ptAttrs(props.pt, "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrToastRegion"), "root")}
       data-part="root"
-      class={ptClass(props.pt, props.unstyled, "cr-toast-region cr-toast-region--" + (props.position || "tr"), "root")}
-      style={ptStyle(props.pt, props.dt, "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrToastRegion"), props.unstyled, "cr-toast-region cr-toast-region--" + (props.position || "tr"), "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrToastRegion"), props.dt, "root")}
     >
       <For each={state.groups()}>
         {(g: CrToastGroup) => (
           <div
-            {...ptAttrs(props.pt, "toast")}
+            {...ptAttrs(ptResolve(cr, props.pt, "CrToastRegion"), "toast")}
             data-part="toast"
             data-state={g.signal}
             data-count={g.count}
-            class={ptClass(props.pt, props.unstyled, "cr-toast" + (g.signal ? " cr-toast--" + g.signal : ""), "toast")}
+            class={ptClass(ptResolve(cr, props.pt, "CrToastRegion"), props.unstyled, "cr-toast" + (g.signal ? " cr-toast--" + g.signal : ""), "toast")}
             role={g.signal === "err" ? "alert" : "status"}
             aria-live={g.signal === "err" ? "assertive" : "polite"}
           >
-            <span {...ptAttrs(props.pt, "msg")} data-part="msg" class={ptClass(props.pt, props.unstyled, "cr-toast__msg", "msg")}>{g.message}</span>
+            <span {...ptAttrs(ptResolve(cr, props.pt, "CrToastRegion"), "msg")} data-part="msg" class={ptClass(ptResolve(cr, props.pt, "CrToastRegion"), props.unstyled, "cr-toast__msg", "msg")}>{g.message}</span>
             <Show when={g.count > 1}>
               {/* aria-hidden on purpose: the count is the ONLY thing that
                * changes when a duplicate arrives. Keeping it out of the live
                * region's announced text means the row updates silently instead
                * of re-announcing — critical for assertive `err` toasts. */}
               <span
-                {...ptAttrs(props.pt, "count")}
+                {...ptAttrs(ptResolve(cr, props.pt, "CrToastRegion"), "count")}
                 data-part="count"
-                class={ptClass(props.pt, props.unstyled, "cr-toast__count", "count")}
+                class={ptClass(ptResolve(cr, props.pt, "CrToastRegion"), props.unstyled, "cr-toast__count", "count")}
                 aria-hidden="true"
               >{state.countLabel(g)}</span>
             </Show>
             <button
-              {...ptAttrs(props.pt, "close")}
+              {...ptAttrs(ptResolve(cr, props.pt, "CrToastRegion"), "close")}
               type="button"
               data-part="close"
-              class={ptClass(props.pt, props.unstyled, "cr-toast__close", "close")}
-              aria-label="Dismiss"
-              onClick={() => props.onDismiss && props.onDismiss(g.newestId)}
+              class={ptClass(ptResolve(cr, props.pt, "CrToastRegion"), props.unstyled, "cr-toast__close", "close")}
+              aria-label={resolveMessage(cr, props.labels, "CrToastRegion", "dismiss")}
+              onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrToastRegion'), 'close', 'onClick', event); props.onDismiss && props.onDismiss(g.newestId); }}
             >
               ✕
             </button>

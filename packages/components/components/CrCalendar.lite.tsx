@@ -1,5 +1,7 @@
-import { useStore, For, Show } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, For, Show, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptAttrs, ptClass, ptHandler, ptResolve, ptStyle, resolveLocale, resolveMessage } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrCalendarDay {
   iso: string;
@@ -32,18 +34,28 @@ export interface CrCalendarProps {
   /** Fires with the new `YYYY-MM` when the month is stepped, or when the
    *  switcher's month dropdown / year stepper changes it. */
   onMonthChange?: (month: string) => void;
+  /** Override this component's built-in English strings. Any key you omit falls
+   *  back to the app-level `messages` from context, then to the built-in default.
+   *  See lib/messages.ts for the keys. */
+  labels?: Record<string, any>;
+  /** BCP-47 tag for month/weekday names (e.g. "it", "en-GB"). Falls back to the
+   *  app-level `locale` from context, then "en". */
+  locale?: string;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "header" · "prev" · "next" · "grid" · "weekday" · "day" ·
    * "monthSelect" · "yearSelect".
    * The selected accent is `--cr-calendar-selected-bg` (a state, Law 2). */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"day" | "grid" | "header" | "next" | "prev" | "root" | "weekday">;
+  dt?: CrDesignTokens;
 }
 
-const WD = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
-const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const MON_FULL = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+/* Month and weekday names come from `Intl.DateTimeFormat`, never a table: it is in
+ * every supported runtime, covers every locale, and needs no translation file. The
+ * reference date is a FIXED UTC day (2021-01-03 is a Sunday) so weekday order is
+ * derived, not read from a clock — the same SSR-determinism discipline the rest of
+ * this component follows. Formatting lives in useStore getters because Mitosis
+ * strips free consts from the compiled output (see CrTelemetry). */
 
 /* A month calendar grid — WAI-ARIA `role="grid"` with weekday columnheaders and
  * day buttons, roving tabindex (←/→ ±1 day, ↑/↓ ±1 week, Home/End week ends,
@@ -54,6 +66,18 @@ const MON_FULL = ["January", "February", "March", "April", "May", "June", "July"
  * (prev, next, month dropdown, year dropdown) funnels through state.goTo and
  * emits onMonthChange with a `YYYY-MM`. Styling via .cr-calendar; data-part per part. */
 export default function CrCalendar(props: CrCalendarProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   const state = useStore({
     pad(n: number): string {
       return n < 10 ? "0" + n : "" + n;
@@ -69,7 +93,11 @@ export default function CrCalendar(props: CrCalendarProps) {
     },
     get monthLabel(): string {
       const v = state.view;
-      return MON[v[1]] + " " + v[0];
+      const fmt = new Intl.DateTimeFormat(resolveLocale(props.locale, cr && cr.locale), {
+        month: "short",
+        timeZone: "UTC",
+      });
+      return fmt.format(new Date(Date.UTC(v[0], v[1], 1))) + " " + v[0];
     },
     // "monday" → 1, anything else (incl. undefined) → 0 = Sunday.
     get firstDow(): number {
@@ -77,8 +105,13 @@ export default function CrCalendar(props: CrCalendarProps) {
     },
     get weekdays(): string[] {
       const ws = state.firstDow;
+      const fmt = new Intl.DateTimeFormat(resolveLocale(props.locale, cr && cr.locale), {
+        weekday: "short",
+        timeZone: "UTC",
+      });
       const out: string[] = [];
-      for (let i = 0; i < 7; i++) out.push(WD[(i + ws) % 7]);
+      /* 2021-01-03 is a Sunday; +i days walks the week from the configured start. */
+      for (let i = 0; i < 7; i++) out.push(fmt.format(new Date(Date.UTC(2021, 0, 3 + ((i + ws) % 7)))));
       return out;
     },
     outOfRange(iso: string): boolean {
@@ -117,7 +150,13 @@ export default function CrCalendar(props: CrCalendarProps) {
       return props.switcher !== false;
     },
     get monthNames(): string[] {
-      return MON_FULL;
+      const fmt = new Intl.DateTimeFormat(resolveLocale(props.locale, cr && cr.locale), {
+        month: "long",
+        timeZone: "UTC",
+      });
+      const out: string[] = [];
+      for (let i = 0; i < 12; i++) out.push(fmt.format(new Date(Date.UTC(2021, i, 1))));
+      return out;
     },
     get viewYear(): number {
       return state.view[0];
@@ -203,29 +242,29 @@ export default function CrCalendar(props: CrCalendarProps) {
 
   return (
     <div
-      {...ptAttrs(props.pt, "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrCalendar"), "root")}
       data-part="root"
-      class={ptClass(props.pt, props.unstyled, "cr-calendar", "root")}
-      style={ptStyle(props.pt, props.dt, "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrCalendar"), props.unstyled, "cr-calendar", "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrCalendar"), props.dt, "root")}
     >
-      <div {...ptAttrs(props.pt, "header")} data-part="header" class={ptClass(props.pt, props.unstyled, "cr-calendar__header", "header")}>
+      <div {...ptAttrs(ptResolve(cr, props.pt, "CrCalendar"), "header")} data-part="header" class={ptClass(ptResolve(cr, props.pt, "CrCalendar"), props.unstyled, "cr-calendar__header", "header")}>
         <button
-          {...ptAttrs(props.pt, "prev")}
+          {...ptAttrs(ptResolve(cr, props.pt, "CrCalendar"), "prev")}
           type="button"
           data-part="prev"
-          class={ptClass(props.pt, props.unstyled, "cr-calendar__nav", "prev")}
-          aria-label="Previous month"
-          onClick={() => state.stepMonth(-1)}
+          class={ptClass(ptResolve(cr, props.pt, "CrCalendar"), props.unstyled, "cr-calendar__nav", "prev")}
+          aria-label={resolveMessage(cr, props.labels, "CrCalendar", "prevMonth")}
+          onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrCalendar'), 'prev', 'onClick', event); state.stepMonth(-1); }}
         >
           <span aria-hidden="true">◂</span>
         </button>
         <Show when={state.showSwitcher}>
           <span class="cr-calendar__switcher">
             <select
-              {...ptAttrs(props.pt, "monthSelect")}
+              {...ptAttrs(ptResolve(cr, props.pt, "CrCalendar"), "monthSelect")}
               data-part="monthSelect"
-              class={ptClass(props.pt, props.unstyled, "cr-calendar__select cr-calendar__select--month", "monthSelect")}
-              aria-label="Month"
+              class={ptClass(ptResolve(cr, props.pt, "CrCalendar"), props.unstyled, "cr-calendar__select cr-calendar__select--month", "monthSelect")}
+              aria-label={resolveMessage(cr, props.labels, "CrCalendar", "month")}
               value={state.viewMonth}
               onChange={(event) => state.pickMonth(event)}
             >
@@ -238,10 +277,10 @@ export default function CrCalendar(props: CrCalendarProps) {
               </For>
             </select>
             <select
-              {...ptAttrs(props.pt, "yearSelect")}
+              {...ptAttrs(ptResolve(cr, props.pt, "CrCalendar"), "yearSelect")}
               data-part="yearSelect"
-              class={ptClass(props.pt, props.unstyled, "cr-calendar__select cr-calendar__select--year", "yearSelect")}
-              aria-label="Year"
+              class={ptClass(ptResolve(cr, props.pt, "CrCalendar"), props.unstyled, "cr-calendar__select cr-calendar__select--year", "yearSelect")}
+              aria-label={resolveMessage(cr, props.labels, "CrCalendar", "year")}
               value={state.viewYear}
               onChange={(event) => state.pickYear(event)}
             >
@@ -260,32 +299,32 @@ export default function CrCalendar(props: CrCalendarProps) {
           <span class="cr-calendar__month" aria-live="polite">{state.monthLabel}</span>
         </Show>
         <button
-          {...ptAttrs(props.pt, "next")}
+          {...ptAttrs(ptResolve(cr, props.pt, "CrCalendar"), "next")}
           type="button"
           data-part="next"
-          class={ptClass(props.pt, props.unstyled, "cr-calendar__nav", "next")}
-          aria-label="Next month"
-          onClick={() => state.stepMonth(1)}
+          class={ptClass(ptResolve(cr, props.pt, "CrCalendar"), props.unstyled, "cr-calendar__nav", "next")}
+          aria-label={resolveMessage(cr, props.labels, "CrCalendar", "nextMonth")}
+          onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrCalendar'), 'next', 'onClick', event); state.stepMonth(1); }}
         >
           <span aria-hidden="true">▸</span>
         </button>
       </div>
 
       <div
-        {...ptAttrs(props.pt, "grid")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrCalendar"), "grid")}
         data-part="grid"
-        class={ptClass(props.pt, props.unstyled, "cr-calendar__grid", "grid")}
+        class={ptClass(ptResolve(cr, props.pt, "CrCalendar"), props.unstyled, "cr-calendar__grid", "grid")}
         role="grid"
         aria-label={props.label || state.monthLabel}
-        onKeyDown={(event) => state.onKey(event)}
+        onKeyDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrCalendar'), 'grid', 'onKeyDown', event); state.onKey(event); }}
       >
         <div class="cr-calendar__row cr-calendar__row--head" role="row">
           <For each={state.weekdays}>
             {(wd: string) => (
               <span
-                {...ptAttrs(props.pt, "weekday")}
+                {...ptAttrs(ptResolve(cr, props.pt, "CrCalendar"), "weekday")}
                 data-part="weekday"
-                class={ptClass(props.pt, props.unstyled, "cr-calendar__weekday", "weekday")}
+                class={ptClass(ptResolve(cr, props.pt, "CrCalendar"), props.unstyled, "cr-calendar__weekday", "weekday")}
                 role="columnheader"
                 aria-label={wd}
               >
@@ -301,13 +340,13 @@ export default function CrCalendar(props: CrCalendarProps) {
                 <For each={week}>
                   {(cell: CrCalendarDay, dow: number) => (
                     <button
-                      {...ptAttrs(props.pt, "day")}
+                      {...ptAttrs(ptResolve(cr, props.pt, "CrCalendar"), "day")}
                       type="button"
                       data-part="day"
                       data-idx={w * 7 + dow}
                       data-state={props.value === cell.iso ? "selected" : cell.inMonth ? "in-month" : "adjacent"}
                       class={ptClass(
-                        props.pt,
+                        ptResolve(cr, props.pt, "CrCalendar"),
                         props.unstyled,
                         "cr-calendar__day" +
                           (cell.inMonth ? "" : " cr-calendar__day--adjacent") +
@@ -322,7 +361,7 @@ export default function CrCalendar(props: CrCalendarProps) {
                       aria-label={cell.iso}
                       disabled={cell.disabled}
                       tabIndex={state.tabbable(cell.iso, cell.inMonth, cell.day) ? 0 : -1}
-                      onClick={() => state.pick(cell)}
+                      onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrCalendar'), 'day', 'onClick', event); state.pick(cell); }}
                     >
                       {cell.day}
                     </button>

@@ -1,5 +1,7 @@
-import { Show } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { Show, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrToggleChipProps {
   label: string;
@@ -14,8 +16,8 @@ export interface CrToggleChipProps {
    * Law 2: the ON state reads via the accent (a state), NOT a per-option identity
    * hue — retarget it with dt={{ "--cr-togglechip-on-bg": … }} if needed. */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"badge" | "root">;
+  dt?: CrDesignTokens;
 }
 
 /* An interactive multi-select filter pill (role=checkbox). Distinct from the
@@ -28,25 +30,37 @@ export interface CrToggleChipProps {
  * any string or number renders verbatim — so 0 and "" still render, because an
  * explicit zero is a meaningful filter result. */
 export default function CrToggleChip(props: CrToggleChipProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   return (
     <button
-      {...ptAttrs(props.pt, "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrToggleChip"), "root")}
       type="button"
       role="checkbox"
       aria-checked={props.pressed ? "true" : "false"}
       disabled={props.disabled}
       data-part="root"
       data-state={props.pressed ? "on" : "off"}
-      class={ptClass(props.pt, props.unstyled, "cr-togglechip" + (props.pressed ? " cr-togglechip--on" : ""), "root")}
-      style={ptStyle(props.pt, props.dt, "root")}
-      onClick={() => props.onToggle && props.onToggle()}
+      class={ptClass(ptResolve(cr, props.pt, "CrToggleChip"), props.unstyled, "cr-togglechip" + (props.pressed ? " cr-togglechip--on" : ""), "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrToggleChip"), props.dt, "root")}
+      onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrToggleChip'), 'root', 'onClick', event); props.onToggle && props.onToggle(); }}
     >
       {props.label}
       <Show when={props.badge === true}>
-        <span {...ptAttrs(props.pt, "badge")} class={ptClass(props.pt, props.unstyled, "cr-togglechip__badge cr-togglechip__badge--dot", "badge")} data-part="badge" aria-hidden="true" />
+        <span {...ptAttrs(ptResolve(cr, props.pt, "CrToggleChip"), "badge")} class={ptClass(ptResolve(cr, props.pt, "CrToggleChip"), props.unstyled, "cr-togglechip__badge cr-togglechip__badge--dot", "badge")} data-part="badge" aria-hidden="true" />
       </Show>
       <Show when={props.badge !== undefined && props.badge !== null && props.badge !== false && props.badge !== true}>
-        <span {...ptAttrs(props.pt, "badge")} class={ptClass(props.pt, props.unstyled, "cr-togglechip__badge", "badge")} data-part="badge">
+        <span {...ptAttrs(ptResolve(cr, props.pt, "CrToggleChip"), "badge")} class={ptClass(ptResolve(cr, props.pt, "CrToggleChip"), props.unstyled, "cr-togglechip__badge", "badge")} data-part="badge">
           {props.badge}
         </span>
       </Show>

@@ -1,5 +1,7 @@
-import { useStore, useRef } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, useRef, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 import { placeEl } from "../lib/position.ts";
 
 export interface CrTooltipProps {
@@ -15,8 +17,8 @@ export interface CrTooltipProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "trigger" · "bubble". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"bubble" | "root" | "trigger">;
+  dt?: CrDesignTokens;
 }
 
 /** A hint bubble revealed on hover/focus. The bubble carries role=tooltip and
@@ -38,6 +40,18 @@ export interface CrTooltipProps {
  * its CSS fallback position — never blocks the CSS reveal.
  * See references/components.md#tooltip. */
 export default function CrTooltip(props: CrTooltipProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   const rootRef = useRef(null);
 
   const state = useStore({
@@ -60,19 +74,19 @@ export default function CrTooltip(props: CrTooltipProps) {
   });
 
   return (
-    <span {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-tooltip", "root")} data-part="root" data-state={state.dismissed ? "dismissed" : undefined} style={ptStyle(props.pt, props.dt, "root")} data-dismissed={state.dismissed ? "true" : undefined} ref={rootRef} onMouseEnter={() => state.place()} onMouseLeave={() => state.reset()} onFocus={() => state.place()}>
+    <span {...ptAttrs(ptResolve(cr, props.pt, "CrTooltip"), "root")} class={ptClass(ptResolve(cr, props.pt, "CrTooltip"), props.unstyled, "cr-tooltip", "root")} data-part="root" data-state={state.dismissed ? "dismissed" : undefined} style={ptStyle(ptResolve(cr, props.pt, "CrTooltip"), props.dt, "root")} data-dismissed={state.dismissed ? "true" : undefined} ref={rootRef} onMouseEnter={() => state.place()} onMouseLeave={() => state.reset()} onFocus={() => state.place()}>
       <span
-        {...ptAttrs(props.pt, "trigger")}
-        class={ptClass(props.pt, props.unstyled, "cr-tooltip__trigger", "trigger")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrTooltip"), "trigger")}
+        class={ptClass(ptResolve(cr, props.pt, "CrTooltip"), props.unstyled, "cr-tooltip__trigger", "trigger")}
         data-part="trigger"
         tabIndex={0}
         aria-describedby={props.id}
-        onKeyDown={(event) => state.onKey(event)}
-        onBlur={() => state.reset()}
+        onKeyDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrTooltip'), 'trigger', 'onKeyDown', event); state.onKey(event); }}
+        onBlur={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrTooltip'), 'trigger', 'onBlur', event); state.reset(); }}
       >
         {props.children}
       </span>
-      <span {...ptAttrs(props.pt, "bubble")} class={ptClass(props.pt, props.unstyled, "cr-tooltip__bubble", "bubble")} data-part="bubble" role="tooltip" id={props.id}>
+      <span {...ptAttrs(ptResolve(cr, props.pt, "CrTooltip"), "bubble")} class={ptClass(ptResolve(cr, props.pt, "CrTooltip"), props.unstyled, "cr-tooltip__bubble", "bubble")} data-part="bubble" role="tooltip" id={props.id}>
         {props.label}
       </span>
     </span>

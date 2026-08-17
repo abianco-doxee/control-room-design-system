@@ -31,12 +31,33 @@ export function refreshCadence(ms) {
 
 // Signed relative phrase between two epoch-ms timestamps. `now` is REQUIRED — see
 // the header note on the clock.
-export function relativeTime(then, now) {
+// Localised via Intl.RelativeTimeFormat — MUST stay in lockstep with the
+// CrRelativeTime component, which renders the same phrase (a parity test asserts
+// the two match exactly). `style: "narrow"` keeps the terse machine register: in
+// English it is byte-identical to the previous hand-rolled output ("5m ago",
+// "in 2h"). A few CLDR locales render narrow as a bare +/- sign ("-5 min"), which
+// reads as a delta rather than an elapsed time, so those take "short" instead —
+// a BEHAVIOUR table, not a translation table.
+//
+// `numeric: "auto"` yields the locale's own "now"/"ora"/"jetzt" for the sub-45s
+// case, replacing the hand-written "just now".
+export function relativeTime(then, now, locale) {
   const delta = now - then;
   const abs = Math.abs(delta);
-  if (abs < 45000) return "just now";
-  const phrase = humanDuration(abs, { max: 1 });
-  return delta >= 0 ? phrase + " ago" : "in " + phrase;
+  const loc = locale || "en";
+  const rtf = new Intl.RelativeTimeFormat(loc, {
+    numeric: "auto",
+    style: loc.split("-")[0] === "fr" ? "short" : "narrow",
+  });
+  if (abs < 45000) return rtf.format(0, "second");
+  // Unit SELECTION stays ours (Intl formats a value+unit pair, it does not pick
+  // the unit), so the d/h/m/s ladder is unchanged.
+  let value, unit;
+  if (abs >= 86400000) { value = Math.floor(abs / 86400000); unit = "day"; }
+  else if (abs >= 3600000) { value = Math.floor(abs / 3600000); unit = "hour"; }
+  else if (abs >= 60000) { value = Math.floor(abs / 60000); unit = "minute"; }
+  else { value = Math.max(1, Math.floor(abs / 1000)); unit = "second"; }
+  return rtf.format(delta >= 0 ? -value : value, unit);
 }
 
 function compactParts(ms, max) {

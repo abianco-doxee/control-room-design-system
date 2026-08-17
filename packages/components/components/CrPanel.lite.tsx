@@ -1,5 +1,7 @@
-import { Show } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { Show, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 export interface CrPanelProps {
   title?: string;
   weight?: "default" | "major";
@@ -24,15 +26,27 @@ export interface CrPanelProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "bleed" · "index" · "eyebrow" · "title" · "lede" · "footer". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"bleed" | "eyebrow" | "footer" | "index" | "lede" | "root" | "title">;
+  dt?: CrDesignTokens;
 }
 export default function CrPanel(props: CrPanelProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
+
   return (
     <section
-      {...ptAttrs(props.pt, "root")}
-      class={ptClass(
-        props.pt,
+      {...ptAttrs(ptResolve(cr, props.pt, "CrPanel"), "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrPanel"),
         props.unstyled,
         "cr-panel" +
           (props.weight === "major" ? " cr-panel--major" : "") +
@@ -44,12 +58,12 @@ export default function CrPanel(props: CrPanelProps) {
       )}
       data-part="root"
       data-state={props.weight || "default"}
-      style={ptStyle(props.pt, props.dt, "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrPanel"), props.dt, "root")}
     >
       <Show when={props.bleed}>
         <i
-          {...ptAttrs(props.pt, "bleed")}
-          class={ptClass(props.pt, props.unstyled, "cr-panel__bleed", "bleed")}
+          {...ptAttrs(ptResolve(cr, props.pt, "CrPanel"), "bleed")}
+          class={ptClass(ptResolve(cr, props.pt, "CrPanel"), props.unstyled, "cr-panel__bleed", "bleed")}
           data-part="bleed"
           data-bleed={props.bleed}
           aria-hidden="true"
@@ -57,8 +71,8 @@ export default function CrPanel(props: CrPanelProps) {
       </Show>
       <Show when={props.index}>
         <span
-          {...ptAttrs(props.pt, "index")}
-          class={ptClass(props.pt, props.unstyled, "cr-panel__index", "index")}
+          {...ptAttrs(ptResolve(cr, props.pt, "CrPanel"), "index")}
+          class={ptClass(ptResolve(cr, props.pt, "CrPanel"), props.unstyled, "cr-panel__index", "index")}
           data-part="index"
           aria-hidden="true"
         >
@@ -66,15 +80,15 @@ export default function CrPanel(props: CrPanelProps) {
         </span>
       </Show>
       <Show when={props.eyebrow}>
-        <p {...ptAttrs(props.pt, "eyebrow")} class={ptClass(props.pt, props.unstyled, "cr-panel__eyebrow", "eyebrow")} data-part="eyebrow">{props.eyebrow}</p>
+        <p {...ptAttrs(ptResolve(cr, props.pt, "CrPanel"), "eyebrow")} class={ptClass(ptResolve(cr, props.pt, "CrPanel"), props.unstyled, "cr-panel__eyebrow", "eyebrow")} data-part="eyebrow">{props.eyebrow}</p>
       </Show>
-      <Show when={props.title}><h4 {...ptAttrs(props.pt, "title")} class={ptClass(props.pt, props.unstyled, "cr-panel__title", "title")} data-part="title">{props.title}</h4></Show>
+      <Show when={props.title}><h4 {...ptAttrs(ptResolve(cr, props.pt, "CrPanel"), "title")} class={ptClass(ptResolve(cr, props.pt, "CrPanel"), props.unstyled, "cr-panel__title", "title")} data-part="title">{props.title}</h4></Show>
       <Show when={props.lede}>
-        <p {...ptAttrs(props.pt, "lede")} class={ptClass(props.pt, props.unstyled, "cr-panel__lede", "lede")} data-part="lede">{props.lede}</p>
+        <p {...ptAttrs(ptResolve(cr, props.pt, "CrPanel"), "lede")} class={ptClass(ptResolve(cr, props.pt, "CrPanel"), props.unstyled, "cr-panel__lede", "lede")} data-part="lede">{props.lede}</p>
       </Show>
       {props.children}
       <Show when={props.footer}>
-        <p {...ptAttrs(props.pt, "footer")} class={ptClass(props.pt, props.unstyled, "cr-panel__footer", "footer")} data-part="footer">{props.footer}</p>
+        <p {...ptAttrs(ptResolve(cr, props.pt, "CrPanel"), "footer")} class={ptClass(ptResolve(cr, props.pt, "CrPanel"), props.unstyled, "cr-panel__footer", "footer")} data-part="footer">{props.footer}</p>
       </Show>
     </section>
   );

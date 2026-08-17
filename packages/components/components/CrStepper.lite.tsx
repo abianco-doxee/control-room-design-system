@@ -1,5 +1,7 @@
-import { useStore, For, Show } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, For, Show, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrStepperStep {
   label: string;
@@ -16,8 +18,8 @@ export interface CrStepperProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "item" · "btn" · "dot" · "text" · "label" · "hint". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"btn" | "dot" | "hint" | "item" | "label" | "root" | "text">;
+  dt?: CrDesignTokens;
 }
 
 /* Stepper — a numbered progress indicator for a multi-step flow (the shape the
@@ -26,6 +28,18 @@ export interface CrStepperProps {
  * check. Pass onStep to make steps navigable buttons (native focus/activation);
  * omit it for a read-only indicator. Styling via .cr-stepper. */
 export default function CrStepper(props: CrStepperProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   const state = useStore({
     cur(): number {
       return props.active || 0;
@@ -39,27 +53,27 @@ export default function CrStepper(props: CrStepperProps) {
   });
 
   return (
-    <ol {...ptAttrs(props.pt, "root")} data-part="root" class={ptClass(props.pt, props.unstyled, "cr-stepper", "root")} style={ptStyle(props.pt, props.dt, "root")}>
+    <ol {...ptAttrs(ptResolve(cr, props.pt, "CrStepper"), "root")} data-part="root" class={ptClass(ptResolve(cr, props.pt, "CrStepper"), props.unstyled, "cr-stepper", "root")} style={ptStyle(ptResolve(cr, props.pt, "CrStepper"), props.dt, "root")}>
       <For each={props.steps}>
         {(step: CrStepperStep, i: number) => (
-          <li {...ptAttrs(props.pt, "item")} data-part="item" data-state={state.status(i)} class={ptClass(props.pt, props.unstyled, "cr-stepper__item cr-stepper__item--" + state.status(i), "item")} aria-current={i === state.cur() ? "step" : undefined}>
+          <li {...ptAttrs(ptResolve(cr, props.pt, "CrStepper"), "item")} data-part="item" data-state={state.status(i)} class={ptClass(ptResolve(cr, props.pt, "CrStepper"), props.unstyled, "cr-stepper__item cr-stepper__item--" + state.status(i), "item")} aria-current={i === state.cur() ? "step" : undefined}>
             <Show when={props.onStep}>
-              <button {...ptAttrs(props.pt, "btn")} type="button" data-part="btn" class={ptClass(props.pt, props.unstyled, "cr-stepper__btn", "btn")} onClick={() => props.onStep && props.onStep(i)}>
-                <span {...ptAttrs(props.pt, "dot")} data-part="dot" class={ptClass(props.pt, props.unstyled, "cr-stepper__dot", "dot")} aria-hidden="true">{state.marker(i)}</span>
-                <span {...ptAttrs(props.pt, "text")} data-part="text" class={ptClass(props.pt, props.unstyled, "cr-stepper__text", "text")}>
-                  <span {...ptAttrs(props.pt, "label")} data-part="label" class={ptClass(props.pt, props.unstyled, "cr-stepper__label", "label")}>{step.label}</span>
+              <button {...ptAttrs(ptResolve(cr, props.pt, "CrStepper"), "btn")} type="button" data-part="btn" class={ptClass(ptResolve(cr, props.pt, "CrStepper"), props.unstyled, "cr-stepper__btn", "btn")} onClick={() => props.onStep && props.onStep(i)}>
+                <span {...ptAttrs(ptResolve(cr, props.pt, "CrStepper"), "dot")} data-part="dot" class={ptClass(ptResolve(cr, props.pt, "CrStepper"), props.unstyled, "cr-stepper__dot", "dot")} aria-hidden="true">{state.marker(i)}</span>
+                <span {...ptAttrs(ptResolve(cr, props.pt, "CrStepper"), "text")} data-part="text" class={ptClass(ptResolve(cr, props.pt, "CrStepper"), props.unstyled, "cr-stepper__text", "text")}>
+                  <span {...ptAttrs(ptResolve(cr, props.pt, "CrStepper"), "label")} data-part="label" class={ptClass(ptResolve(cr, props.pt, "CrStepper"), props.unstyled, "cr-stepper__label", "label")}>{step.label}</span>
                   <Show when={step.hint}>
-                    <span {...ptAttrs(props.pt, "hint")} data-part="hint" class={ptClass(props.pt, props.unstyled, "cr-stepper__hint", "hint")}>{step.hint}</span>
+                    <span {...ptAttrs(ptResolve(cr, props.pt, "CrStepper"), "hint")} data-part="hint" class={ptClass(ptResolve(cr, props.pt, "CrStepper"), props.unstyled, "cr-stepper__hint", "hint")}>{step.hint}</span>
                   </Show>
                 </span>
               </button>
             </Show>
             <Show when={!props.onStep}>
-              <span {...ptAttrs(props.pt, "dot")} data-part="dot" class={ptClass(props.pt, props.unstyled, "cr-stepper__dot", "dot")} aria-hidden="true">{state.marker(i)}</span>
-              <span {...ptAttrs(props.pt, "text")} data-part="text" class={ptClass(props.pt, props.unstyled, "cr-stepper__text", "text")}>
-                <span {...ptAttrs(props.pt, "label")} data-part="label" class={ptClass(props.pt, props.unstyled, "cr-stepper__label", "label")}>{step.label}</span>
+              <span {...ptAttrs(ptResolve(cr, props.pt, "CrStepper"), "dot")} data-part="dot" class={ptClass(ptResolve(cr, props.pt, "CrStepper"), props.unstyled, "cr-stepper__dot", "dot")} aria-hidden="true">{state.marker(i)}</span>
+              <span {...ptAttrs(ptResolve(cr, props.pt, "CrStepper"), "text")} data-part="text" class={ptClass(ptResolve(cr, props.pt, "CrStepper"), props.unstyled, "cr-stepper__text", "text")}>
+                <span {...ptAttrs(ptResolve(cr, props.pt, "CrStepper"), "label")} data-part="label" class={ptClass(ptResolve(cr, props.pt, "CrStepper"), props.unstyled, "cr-stepper__label", "label")}>{step.label}</span>
                 <Show when={step.hint}>
-                  <span {...ptAttrs(props.pt, "hint")} data-part="hint" class={ptClass(props.pt, props.unstyled, "cr-stepper__hint", "hint")}>{step.hint}</span>
+                  <span {...ptAttrs(ptResolve(cr, props.pt, "CrStepper"), "hint")} data-part="hint" class={ptClass(ptResolve(cr, props.pt, "CrStepper"), props.unstyled, "cr-stepper__hint", "hint")}>{step.hint}</span>
                 </Show>
               </span>
             </Show>

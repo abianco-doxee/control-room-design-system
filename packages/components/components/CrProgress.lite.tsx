@@ -1,5 +1,7 @@
-import { Show, useStore } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { Show, useStore, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrProgressProps {
   /** 0..max. Ignored when indeterminate. */
@@ -14,8 +16,8 @@ export interface CrProgressProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "label" · "track" · "fill". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"fill" | "label" | "root" | "track">;
+  dt?: CrDesignTokens;
 }
 
 /* Progress and capacity in one bar (role=progressbar). Determinate fills to
@@ -27,6 +29,18 @@ export interface CrProgressProps {
  * The fill style is a useStore METHOD, not a getter — a getter compiles to a Qwik
  * useComputed that can run before the store is initialized. */
 export default function CrProgress(props: CrProgressProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   const state = useStore({
     fillStyle() {
       if (props.indeterminate) return {};
@@ -37,9 +51,9 @@ export default function CrProgress(props: CrProgressProps) {
 
   return (
     <div
-      {...ptAttrs(props.pt, "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrProgress"), "root")}
       class={ptClass(
-        props.pt,
+        ptResolve(cr, props.pt, "CrProgress"),
         props.unstyled,
         "cr-progress" +
           (props.indeterminate ? " cr-progress--indeterminate" : "") +
@@ -48,14 +62,14 @@ export default function CrProgress(props: CrProgressProps) {
       )}
       data-part="root"
       data-state={props.indeterminate ? "indeterminate" : props.signal}
-      style={ptStyle(props.pt, props.dt, "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrProgress"), props.dt, "root")}
     >
       <Show when={props.label}>
-        <span {...ptAttrs(props.pt, "label")} class={ptClass(props.pt, props.unstyled, "cr-progress__label", "label")} data-part="label">{props.label}</span>
+        <span {...ptAttrs(ptResolve(cr, props.pt, "CrProgress"), "label")} class={ptClass(ptResolve(cr, props.pt, "CrProgress"), props.unstyled, "cr-progress__label", "label")} data-part="label">{props.label}</span>
       </Show>
       <span
-        {...ptAttrs(props.pt, "track")}
-        class={ptClass(props.pt, props.unstyled, "cr-progress__track", "track")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrProgress"), "track")}
+        class={ptClass(ptResolve(cr, props.pt, "CrProgress"), props.unstyled, "cr-progress__track", "track")}
         data-part="track"
         role="progressbar"
         aria-label={props.label || "progress"}
@@ -63,7 +77,7 @@ export default function CrProgress(props: CrProgressProps) {
         aria-valuemax={props.indeterminate ? undefined : props.max || 100}
         aria-valuenow={props.indeterminate ? undefined : props.value}
       >
-        <span {...ptAttrs(props.pt, "fill")} class={ptClass(props.pt, props.unstyled, "cr-progress__fill", "fill")} data-part="fill" style={state.fillStyle()}></span>
+        <span {...ptAttrs(ptResolve(cr, props.pt, "CrProgress"), "fill")} class={ptClass(ptResolve(cr, props.pt, "CrProgress"), props.unstyled, "cr-progress__fill", "fill")} data-part="fill" style={state.fillStyle()}></span>
       </span>
     </div>
   );

@@ -1,5 +1,7 @@
-import { useStore, useRef, onMount, Show, For } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, useRef, onMount, Show, For, useContext, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrToolbarItem {
   id: string;
@@ -24,8 +26,8 @@ export interface CrToolbarProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "item" · "more" · "menu" · "menuitem". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"item" | "menu" | "menuitem" | "more" | "root">;
+  dt?: CrDesignTokens;
 }
 
 const FOCUSABLE =
@@ -41,6 +43,18 @@ const FOCUSABLE =
  *     reachable), then the measure pass moves the overflow into the menu.
  * Styling via .cr-toolbar; data-part per part. */
 export default function CrToolbar(props: CrToolbarProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   const rootRef = useRef<any>(null);
 
     const state = useStore({
@@ -217,29 +231,29 @@ export default function CrToolbar(props: CrToolbarProps) {
 
   return (
     <div
-      {...ptAttrs(props.pt, "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrToolbar"), "root")}
       ref={rootRef}
       data-part="root"
-      class={ptClass(props.pt, props.unstyled, "cr-toolbar" + (props.items && props.overflow ? " cr-toolbar--overflow" : ""), "root")}
-      style={ptStyle(props.pt, props.dt, "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrToolbar"), props.unstyled, "cr-toolbar" + (props.items && props.overflow ? " cr-toolbar--overflow" : ""), "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrToolbar"), props.dt, "root")}
       role="toolbar"
       aria-label={props.label}
       aria-orientation={props.orientation === "vertical" ? "vertical" : "horizontal"}
-      onKeyDown={(event) => state.onKey(event)}
+      onKeyDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrToolbar'), 'root', 'onKeyDown', event); state.onKey(event); }}
     >
       <Show when={props.items} else={props.children}>
         <For each={props.items}>
           {(item: CrToolbarItem, i: number) => (
             <button
-              {...ptAttrs(props.pt, "item")}
+              {...ptAttrs(ptResolve(cr, props.pt, "CrToolbar"), "item")}
               type="button"
               data-tb-item="1"
               data-part="item"
               hidden={state.hiddenAt(i)}
               disabled={item.disabled}
-              class={ptClass(props.pt, props.unstyled, "cr-toolbar__item cr-btn cr-btn--outline cr-btn--sm", "item")}
+              class={ptClass(ptResolve(cr, props.pt, "CrToolbar"), props.unstyled, "cr-toolbar__item cr-btn cr-btn--outline cr-btn--sm", "item")}
               tabIndex={-1}
-              onClick={() => item.onSelect && item.onSelect()}
+              onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrToolbar'), 'item', 'onClick', event); item.onSelect && item.onSelect(); }}
             >
               {item.label}
             </button>
@@ -249,39 +263,39 @@ export default function CrToolbar(props: CrToolbarProps) {
         <Show when={props.overflow && state.overflowItems.length > 0}>
           <div class="cr-toolbar__more-wrap" data-state={state.menuOpen ? "open" : "closed"}>
             <button
-              {...ptAttrs(props.pt, "more")}
+              {...ptAttrs(ptResolve(cr, props.pt, "CrToolbar"), "more")}
               type="button"
               data-tb-more="1"
               data-part="more"
-              class={ptClass(props.pt, props.unstyled, "cr-toolbar__more cr-btn cr-btn--outline cr-btn--sm", "more")}
+              class={ptClass(ptResolve(cr, props.pt, "CrToolbar"), props.unstyled, "cr-toolbar__more cr-btn cr-btn--outline cr-btn--sm", "more")}
               aria-haspopup="menu"
               aria-expanded={state.menuOpen ? "true" : "false"}
               aria-label={state.moreLabel}
               tabIndex={-1}
-              onClick={() => state.toggleMenu()}
-              onKeyDown={(event) => state.onMoreKey(event)}
+              onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrToolbar'), 'more', 'onClick', event); state.toggleMenu(); }}
+              onKeyDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrToolbar'), 'more', 'onKeyDown', event); state.onMoreKey(event); }}
             >
               <span aria-hidden="true">⋯</span>
             </button>
             <Show when={state.menuOpen}>
               <button type="button" class="cr-menu__scrim" aria-hidden="true" tabIndex={-1} onClick={() => state.closeMenu()} />
               <div
-                {...ptAttrs(props.pt, "menu")}
+                {...ptAttrs(ptResolve(cr, props.pt, "CrToolbar"), "menu")}
                 data-part="menu"
-                class={ptClass(props.pt, props.unstyled, "cr-menu__panel cr-menu__panel--right", "menu")}
+                class={ptClass(ptResolve(cr, props.pt, "CrToolbar"), props.unstyled, "cr-menu__panel cr-menu__panel--right", "menu")}
                 role="menu"
-                onKeyDown={(event) => state.onMenuKey(event)}
+                onKeyDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrToolbar'), 'menu', 'onKeyDown', event); state.onMenuKey(event); }}
               >
                 <For each={state.overflowItems}>
                   {(item: CrToolbarItem) => (
                     <button
-                      {...ptAttrs(props.pt, "menuitem")}
+                      {...ptAttrs(ptResolve(cr, props.pt, "CrToolbar"), "menuitem")}
                       type="button"
                       role="menuitem"
                       data-part="menuitem"
                       disabled={item.disabled}
-                      class={ptClass(props.pt, props.unstyled, "cr-menu__item" + (item.danger ? " cr-menu__item--danger" : ""), "menuitem")}
-                      onClick={() => state.pickMenu(item)}
+                      class={ptClass(ptResolve(cr, props.pt, "CrToolbar"), props.unstyled, "cr-menu__item" + (item.danger ? " cr-menu__item--danger" : ""), "menuitem")}
+                      onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrToolbar'), 'menuitem', 'onClick', event); state.pickMenu(item); }}
                     >
                       {item.label}
                     </button>

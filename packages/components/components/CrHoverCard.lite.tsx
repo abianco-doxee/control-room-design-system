@@ -1,5 +1,7 @@
-import { useStore, useRef } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, useRef, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 import { placeEl } from "../lib/position.ts";
 
 export interface CrHoverCardProps {
@@ -16,8 +18,8 @@ export interface CrHoverCardProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "trigger" · "panel". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"panel" | "root" | "trigger">;
+  dt?: CrDesignTokens;
 }
 
 /* A rich hover/focus card — like Tooltip but for structured content. Reveal is
@@ -27,6 +29,18 @@ export interface CrHoverCardProps {
  * next hover/focus shows it again. For a plain text hint use Tooltip; for a list
  * of actions use Menu. Styling via .cr-hovercard. */
 export default function CrHoverCard(props: CrHoverCardProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   const rootRef = useRef(null);
 
   const state = useStore({
@@ -65,13 +79,13 @@ export default function CrHoverCard(props: CrHoverCardProps) {
   });
 
   return (
-    <span {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-hovercard", "root")} data-part="root" data-state={state.dismissed ? "dismissed" : undefined} style={ptStyle(props.pt, props.dt, "root")} data-dismissed={state.dismissed ? "true" : undefined} ref={rootRef} onMouseEnter={() => state.place()} onMouseLeave={() => state.reset()} onFocus={() => state.place()}>
-      <span {...ptAttrs(props.pt, "trigger")} class={ptClass(props.pt, props.unstyled, "cr-hovercard__trigger", "trigger")} data-part="trigger" tabIndex={0} onKeyDown={(event) => state.onKey(event)} onBlur={() => state.reset()}>
+    <span {...ptAttrs(ptResolve(cr, props.pt, "CrHoverCard"), "root")} class={ptClass(ptResolve(cr, props.pt, "CrHoverCard"), props.unstyled, "cr-hovercard", "root")} data-part="root" data-state={state.dismissed ? "dismissed" : undefined} style={ptStyle(ptResolve(cr, props.pt, "CrHoverCard"), props.dt, "root")} data-dismissed={state.dismissed ? "true" : undefined} ref={rootRef} onMouseEnter={() => state.place()} onMouseLeave={() => state.reset()} onFocus={() => state.place()}>
+      <span {...ptAttrs(ptResolve(cr, props.pt, "CrHoverCard"), "trigger")} class={ptClass(ptResolve(cr, props.pt, "CrHoverCard"), props.unstyled, "cr-hovercard__trigger", "trigger")} data-part="trigger" tabIndex={0} onKeyDown={(event) => state.onKey(event)} onBlur={() => state.reset()}>
         {props.label}
       </span>
       <span
-        {...ptAttrs(props.pt, "panel")}
-        class={ptClass(props.pt, props.unstyled, "cr-hovercard__panel", "panel")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrHoverCard"), "panel")}
+        class={ptClass(ptResolve(cr, props.pt, "CrHoverCard"), props.unstyled, "cr-hovercard__panel", "panel")}
         data-part="panel"
         role="group"
         aria-label={props.title || props.label}

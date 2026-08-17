@@ -1,5 +1,7 @@
-import { useStore, For } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrRatingProps {
   /** Current rating (0..max). Controlled. */
@@ -15,8 +17,8 @@ export interface CrRatingProps {
    * Parts: "root" · "star". Law 2: the filled colour is the accent (a state),
    * retarget with dt={{ "--cr-rating-on": … }}. */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"root" | "star">;
+  dt?: CrDesignTokens;
 }
 
 /* A star-rating control. Interactive mode is a WAI-ARIA radiogroup with roving
@@ -25,6 +27,18 @@ export interface CrRatingProps {
  * a geometric glyph (no icon font) whose fill encodes the value. Styling via
  * .cr-rating; data-part on root + each star. */
 export default function CrRating(props: CrRatingProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+  });
+  onUpdate(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
+  }, []);
+  onUnMount(() => {
+    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+  });
+
   const state = useStore({
     get count(): number {
       return props.max && props.max > 0 ? props.max : 5;
@@ -66,31 +80,31 @@ export default function CrRating(props: CrRatingProps) {
 
   return (
     <div
-      {...ptAttrs(props.pt, "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrRating"), "root")}
       data-part="root"
-      class={ptClass(props.pt, props.unstyled, "cr-rating" + (props.readonly ? " cr-rating--readonly" : ""), "root")}
-      style={ptStyle(props.pt, props.dt, "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrRating"), props.unstyled, "cr-rating" + (props.readonly ? " cr-rating--readonly" : ""), "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrRating"), props.dt, "root")}
       role={props.readonly ? "img" : "radiogroup"}
       aria-label={props.readonly ? (props.label || "rating") + ": " + state.current + " of " + state.count : props.label}
       aria-disabled={props.disabled ? "true" : undefined}
-      onKeyDown={(event) => state.onKey(event)}
+      onKeyDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrRating'), 'root', 'onKeyDown', event); state.onKey(event); }}
     >
       <For each={state.stars}>
         {(v: number) => (
           <button
-            {...ptAttrs(props.pt, "star")}
+            {...ptAttrs(ptResolve(cr, props.pt, "CrRating"), "star")}
             type="button"
             data-part="star"
             data-value={v}
             data-state={v <= state.current ? "on" : "off"}
-            class={ptClass(props.pt, props.unstyled, "cr-rating__star", "star")}
+            class={ptClass(ptResolve(cr, props.pt, "CrRating"), props.unstyled, "cr-rating__star", "star")}
             role={props.readonly ? undefined : "radio"}
             aria-checked={props.readonly ? undefined : v === state.current ? "true" : "false"}
             aria-label={String(v)}
             tabIndex={props.readonly ? -1 : state.tabbable(v)}
             disabled={props.disabled}
             aria-hidden={props.readonly ? "true" : undefined}
-            onClick={() => state.pick(v)}
+            onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrRating'), 'star', 'onClick', event); state.pick(v); }}
           >
             <span aria-hidden="true">{v <= state.current ? "◆" : "◇"}</span>
           </button>
