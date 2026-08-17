@@ -52,6 +52,11 @@ the `@theme` layer purges to just the utilities in use.
   other key (attributes, and handlers for events the component doesn't own) is
   **spread** onto the part. Parts are documented per component (e.g. Tabs:
   `root` · `tab`).
+
+  Across the two **tiers** (global then instance) the same section merges key-wise,
+  and `class` **concatenates** (global first) while `style` **merges** per property —
+  so an app-level default is never silently dropped by an instance that sets one key
+  of its own. Nested sections merge recursively, so both rules hold at depth.
 - **`dt`** (design tokens) — a map of CSS custom properties applied to the root and
   inherited by the parts. Instance-scoped token override, same idea as PrimeVue's
   `dt`. Prefer the **finer per-component tokens** (below) so an override is
@@ -169,8 +174,15 @@ The section's value is a **`pt` object for the child**, not an attribute bag, so
 `ptAttrs` drops any object-valued key — a nested section can never leak onto the DOM
 as `check="[object Object]"`.
 
-Precedence is therefore the full PrimeVue chain: **global (context) → parent
-(forwarded) → component (`props.pt`)**.
+Precedence is **global (context) → component (`props.pt`)**, component wins — two
+tiers, resolved by `ptResolve(cr, props.pt, "<Name>")`.
+
+A forwarded parent section is not a third tier: it arrives in the child *as* its
+`props.pt`, occupying the instance slot. So a child rendered inside a parent sees
+`global(child) → forwarded-section`, and a `pt` passed directly to that child would
+**replace** the parent's forward rather than layer over it. (`CrFormRow` is the one
+place that merges deliberately, so its delegation attributes survive alongside a
+consumer's section — see the note at its `CrCheckbox`.)
 
 Every nesting site forwards: `CrTable`/`CrDataGrid`/`CrFormRow` → `CrCheckbox`,
 `CrChoiceGroup` → `CrChoice`, `CrForm` → `CrFormRow`, `CrInput` → `CrIcon`,
@@ -192,8 +204,43 @@ props.pt  over  context pt[ComponentName]
 
 Merged **per part**, so a global `{ tab: { class } }` and an instance
 `{ tab: { "data-x": 1 } }` both survive on the tab. Within a part the instance key
-wins — except `class`, which **concatenates** (global first) so an app-level default
-class is never silently dropped.
+wins — except `class` (**concatenates**, global first) and `style` (**merges** per
+property), so an app-level default is never silently dropped. Nested sections merge
+recursively, so both rules hold one level down too.
+
+**Providing it.** The context is exported as `CrContext` from every target's entry
+point, in that framework's own idiom — without it the tier is unreachable, which is
+the whole point of exporting it:
+
+```tsx
+// React / Solid — a context object
+import { CrContext, CrModal } from "@alebianco/cr-design-system/react";
+<CrContext.Provider value={{ pt: { CrModal: { root: { class: "shadow-lg" } } },
+                             locale: "it",
+                             messages: { "CrModal.close": "Chiudi" } }}>
+  <App />
+</CrContext.Provider>
+```
+
+```ts
+// Vue — a { cr, key } pair; provide under its Symbol key
+import { CrContext } from "@alebianco/cr-design-system/vue";
+app.provide(CrContext.key, { pt: { … }, locale: "it", messages: { … } });
+
+// Svelte — the same pair, via setContext
+setContext(CrContext.key, { pt: { … }, locale: "it", messages: { … } });
+
+// Qwik — a ContextId
+useContextProvider(CrContext, { pt: { … }, locale: "it", messages: { … } });
+
+// Angular — an @Injectable({providedIn:"root"}) singleton: set its fields at
+// bootstrap, or override the provider.
+inject(CrContext).locale = "it";
+```
+
+Every field is optional and defaults to empty, so an app that provides nothing —
+or provides only `locale` — behaves exactly as one with no provider at all. The
+shape is typed as `CrGlobalConfig`.
 
 Internally each component calls `ptResolve(cr, props.pt, "CrX")` inline at every
 helper call site. Two constraints force that shape, both learned the hard way:
@@ -231,10 +278,29 @@ dt?: CrDesignTokens;
 and `hooks` as `any`; its docs note an IDE extension is "being planned" to recover the
 autocomplete this gives you directly.
 
+`hooks` resolves through the **same cascade** as the sections, so app-level
+instrumentation works: `pt={{ CrModal: { hooks: { onMounted } } }}` on the provider
+fires for every modal. (Components read them via `ptHooks(ptResolve(…))`; reading
+`props.pt.hooks` directly would make the global tier a silent no-op.)
+
+> Per-target note: Mitosis drops `onUpdate`/`onUnMount` on some targets — a deps-less
+> `onUpdate` emits nowhere, and Solid/Qwik emit no unmount at all. Both are restored
+> from the artifact by `build/build-fix-lifecycle.mjs` (Solid `onCleanup` +
+> `createEffect`, Qwik a returned cleanup from `useVisibleTask$`), so all three hooks
+> fire on all six targets. `--check` fails if any component loses one.
+> `CrKeyHints` merges its own window listeners into the same `onMount`/`onUnMount`
+> as its hooks, because Mitosis keeps only the **last** of each per component.
+
 The types live in **`lib/pt-types.ts`** and are deliberately framework-agnostic (no
 React `JSX` namespace, no Vue `StyleValue`) because they are inlined into **every**
 target's `index.d.ts` — so Vue/Svelte/Solid/Angular consumers get the same checking
 as React/Qwik, not just the TSX targets.
+
+> Coverage note: `tests/pt-types.test.mjs` runs a real `tsc` over the emitted
+> declarations with negative fixtures (a typo'd part, a malformed hook), but the
+> fixtures compile against **Svelte's** `index.d.ts`. The declarations are generated
+> from one shared source, so the types are identical across targets; the *proof* is
+> single-target.
 
 > Build note: component prop blocks are copied verbatim per source file, so a type
 > merely *imported* from `lib/` would be referenced but never declared, and every
@@ -336,7 +402,11 @@ can't do, using Vue's own primitives:
 - **function-form pt** reactive to internal state: `pt.tab = ({ active }) => ({...})`
 - **listener chaining** via Vue `mergeProps` (consumer `onClick` runs *and*
   selection still fires)
-- **global pt** via `inject('crGlobalPT', …)` (app-level defaults)
+- **global pt** via `inject(CrContext.key, …)` — the *same* context every generated
+  component reads, so one provider configures the whole library. (It previously
+  injected a string key, `'crGlobalPT'`, which made this component the one exception
+  to the documented tier: an app providing `CrContext` configured all 80 others and
+  not this one, and vice versa.) It also wires `pt.hooks` through that cascade.
 
 Verified: after one build, Vue's `CrTabs` is the override; React/Svelte/Solid/Qwik/
 Angular are generated from `CrTabs.lite.tsx` (see `tests/styling-contract.test.mjs`).
