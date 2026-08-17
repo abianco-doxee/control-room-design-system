@@ -80,12 +80,7 @@ test("pt/dt/unstyled contract covers every functional component", () => {
     const src = readFileSync(join(COMPONENTS, f), "utf8");
     const gaps = [];
     if (!/from "\.\.\/lib\/pt\.ts"/.test(src)) gaps.push("pt.ts import");
-    // A nestable component may let its PARENT name the part it occupies (CrCheckbox
-    // reports data-part="check" inside CrTable, preserving the hook the inline input
-    // had before extraction), so accept the `props.part || "root"` form too. The
-    // default must still be "root".
-    if (!/data-part="root"|data-part=\{props\.part \|\| "root"\}/.test(src))
-      gaps.push('data-part="root"');
+    if (!/data-part="root"/.test(src)) gaps.push('data-part="root"');
     if (!/\bunstyled\?\s*:/.test(src)) gaps.push("unstyled?:");
     if (!/\bpt\?\s*:/.test(src)) gaps.push("pt?:");
     if (!/\bdt\?\s*:/.test(src)) gaps.push("dt?:");

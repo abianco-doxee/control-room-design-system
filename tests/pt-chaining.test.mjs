@@ -323,16 +323,16 @@ test("vue reaches the same guarantee through its native mergeProps override", ()
 // ── the parent tier + localisation ───────────────────────────────────────────
 
 test("ptNested forwards a section as a child's pt, and never as an attribute", () => {
-  const parentPt = { check: { root: { "data-testid": "row-select" } }, td: { class: "c" } };
+  const parentPt = { checkbox: { root: { "data-testid": "row-select" } }, td: { class: "c" } };
   assert.deepEqual(
-    pt.ptNested(parentPt, "check"),
+    pt.ptNested(parentPt, "checkbox"),
     { root: { "data-testid": "row-select" } },
     "the section is handed to the child verbatim"
   );
   assert.equal(pt.ptNested(parentPt, "absent"), undefined, "no section → child sees no pt");
   // The regression this guards: spreading an object-valued section would emit
-  // check="[object Object]" onto the DOM.
-  assert.deepEqual(pt.ptAttrs(parentPt, "check"), {}, "nested section never spread");
+  // checkbox="[object Object]" onto the DOM.
+  assert.deepEqual(pt.ptAttrs(parentPt, "checkbox"), {}, "nested section never spread");
   assert.deepEqual(
     pt.ptAttrs({ td: { "data-x": "1" } }, "td"),
     { "data-x": "1" },

@@ -165,14 +165,14 @@ A component rendered inside another is reachable through the parent's `pt`, usin
 PrimeVue's nested-section convention:
 
 ```tsx
-<CrTable pt={{ check: { root: { "data-testid": "row-select" } } }} />
+<CrTable pt={{ checkbox: { root: { "data-testid": "row-select" } } }} />
 // …inside CrTable:
-<CrCheckbox pt={ptNested(pt, "check")} />
+<CrCheckbox pt={ptNested(pt, "checkbox")} />
 ```
 
 The section's value is a **`pt` object for the child**, not an attribute bag, so
 `ptAttrs` drops any object-valued key — a nested section can never leak onto the DOM
-as `check="[object Object]"`.
+as `checkbox="[object Object]"`.
 
 Precedence is **global (context) → component (`props.pt`)**, component wins — two
 tiers, resolved by `ptResolve(cr, props.pt, "<Name>")`.

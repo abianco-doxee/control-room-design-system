@@ -20,20 +20,20 @@ export interface CrTableProps {
    *  See lib/messages.ts for the keys. */
   labels?: Record<string, any>;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
-   * Parts: "root" · "head" · "body" · "row" · "th" · "td" · "sort" · "indicator" · "check". */
+   * Parts: "root" · "head" · "body" · "row" · "th" · "td" · "sort" · "indicator" · "checkbox". */
   unstyled?: boolean;
-  /** BREAKING (shape, not name): `check` is now a NESTED SECTION. The selection
-   *  checkbox became a real CrCheckbox, so this value is a `pt` for that CHILD —
-   *  `pt={{ check: { root: { "data-testid": "row-select" } } }}` — where it used to
-   *  be a flat attribute bag applied straight to the inline `<input>`:
-   *  `pt={{ check: { "data-testid": "row-select" } }}`.
+  /** `checkbox` is a NESTED SECTION: its value is a `pt` for the inner CrCheckbox
+   *  (`pt={{ checkbox: { root: { "data-testid": "row-select" } } }}`), not an
+   *  attribute bag.
    *
-   *  Both shapes are structurally valid `CrPTSection`s (its index signature accepts
-   *  any key), so TypeScript cannot flag the old form. `data-part="check"` is still
-   *  emitted on the input, so CSS and test locators targeting the part keep working;
-   *  only a `pt` written against the old shape needs the extra `root` level. */
+   *  RENAMED from `check`, which until the checkbox was extracted was a flat bag
+   *  applied straight to an inline `<input>`. Both shapes are structurally valid
+   *  `CrPTSection`s — its index signature accepts any key — so reusing the name
+   *  would let old `pt={{ check: { class: "big" } }}` keep compiling while silently
+   *  doing nothing: the child would look for `root` and find `class`. The rename
+   *  turns that into a compile error instead. */
   pt?: CrPassThrough<
-    "body" | "check" | "head" | "indicator" | "root" | "row" | "sort" | "td" | "th"
+    "body" | "checkbox" | "head" | "indicator" | "root" | "row" | "sort" | "td" | "th"
   >;
   dt?: CrDesignTokens;
 }
@@ -138,8 +138,7 @@ export default function CrTable(props: CrTableProps) {
               <Show when={props.selectable}>
                 <td {...ptAttrs(ptResolve(cr, props.pt, "CrTable"), "td")} class={ptClass(ptResolve(cr, props.pt, "CrTable"), props.unstyled, "cr-table__sel", "td")} data-part="td">
                   <CrCheckbox
-                    pt={ptNested(ptResolve(cr, props.pt, "CrTable"), "check")}
-                    part="check"
+                    pt={ptNested(ptResolve(cr, props.pt, "CrTable"), "checkbox")}
                     unstyled={props.unstyled}
                     checked={!!state.selected[rowIndex]}
                     label={resolveMessage(cr, props.labels, "CrTable", "selectRow")}
