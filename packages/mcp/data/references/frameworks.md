@@ -18,6 +18,13 @@ import { CrButton } from "@alebianco/cr-design-system/qwik";
 import { CrButton } from "@alebianco/cr-design-system/vue";
 ```
 
+Every entry also exports **`CrContext`** — the app-level tier for global `pt`,
+`locale` and `messages`. It is the one non-component export, and its shape is that
+framework's own context primitive (React/Solid a context object, Vue/Svelte a
+`{ cr, key }` pair, Qwik a `ContextId`, Angular an injectable), so how you provide
+it differs per target. Typed as `CrGlobalConfig`; see
+[styling-contract.md](styling-contract.md) for the per-target provider examples.
+
 How each entry is distributed reflects what that framework needs — the package is
 private, but every entry is a genuine, consumable package:
 
@@ -33,9 +40,13 @@ Qwik are TSX, so `tsc` emits full declarations. For Vue/Svelte/Solid/Angular
 (non-TSX source), `build/build-pkg-types.mjs` generates an `index.d.ts` from the
 shared, framework-agnostic prop interfaces — every component's `<Name>Props` is
 re-exported, and the component value is typed per framework (Vue `DefineComponent`,
-Solid render fn, Svelte component constructor, Angular class). Peer deps cover all
-six frameworks, each marked `optional` so installing for one target doesn't pull
-the rest. Guarded by `verify:pkg-types` (drift) and `tests/pkg-exports.test.mjs`.
+Solid render fn, Svelte component constructor, Angular class). The shared styling
+types (`CrPassThrough`, `CrDesignTokens`, `CrHooks`, `CrGlobalConfig`, …) are
+**inlined** from `lib/pt-types.ts` into each `index.d.ts`, because a type merely
+imported from `lib/` would be referenced but never declared; `CrContext` is declared
+per target alongside them. Peer deps cover all six frameworks, each marked
+`optional` so installing for one target doesn't pull the rest. Guarded by
+`verify:pkg-types` (drift) and `tests/pkg-exports.test.mjs`.
 
 The build compiles the typed packages with `pnpm run build:pkg` (relative import
 extensions rewritten `.tsx → .js` so the emit resolves in Node ESM and bundlers);
