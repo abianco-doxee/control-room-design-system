@@ -72,11 +72,29 @@ for (const [target, { ext, index }] of Object.entries(TARGETS)) {
   const names = readdirSync(compDir)
     .filter((f) => f.endsWith("." + ext))
     // Context modules (cr.context.*) live alongside the components but are not
-    // exported as components — they are imported directly by the components that
-    // consume them, and `cr.context` is not a legal identifier for a barrel export.
+    // components — no Props interface, and `cr.context` is not a legal identifier
+    // for a barrel export. They are re-exported separately, as `CrContext`, below.
     .filter((f) => !f.includes(".context."))
     .map((f) => f.slice(0, -(ext.length + 1)))
     .sort();
+
+  // The app-level tier (global `pt` / `locale` / `messages`) is only reachable if
+  // the context object itself is exported: without this the whole tier is
+  // documented but unusable, since consumers cannot name the thing they must
+  // provide. Emitted as `CrContext` on every target, each in that framework's own
+  // idiom (React/Solid `createContext`, Vue/Svelte `{ cr, key }`, Qwik
+  // `createContextId`, Angular an `@Injectable`) — see the per-target usage in
+  // references/styling-contract.md.
+  //
+  // The context file is emitted extensionless-import by Mitosis but written with
+  // the target's own extension; find it by scan rather than assuming, so a change
+  // in the generators surfaces here as a missing export rather than a bad path.
+  const ctxFile = readdirSync(compDir)
+    .filter((f) => f.includes(".context.") && !f.endsWith(".map"))
+    .sort()[0];
+  const ctxLine = ctxFile
+    ? `export { default as CrContext } from "./components/${ctxFile}";\n`
+    : "";
 
   // TypeScript targets carry an exported `<Name>Props` interface per component; a
   // typed package re-exports those types alongside the component so consumers get
@@ -99,7 +117,7 @@ for (const [target, { ext, index }] of Object.entries(TARGETS)) {
       : value;
   });
 
-  const body = HEADER + lines.join("\n") + "\n";
+  const body = HEADER + ctxLine + lines.join("\n") + "\n";
   const outFile = join(dir, index);
 
   if (check) {
