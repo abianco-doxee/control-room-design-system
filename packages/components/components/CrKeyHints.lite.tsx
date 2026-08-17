@@ -1,5 +1,5 @@
 import { useStore, onMount, onUnMount, For, Show, useContext, onUpdate } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle, ptResolve } from "../lib/pt.ts";
+import { ptAttrs, ptClass, ptNested, ptResolve, ptStyle } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 import { parseKeys, describeKeys } from "../lib/keys.ts";
@@ -173,7 +173,7 @@ export default function CrKeyHints(props: CrKeyHintsProps) {
                                 +
                               </span>
                             </Show>
-                            <CrKbd keys={k} />
+                            <CrKbd keys={k} pt={ptNested(ptResolve(cr, props.pt, "CrKeyHints"), "kbd")} />
                           </span>
                         )}
                       </For>

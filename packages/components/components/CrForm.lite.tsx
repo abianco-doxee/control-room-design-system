@@ -1,6 +1,6 @@
 import { useStore, Show, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
 import CrFormRow from "./CrFormRow.lite";
-import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler } from "../lib/pt.ts";
+import { ptAttrs, ptClass, ptHandler, ptNested, ptResolve, ptStyle } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 
@@ -595,6 +595,7 @@ export default function CrForm(props: CrFormProps) {
       <For each={state.rows()}>
         {(row: any) => (
           <CrFormRow
+            pt={ptNested(ptResolve(cr, props.pt, "CrForm"), "row")}
             rowType={row.t}
             field={row.field}
             pathKey={state.key(row.path)}

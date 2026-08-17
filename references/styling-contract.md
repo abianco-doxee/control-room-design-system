@@ -172,6 +172,16 @@ as `check="[object Object]"`.
 Precedence is therefore the full PrimeVue chain: **global (context) → parent
 (forwarded) → component (`props.pt`)**.
 
+Every nesting site forwards: `CrTable`/`CrDataGrid`/`CrFormRow` → `CrCheckbox`,
+`CrChoiceGroup` → `CrChoice`, `CrForm` → `CrFormRow`, `CrInput` → `CrIcon`,
+`CrKeyHints` → `CrKbd`. A guard in `tests/pt-chaining.test.mjs` scans the sources
+and fails on any nested component that does not receive a `pt`, because an
+unforwarded child is silently unreachable — nothing else would break.
+
+> A nested section must be handed over with `ptNested`, never spread. `CrChoiceGroup`
+> previously spread `ptAttrs(…, "choice")` onto `<CrChoice>`, which set stray props
+> on the component instead of styling it.
+
 ### The cascade: global → component
 
 App-level defaults come from a context provider; an instance's own `pt` wins:

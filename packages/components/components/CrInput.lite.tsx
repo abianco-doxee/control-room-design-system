@@ -1,6 +1,6 @@
 import { Show, useStore, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
 import CrIcon from "./CrIcon.lite.tsx";
-import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler, resolveMessage } from "../lib/pt.ts";
+import { ptAttrs, ptClass, ptHandler, ptNested, ptResolve, ptStyle, resolveMessage } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 
@@ -85,7 +85,7 @@ export default function CrInput(props: CrInputProps) {
               style={ptStyle(ptResolve(cr, props.pt, "CrInput"), props.dt, "icon")}
               aria-hidden="true"
             >
-              <CrIcon name={props.icon} size={16} />
+              <CrIcon name={props.icon} size={16} pt={ptNested(ptResolve(cr, props.pt, "CrInput"), "iconGlyph")} />
             </span>
           </Show>
           <input
@@ -124,7 +124,7 @@ export default function CrInput(props: CrInputProps) {
                 if (props.onChange) props.onChange("");
               }}
             >
-              <CrIcon name="close" size={14} />
+              <CrIcon name="close" size={14} pt={ptNested(ptResolve(cr, props.pt, "CrInput"), "clearGlyph")} />
             </button>
           </Show>
         </span>

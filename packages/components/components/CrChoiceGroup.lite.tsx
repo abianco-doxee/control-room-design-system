@@ -1,6 +1,6 @@
 import { useStore, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
 import CrChoice from "./CrChoice.lite";
-import { ptClass, ptAttrs, ptStyle, ptResolve } from "../lib/pt.ts";
+import { ptAttrs, ptClass, ptNested, ptResolve, ptStyle } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 
@@ -34,6 +34,9 @@ export interface CrChoiceGroupProps {
   /** Fires with the full next selection — `type="checkbox"` only. */
   onChangeMany?: (values: string[]) => void;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root". The "choice" section is a NESTED pt handed to each CrChoice
+   * (its own parts), not an attribute bag — it was previously spread onto the
+   * component, which set stray props instead of styling the child.
    * Parts: "root" · "choice". */
   unstyled?: boolean;
   pt?: CrPassThrough<"root">;
@@ -105,7 +108,7 @@ export default function CrChoiceGroup(props: CrChoiceGroupProps) {
       <For each={props.options}>
         {(opt: CrChoiceOption) => (
           <CrChoice
-            {...ptAttrs(ptResolve(cr, props.pt, "CrChoiceGroup"), "choice")}
+            pt={ptNested(ptResolve(cr, props.pt, "CrChoiceGroup"), "choice")}
             type={props.type === "checkbox" ? "checkbox" : "radio"}
             name={state.isRadio() ? state.groupName() : undefined}
             label={opt.label}
