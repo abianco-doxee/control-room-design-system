@@ -3,10 +3,10 @@
 /* ── Overflow ("+N more" disclosure) ─────────────────────────────────────── */
 .cr-overflow {
   font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--cr-overflow-fg);
   background: transparent; border: 0; cursor: pointer; padding: var(--space-0-5) var(--space-1);
 }
-.cr-overflow:hover { color: var(--sig-work); }
+.cr-overflow:hover { color: var(--cr-overflow-hover-fg); }
 .cr-overflow--static { cursor: default; }
 .cr-overflow:focus-visible { outline: var(--focus-w) solid var(--focus); outline-offset: var(--focus-offset); }
 

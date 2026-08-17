@@ -119,7 +119,7 @@
   --cr-btn-size: var(--text-sm);
   --cr-panel-pad: var(--pad);
   --cr-panel-bg: var(--panel);
-  --cr-panel-gap: var(--gap);
+  --cr-panel-gap: 0;
   --cr-chip-pad-x: var(--pad-tight);
   --cr-chip-pad-y: var(--space-0-5);
   --cr-chip-bg: var(--sig-done);
@@ -162,15 +162,13 @@
   --cr-field-placeholder: var(--muted);
   --cr-field-focus: var(--focus);
   --cr-field-error: var(--sig-err);
-  --cr-check-bg: var(--board);
+  --cr-check-bg: transparent;
   --cr-check-checked: var(--sig-work);
   --cr-check-mark: var(--on-sig);
   --cr-switch-track: var(--panel-2);
   --cr-switch-track-on: var(--sig-done);
   --cr-switch-thumb: var(--muted);
   --cr-switch-thumb-on: var(--on-sig);
-  --cr-radio-bg: var(--panel-2);
-  --cr-radio-dot: var(--sig-work);
   --cr-slider-track: var(--panel-2);
   --cr-slider-thumb: var(--sig-work);
   --cr-combobox-panel-bg: var(--panel);
@@ -218,6 +216,8 @@
   --cr-kbd-fg: var(--muted);
   --cr-breadcrumb-fg: var(--muted);
   --cr-breadcrumb-current-fg: var(--ink);
+  --cr-overflow-fg: var(--muted);
+  --cr-overflow-hover-fg: var(--sig-work);
   --cr-datagrid-bg: var(--board);
   --cr-datagrid-border: var(--border);
   --cr-datagrid-seam: var(--seam);
@@ -226,7 +226,6 @@
   --cr-masthead-accent: var(--sig-accent);
   --cr-alert-bg: var(--panel);
   --cr-alert-border: var(--border);
-  --cr-spinner-track: var(--panel-2);
   --cr-spinner-accent: var(--sig-work);
   --cr-skeleton-bg: var(--panel-2);
   --cr-togglechip-bg: var(--panel-2);

@@ -60,7 +60,7 @@
 .cr-table__sel input[type="checkbox"] {
   appearance: none; -webkit-appearance: none; margin: 0; vertical-align: middle; color: inherit;
   width: var(--space-4); height: var(--space-4); flex-shrink: 0;
-  border: var(--brd) solid currentColor; background: transparent;
+  border: var(--brd) solid currentColor; background: var(--cr-check-bg);
   display: inline-grid; place-content: center; cursor: pointer;
 }
 /* Checked: flood the fill to the accent (Law 2 — selection is a real state) and

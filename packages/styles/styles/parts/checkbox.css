@@ -27,7 +27,7 @@
 .cr-check input {
   appearance: none; -webkit-appearance: none; margin: 0; color: inherit;
   width: var(--space-4); height: var(--space-4); flex-shrink: 0;
-  border: var(--brd) solid currentColor; background: transparent;
+  border: var(--brd) solid currentColor; background: var(--cr-check-bg);
   display: inline-grid; place-content: center; cursor: pointer;
 }
 /* The mark is present in BOTH states and only its opacity changes. This is what
