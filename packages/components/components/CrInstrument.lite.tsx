@@ -1,5 +1,5 @@
 import { useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle, ptResolve } from "../lib/pt.ts";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHooks } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 export interface CrInstrumentProps {
@@ -15,13 +15,16 @@ export default function CrInstrument(props: CrInstrumentProps) {
   const cr = useContext(CrContext);
 
   onMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrInstrument"));
+    if (h && h.onMounted) h.onMounted();
   });
   onUpdate(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
-  }, []);
+    const h = ptHooks(ptResolve(cr, props.pt, "CrInstrument"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
   onUnMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrInstrument"));
+    if (h && h.onUnmounted) h.onUnmounted();
   });
 
   return <div {...ptAttrs(ptResolve(cr, props.pt, "CrInstrument"), "root")} class={ptClass(ptResolve(cr, props.pt, "CrInstrument"), props.unstyled, "cr-instrument", "root")} data-part="root" style={ptStyle(ptResolve(cr, props.pt, "CrInstrument"), props.dt, "root")}>{props.children}</div>;

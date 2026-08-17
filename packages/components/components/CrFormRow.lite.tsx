@@ -1,6 +1,6 @@
 import { Show, For, onUpdate, useContext, onMount, onUnMount } from "@builder.io/mitosis";
 import CrCheckbox from "./CrCheckbox.lite.tsx";
-import { ptClass, ptAttrs, ptStyle, ptResolve } from "../lib/pt.ts";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptNested, ptHooks } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 
@@ -42,7 +42,10 @@ export interface CrFormRowProps {
    * row wrapper). This is CrForm's internal presentational row, so pt/unstyled
    * apply at the row level; the row keeps its computed paddingLeft style. */
   unstyled?: boolean;
-  pt?: CrPassThrough<"root">;
+  /** `check` is a NESTED SECTION: its value is a `pt` for the inner CrCheckbox on a
+   *  checkbox row (`pt={{ check: { root: { "data-testid": "agree" } } }}`). The row's
+   *  own delegation attributes still win on collision — see the note at the call. */
+  pt?: CrPassThrough<"check" | "root">;
   dt?: CrDesignTokens;
 }
 
@@ -66,13 +69,16 @@ export default function CrFormRow(props: CrFormRowProps) {
   const cr = useContext(CrContext);
 
   onMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrFormRow"));
+    if (h && h.onMounted) h.onMounted();
   });
   onUpdate(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
-  }, []);
+    const h = ptHooks(ptResolve(cr, props.pt, "CrFormRow"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
   onUnMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrFormRow"));
+    if (h && h.onUnmounted) h.onUnmounted();
   });
 
   /* Render probe (guarded, zero-cost unless a test opts in). Compiles to a React
@@ -131,8 +137,18 @@ export default function CrFormRow(props: CrFormRowProps) {
               * The no-op onChange stays for the same reason as before: React warns
               * about a controlled `checked` with no handler, and the real update
               * flows through the form's delegated listener. */}
+            {/* The consumer's own section for this checkbox is MERGED UNDER the
+              * delegation attributes, not replaced by them: a literal `pt` here
+              * discarded whatever the caller passed, and the checkbox inside a form
+              * row is the control a test most often needs to reach. The three keys
+              * below still win on collision, because the form's delegated listener
+              * stops working without them. */}
             <CrCheckbox
-              pt={{ root: { "data-path": props.pathKey, "data-kind": "checkbox", "aria-describedby": props.descId } }}
+              pt={ptResolve(
+                { pt: { CrCheckbox: ptNested(ptResolve(cr, props.pt, "CrFormRow"), "check") } },
+                { root: { "data-path": props.pathKey, "data-kind": "checkbox", "aria-describedby": props.descId } },
+                "CrCheckbox"
+              )}
               unstyled={props.unstyled}
               checked={props.value === true}
               disabled={props.disabled}

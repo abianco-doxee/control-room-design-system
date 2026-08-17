@@ -1,6 +1,6 @@
 import { useStore, Show, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
 import CrCheckbox from "./CrCheckbox.lite.tsx";
-import { ptAttrs, ptClass, ptHandler, ptNested, ptResolve, ptStyle, resolveMessage } from "../lib/pt.ts";
+import { ptAttrs, ptClass, ptHandler, ptNested, ptResolve, ptStyle, resolveMessage, ptHooks } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 
@@ -22,7 +22,19 @@ export interface CrTableProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "head" · "body" · "row" · "th" · "td" · "sort" · "indicator" · "check". */
   unstyled?: boolean;
-  pt?: CrPassThrough<"body" | "check" | "head" | "indicator" | "root" | "row" | "sort" | "td" | "th">;
+  /** BREAKING (shape, not name): `check` is now a NESTED SECTION. The selection
+   *  checkbox became a real CrCheckbox, so this value is a `pt` for that CHILD —
+   *  `pt={{ check: { root: { "data-testid": "row-select" } } }}` — where it used to
+   *  be a flat attribute bag applied straight to the inline `<input>`:
+   *  `pt={{ check: { "data-testid": "row-select" } }}`.
+   *
+   *  Both shapes are structurally valid `CrPTSection`s (its index signature accepts
+   *  any key), so TypeScript cannot flag the old form. `data-part="check"` is still
+   *  emitted on the input, so CSS and test locators targeting the part keep working;
+   *  only a `pt` written against the old shape needs the extra `root` level. */
+  pt?: CrPassThrough<
+    "body" | "check" | "head" | "indicator" | "root" | "row" | "sort" | "td" | "th"
+  >;
   dt?: CrDesignTokens;
 }
 
@@ -33,13 +45,16 @@ export default function CrTable(props: CrTableProps) {
   const cr = useContext(CrContext);
 
   onMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrTable"));
+    if (h && h.onMounted) h.onMounted();
   });
   onUpdate(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
-  }, []);
+    const h = ptHooks(ptResolve(cr, props.pt, "CrTable"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
   onUnMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrTable"));
+    if (h && h.onUnmounted) h.onUnmounted();
   });
 
   const state = useStore({
@@ -124,6 +139,7 @@ export default function CrTable(props: CrTableProps) {
                 <td {...ptAttrs(ptResolve(cr, props.pt, "CrTable"), "td")} class={ptClass(ptResolve(cr, props.pt, "CrTable"), props.unstyled, "cr-table__sel", "td")} data-part="td">
                   <CrCheckbox
                     pt={ptNested(ptResolve(cr, props.pt, "CrTable"), "check")}
+                    part="check"
                     unstyled={props.unstyled}
                     checked={!!state.selected[rowIndex]}
                     label={resolveMessage(cr, props.labels, "CrTable", "selectRow")}

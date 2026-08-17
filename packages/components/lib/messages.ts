@@ -21,6 +21,14 @@
  * order under the caller's control, which concatenation cannot do across
  * languages. */
 
+/* Every key here MUST have a `resolveMessage(cr, props.labels, "<Comp>", "<key>")`
+ * call site, and vice versa — guarded by tests/pt-chaining.test.mjs. A key with no
+ * call site is dead weight that reads as an overridable string but is not: it was
+ * how `CrPalette`'s three entries shipped while that component hardcoded its four
+ * accessible names. CrPalette is in the DECORATIVE exclusion set (no styling
+ * contract, so no `labels` prop), so its keys were removed rather than wired; if it
+ * is ever promoted to a functional component, add the prop and the keys together. */
+
 export type CrMessage = string | ((value: any) => string);
 
 export const CR_MESSAGES: Record<string, Record<string, CrMessage>> = {
@@ -54,11 +62,6 @@ export const CR_MESSAGES: Record<string, Record<string, CrMessage>> = {
     prevPage: "Previous page",
     nextPage: "Next page",
     page: (n: any) => "Page " + n,
-  },
-  CrPalette: {
-    commandPalette: "Command palette",
-    searchCommands: "Search commands",
-    commands: "Commands",
   },
   CrPinInput: { digit: (n: any) => "Digit " + n },
   CrResizable: { resize: "Resize panels" },

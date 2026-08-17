@@ -1,6 +1,6 @@
 import { useStore, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
 import CrChoice from "./CrChoice.lite";
-import { ptAttrs, ptClass, ptNested, ptResolve, ptStyle } from "../lib/pt.ts";
+import { ptAttrs, ptClass, ptNested, ptResolve, ptStyle, ptHooks } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 
@@ -39,7 +39,9 @@ export interface CrChoiceGroupProps {
    * component, which set stray props instead of styling the child.
    * Parts: "root" · "choice". */
   unstyled?: boolean;
-  pt?: CrPassThrough<"root">;
+  /** `choice` is a NESTED SECTION: its value is a `pt` for the inner CrChoice
+   *  (`pt={{ choice: { input: { … } } }}`), not an attribute bag for an element. */
+  pt?: CrPassThrough<"choice" | "root">;
   dt?: CrDesignTokens;
 }
 
@@ -60,13 +62,16 @@ export default function CrChoiceGroup(props: CrChoiceGroupProps) {
   const cr = useContext(CrContext);
 
   onMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrChoiceGroup"));
+    if (h && h.onMounted) h.onMounted();
   });
   onUpdate(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
-  }, []);
+    const h = ptHooks(ptResolve(cr, props.pt, "CrChoiceGroup"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
   onUnMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrChoiceGroup"));
+    if (h && h.onUnmounted) h.onUnmounted();
   });
 
   const state = useStore({
