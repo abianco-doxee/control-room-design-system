@@ -1,5 +1,5 @@
 import { onMount, onUnMount, onUpdate, useContext, useStore } from "@builder.io/mitosis";
-import { ptAttrs, ptClass, ptResolve, ptStyle, resolveLocale } from "../lib/pt.ts";
+import { ptAttrs, ptClass, ptResolve, ptStyle, resolveLocale, ptHooks } from "../lib/pt.ts";
 import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
 import CrContext from "./cr.context.lite";
 
@@ -30,13 +30,16 @@ export default function CrRelativeTime(props: CrRelativeTimeProps) {
   const cr = useContext(CrContext);
 
   onMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onMounted) props.pt.hooks.onMounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrRelativeTime"));
+    if (h && h.onMounted) h.onMounted();
   });
   onUpdate(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUpdated) props.pt.hooks.onUpdated();
-  }, []);
+    const h = ptHooks(ptResolve(cr, props.pt, "CrRelativeTime"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
   onUnMount(() => {
-    if (props.pt && props.pt.hooks && props.pt.hooks.onUnmounted) props.pt.hooks.onUnmounted();
+    const h = ptHooks(ptResolve(cr, props.pt, "CrRelativeTime"));
+    if (h && h.onUnmounted) h.onUnmounted();
   });
 
   const state = useStore({
@@ -66,18 +69,36 @@ export default function CrRelativeTime(props: CrRelativeTimeProps) {
     const lang = loc.split("-")[0];
     /* `narrow` keeps the terse machine register Law 8 asks for — in English it is
      * byte-identical to the previous hand-rolled output ("5m ago", "in 2h", "now").
-     * A few CLDR locales render narrow as a bare +/- sign ("-5 min"), which reads
+     * Some CLDR locales render narrow as a bare +/- sign ("-5 min"), which reads
      * as a delta rather than an elapsed time; those take `short` instead. This is a
      * BEHAVIOUR table (which style reads correctly), not a translation table — no
-     * per-locale copy to maintain, and an unlisted locale defaults to narrow. */
-    const signOnly = lang === "fr";
-    const rtf = new Intl.RelativeTimeFormat(loc, {
-      numeric: "auto",
-      style: signOnly ? "short" : "narrow",
-    });
+     * per-locale copy to maintain, and an unlisted locale defaults to narrow.
+     * MUST stay in lockstep with utils/duration.js relativeTime(). */
+    const signOnly =
+      ["fr", "ru", "sv", "nb", "nn", "no", "da", "uk", "be"].indexOf(lang) !== -1;
+    const style = signOnly ? "short" : "narrow";
     /* numeric:"auto" turns 0 seconds into the locale's "now"/"ora"/"jetzt",
-     * replacing the hand-written 45s "just now" threshold. */
-    if (abs < 45000) return rtf.format(0, "second");
+     * replacing the hand-written 45s "just now" threshold. It is used ONLY there:
+     * on the ladder it would swap in CALENDAR words for ±1 of any unit
+     * ("yesterday"/"tomorrow"), and the value below is an ELAPSED-DURATION count,
+     * not a calendar offset — 47h ago is "2d ago", never "yesterday". */
+    if (abs < 45000) {
+      let nowRtf;
+      try {
+        nowRtf = new Intl.RelativeTimeFormat(loc, { numeric: "auto", style });
+      } catch (err) {
+        nowRtf = new Intl.RelativeTimeFormat("en", { numeric: "auto", style: "narrow" });
+      }
+      return nowRtf.format(0, "second");
+    }
+    /* An invalid tag ("en_US" — the Java/Python/POSIX spelling) throws RangeError
+     * during render, which would blank the subtree; fall back to English. */
+    let rtf;
+    try {
+      rtf = new Intl.RelativeTimeFormat(loc, { numeric: "always", style });
+    } catch (err) {
+      rtf = new Intl.RelativeTimeFormat("en", { numeric: "always", style: "narrow" });
+    }
     const v = state.pickValue(abs);
     return rtf.format(delta >= 0 ? -v : v, state.pickUnit(abs));
     },
