@@ -59,10 +59,17 @@ const names = readdirSync(join(COMPONENTS, "components"))
 for (const n of names) {
   cpSync(join(COMPONENTS, "components", `${n}.js`), join(WORK, "src", "components", `${n}.ts`));
 }
-// The shared lib the components import as `../lib/pt.ts`. It has to live INSIDE
+// The shared lib the components import as `../lib/pt.ts`. It comes from the
+// SOURCE tree (packages/components/lib) — dist/frameworks/<target>/lib is not
+// emitted by the mitosis build, only dist/pkg/<target>/lib is, and that is
+// compiled JS rather than the .ts these specifiers name. It has to live inside
 // rootDir or tsc rejects it (TS6059), so the layout mirrors the real one:
 // src/components/*.ts alongside src/lib/*.
-cpSync(join(COMPONENTS, "lib"), join(WORK, "src", "lib"), { recursive: true });
+cpSync(join(HERE, "..", "components", "lib"), join(WORK, "src", "lib"), { recursive: true });
+// …plus the icon pack, which components import as `../lib/icons/pixel.ts` but
+// which actually lives in the icons package.
+mkdirSync(join(WORK, "src", "lib", "icons"), { recursive: true });
+cpSync(join(HERE, "..", "icons", "pixel.ts"), join(WORK, "src", "lib", "icons", "pixel.ts"));
 
 writeFileSync(
   join(WORK, "tsconfig.json"),
@@ -116,25 +123,15 @@ const { diagnostics } = performCompilation({
   options: config.options,
 });
 
-// Two categories are filtered, and both are deliberate.
+// Only TS2307 ("cannot find module") is filtered, and it is a staging artefact:
+// the components are compiled outside their package, so the sibling lib/context
+// specifiers do not resolve here. Nothing to do with the components themselves.
 //
-// TS2307 ("cannot find module") is a staging artefact: the components are
-// compiled outside their package, so the sibling lib/context specifiers do not
-// resolve here. Nothing to do with the components.
-//
-// TS2339 ("property does not exist") is DOM typing in the generated code —
-// `querySelector` gives back `Element` or `unknown`, and the generator calls
-// `.focus()` / `.value` on it. Correct at runtime, and this gate is about
-// Angular's SEMANTICS: dependency injection, template binding, @Input/@Output
-// classification, lifecycle. Tightening the generator's DOM types is a separate
-// job, and holding this gate red for it would mean holding the real regressions
-// hostage to cosmetics.
-//
-// Everything else fails the build. That is what caught the six defects listed
-// above, each of which broke Angular consumers.
-const IGNORED = new Set([2307, 2339]);
+// TS2339 used to be filtered too — 24 DOM-typing diagnostics where the generator
+// calls `.focus()` / `.value` on a `querySelector` result. Those are now fixed at
+// the source in build-fix-angular.mjs, so the gate holds ngc to zero.
+const IGNORED = new Set([2307]);
 const real = diagnostics.filter((d) => !IGNORED.has(d.code));
-const ignored = diagnostics.filter((d) => IGNORED.has(d.code));
 
 if (real.length) {
   console.error(formatDiagnostics(real));
@@ -145,7 +142,4 @@ if (real.length) {
 }
 
 rmSync(WORK, { recursive: true, force: true });
-console.log(
-  `✓ Angular AOT: ${names.length} component(s) compile with ngc` +
-    (ignored.length ? ` (${ignored.length} DOM-typing diagnostic(s) ignored — see IGNORED)` : "")
-);
+console.log(`✓ Angular AOT: ${names.length} component(s) compile clean with ngc`);

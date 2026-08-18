@@ -29,5 +29,5 @@ export default function CrStatusDot(props: CrStatusDotProps) {
   });
 
 
-  return <span {...ptAttrs(ptResolve(cr, props.pt, "CrStatusDot"), "root")} class={ptClass(ptResolve(cr, props.pt, "CrStatusDot"), props.unstyled, "cr-dot", "root")} data-part="root" role="img" aria-label={props.label} style={{ background: "var(--sig-" + (props.signal || "idle") + ")", ...ptStyle(ptResolve(cr, props.pt, "CrStatusDot"), props.dt, "root") }} />;
+  return <span {...ptAttrs(ptResolve(cr, props.pt, "CrStatusDot"), "root")} class={ptClass(ptResolve(cr, props.pt, "CrStatusDot"), props.unstyled, "cr-dot", "root")} data-part="root" role="img" aria-label={props.label} style={ptStyle(ptResolve(cr, props.pt, "CrStatusDot"), props.dt, "root", { background: "var(--sig-" + (props.signal || "idle") + ")" })} />;
 }

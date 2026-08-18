@@ -293,9 +293,23 @@ export function ptAttrs(pt: any, part: string): any {
  *  would char-index it into `{0:"c",1:"o",…}` and render garbage inline style. A
  *  string is dropped rather than mangled; `ptAttrs` already skips `style` entirely,
  *  so there is no second path that would emit it. */
-export function ptStyle(pt: any, dt: any, part: string): any {
+/** `own` is the component's OWN inline style for the part.
+ *
+ *  It exists so a component never has to write `style={{ x: 1, ...ptStyle(…) }}`.
+ *  Mitosis cannot express a literal merged with a spread in an Angular template —
+ *  it emits an unresolved `useObjectWrapper(…)` helper, which fails to parse
+ *  (NG5002) and breaks the whole component for Angular consumers. Passing the
+ *  literal through here keeps the template to a single call.
+ *
+ *  Precedence is unchanged: dt (root only) → the component's own → the consumer's
+ *  pt style, so a consumer override still wins. */
+export function ptStyle(pt: any, dt: any, part: string, own?: any): any {
   const p = pt && pt[part];
   const base = part === "root" ? dt || {} : {};
   const style = p && p.style;
-  return { ...base, ...(isPlainObject(style) ? style : {}) };
+  return {
+    ...base,
+    ...(isPlainObject(own) ? own : {}),
+    ...(isPlainObject(style) ? style : {}),
+  };
 }

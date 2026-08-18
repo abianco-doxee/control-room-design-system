@@ -158,10 +158,26 @@ for (const f of files) {
   const out = src
     .split("\n")
     .map((line) => {
-      const opensTemplate = /template:\s*`/.test(line);
-      if (opensTemplate) inTemplate = !/`[\s\S]*`/.test(line.split("template:")[1]);
-      else if (inTemplate && /`/.test(line)) inTemplate = false;
-      if (inTemplate || opensTemplate) return line;
+      // Track the template by counting backticks, not by "does this line have
+      // one": the opener is `selector: '…', template: \`` and the closer is a
+      // lone backtick many lines later, while lines in between can contain their
+      // own. Getting this wrong silently skips the entire class body — which is
+      // how a whole component kept its raw &quot; entities and bare `cr`.
+      // The template opens at `template: \`` and closes at the line that begins
+      // the next @Component field — the generator always emits `\`,styles: [...]`
+      // or `\`,` — so the closer is matched explicitly. Backtick PARITY does not
+      // work: that closing line carries three of them (one ending the template,
+      // two around the styles string). Getting this wrong skips the whole class
+      // body, which is how one component kept its raw &quot; entities and bare `cr`.
+      const opensTemplate = !inTemplate && /template:\s*`/.test(line);
+      if (opensTemplate) {
+        inTemplate = true;
+        return line;
+      }
+      if (inTemplate) {
+        if (/^\s*`\s*,/.test(line)) inTemplate = false;
+        return line;
+      }
 
       // Outside the template, qualify `cr` wherever it appears in executable code
       // — not only on the setAttributes() spread lines. The generator also copies
@@ -218,6 +234,84 @@ for (const f of files) {
   // argument is silently dropped — the consumer only ever sees the key. Angular's
   // convention for multi-value events is a single payload object, so they are
   // packed into one.
+  // DOM lookups come back untyped, and Angular's AOT compiler type-checks them.
+  //
+  //   const nodes = Array.from(root.querySelectorAll(…));  → unknown[]
+  //   const el = root.querySelector(…);                    → Element
+  //
+  // then `.focus()` / `.value` / `.setAttribute()` on those is a TS2339 error.
+  // The code is correct at runtime — these really are HTMLElements — so the fix
+  // is the annotation, not the logic. Annotating the .lite source does NOT work:
+  // Mitosis strips type annotations from its Angular output (React keeps them),
+  // so it has to be applied here.
+  const typeDomQueries = (code) =>
+    code
+      .replace(/(\b(?:const|let)\s+\w+)(\s*=\s*Array\.from\([^;]*querySelectorAll)/g, "$1: any[]$2")
+      .replace(/(\b(?:const|let)\s+\w+)(\s*=\s*[\w.]*\.querySelector\()/g, "$1: any$2")
+      .replace(/(\b(?:const|let)\s+\w+)(\s*=\s*\w+\s*\?\s*[\w.]*\.querySelector\()/g, "$1: any$2");
+
+  // The test-only render counter.
+  // `window.__CR_ROW_RENDERS__`, the per-row render counter the React memo
+  //    test reads. It is a deliberate test hook rather than a DOM API, so it is
+  //    reached through a cast instead of being declared globally.
+  // A method whose body is a DOM query returns unknown[] once Mitosis strips the
+  // source's `: any[]` return type, so `.focus()` / `.value` on a result fails.
+  // Matched by NAME: two earlier pattern-based attempts reached into the
+  // @Component template above and rewrote it, which made every template
+  // expression resolve against the class instead — a worse break than the fix.
+  const DOM_METHODS = ["inputs", "barItems"];
+  const typeDomMethods = (code) =>
+    DOM_METHODS.reduce(
+      (acc, name) => acc.replace(new RegExp(`^${name}\\(\\) \\{$`, "m"), `${name}(): any[] {`),
+      code
+    );
+
+  // Inside an Angular event binding the event object is `$event`. Mitosis
+  // rewrites the FIRST occurrence in a handler body and leaves any later one as a
+  // bare `event`, which Angular resolves against the component — "Property
+  // 'event' does not exist" under AOT, and undefined at runtime. Affects any
+  // handler that touches the event twice (CrSlider, CrTabs).
+  const dollarEvent = (code) =>
+    code.replace(
+      /\((?:input|click|change|keydown|keyup|blur|focus|mousedown|mousemove|pointerdown)\)="([\s\S]*?)"/g,
+      (m, body) => m.replace(body, body.replace(/(?<![.\w$])event(?![\w])/g, "$event"))
+    );
+
+  // `children` is a React/Vue/Svelte concept. Angular projects content with
+  // <ng-content> and has no `children` property, so the generator's
+  // `*ngIf="children"` is "Property 'children' does not exist" under AOT — and at
+  // runtime it is always falsy, so CrField/CrInputGroup silently render their
+  // FALLBACK branch even when the consumer projected content.
+  //
+  // Angular's own way to ask "was anything projected?" is @ContentChild with a
+  // static read of the host's child nodes. A declared field backed by that check
+  // keeps the emitted template untouched.
+  const declareChildren = (code) => {
+    if (!/\*ngIf="!?\(?children\)?"/.test(code)) return code;
+    if (/get children\b/.test(code)) return code;
+    // Insert the accessor right after the ctorParameters metadata, which every
+    // component in this set has by the time this pass runs.
+    return code.replace(
+      /^(\s*static ctorParameters\(\)[^\n]*\n)/m,
+      `$1
+  /** Whether the consumer projected any content. Angular has no \`children\`; this
+   *  reads the host element's child nodes once the view exists, which is what the
+   *  generator's \`*ngIf="children"\` is actually asking. */
+  get children(): boolean {
+    const host = this.elRef0?.nativeElement ?? null;
+    return !!host && host.childNodes.length > 0;
+  }
+`
+    );
+  };
+
+  // The test-only render counter: a deliberate hook the React memo test reads,
+  // not a DOM API, so it is reached through a cast rather than declared globally.
+  const typeWindowHook = (code) =>
+    code
+      .replace(/\bwindow\.__CR_ROW_RENDERS__/g, "(window as any).__CR_ROW_RENDERS__")
+      .replace(/\bconst w = window;/g, "const w = window as any;");
+
   const packMultiArgEmit = (code) =>
     code.replace(/this\.(\w+)\.emit\(([^;]*?)\);/g, (m, name, args) => {
       const parts = args.split(",").map((a) => a.trim());
@@ -232,15 +326,24 @@ for (const f of files) {
     // noticed. Marking it optional matches how it is actually called.
     code.replace(/setAttributes\(el, value, changes\) \{/, "setAttributes(el, value, changes?) {");
 
-  const withImports = packMultiArgEmit(
-    valueReturningInputs(
-      optionalChanges(
-        addCtorParameters(
-          importContext(typeRenderer(addStandaloneFalse(addMissingModuleImports(out, f))))
-        )
-      )
-    )
-  );
+  // Each pass is independent and order-insensitive; a flat pipeline keeps it
+  // readable as the list grows.
+  const withImports = [
+    (c) => addMissingModuleImports(c, f),
+    addStandaloneFalse,
+    typeRenderer,
+    importContext,
+    addCtorParameters,
+    optionalChanges,
+    valueReturningInputs,
+    packMultiArgEmit,
+    typeDomQueries,
+    typeDomMethods,
+    typeWindowHook,
+    dollarEvent,
+    declareChildren,
+  ].reduce((code, pass) => pass(code), out);
+
   if (withImports !== src) {
     touched++;
     if (!CHECK) writeFileSync(path, withImports);
