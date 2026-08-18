@@ -66,8 +66,7 @@ function addImport(src, name, mod) {
 // here from the mount effect as the anchor.
 function fixSolid(src, comp) {
   let out = src;
-  const re =
-    /onMount\(\(\) => \{[\s\S]*?if \(h && h\.onMounted\) h\.onMounted\(\);[\s\S]*?\}\);/;
+  const re = /onMount\(\(\) => \{[\s\S]*?if \(h && h\.onMounted\) h\.onMounted\(\);[\s\S]*?\}\);/;
   const m = out.match(re);
   if (!m) return null;
   // Guard on the hook NAME rather than the receiver, so the fixer always sees its
