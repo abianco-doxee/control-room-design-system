@@ -17,16 +17,25 @@
 import { expect, test } from "@playwright/test";
 import { bundleClient } from "../../components/build/bundle-client.mjs";
 
-// Angular is absent on purpose. Running it in a browser means JIT, and JIT
-// constructor injection needs `design:paramtypes` metadata — which esbuild does
-// not emit (a documented limitation, not a config mistake) and TypeScript 7 no
-// longer exposes `transpileModule` to generate. Getting Angular in here needs its
-// real AOT build pipeline, which is a bigger piece of work than this suite.
+// Angular is absent from THIS suite — it has its own gate, test:aot.
 //
-// It is not untested: tests/pkg-frameworks.test.mjs instantiates all 81 Angular
-// components on the real @angular/core and drives their @Input getters and
-// @Output emitters. What is missing is the DOM half — template bindings and
-// click delegation — and that gap is real, not covered elsewhere.
+// Running it in a browser means JIT, and JIT needs constructor metadata that
+// nothing in this toolchain produces: esbuild does not implement
+// emitDecoratorMetadata (documented, verified — it emits no design:paramtypes),
+// and TypeScript 7 removed the transpileModule API that could generate it.
+// Supplying Angular's own `static ctorParameters` fallback gets past NG0202 —
+// DI then resolves both CrContext and Renderer2 — but bootstrap moves on to
+// NG0203 on the injectable context, and each layer peeled back reveals the next.
+// So Angular is covered the way it is actually consumed instead: packages/angular-aot
+// compiles all 81 through the real ngc, which type-checks each component class
+// AND its template. That found six defects the instantiate gate could not see.
+// What remains uncovered for Angular alone is live DOM interaction — a real click
+// on a real element — which needs a browser it cannot be bootstrapped into here.
+//
+// The three defects found while attempting this DO ship (see
+// build-fix-angular.mjs): standalone:false, the typed Renderer2 parameter, and
+// the missing CrContext import each broke all 81 components for any consumer on
+// Angular >= 19.
 const TARGETS = ["react", "vue", "svelte", "solid", "qwik"];
 
 /** A blank page with the bundle inlined, so nothing depends on a dev server. */

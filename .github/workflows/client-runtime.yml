@@ -46,3 +46,9 @@ jobs:
             pnpm exec playwright install --with-deps chromium
       - name: Client runtime gate (react/vue/svelte/solid/qwik in a browser)
         run: pnpm run test:client
+      # Angular's equivalent. It cannot be driven in a browser here (JIT needs
+      # design:paramtypes metadata this toolchain cannot emit), but AOT is how
+      # Angular is actually consumed — `ng build` runs ngc — and ngc type-checks
+      # the class AND its template, which the instantiate gate never does.
+      - name: Angular AOT gate (all 81 components through ngc)
+        run: pnpm run test:aot

@@ -1,0 +1,17 @@
+{
+  "name": "@alebianco/cr-angular-aot",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Angular AOT compile gate. Isolated because @angular/compiler-cli pins typescript >=6.0 <6.1 while the workspace runs 7.x — a dedicated package keeps that older compiler out of everything else.",
+  "scripts": {
+    "test:aot": "node build/compile-aot.mjs"
+  },
+  "devDependencies": {
+    "@angular/common": "22.1.2",
+    "@angular/compiler": "22.1.2",
+    "@angular/compiler-cli": "22.1.2",
+    "@angular/core": "22.1.2",
+    "typescript": "6.0.3"
+  }
+}
