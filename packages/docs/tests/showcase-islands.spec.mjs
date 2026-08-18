@@ -876,9 +876,12 @@ test.describe("component browser — live islands", () => {
     await page.waitForFunction(() => Array.isArray(window.__CR_ISLANDS__));
     const cal = page.locator('[data-island="calendar"]');
     const heads = cal.locator(".cr-calendar__weekday");
-    await expect(heads.first()).toHaveText("Su"); // default "sunday"
+    // Weekday names come from Intl.DateTimeFormat({ weekday: "short" }), not a
+    // hardcoded table — English short names are three letters. "narrow" is not an
+    // option here: it collapses to S M T W T F S, with S and T each ambiguous.
+    await expect(heads.first()).toHaveText("Sun"); // default "sunday"
     await cal.locator(".pg__controls select").first().selectOption("monday");
-    await expect(heads.first()).toHaveText("Mo");
+    await expect(heads.first()).toHaveText("Mon");
   });
 
   // axe (test:a11y) evaluates RESTING states only and never enters :hover, so it
