@@ -14,6 +14,7 @@ import { fileURLToPath } from "node:url";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as CR from "../packages/components/dist/pkg/react/index.js";
+import { propsFor } from "./fixtures/component-props.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const PKG = join(ROOT, "packages", "components", "dist", "pkg", "react");
@@ -36,6 +37,28 @@ test("the package exposes every component as a named export", () => {
   // and the full barrel is substantial (all 61 components)
   const fns = Object.keys(CR).filter((k) => typeof CR[k] === "function");
   assert.ok(fns.length >= 60, `expected ~61 component exports, got ${fns.length}`);
+});
+
+// The tests below render a representative handful. This one renders EVERY
+// component from the published package with a realistic prop set — the same gap
+// that let CrCalendar throw on every Solid render and CrLineChart on every Svelte
+// render while the suite stayed green. React is the one target consumers get
+// pre-compiled, so "it imports" is not enough: it has to produce markup.
+test("every component in the package SSR-renders", () => {
+  const names = Object.keys(CR)
+    .filter((k) => k !== "CrContext") // the context export, not a component
+    .sort();
+  assert.ok(names.length >= 60, `expected ~81 components, got ${names.length}`);
+  const failed = [];
+  for (const name of names) {
+    try {
+      const html = renderToStaticMarkup(createElement(CR[name], propsFor(name)));
+      if (!html || !html.length) failed.push(`${name}: produced no output`);
+    } catch (e) {
+      failed.push(`${name}: ${String(e.message).split("\n")[0]}`);
+    }
+  }
+  assert.deepEqual(failed, [], `react render failures:\n  ${failed.join("\n  ")}`);
 });
 
 test("a named export renders to correct Control Room markup", () => {

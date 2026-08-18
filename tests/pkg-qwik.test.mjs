@@ -31,6 +31,20 @@ test("the qwik package imports and exposes every component as a named export", (
   assert.ok(exported.length >= 60, `expected ~61 exports, got ${exported.length}`);
 });
 
+// Qwik cannot be SSR-rendered here the way the other five targets are: its
+// renderToString needs a Vite build context (import.meta.env, the client
+// manifest), and the optimizer only transforms source — see the NOTE above. So
+// the strongest floor available in plain Node is that EVERY component loads and
+// is callable, not the seven the next test spot-checks. Real rendering for Qwik
+// happens in the consumer's own build; the compile gate
+// (tests/compile-all.test.mjs) proves all 81 parse as valid Qwik TSX.
+test("every component loads as a callable Qwik component", () => {
+  const names = Object.keys(CR).filter((k) => k !== "CrContext");
+  assert.ok(names.length >= 60, `expected ~81 components, got ${names.length}`);
+  const bad = names.filter((n) => typeof CR[n] !== "function");
+  assert.deepEqual(bad, [], `not callable: ${bad.join(", ")}`);
+});
+
 test("exports load as callable Qwik components", () => {
   // component$ output is a callable component; QRL/lazy markers are added later by
   // the consumer's Qwik optimizer, so here we assert they load as functions.
