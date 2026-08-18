@@ -384,11 +384,18 @@ export default function CrForm(props: CrFormProps) {
      * `mode` = when a field FIRST validates (blur | change | submit);
      * `revalidateMode` = once it has validated once, when it re-checks
      * (change | blur). A field that has errored is always live-revalidated so a
-     * fix clears the message as expected. */
-    mode(): string {
+     * fix clears the message as expected.
+     *
+     * NOT named `mode`/`revalidateMode`: Svelte flattens `state.x()` to a bare
+     * `function x()` in the SAME scope as the `export let x` prop, so a state
+     * member sharing a prop's name emits `export let mode` + `function mode()`
+     * — "Identifier 'mode' has already been declared", and the body's
+     * `return mode || "blur"` self-references the function. Same trap as
+     * CrTabs' `current`; see the note there. */
+    firstMode(): string {
       return props.mode || "blur";
     },
-    revalidateMode(): string {
+    reMode(): string {
       return props.revalidateMode || "change";
     },
     isLive(path: any[]): boolean {
@@ -428,8 +435,8 @@ export default function CrForm(props: CrFormProps) {
       const k = state.key(path);
       if (state.isLive(path)) {
         /* already validated once — re-check on change if that's the revalidate mode */
-        if (state.revalidateMode() === "change" || state.errs[k]) state.revalidate(next);
-      } else if (state.mode() === "change") {
+        if (state.reMode() === "change" || state.errs[k]) state.revalidate(next);
+      } else if (state.firstMode() === "change") {
         /* first validation happens on change */
         state.touched = { ...state.touched, [k]: true };
         state.revalidate(next);
@@ -438,8 +445,8 @@ export default function CrForm(props: CrFormProps) {
     blur(path: any[]) {
       const k = state.key(path);
       if (state.isLive(path)) {
-        if (state.revalidateMode() === "blur") state.revalidate(state.vals);
-      } else if (state.mode() === "blur") {
+        if (state.reMode() === "blur") state.revalidate(state.vals);
+      } else if (state.firstMode() === "blur") {
         state.touched = { ...state.touched, [k]: true };
         state.revalidate(state.vals);
       }
@@ -547,12 +554,15 @@ export default function CrForm(props: CrFormProps) {
        * button stays in its pending state until validate AND onSubmit settle. */
       const payload = state.pruned(values); /* drop hidden fields from validation + submit */
       Promise.resolve(props.validate ? props.validate(payload) || {} : {}).then((e: any) => {
-        const errs = e || {};
-        state.errs = errs;
+        /* NOT named `errs`: Mitosis strips the `state.` prefix, so a local with a
+         * store member's name collapses to `const errs = …; errs = errs;` — a
+         * const reassignment that fails to compile on Svelte. */
+        const nextErrs = e || {};
+        state.errs = nextErrs;
         const t: Record<string, boolean> = {};
-        for (const k of Object.keys(errs)) t[k] = true;
+        for (const k of Object.keys(nextErrs)) t[k] = true;
         state.touched = t;
-        if (Object.keys(errs).length === 0 && props.onSubmit) {
+        if (Object.keys(nextErrs).length === 0 && props.onSubmit) {
           Promise.resolve(props.onSubmit(payload)).then(
             () => { state.submitting = false; },
             () => { state.submitting = false; },
