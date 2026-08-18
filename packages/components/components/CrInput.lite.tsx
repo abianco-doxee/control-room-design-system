@@ -17,7 +17,14 @@ import CrContext from "./cr.context.lite";
  * CrField/CrInputGroup/CrFormRow rely on is preserved. With either affordance the
  * input is wrapped in a positioned span.cr-input-wrap and padded on that edge so
  * text never runs under the glyph. Both edges use logical properties
- * (inset-inline-*), so they swap correctly under RTL. */
+ * (inset-inline-*), so they swap correctly under RTL.
+ *
+ * The clear button's onClick calls `props.onChange('')` with SINGLE quotes, and
+ * carries no inline comment. Mitosis's Vue generator emits an event handler into
+ * a double-quoted attribute and inlines any comment inside it verbatim, so ANY
+ * double quote in that body — a string literal or a word in a comment — closes
+ * the attribute early and the remainder lands as junk object keys. The SFC then
+ * fails to transform. Keep that handler free of double quotes. */
 export interface CrInputProps {
   id?: string;
   name?: string;
@@ -127,7 +134,7 @@ export default function CrInput(props: CrInputProps) {
               onClick={(event) => {
                 ptHandler(ptResolve(cr, props.pt, 'CrInput'), 'clear', 'onClick', event);
                 if (props.onClear) props.onClear();
-                if (props.onChange) props.onChange("");
+                if (props.onChange) props.onChange('');
               }}
             >
               <CrIcon name="close" size={14} pt={ptNested(ptResolve(cr, props.pt, "CrInput"), "clearGlyph")} />

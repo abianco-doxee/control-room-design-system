@@ -73,6 +73,21 @@ async function compileVue(name) {
  *  rendered here, because that would mean staging a parent directory too. Affects
  *  CrIcon and anything nesting it (CrInput) — pre-existing, and a harness gap
  *  rather than a product one: those components build and ship correctly. */
+/** Point a `../lib/…` specifier at the target's real compiled lib file.
+ *
+ *  The temp module sits in packages/components/, one level ABOVE components/, so
+ *  a relative `../lib/…` would resolve outside the package and fail. Rewriting it
+ *  to an absolute file URL is what makes CrIcon (and CrInput, which nests it)
+ *  renderable — they used to be the one documented hole in this harness. */
+function absolutiseLib(code, fw) {
+  if (!fw) return code;
+  const libDir = join(ROOT, "dist", "frameworks", fw, "lib");
+  return code.replace(/(["'])\.\.\/lib\/([A-Za-z0-9/_.-]+?)\1/g, (m, _q, rel) => {
+    const file = join(libDir, rel);
+    return existsSync(file) ? JSON.stringify(pathToFileURL(file).href) : m;
+  });
+}
+
 async function stageDeps(dir, fw, code, compileOne, seen) {
   let out = code;
   for (const m of [...code.matchAll(/from\s+["']\.\/(Cr[A-Za-z0-9]+)(?:\.[a-z]+)?["']/g)]) {
@@ -89,6 +104,8 @@ async function stageDeps(dir, fw, code, compileOne, seen) {
     let rewritten = await stageDeps(dir, fw, compiled, compileOne, seen);
     // a dependency in the cascade imports the context as a sibling too
     rewritten = rewritten.replace(/(["'])\.\/cr\.context\1/g, '"./cr.context.mjs"');
+    // …and may reach into ../lib/ (CrInput nests CrIcon, which pulls the icon pack)
+    rewritten = absolutiseLib(rewritten, fw);
     writeFileSync(join(dir, `${dep}.mjs`), rewritten);
   }
   return out;
@@ -109,6 +126,11 @@ async function loadTemp(code, filename, fw, compileOne) {
     }
     // Nested components are imported as siblings; stage the whole tree.
     if (compileOne) code = await stageDeps(dir, fw, code, compileOne, new Set());
+    // `../lib/…` is relative to components/, but the temp dir sits one level
+    // higher (in packages/components/), so the specifier would resolve outside
+    // the package. Point it at the real file instead of staging a parent dir —
+    // that is what used to make CrIcon (and CrInput, which nests it) unrenderable.
+    code = absolutiseLib(code, fw);
     writeFileSync(p, code);
     return {
       mod: await import(pathToFileURL(p).href),
