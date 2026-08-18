@@ -66,9 +66,8 @@ function addImport(src, name, mod) {
 // here from the mount effect as the anchor.
 function fixSolid(src, comp) {
   let out = src;
-  const re = new RegExp(
-    `onMount\\(\\(\\) => \\{[\\s\\S]*?if \\(h && h\\.onMounted\\) h\\.onMounted\\(\\);[\\s\\S]*?\\}\\);`
-  );
+  const re =
+    /onMount\(\(\) => \{[\s\S]*?if \(h && h\.onMounted\) h\.onMounted\(\);[\s\S]*?\}\);/;
   const m = out.match(re);
   if (!m) return null;
   // Guard on the hook NAME rather than the receiver, so the fixer always sees its
@@ -106,9 +105,8 @@ function fixQwik(src, comp) {
   // distinct name so it cannot shadow the enclosing `h`), so a guard looking for
   // `h.onUnmounted` would never see its own work and would re-inject on every run.
   if (src.includes("onUnmounted")) return src;
-  const re = new RegExp(
-    `(useVisibleTask\\$\\(\\(\\) => \\{[\\s\\S]*?if \\(h && h\\.onMounted\\) h\\.onMounted\\(\\);)([\\s\\S]*?)(\\n\\s*\\}\\);)`
-  );
+  const re =
+    /(useVisibleTask\$\(\(\) => \{[\s\S]*?if \(h && h\.onMounted\) h\.onMounted\(\);)([\s\S]*?)(\n\s*\}\);)/;
   const m = src.match(re);
   if (!m) return null;
   const ret =
