@@ -60,10 +60,7 @@ test("relativeTime is localised, and unit selection stays ours", () => {
   // it falls back to `short`. Guards the behaviour table in duration.js.
   // NB: CLDR separates the number from the unit with U+00A0 (non-breaking space)
   // in fr — compare on the normalised string so the intent is legible.
-  assert.equal(
-    relativeTime(now - 5 * 60000, now, "fr").replace(/ /g, " "),
-    "il y a 5 min"
-  );
+  assert.equal(relativeTime(now - 5 * 60000, now, "fr").replace(/ /g, " "), "il y a 5 min");
   // The d/h/m/s ladder is ours, not Intl's: 2 days must not become "the day
   // before yesterday" style prose at the wrong granularity.
   assert.equal(relativeTime(now - 3 * 86400000, now), "3d ago");

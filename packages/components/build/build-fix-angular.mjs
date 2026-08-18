@@ -50,7 +50,9 @@ let touched = 0;
 // for CrInput→CrIcon; adding CrCheckbox to CrTable/CrDataGrid surfaced it. Add the
 // missing import for every Cr*Module the file references but does not import.
 function addMissingModuleImports(code, file) {
-  const referenced = [...new Set([...code.matchAll(/\b(Cr[A-Za-z0-9]+)Module\b/g)].map((m) => m[1]))];
+  const referenced = [
+    ...new Set([...code.matchAll(/\b(Cr[A-Za-z0-9]+)Module\b/g)].map((m) => m[1])),
+  ];
   const self = file.replace(/\.js$/, "");
   const missing = referenced.filter(
     (n) => n !== self && !new RegExp(`import\\s*\\{[^}]*\\b${n}Module\\b`).test(code)
