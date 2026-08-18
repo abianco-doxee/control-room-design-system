@@ -74,17 +74,17 @@ export default function CrTabs(props: CrTabsProps) {
       const focused: any = document.activeElement;
       const list = focused ? focused.closest('[role="tablist"]') : null;
       if (!list) return;
-      const tabs = Array.from(list.querySelectorAll('[role="tab"]'));
-      const i = tabs.indexOf(focused);
+      const nodes = Array.from(list.querySelectorAll('[role="tab"]'));
+      const i = nodes.indexOf(focused);
       let next = -1;
-      if (e.key === "ArrowRight" || e.key === "ArrowDown") next = (i + 1) % tabs.length;
-      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = (i - 1 + tabs.length) % tabs.length;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") next = (i + 1) % nodes.length;
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = (i - 1 + nodes.length) % nodes.length;
       else if (e.key === "Home") next = 0;
-      else if (e.key === "End") next = tabs.length - 1;
+      else if (e.key === "End") next = nodes.length - 1;
       if (next >= 0) {
         e.preventDefault();
         state.select(next);
-        (tabs[next] as HTMLElement).focus();
+        (nodes[next] as HTMLElement).focus();
       }
     },
   });
