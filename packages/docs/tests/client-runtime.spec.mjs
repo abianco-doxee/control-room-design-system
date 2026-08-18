@@ -15,31 +15,28 @@
 // alone is ~3MB with the JIT compiler) cost far more than the SSR gates. It runs
 // on the `Client runtime` workflow — manual dispatch, plus a weekly schedule.
 import { expect, test } from "@playwright/test";
+import { bundleAngular } from "../../angular-aot/build/bundle-aot.mjs";
 import { bundleClient } from "../../components/build/bundle-client.mjs";
 
-// Angular is absent from THIS suite — it has its own gate, test:aot.
+// Angular gets here through AOT, not the shared bundler.
 //
-// Running it in a browser means JIT, and JIT needs constructor metadata that
-// nothing in this toolchain produces: esbuild does not implement
-// emitDecoratorMetadata (documented, verified — it emits no design:paramtypes),
-// and TypeScript 7 removed the transpileModule API that could generate it.
-// Supplying Angular's own `static ctorParameters` fallback gets past NG0202 —
-// DI then resolves both CrContext and Renderer2 — but bootstrap moves on to
-// NG0203 on the injectable context, and each layer peeled back reveals the next.
-// So Angular is covered the way it is actually consumed instead: packages/angular-aot
-// compiles all 81 through the real ngc, which type-checks each component class
-// AND its template. That found six defects the instantiate gate could not see.
-// What remains uncovered for Angular alone is live DOM interaction — a real click
-// on a real element — which needs a browser it cannot be bootstrapped into here.
+// A browser mount normally means JIT, and JIT kept failing with NG0203: the
+// injector could not construct a generated component even though every piece of
+// metadata was present and the same context injected fine into a hand-written
+// one. AOT sidesteps the question — ngc bakes the factory into a `ɵcmp`
+// definition, so nothing reflects over a constructor at runtime — and it is what
+// `ng build` does anyway, so this exercises the path consumers actually take.
 //
-// The three defects found while attempting this DO ship (see
-// build-fix-angular.mjs): standalone:false, the typed Renderer2 parameter, and
-// the missing CrContext import each broke all 81 components for any consumer on
-// Angular >= 19.
-const TARGETS = ["react", "vue", "svelte", "solid", "qwik"];
+// Two things that path needs and JIT did not: a standalone host (BrowserModule
+// drags in Angular internals that are still JIT-compiled), and the Angular build
+// LINKER over @angular/* — the published packages are partially compiled, and
+// without linking the browser reports "_PlatformLocation needs to be compiled
+// using the JIT compiler".
+const TARGETS = ["react", "vue", "svelte", "solid", "qwik", "angular"];
 
 /** A blank page with the bundle inlined, so nothing depends on a dev server. */
 async function mount(page, target, component, props = {}) {
+  if (target === "angular") return mountAngular(page, component, props);
   const code = await bundleClient(target, component);
   await page.setContent('<!doctype html><html><body><div id="app"></div></body></html>');
   if (target === "qwik") {
@@ -73,6 +70,30 @@ async function mount(page, target, component, props = {}) {
   );
   // Qwik and Angular bootstrap asynchronously.
   await page.waitForFunction(() => document.querySelector("#app *") !== null, null, {
+    timeout: 15000,
+  });
+}
+
+/** Angular's mount: the host template is generated at BUILD time (AOT needs real
+ *  source to compile), so inputs/outputs are passed to the bundler rather than
+ *  applied afterwards. */
+async function mountAngular(page, component, props) {
+  const inputs = Object.keys(props).filter((k) => typeof props[k] !== "function");
+  const outputs = ["onChange", "onClick", "onSelect"];
+  const code = await bundleAngular(component, inputs, outputs);
+  await page.setContent(
+    '<!doctype html><html><body><div id="app"><app-root></app-root></div></body></html>'
+  );
+  await page.evaluate(
+    ([p]) => {
+      window.__props = p;
+      window.__calls = [];
+    },
+    [props]
+  );
+  await page.addScriptTag({ content: code });
+  await page.evaluate(() => window.__bootstrap());
+  await page.waitForFunction(() => document.querySelector("#app app-root *") !== null, null, {
     timeout: 15000,
   });
 }

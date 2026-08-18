@@ -44,7 +44,7 @@ jobs:
         run: |
           pnpm exec playwright install chromium ||
             pnpm exec playwright install --with-deps chromium
-      - name: Client runtime gate (react/vue/svelte/solid/qwik in a browser)
+      - name: Client runtime gate (all six targets in a browser)
         run: pnpm run test:client
       # Angular's equivalent. It cannot be driven in a browser here (JIT needs
       # design:paramtypes metadata this toolchain cannot emit), but AOT is how
