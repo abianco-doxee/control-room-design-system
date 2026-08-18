@@ -158,7 +158,7 @@
   },
   "devDependencies": {
     "@angular/common": "^21.2.19",
-    "@angular/compiler": "^21.2.20",
+    "@angular/compiler": "^22.1.2",
     "@angular/core": "^21.2.19",
     "@angular/platform-browser": "^21.2.19",
     "@angular/platform-server": "^21.2.19",
