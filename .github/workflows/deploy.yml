@@ -63,10 +63,17 @@ jobs:
       - name: Tooling gate (MCP server tools + skill installer)
         run: pnpm run test:tooling
       - name: Install Playwright Chromium
-        # Its own cap: this is the one step that reaches the network via apt, so
-        # it should fail on its own rather than consume the whole job's budget.
+        # `--with-deps` shells out to `apt-get update`, which has now stalled twice
+        # on the runner's mirror list (26 min once, then 10 min until this step's
+        # timeout killed it) — an upstream flake, nothing to do with this repo.
+        # ubuntu-latest already ships the browser libraries Playwright needs, so
+        # the browser download alone is enough and skips apt entirely. Fall back to
+        # --with-deps only if that bare install fails, and cap the whole thing so a
+        # stall cannot eat the job's budget.
         timeout-minutes: 10
-        run: pnpm exec playwright install --with-deps chromium
+        run: |
+          pnpm exec playwright install chromium ||
+            pnpm exec playwright install --with-deps chromium
       - name: Accessibility gate (axe, all four themes)
         run: pnpm run test:a11y
       - name: Live islands gate (real components mount + stay interactive)
