@@ -15,6 +15,9 @@ dist/.sd/
 **/dist/pkg/
 # Temp modules from the cross-framework render harness (build/render-fw.mjs)
 .fwtmp-*/
+# Angular AOT staging: normally removed in a finally, but a crashed run leaves it.
+.aot-work/
+.aot-bundle-*/
 
 # Astro / Starlight build output & cache (site output goes to site-dist/)
 # (lives under packages/docs since the workspace split)
