@@ -1,0 +1,48 @@
+name: Client runtime
+
+# The client half of the runtime proof: every target compiled by its own real
+# toolchain, mounted in a browser, then clicked. The SSR gates in Build & Deploy
+# prove a component produces the right markup once; this proves the handler fires
+# and internal state re-renders the DOM.
+#
+# NOT on every push, deliberately. Each target needs its own browser bundle
+# (React ~600KB, Angular's JIT bundle ~3MB), which costs far more than the Node
+# SSR gates that already run on every commit. Manual dispatch for when component
+# logic changes, plus a weekly run so a silent break surfaces on its own.
+on:
+  workflow_dispatch:
+  schedule:
+    # Mondays 06:00 UTC — before the week's work, after the weekend's dependabot.
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: client-runtime-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  client-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # The bundler reads dist/frameworks/**, so the components have to exist.
+      - name: Compile the framework components
+        run: pnpm run build:components
+      - name: Install Playwright Chromium
+        # Bare install, no --with-deps: apt has stalled twice on these runners and
+        # ubuntu-latest already ships the browser libraries. See deploy.yml.
+        timeout-minutes: 10
+        run: |
+          pnpm exec playwright install chromium ||
+            pnpm exec playwright install --with-deps chromium
+      - name: Client runtime gate (react/vue/svelte/solid/qwik in a browser)
+        run: pnpm run test:client
