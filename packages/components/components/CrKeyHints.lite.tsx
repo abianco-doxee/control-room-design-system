@@ -115,9 +115,14 @@ export default function CrKeyHints(props: CrKeyHintsProps) {
   onUnMount(() => {
     const h = ptHooks(ptResolve(cr, props.pt, "CrKeyHints"));
     if (h && h.onUnmounted) h.onUnmounted();
-    window.removeEventListener("keydown", state.onDown);
-    window.removeEventListener("keyup", state.onUp);
-    window.removeEventListener("blur", state.hide);
+    /* Guarded because Svelte runs onDestroy during SSR (unlike onMount, which it
+     * skips), so this block executes on the server and `window` is not defined
+     * there. The mount side needs no guard for the same reason. */
+    if (typeof window !== "undefined") {
+      window.removeEventListener("keydown", state.onDown);
+      window.removeEventListener("keyup", state.onUp);
+      window.removeEventListener("blur", state.hide);
+    }
   });
 
   return (

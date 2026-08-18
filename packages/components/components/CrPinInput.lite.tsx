@@ -51,7 +51,10 @@ export default function CrPinInput(props: CrPinInputProps) {
   const rootRef = useRef(null);
 
   const state = useStore({
-    slots(): number[] {
+    /* NOT named `slots`: Svelte reserves `$$slots`, and Mitosis rewrites a store
+     * member called `slots` into `$$slots.s()` — which is not a function, so the
+     * component throws on render. */
+    cells(): number[] {
       const n = props.length || 6;
       const out: number[] = [];
       for (let i = 0; i < n; i++) out.push(i);
@@ -103,7 +106,7 @@ export default function CrPinInput(props: CrPinInputProps) {
 
   return (
     <div {...ptAttrs(ptResolve(cr, props.pt, "CrPinInput"), "root")} data-part="root" class={ptClass(ptResolve(cr, props.pt, "CrPinInput"), props.unstyled, "cr-pin", "root")} style={ptStyle(ptResolve(cr, props.pt, "CrPinInput"), props.dt, "root")} role="group" aria-label={props.label || "Verification code"} ref={rootRef} onPaste={(event) => state.onPaste(event)}>
-      <For each={state.slots()}>
+      <For each={state.cells()}>
         {(i: number) => (
           <input
             {...ptAttrs(ptResolve(cr, props.pt, "CrPinInput"), "cell")}
