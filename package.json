@@ -169,7 +169,7 @@
     "@builder.io/mitosis": "^0.14.0",
     "@builder.io/mitosis-cli": "^0.14.0",
     "@builder.io/qwik": "^1.20.0",
-    "@changesets/cli": "^2.31.1",
+    "@changesets/cli": "^3.0.0",
     "@fontsource/saira-condensed": "^5.3.0",
     "@iconify-json/pixelarticons": "^1.2.7",
     "@playwright/test": "^1.62.1",
