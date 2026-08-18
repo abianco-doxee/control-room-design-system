@@ -101,6 +101,8 @@ export function resolveLocale(localLocale: any, globalLocale: any): string {
  *  every page, no number, no error. Such an override is ignored in favour of the
  *  built-in, and reported once via console.error so it is fixable. */
 function own(obj: any, key: string): any {
+  // Object.hasOwn is ES2022; this file ships at ES2020 (see build/tsconfig.*.json).
+  // biome-ignore lint/suspicious/noPrototypeBuiltins: ES2020 target, see above.
   return obj && Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : undefined;
 }
 

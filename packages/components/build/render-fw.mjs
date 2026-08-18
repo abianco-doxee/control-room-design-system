@@ -25,20 +25,22 @@ function stageContext(dir, fw) {
     if (!existsSync(from)) continue;
     let code = readFileSync(from, "utf8");
     // The TS variants only carry type annotations we can drop for a runtime import.
-    if (ext === "ts") code = code.replace(/<any>/g, "").replace(/:\s*[A-Za-z<>\[\]{}, |]+(?=\s*=)/g, "");
+    if (ext === "ts")
+      code = code.replace(/<any>/g, "").replace(/:\s*[A-Za-z<>[\]{}, |]+(?=\s*=)/g, "");
     writeFileSync(join(dir, "cr.context.mjs"), code);
     return true;
   }
   return false;
 }
 
-
 /* One compile step per target, shared by the entry component and every nested
  * dependency staged beside it. */
 async function compileSvelte(name) {
   const { compile } = await import("svelte/compiler");
   return compile(src("svelte", name, "svelte"), {
-    generate: "ssr", css: "injected", filename: `${name}.svelte`,
+    generate: "ssr",
+    css: "injected",
+    filename: `${name}.svelte`,
   }).js.code;
 }
 async function compileSolid(name) {
