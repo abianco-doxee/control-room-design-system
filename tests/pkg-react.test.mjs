@@ -44,6 +44,32 @@ test("the package exposes every component as a named export", () => {
 // that let CrCalendar throw on every Solid render and CrLineChart on every Svelte
 // render while the suite stayed green. React is the one target consumers get
 // pre-compiled, so "it imports" is not enough: it has to produce markup.
+// React warns (it does not throw) when a list child has no `key`, so a missing
+// key is invisible to a plain render assertion — the 26 components that shipped
+// without one rendered "fine" for exactly that reason. Capture console.error and
+// fail on the warning, so build-fix-keys.mjs staying wired is enforced.
+test("no component renders a list without keys", () => {
+  const names = Object.keys(CR).filter((k) => k !== "CrContext");
+  const warnings = [];
+  const original = console.error;
+  console.error = (...args) => {
+    const msg = String(args[0] ?? "");
+    if (/unique "key" prop/.test(msg)) warnings.push(String(args[2] ?? msg));
+  };
+  try {
+    for (const name of names) {
+      try {
+        renderToStaticMarkup(createElement(CR[name], propsFor(name)));
+      } catch {
+        /* render failures are the other test's business */
+      }
+    }
+  } finally {
+    console.error = original;
+  }
+  assert.deepEqual(warnings, [], `components rendering keyless lists:\n  ${warnings.join("\n  ")}`);
+});
+
 test("every component in the package SSR-renders", () => {
   const names = Object.keys(CR)
     .filter((k) => k !== "CrContext") // the context export, not a component

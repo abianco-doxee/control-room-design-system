@@ -14,7 +14,7 @@
 // `resolves the ./qwik subpath` test guards that; keep it.
 
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
@@ -43,6 +43,33 @@ test("every component loads as a callable Qwik component", () => {
   assert.ok(names.length >= 60, `expected ~81 components, got ${names.length}`);
   const bad = names.filter((n) => typeof CR[n] !== "function");
   assert.deepEqual(bad, [], `not callable: ${bad.join(", ")}`);
+});
+
+// Qwik's useContext THROWS when no provider is above the component
+// ("Code(13): not found state for context") — every other target yields undefined
+// and lets the pt/locale cascade fall back to its defaults. CrContext is opt-in,
+// so a bare `useContext(CrContext)` made EVERY Qwik component unrenderable in an
+// app that never provides it, which is every app that does not use the global
+// tier — including this repo's own examples/console. build-fix-qwik.mjs passes a
+// `null` default; this guards that it stays passed.
+//
+// NOT `undefined`: qwik's implementation guards with `if (defaultValue !== undefined)`
+// and falls through to the throw, so undefined behaves exactly like no default.
+test("every context read passes a default, so a provider-less app can render", () => {
+  const dir = join(ROOT, "packages", "components", "dist", "frameworks", "qwik", "components");
+  const bare = [];
+  for (const f of readdirSync(dir).filter((n) => n.endsWith(".tsx"))) {
+    const src = readFileSync(join(dir, f), "utf8");
+    for (const m of src.matchAll(/useContext\(CrContext([^)]*)\)/g)) {
+      const arg = m[1].trim();
+      if (arg === "" || /^,\s*undefined$/.test(arg)) bare.push(`${f}: useContext(CrContext${arg})`);
+    }
+  }
+  assert.deepEqual(
+    bare,
+    [],
+    `context reads that throw without a provider:\n  ${bare.join("\n  ")}`
+  );
 });
 
 test("exports load as callable Qwik components", () => {
