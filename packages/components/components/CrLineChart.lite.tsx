@@ -473,7 +473,11 @@ export default function CrLineChart(props: CrLineChartProps) {
           area += " L " + pts[pts.length - 1].x.toFixed(2) + "," + (m.T + m.plotH).toFixed(2) + " Z";
         }
         const end = pts.length ? pts[pts.length - 1] : { x: m.L, y: m.T };
-        return { name: s.name, color: state.hue(s.signal, si), line, area, ex: end.x, ey: end.y, si, hidden: state.isHidden(si) };
+        /* key NOT named `hidden`: it collides with the store member of the same
+         * name, and Mitosis's Vue generator rewrites store reads to `.value` —
+         * the property key becomes `hidden.value:`, a syntax error. Same trap as
+         * CrCombobox's `query`; see the note there. */
+        return { name: s.name, color: state.hue(s.signal, si), line, area, ex: end.x, ey: end.y, si, off: state.isHidden(si) };
       });
       const yticks = m.ticks.map((v: number) => ({ y: yAt(v), label: state.fmtTick(v) + (props.unit || "") }));
       const ticks = m.broken
@@ -598,7 +602,7 @@ export default function CrLineChart(props: CrLineChartProps) {
         </For>
         <For each={state.geo().lines}>
           {(s: { name: string; color: string; line: string; area: string; ex: number; ey: number; si: number; hidden: boolean }) => (
-            <g style={{ display: s.hidden ? "none" : "inline" }}>
+            <g style={{ display: s.off ? "none" : "inline" }}>
               <Show when={props.area}>
                 <path class="cr-linechart__area" d={s.area} style={{ fill: s.color }} />
               </Show>
@@ -637,8 +641,8 @@ export default function CrLineChart(props: CrLineChartProps) {
             {(s: { name: string; color: string; si: number; hidden: boolean }) => (
               <button
                 type="button"
-                class={"cr-chart__key" + (s.hidden ? " cr-chart__key--off" : "")}
-                aria-pressed={s.hidden ? "false" : "true"}
+                class={"cr-chart__key" + (s.off ? " cr-chart__key--off" : "")}
+                aria-pressed={s.off ? "false" : "true"}
                 onClick={() => state.toggle(s.si)}
               >
                 <span class="cr-chart__sw" style={{ background: s.color }} aria-hidden="true"></span>

@@ -70,10 +70,14 @@ export default function CrCombobox(props: CrComboboxProps) {
       if (!q) return opts;
       return opts.filter((o: CrComboOption) => o.label.toLowerCase().includes(q));
     },
-    load(query: string) {
+    /* param NOT named `query`: it collides with the store member of the same
+     * name, and Mitosis's Vue generator rewrites store reads to `.value` — the
+     * parameter becomes `function load(query.value)`, which is a syntax error.
+     * Same trap as CrForm's `errs`; see the note there. */
+    load(q: string) {
       if (!props.source) return;
       state.loading = true;
-      Promise.resolve(props.source(query)).then(
+      Promise.resolve(props.source(q)).then(
         (res: any) => {
           state.loaded = res || [];
           state.loading = false;
