@@ -46,7 +46,7 @@ jobs:
         run: pnpm run verify:types
       - name: Package consumability gate (react/qwik/vue named exports build + import)
         run: pnpm run test:pkg
-      - name: Cross-framework runtime gate (Vue/Svelte/Solid SSR-render the output)
+      - name: Cross-framework runtime gate (all 81 components on every target)
         run: pnpm run test:frameworks
       - name: Styling-contract gate (pt/dt/unstyled coverage + finer tokens + util ports incl. position + responsive tokens)
         run: pnpm run test:contract
@@ -100,23 +100,31 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: examples/console/package-lock.json
+      # The example consumes the library through its published subpaths
+      # (@alebianco/cr-tokens/css, @alebianco/cr-components/qwik, …) via file:
+      # links, so those packages must be BUILT before npm can resolve them.
+      - name: Build the packages the example consumes
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build:tokens
+          pnpm run build:styles
+          pnpm run build:components
       # `npm ci` (not `npm install`) so a lockfile that drifted from package.json
-      # is an error too, not something quietly reconciled.
+      # is an error too, not something quietly reconciled. This is also the check
+      # that catches an unsatisfiable peer range — a dependabot PR once proposed
+      # vite@8 here while qwik pinned `>=5 <8`, and nothing caught it because
+      # no job installed this app.
       - name: Install the example app (peer + lockfile check)
         working-directory: examples/console
         run: npm ci
-      # NOTE: `npm run build` is deliberately NOT run yet. The example still
-      # imports the pre-monorepo paths (../../../dist/control-room.css,
-      # ../../../../dist/frameworks/qwik, ../../../../lib/forms/index.js), none of
-      # which the packages/* layout emits, so it cannot build today — a separate
-      # problem from the one this job exists to catch. Add the build step once
-      # those imports are repointed; the install check above is what guards the
-      # dependency graph.
+      # Building it is what exercises those exports maps as a real consumer does.
+      - name: Build the example app
+        working-directory: examples/console
+        run: npm run build
 
   # Deploy to GitHub Pages only from main.
   deploy:
