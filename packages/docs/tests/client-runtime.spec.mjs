@@ -14,9 +14,14 @@
 // Deliberately NOT part of `test:*` on every push: six browser bundles (Angular
 // alone is ~3MB with the JIT compiler) cost far more than the SSR gates. It runs
 // on the `Client runtime` workflow — manual dispatch, plus a weekly schedule.
+
+import { readdirSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { expect, test } from "@playwright/test";
-import { bundleAngular } from "../../angular-aot/build/bundle-aot.mjs";
-import { bundleClient } from "../../components/build/bundle-client.mjs";
+import { propsFor } from "../../../tests/fixtures/component-props.mjs";
+import { bundleAngular, bundleAngularAll } from "../../angular-aot/build/bundle-aot.mjs";
+import { bundleClient, bundleClientAll } from "../../components/build/bundle-client.mjs";
 
 // Angular gets here through AOT, not the shared bundler.
 //
@@ -74,16 +79,12 @@ async function mount(page, target, component, props = {}) {
   });
 }
 
-/** Angular's mount: the host template is generated at BUILD time (AOT needs real
- *  source to compile), so inputs/outputs are passed to the bundler rather than
- *  applied afterwards. */
+/** Angular's mount. The host template is generated at BUILD time (AOT needs real
+ *  source to compile), so it goes through the same registry bundle as the breadth
+ *  test rather than building a one-off — one ngc run instead of two. */
 async function mountAngular(page, component, props) {
-  const inputs = Object.keys(props).filter((k) => typeof props[k] !== "function");
-  const outputs = ["onChange", "onClick", "onSelect"];
-  const code = await bundleAngular(component, inputs, outputs);
-  await page.setContent(
-    '<!doctype html><html><body><div id="app"><app-root></app-root></div></body></html>'
-  );
+  const code = await registryFor("angular");
+  await page.setContent('<!doctype html><html><body><div id="app"></div></body></html>');
   await page.evaluate(
     ([p]) => {
       window.__props = p;
@@ -92,13 +93,143 @@ async function mountAngular(page, component, props) {
     [props]
   );
   await page.addScriptTag({ content: code });
-  await page.evaluate(() => window.__bootstrap());
-  await page.waitForFunction(() => document.querySelector("#app app-root *") !== null, null, {
+  await page.evaluate(
+    ([name, p]) => window.__mountByName(name, document.getElementById("app"), p),
+    [component, props]
+  );
+  await page.waitForFunction(() => document.querySelector("#app *") !== null, null, {
     timeout: 15000,
   });
 }
 
+/** Every compiled component, from the svelte output (all targets emit the same set). */
+const ALL = readdirSync(
+  join(
+    dirname(fileURLToPath(import.meta.url)),
+    "..",
+    "..",
+    "components",
+    "dist",
+    "frameworks",
+    "svelte",
+    "components"
+  )
+)
+  .filter((f) => f.endsWith(".svelte"))
+  .map((f) => f.replace(/\.svelte$/, ""))
+  .sort();
+
+/* One bundle per target carrying EVERY component, built once and reused by the
+ * breadth test below. Per-component bundles would mean 81 builds per target —
+ * tolerable for esbuild at ~70ms, but Angular's ngc costs ~3s per invocation, so
+ * that alone would be four and a half minutes. Bundled together it is ~2s. */
+function assert(failed, errors, target) {
+  const problems = [...failed, ...errors.map((e) => `pageerror: ${e}`)];
+  if (problems.length) {
+    throw new Error(
+      `${target}: ${problems.length} component(s) failed to mount:\n  ${problems.join("\n  ")}`
+    );
+  }
+}
+
+/* Angular binds @Inputs/@Outputs in the host TEMPLATE, generated at build time,
+ * and binding a name the component does not declare is a compile error (NG8002).
+ * So the bindings are read from each component's own @Input/@Output list rather
+ * than guessed — that also means the deep tests' extra props (CrButton's
+ * `emphasis`, CrSwitch's `checked`) bind wherever they genuinely exist. */
+const NG_DIR = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "..",
+  "..",
+  "components",
+  "dist",
+  "frameworks",
+  "angular",
+  "components"
+);
+function angularBindings(name) {
+  const src = readFileSync(join(NG_DIR, `${name}.js`), "utf8");
+  const inputs = [...src.matchAll(/@Input\(\)\s*(\w+)/g)].map((m) => m[1]);
+  const outputs = [...src.matchAll(/@Output\(\)\s*(\w+)/g)].map((m) => m[1]);
+  return { inputs: [...new Set(inputs)], outputs: [...new Set(outputs)] };
+}
+
+const registryCache = new Map();
+async function registryFor(target) {
+  if (registryCache.has(target)) return registryCache.get(target);
+  const code =
+    target === "angular"
+      ? await bundleAngularAll(
+          ALL.map((name) => ({
+            name,
+            // Angular binds @Inputs and @Outputs in the host TEMPLATE, which is
+            // generated at build time — so both have to be declared here rather
+            // than passed to a mount call. Inputs come from the fixture; the
+            // deep tests below also pass props the fixture does not carry
+            // (CrButton's `emphasis`, CrSwitch's `checked`), so those are unioned
+            // in, and the handler names are bound for every component.
+            ...angularBindings(name),
+          }))
+        )
+      : await bundleClientAll(target, ALL);
+  registryCache.set(target, code);
+  return code;
+}
+
 for (const target of TARGETS) {
+  // Breadth: every component must MOUNT in a browser and put something in the
+  // DOM. The three tests below go deep on a handful; this one is the floor —
+  // a component that throws on mount is broken for that target, full stop.
+  test(`${target}: every component mounts in a browser`, async ({ page }) => {
+    test.setTimeout(120000);
+    const code = await registryFor(target);
+    const errors = [];
+    page.on("pageerror", (e) => errors.push(String(e.message).split("\n")[0]));
+
+    await page.setContent('<!doctype html><html><body><div id="app"></div></body></html>');
+    if (target === "qwik") {
+      const { readFileSync } = await import("node:fs");
+      const { createRequire } = await import("node:module");
+      const req = createRequire(import.meta.url);
+      await page.addScriptTag({
+        content: readFileSync(req.resolve("@builder.io/qwik/qwikloader.js"), "utf8"),
+      });
+    }
+    await page.addScriptTag({ content: code });
+
+    const failed = await page.evaluate(
+      async ([names, propsByName]) => {
+        const out = [];
+        for (const name of names) {
+          const host = document.createElement("div");
+          document.getElementById("app").appendChild(host);
+          try {
+            await window.__mountByName(name, host, propsByName[name] || {});
+            // A component may legitimately render nothing (an empty list, a
+            // closed overlay) — the assertion is that mounting did not throw.
+          } catch (e) {
+            out.push(`${name}: ${String(e.message).split("\n")[0].slice(0, 90)}`);
+          }
+        }
+        return out;
+      },
+      [ALL, Object.fromEntries(ALL.map((n) => [n, propsFor(n)]))]
+    );
+
+    assert(failed, errors, target);
+    // Guard the guard: a registry that mounted nothing would also report zero
+    // failures, so require that the page actually gained elements.
+    const rendered = await page.evaluate(
+      () =>
+        Array.from(document.querySelectorAll("#app > div")).filter((d) => d.children.length > 0)
+          .length
+    );
+    // EVERY component renders content on every target today, so the bar is the
+    // full set rather than a loose floor: a component that silently stops
+    // rendering is exactly the regression this is here to catch.
+    expect(rendered, `${target}: mounted but rendered nothing`).toBe(ALL.length);
+  });
+
   test.describe(`${target} client runtime`, () => {
     test("renders a component into the DOM", async ({ page }) => {
       await mount(page, target, "CrButton", { signal: "accent", emphasis: "outline" });

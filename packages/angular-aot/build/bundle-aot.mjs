@@ -41,8 +41,29 @@ const selectorOf = (name) =>
  * @param inputs  prop names to bind as @Inputs
  * @param outputs prop names to wire as @Outputs (recorded into window.__calls)
  */
+/** Build ONE bundle hosting MANY components, exposing
+ *  `window.__mountByName(name, el, props)`.
+ *
+ *  Angular's host template is generated at build time, so unlike the other
+ *  targets a registry needs one host component per entry — but they all compile
+ *  in a single ngc run, which is what matters: ngc costs ~3s per invocation, so
+ *  81 separate builds would be four and a half minutes. */
+export async function bundleAngularAll(entries) {
+  return buildAngular(entries, "registry");
+}
+
 export async function bundleAngular(name, inputs = [], outputs = []) {
-  const work = join(HERE, `.aot-bundle-${name}`);
+  return buildAngular([{ name, inputs, outputs }], name);
+}
+
+async function buildAngular(entries, tag) {
+  // Unique per build: Playwright runs specs in parallel workers, and a shared
+  // work directory means two ngc runs racing on the same files (ENOTEMPTY, then
+  // "emitted no main.js").
+  const work = join(
+    HERE,
+    `.aot-bundle-${tag}-${process.pid}-${Math.random().toString(36).slice(2, 8)}`
+  );
   rmSync(work, { recursive: true, force: true });
   mkdirSync(join(work, "src", "components"), { recursive: true });
 
@@ -76,36 +97,51 @@ export async function bundleAngular(name, inputs = [], outputs = []) {
   cpSync(join(HERE, "..", "icons", "pixel.ts"), join(work, "src", "lib", "icons", "pixel.ts"));
   stripTsExt(join(work, "src"));
 
-  const selector = selectorOf(name);
-  const bind = inputs.map((k) => `[${k}]="p.${k}"`).join(" ");
-  const on = outputs.map((k) => `(${k})="rec('${k}', $event)"`).join(" ");
+  const hosts = entries.map(({ name, inputs = [], outputs = [] }, i) => {
+    const selector = selectorOf(name);
+    const bind = inputs.map((k) => `[${k}]="p.${k}"`).join(" ");
+    const on = outputs.map((k) => `(${k})="rec('${k}', $event)"`).join(" ");
+    return {
+      name,
+      cls: `Host${i}`,
+      src: `@Component({
+  standalone: true,
+  imports: [${name}Module],
+  selector: "app-host-${i}",
+  template: \`<${selector} ${bind} ${on}></${selector}>\`,
+})
+export class Host${i} {
+  p: any = (window as any).__props || {};
+  rec(key: string, value: any) {
+    ((window as any).__calls ||= []).push([key, value]);
+  }
+}`,
+    };
+  });
 
-  // The host app. AOT needs a real component to compile, so the fixture is
+  // The host app. AOT needs real components to compile, so the fixtures are
   // generated as source rather than assembled in the browser.
   writeFileSync(
     join(work, "src", "main.ts"),
     `import { Component } from "@angular/core";
 import { bootstrapApplication } from "@angular/platform-browser";
-import Cmp, { ${name}Module } from "./components/${name}";
+${entries.map(({ name }) => `import { ${name}Module } from "./components/${name}";`).join("\n")}
 
-@Component({
-  // Standalone host: importing BrowserModule drags in Angular internals
-  // (_PlatformLocation) that are still JIT-compiled in the published package, and
-  // the bundle has no compiler. A standalone component importing only the
-  // component's own NgModule avoids that entirely.
-  standalone: true,
-  imports: [${name}Module],
-  selector: "app-root",
-  template: \`<${selector} ${bind} ${on}></${selector}>\`,
-})
-export class HostComponent {
-  p: any = (window as any).__props || {};
-  rec(key: string, value: any) {
-    ((window as any).__calls ||= []).push([key, value]);
-  }
-}
+${hosts.map((h) => h.src).join("\n\n")}
 
-(window as any).__bootstrap = () => bootstrapApplication(HostComponent);
+const REGISTRY: any = { ${hosts.map((h) => `"${h.name}": ${h.cls}`).join(", ")} };
+
+(window as any).__mountByName = (name: string, el: any, props: any) => {
+  (window as any).__props = props;
+  const tag = "app-host-" + Object.keys(REGISTRY).indexOf(name);
+  el.appendChild(document.createElement(tag));
+  return bootstrapApplication(REGISTRY[name]);
+};
+(window as any).__bootstrap = () => (window as any).__mountByName(
+  ${JSON.stringify(entries[0]?.name ?? "")},
+  document.querySelector("#app"),
+  (window as any).__props || {}
+);
 `
   );
 
@@ -151,13 +187,13 @@ export class HostComponent {
   const fatal = diagnostics.filter((d) => d.category === 1 && d.code !== 2307);
   if (fatal.length) {
     rmSync(work, { recursive: true, force: true });
-    throw new Error(`ngc failed for ${name}:\n${formatDiagnostics(fatal)}`);
+    throw new Error(`ngc failed for ${tag}:\n${formatDiagnostics(fatal)}`);
   }
 
   const entry = join(work, "out", "main.js");
   if (!existsSync(entry)) {
     rmSync(work, { recursive: true, force: true });
-    throw new Error(`ngc emitted no main.js for ${name}`);
+    throw new Error(`ngc emitted no main.js for ${tag}`);
   }
 
   // Angular's published packages are PARTIALLY compiled: they ship

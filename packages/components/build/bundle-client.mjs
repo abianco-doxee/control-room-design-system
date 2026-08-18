@@ -67,8 +67,8 @@ const COMMON = {
   define: { "process.env.NODE_ENV": '"production"' },
 };
 
-/* Each builder returns the entry source that defines window.__mount(el, props).
- * The spec calls it, then interacts with whatever it rendered. */
+/* Each builder returns the entry source for ONE component, defining
+ * window.__mount(el, props). The spec calls it, then interacts with the result. */
 const ENTRIES = {
   react: (dir, name) => `
     import { createElement } from "react";
@@ -97,39 +97,56 @@ const ENTRIES = {
     import Cmp from "${join(dir, "components", `${name}.tsx`)}";
     window.__mount = (el, props) => render(el, jsx(Cmp, props));
   `,
-  // Angular has no "render this component with these props" call — a component
-  // is instantiated by a host template that binds its @Inputs. So the host is
-  // built at mount time from the prop names, binding each through a component
-  // field, and outputs are wired by name so a click can be observed.
-  angular: (dir, name) => `
-    import "@angular/compiler";
-    import { Component } from "@angular/core";
-    import { bootstrapApplication } from "@angular/platform-browser";
-    import Cmp, { ${name}Module } from "${join(dir, "components", `${name}.js`)}";
-    window.__mount = (el, props) => {
-      const selector = (Cmp["\u0275cmp"] && Cmp["\u0275cmp"].selectors?.[0]?.[0]) ||
-        Reflect.get(Cmp, "__selector") || "${name
-          .replace(/^Cr/, "cr-")
-          .replace(/([a-z])([A-Z])/g, "$1-$2")
-          .toLowerCase()}";
-      const inputs = Object.keys(props).filter((k) => typeof props[k] !== "function");
-      const outputs = Object.keys(props).filter((k) => typeof props[k] === "function");
-      const bind = inputs.map((k) => \`[\${k}]="p.\${k}"\`).join(" ");
-      const on = outputs.map((k) => \`(\${k})="h('\${k}', $event)"\`).join(" ");
-      @Component({
-        standalone: true,
-        selector: "app-root",
-        imports: [${name}Module],
-        template: \`<\${selector} \${bind} \${on}></\${selector}>\`,
-      })
-      class Root {
-        p = props;
-        h(key, value) { props[key](value); }
-      }
-      const host = document.createElement("app-root");
-      el.appendChild(host);
-      return bootstrapApplication(Root);
-    };
+};
+
+/* The same, but for EVERY component at once: one bundle per target exposing
+ * window.__mountByName(name, el, props).
+ *
+ * Bundling per component per target is 81 x 5 builds. Cheap targets are ~70ms
+ * each, so that alone is tolerable — but the suite is meant to grow, and one
+ * bundle amortises the framework runtime (React's is ~600KB) across every
+ * component instead of paying it 81 times. */
+const EXT = { react: "tsx", solid: "jsx", vue: "vue", svelte: "svelte", qwik: "tsx" };
+
+const REGISTRY = {
+  react: (imports, map) => `
+    import { createElement } from "react";
+    import { createRoot } from "react-dom/client";
+    import { flushSync } from "react-dom";
+    ${imports}
+    const R = { ${map} };
+    // flushSync so the mount is COMMITTED before the caller continues — a
+    // breadth loop that just calls render() would finish before React does any
+    // work, and a registry that rendered nothing would look identical to one
+    // that worked.
+    window.__mountByName = (n, el, props) =>
+      flushSync(() => createRoot(el).render(createElement(R[n], props)));
+  `,
+  solid: (imports, map) => `
+    import { render } from "solid-js/web";
+    ${imports}
+    const R = { ${map} };
+    window.__mountByName = (n, el, props) => render(() => R[n](props), el);
+  `,
+  vue: (imports, map) => `
+    import { createApp, h } from "vue";
+    ${imports}
+    const R = { ${map} };
+    window.__mountByName = (n, el, props) =>
+      createApp({ render: () => h(R[n], props) }).mount(el);
+  `,
+  svelte: (imports, map) => `
+    import { mount } from "svelte";
+    ${imports}
+    const R = { ${map} };
+    window.__mountByName = (n, el, props) => mount(R[n], { target: el, props });
+  `,
+  qwik: (imports, map) => `
+    import { render } from "@builder.io/qwik";
+    import { jsx } from "@builder.io/qwik/jsx-runtime";
+    ${imports}
+    const R = { ${map} };
+    window.__mountByName = (n, el, props) => render(el, jsx(R[n], props));
   `,
 };
 
@@ -282,6 +299,29 @@ export async function bundleClient(target, name) {
       '{"compilerOptions":{"experimentalDecorators":true,"useDefineForClassFields":false}}';
     opts.loader = { ".js": "ts" };
   }
+
+  const out = await esbuild.build(opts);
+  return out.outputFiles[0].text;
+}
+
+/** Build ONE browser IIFE per target exposing `window.__mountByName(name, el, props)`
+ *  for every component. */
+export async function bundleClientAll(target, names) {
+  const dir = fw(target);
+  const build = REGISTRY[target];
+  if (!build) throw new Error(`no client registry for target ${target}`);
+
+  const imports = names
+    .map((n, i) => `import C${i} from "${join(dir, "components", `${n}.${EXT[target]}`)}";`)
+    .join("\n");
+  const map = names.map((n, i) => `"${n}": C${i}`).join(", ");
+
+  const opts = {
+    ...COMMON,
+    stdin: { contents: build(imports, map), resolveDir: WORKSPACE, loader: "ts" },
+    plugins: await pluginsFor(target),
+  };
+  if (target === "react") opts.loader = { ".ts": "tsx", ".tsx": "tsx" };
 
   const out = await esbuild.build(opts);
   return out.outputFiles[0].text;
