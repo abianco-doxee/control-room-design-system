@@ -161,7 +161,7 @@
     "@angular/compiler": "^21.2.20",
     "@angular/core": "^21.2.19",
     "@angular/platform-browser": "^21.2.19",
-    "@angular/platform-server": "^21.2.19",
+    "@angular/platform-server": "^22.1.2",
     "@astrojs/starlight": "^0.41.7",
     "@axe-core/playwright": "^4.12.1",
     "@babel/core": "^8.0.0",
