@@ -103,13 +103,31 @@ for (const target of ["react", "qwik"]) {
   });
 }
 
-// A local that shares a PROP's name is the same trap one level up: Mitosis strips
-// the `props.` prefix, so `const series = props.series || []` becomes
-// `const series = series || []` — a self-referential TDZ error that compiles fine
-// and throws the moment the component renders. It cost CrLineChart its entire
-// Svelte runtime. Scan the generated Svelte (the target where the collapse is a
-// hard error) for any local declaration reusing an `export let` name.
-test("svelte: no local shadows a prop (the props.x → x TDZ collapse)", () => {
+// ── shadow gates ─────────────────────────────────────────────────────────────
+//
+// Mitosis flattens both `props.x` and `state.x` to a bare `x` on the targets that
+// have nowhere else to put them. A local, parameter, or object key reusing one of
+// those names therefore COLLAPSES into the same identifier, and the result is
+// valid-looking code that is wrong:
+//
+//   const series = props.series || []   →  const series = series || []   (TDZ throw)
+//   mode()       + prop `mode`          →  dup identifier / self-reference
+//   param query  + store member         →  function load(query.value)    (Vue)
+//   key hidden   + store member         →  hidden.value:                 (Vue)
+//
+// Which targets are actually exposed is not a guess — it follows from how each one
+// emits props, verified against the generated output:
+//
+//   svelte   `export let x`   → prop and locals share ONE lexical scope. Exposed.
+//   angular  `@Input() x`     → prop is `this.x`; a local `let x` cannot collide.
+//   react/vue/solid/qwik      → keep `props.x` intact; nothing to collapse.
+//
+// Vue is exposed to the STORE half only (it rewrites store reads to `.value`),
+// which is what broke CrCombobox and CrLineChart. So: scan Svelte for prop
+// shadows, and scan the .lite sources for store shadows, which covers every
+// target from the one place the collision is authored.
+
+test("svelte: no local shadows a prop (the props.x → x collapse)", () => {
   const shadows = [];
   for (const n of NAMES) {
     const lines = readFileSync(join(FW, "svelte", "components", `${n}.svelte`), "utf8").split("\n");
@@ -126,4 +144,60 @@ test("svelte: no local shadows a prop (the props.x → x TDZ collapse)", () => {
     });
   }
   assert.deepEqual(shadows, [], `prop shadows:\n  ${shadows.join("\n  ")}`);
+});
+
+// The store half, checked at the SOURCE — one scan covering every target, since
+// the collision is authored once in the .lite file. Catches the CrForm `errs`,
+// CrCombobox `query` and CrLineChart `hidden` shapes: a local, a function
+// parameter, or an object key reusing a `useStore({...})` member's name.
+test("lite sources: no local, param, or key shadows a store member", () => {
+  const dir = join(ROOT, "packages", "components", "components");
+  const shadows = [];
+  for (const file of readdirSync(dir).filter((f) => f.endsWith(".lite.tsx"))) {
+    const src = readFileSync(join(dir, file), "utf8");
+    const storeAt = src.indexOf("useStore({");
+    if (storeAt === -1) continue;
+
+    // Member names are the keys at the store literal's top level of indentation.
+    const members = new Set();
+    const after = src.slice(storeAt);
+    for (const m of after.matchAll(/^ {4}([A-Za-z_][A-Za-z0-9_]*)\s*[:(]/gm)) members.add(m[1]);
+    if (!members.size) continue;
+
+    let inBlockComment = false;
+    src.split("\n").forEach((line, i) => {
+      // Strip comments properly: a `/* … */` block spans lines, and its
+      // continuation lines carry no marker of their own beyond a leading `*`.
+      let code = line;
+      if (inBlockComment) {
+        const close = code.indexOf("*/");
+        if (close === -1) return;
+        code = code.slice(close + 2);
+        inBlockComment = false;
+      }
+      const open = code.indexOf("/*");
+      if (open !== -1 && code.indexOf("*/", open) === -1) {
+        inBlockComment = true;
+        code = code.slice(0, open);
+      }
+      code = code.split("/*")[0].split("//")[0];
+      const flag = (name, kind) => {
+        if (members.has(name))
+          shadows.push(`${file}:${i + 1}: ${kind} '${name}' shadows a store member`);
+      };
+      // `const x =` / `let x =`, but not the store's own `const state = useStore`
+      for (const m of code.matchAll(/\b(?:const|let)\s+([A-Za-z_][A-Za-z0-9_]*)\s*[=:]/g)) {
+        if (m[1] !== "state") flag(m[1], "local");
+      }
+      // a method's own parameter list: `name(a: T, b: T) {`
+      const sig = /^\s{4}[A-Za-z_][A-Za-z0-9_]*\(([^)]*)\)\s*[:{]/.exec(code);
+      if (sig && sig[1].trim()) {
+        for (const p of sig[1].split(",")) {
+          const nm = /^\s*([A-Za-z_][A-Za-z0-9_]*)/.exec(p);
+          if (nm) flag(nm[1], "param");
+        }
+      }
+    });
+  }
+  assert.deepEqual(shadows, [], `store-member shadows:\n  ${shadows.join("\n  ")}`);
 });
