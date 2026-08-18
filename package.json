@@ -155,7 +155,8 @@
     "version": "changeset version",
     "release": "changeset publish",
     "verify": "pnpm run verify:tokens && pnpm run verify:theme && pnpm run verify:palette && pnpm run verify:styles && pnpm run verify:icons && pnpm run verify:catalog && pnpm run verify:llms && pnpm run verify:brand-preview && pnpm run verify:mcp && pnpm run verify:skill && pnpm run skills:check",
-    "test:client": "pnpm --filter @alebianco/cr-docs run test:client"
+    "test:client": "pnpm --filter @alebianco/cr-docs run test:client",
+    "test:aot": "pnpm --filter @alebianco/cr-angular-aot run test:aot"
   },
   "devDependencies": {
     "@angular/common": "^22.1.2",

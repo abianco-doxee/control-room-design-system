@@ -80,6 +80,42 @@ let touched = 0;
 // is named `crContext` (lowercase) — so the import has to be aliased. Like the
 // missing Cr*Module imports above, this only shows up when Angular actually
 // resolves the constructor, which the instantiate gate never does.
+// Angular's JIT DI reads constructor parameter TYPES, which TypeScript normally
+// supplies as `design:paramtypes` under emitDecoratorMetadata. Nothing available
+// here emits it: esbuild does not implement it (documented), and TypeScript 7
+// dropped the transpileModule API that could. Without it a browser bootstrap dies
+// with NG0202 before rendering anything.
+//
+// Angular also accepts an explicit `static ctorParameters` — the same shape its
+// own compiler emits for downlevelled libraries — and that needs no metadata. The
+// annotations are already in the emitted constructor, so derive it:
+//   constructor(public cr: CrContext, private renderer: Renderer2)
+//     → static ctorParameters = () => [{ type: CrContext }, { type: Renderer2 }]
+//
+// Verified in a browser: DI resolves both the injectable context and Renderer2
+// from this alone. Inert for AOT consumers, which read the real types instead.
+function addCtorParameters(code) {
+  if (/static ctorParameters/.test(code)) return code;
+  const ctor = /constructor\(\s*([^)]*?)\s*\)\s*\{\s*\}/s.exec(code);
+  if (!ctor) return code;
+  if (!ctor[1].trim()) {
+    // No-arg constructor (the injectable context): Angular still needs to know
+    // there are no deps, or JIT cannot synthesise a factory for it.
+    return code.replace(ctor[0], ctor[0] + "\n  static ctorParameters() { return []; }\n");
+  }
+  const types = ctor[1]
+    .split(",")
+    .map((p) => /:\s*([A-Za-z_$][\w$]*)/.exec(p))
+    .map((m) => (m ? m[1] : null));
+  if (types.some((t) => !t)) return code; // an untyped param — leave it alone
+  // A static METHOD, not a field: with useDefineForClassFields:false a field
+  // initializer is evaluated at class-definition time, before Angular has an
+  // injector, and the bootstrap fails with NG0203 instead. A method body is only
+  // called when Angular asks for the metadata.
+  const meta = `\n  static ctorParameters() { return [${types.map((t) => `{ type: ${t} }`).join(", ")}]; }\n`;
+  return code.replace(ctor[0], `${ctor[0]}${meta}`);
+}
+
 function importContext(code) {
   if (!/\bCrContext\b/.test(code)) return code;
   if (/import\s+CrContext\b/.test(code)) return code;
@@ -115,10 +151,26 @@ function addMissingModuleImports(code, file) {
 for (const f of files) {
   const path = join(DIR, f);
   const src = readFileSync(path, "utf8");
+  // Track the @Component template block: a bare `cr` is CORRECT inside it
+  // (Angular resolves it against the instance) and a ReferenceError outside it.
+  // The template is the backtick literal that follows `template:`.
+  let inTemplate = false;
   const out = src
     .split("\n")
     .map((line) => {
-      if (!isSpreadLine(line)) return line;
+      const opensTemplate = /template:\s*`/.test(line);
+      if (opensTemplate) inTemplate = !/`[\s\S]*`/.test(line.split("template:")[1]);
+      else if (inTemplate && /`/.test(line)) inTemplate = false;
+      if (inTemplate || opensTemplate) return line;
+
+      // Outside the template, qualify `cr` wherever it appears in executable code
+      // — not only on the setAttributes() spread lines. The generator also copies
+      // it verbatim into the lifecycle hooks (`ptHooks(ptResolve(cr, …))`), which
+      // the narrower check missed: 71 of the 81 components shipped a bare `cr`
+      // there, and it throws the moment the hook runs. Angular's AOT compiler is
+      // what surfaced it — tsc sees an undefined identifier, while the
+      // instantiate gate never executes those hooks.
+      if (!isSpreadLine(line) && !/ptResolve\(cr[,)]/.test(line)) return line;
       let fixed = line;
       for (const [re, ch] of ENTITIES) fixed = fixed.replace(re, ch);
       // Same class of bug, second symptom. A component that reads the app-level
@@ -133,8 +185,61 @@ for (const f of files) {
       return fixed;
     })
     .join("\n");
-  const withImports = importContext(
-    typeRenderer(addStandaloneFalse(addMissingModuleImports(out, f)))
+  // A prop typed `(value) => string` is an INPUT that returns a value, not an
+  // event. Mitosis classifies anything function-shaped as an @Output, so
+  // CrLineChart's `xFormat` escape hatch became an EventEmitter: calling it is a
+  // type error, and the generator's own `.emit(...)` rewrite returns void, so the
+  // custom tick label silently rendered as undefined. Every other target treats it
+  // as a plain prop. Detected by shape — an @Output whose value is READ rather
+  // than only emitted — so a genuine event output is untouched.
+  const valueReturningInputs = (code) => {
+    let out = code;
+    for (const m of code.matchAll(/@Output\(\)\s*(\w+)\s*=\s*new EventEmitter<[^>]*>\(\)/g)) {
+      const name = m[1];
+      // Two shapes give a value-returning prop away, and neither is an event:
+      //   const xf = this.xFormat;              read into a local, then called
+      //   Promise.resolve(this.validate.emit(…) || {})   its result is USED
+      // A real event output is only ever emitted, and its result discarded.
+      const readBack = new RegExp(`const \\w+ = this\\.${name};`).test(code);
+      const resultUsed = new RegExp(`this\\.${name}\\.emit\\([^;]*\\)\\s*(\\|\\||\\?|\\.)`).test(
+        code
+      );
+      if (!readBack && !resultUsed) continue; // a real event output
+      out = out
+        .replace(m[0], `@Input() ${name}: any`)
+        .replace(new RegExp(`this\\.${name}\\.emit\\(`, "g"), `this.${name}(`);
+    }
+    return out;
+  };
+
+  // EventEmitter.emit() takes exactly ONE argument, but the generator forwards
+  // however many the source prop declared: `onSortChange: (key, dir) => void`
+  // becomes `this.onSortChange.emit(this.sortKey, this.sortDir)`, and the second
+  // argument is silently dropped — the consumer only ever sees the key. Angular's
+  // convention for multi-value events is a single payload object, so they are
+  // packed into one.
+  const packMultiArgEmit = (code) =>
+    code.replace(/this\.(\w+)\.emit\(([^;]*?)\);/g, (m, name, args) => {
+      const parts = args.split(",").map((a) => a.trim());
+      if (parts.length < 2) return m;
+      return `this.${name}.emit([${parts.join(", ")}]);`;
+    });
+
+  const optionalChanges = (code) =>
+    // `setAttributes(el, value, changes)` is called BOTH ways by the generator:
+    // with the third argument from ngOnChanges, and without it from ngAfterViewInit.
+    // Under AOT that is "An argument for 'changes' was not provided"; JS never
+    // noticed. Marking it optional matches how it is actually called.
+    code.replace(/setAttributes\(el, value, changes\) \{/, "setAttributes(el, value, changes?) {");
+
+  const withImports = packMultiArgEmit(
+    valueReturningInputs(
+      optionalChanges(
+        addCtorParameters(
+          importContext(typeRenderer(addStandaloneFalse(addMissingModuleImports(out, f))))
+        )
+      )
+    )
   );
   if (withImports !== src) {
     touched++;
