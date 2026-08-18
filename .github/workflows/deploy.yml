@@ -79,6 +79,36 @@ jobs:
         with:
           path: packages/docs/site-dist
 
+  # The example Qwik app is a real consumer of the published packages, with its
+  # own npm lockfile outside the pnpm workspace — so nothing above installs or
+  # builds it. That blind spot let a dependabot PR bump it to vite@8 while
+  # @builder.io/qwik@1.20 still declares `peer vite@">=5 <8"`: `npm ci` fails
+  # outright, and the whole build stayed green because no job ever touched it.
+  #
+  # Kept a separate job on purpose: it must not gate the library build, but it
+  # must go red when the example can no longer be installed or built.
+  example-console:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: examples/console/package-lock.json
+      # `npm ci` (not `npm install`) so a lockfile that drifted from package.json
+      # is an error too, not something quietly reconciled.
+      - name: Install the example app (peer + lockfile check)
+        working-directory: examples/console
+        run: npm ci
+      # NOTE: `npm run build` is deliberately NOT run yet. The example still
+      # imports the pre-monorepo paths (../../../dist/control-room.css,
+      # ../../../../dist/frameworks/qwik, ../../../../lib/forms/index.js), none of
+      # which the packages/* layout emits, so it cannot build today — a separate
+      # problem from the one this job exists to catch. Add the build step once
+      # those imports are repointed; the install check above is what guards the
+      # dependency graph.
+
   # Deploy to GitHub Pages only from main.
   deploy:
     if: github.ref == 'refs/heads/main'
