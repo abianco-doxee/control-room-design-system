@@ -67,7 +67,7 @@ Two gates back it up:
 | Svelte | compiled (`svelte/compiler`, ssr) → `.render()` | **all 81** | `test:frameworks` |
 | Solid | compiled (`babel-preset-solid`, ssr) → `renderToString` | **all 81** | `test:frameworks` |
 | Angular | instantiated on real `@angular/core`; `@Input` getter + `@Output` executed | **all 81** | `test:frameworks` |
-| Qwik | every export loads as a callable component; all 81 parse as Qwik TSX | load + compile | `test:pkg`, `test:frameworks` |
+| Qwik | optimizer-transformed → `renderToString`; markup + props asserted | **all 81** | `test:frameworks` |
 
 Every component is rendered with a realistic prop set from
 `tests/fixtures/component-props.mjs`, derived from each `Cr<Name>Props` interface.
@@ -75,12 +75,21 @@ Before that existed the gates rendered only the ~10 components that need no prop
 which is how CrCalendar came to throw on every Solid render, and CrLineChart on
 every Svelte render, with the suite fully green.
 
-**Qwik is the one target without a render gate.** Its `renderToString` needs a Vite
-build context (`import.meta.env`, the client manifest) that plain Node cannot
-supply, and the optimizer only transforms source — so rendering happens in the
-consumer's build, not here. What is enforced instead: every export loads and is
-callable, all 81 compile as valid Qwik TSX, and the `./qwik` subpath still resolves
-to optimizer-processable source.
+**Qwik renders through its real optimizer.** `component$` is a marker the
+OPTIMIZER lowers into `componentQrl(inlinedQrl(…))` — render the untransformed
+source and Qwik resumes an empty container with no error, which is why this gate
+looked unreachable for so long. The harness calls
+`createOptimizer().transformModulesSync` directly, so the whole Vite/rollup
+pipeline (chunk naming, client manifest, `import.meta.env`) is skipped:
+
+- `entryStrategy: "inline"` keeps every QRL in one module — no lazy chunks to
+  resolve, no manifest to build
+- `mode: "prod"` actually lowers `component$` (`"lib"` preserves it)
+- the CJS server runtime is used, because the ESM one statically imports
+  `@qwik-client-manifest`; both sides must be the SAME Qwik instance, or the
+  render silently produces an empty container
+
+`./qwik` still resolves to optimizer-processable source, guarded by its own test.
 
 `test:frameworks` (harness in `build/render-fw.mjs`) feeds each target's compiled
 output through its **own** compiler + runtime and asserts real Control Room markup /

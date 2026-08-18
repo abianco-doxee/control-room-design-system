@@ -5,10 +5,11 @@
  * This is how the "compile to six frameworks" claim gets verified at RUNTIME, not
  * just type-checked: each target's output is fed through its own compiler + server
  * renderer, so a component that renders under React but breaks under Svelte/Solid/
- * Vue can't slip through. (React is covered by react-dom/server in the pkg gate;
- * Qwik by its import gate.) Used by tests/pkg-frameworks.test.mjs.
+ * Vue can't slip through. (React is covered by react-dom/server in the pkg gate.)
+ * Used by tests/pkg-frameworks.test.mjs.
  */
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -188,7 +189,162 @@ export async function renderVue(name, props = {}) {
   }
 }
 
-export const RENDERERS = { vue: renderVue, svelte: renderSvelte, solid: renderSolid };
+/**
+ * Qwik SSR, without a Vite build.
+ *
+ * The obstacle was never the renderer — it is that `component$` is a marker the
+ * OPTIMIZER lowers into `componentQrl(inlinedQrl(...))`. Render the untransformed
+ * source and Qwik resumes an empty container: no error, no markup, which is what
+ * made this look unreachable. The optimizer is available standalone as
+ * `createOptimizer().transformModulesSync`, so the Vite/rollup pipeline (and its
+ * chunk-naming and manifest requirements) can be skipped entirely:
+ *
+ *   entryStrategy "inline"  keeps every QRL in the one module, so there are no
+ *                           lazy chunks to resolve and no manifest to supply
+ *   mode "prod"             actually lowers component$ (mode "lib" preserves it)
+ *
+ * The server runtime is loaded through `createRequire`, i.e. the CJS build: the
+ * ESM one reads `import.meta.env.BASE_URL`, which only exists under Vite, while
+ * the CJS build has that inlined at publish time. `@qwik-client-manifest` is a
+ * bare specifier Qwik's server imports; there is no manifest without a client
+ * build, so it is stubbed to `undefined`, which is the "no manifest" path.
+ */
+export async function renderQwik(name, props = {}) {
+  const { createOptimizer } = await import("@builder.io/qwik/optimizer");
+  const optimizer = await createOptimizer();
+  const srcDir = join(ROOT, "dist", "frameworks", "qwik", "components");
+
+  const transform = (file, code) => {
+    const res = optimizer.transformModulesSync({
+      srcDir,
+      input: [{ path: file, code }],
+      entryStrategy: { type: "inline" },
+      minify: "none",
+      sourceMaps: false,
+      transpileTs: true,
+      transpileJsx: true,
+      mode: "prod",
+    });
+    const fatal = res.diagnostics.filter((d) => d.category === "error");
+    if (fatal.length) throw new Error(`${file}: ${fatal[0].message}`);
+    return res.modules.find((m) => m.path.endsWith(".js")).code;
+  };
+
+  const dir = mkdtempSync(join(ROOT, ".fwtmp-"));
+  let cleanupGlobalPath = () => {};
+  try {
+    stageContext(dir, "qwik");
+    const staged = new Set();
+    const stage = (dep) => {
+      if (staged.has(dep)) return;
+      staged.add(dep);
+      let code;
+      try {
+        code = transform(`${dep}.tsx`, src("qwik", dep, "tsx"));
+      } catch {
+        return; // not a component of this target
+      }
+      for (const m of code.matchAll(/from\s+["']\.\/(Cr[A-Za-z0-9]+)(?:\.tsx)?["']/g)) stage(m[1]);
+      writeFileSync(join(dir, `${dep}.mjs`), rewrite(code));
+    };
+    const rewrite = (code) =>
+      absolutiseLib(code, "qwik")
+        .replace(/(["'])\.\/cr\.context\1/g, '"./cr.context.mjs"')
+        .replace(/from\s+(["'])\.\/(Cr[A-Za-z0-9]+)(?:\.tsx)?\1/g, 'from "./$2.mjs"');
+
+    const entry = rewrite(transform(`${name}.tsx`, src("qwik", name, "tsx")));
+    for (const m of entry.matchAll(/from\s+["']\.\/(Cr[A-Za-z0-9]+)\.mjs["']/g)) stage(m[1]);
+    const p = join(dir, `${name}.mjs`);
+    writeFileSync(p, entry);
+
+    // The component module and the server runtime MUST come from the same Qwik
+    // instance: mixing the ESM component with the CJS server loads two copies of
+    // the runtime, and the render then resumes an EMPTY container with no error —
+    // exactly the dead end that made this harness look unreachable. Both sides are
+    // ESM here; @qwik-client-manifest is stubbed so the ESM server never reaches
+    // the import.meta.env branch that only exists under Vite.
+    // Everything must run on ONE Qwik instance, and that instance has to be the
+    // CJS build: the ESM server statically imports "@qwik-client-manifest", a bare
+    // specifier with no package behind it, which Node rejects outright unless a
+    // resolver hook is installed (not something a plain `node --test` can do). The
+    // CJS server has no such import. So the component is transpiled to CJS as well
+    // and required from the same graph — mixing the two loads two runtimes, and the
+    // render then resumes an EMPTY container with no error at all, which is exactly
+    // what made this harness look unreachable.
+    const esbuild = await import("esbuild");
+    // require() cannot resolve a file:// specifier, and absolutiseLib emits those
+    // for the ../lib/ imports — convert them back to plain absolute paths.
+    const forRequire = readFileSync(p, "utf8").replace(
+      /(["'])file:\/\/([^"']+)\1/g,
+      (_m, q, path) => `${q}${decodeURIComponent(path)}${q}`
+    );
+    const cjs = (await esbuild.transform(forRequire, { loader: "js", format: "cjs" })).code;
+    const cp = join(dir, `${name}.cjs`);
+    writeFileSync(cp, cjs);
+    // qwik/server requires "@qwik-client-manifest" — the module its CLIENT build
+    // emits. There is no client build here, and the specifier is a bare scope with
+    // no package name, so it cannot be vendored into node_modules (npm rejects the
+    // name, and a fresh install would drop it anyway). Instead stand a throwaway
+    // package up inside the temp dir: require() walks node_modules upward from the
+    // requiring file, so one beside the module under test is found first, and it
+    // disappears with the rest of the temp dir.
+    const stub = join(dir, "node_modules", "@qwik-client-manifest");
+    mkdirSync(stub, { recursive: true });
+    writeFileSync(
+      join(stub, "package.json"),
+      '{"name":"qcm","version":"0.0.0","main":"index.cjs"}'
+    );
+    writeFileSync(join(stub, "index.cjs"), "module.exports = { manifest: undefined };\n");
+
+    // Resolution has to work for qwik/server.cjs, which lives in the real
+    // node_modules — an upward walk from THERE never reaches the temp dir. Rather
+    // than fight the resolver, satisfy the lookup directly: seed require.cache with
+    // a module registered under the id the resolver would have produced, so the
+    // server's require() is a cache hit and never resolves at all.
+    const { Module } = await import("node:module");
+    const stubId = join(stub, "index.cjs");
+    const stubModule = new Module(stubId, null);
+    stubModule.filename = stubId;
+    stubModule.loaded = true;
+    stubModule.exports = { manifest: undefined };
+    Module._cache[stubId] = stubModule;
+    const origResolve = Module._resolveFilename;
+    Module._resolveFilename = function (request, ...rest) {
+      if (request === "@qwik-client-manifest") return stubId;
+      return origResolve.call(this, request, ...rest);
+    };
+    cleanupGlobalPath = () => {
+      Module._resolveFilename = origResolve;
+      delete Module._cache[stubId];
+    };
+
+    const require = createRequire(cp);
+    const mod = require(cp);
+    const { renderToString } = require("@builder.io/qwik/server");
+    const { jsx } = require("@builder.io/qwik");
+    // With entryStrategy "inline" every QRL lives in this one module, but the
+    // renderer still asks a symbol mapper where each symbol came from and throws
+    // Code(31) ("QRLs can not be dynamically resolved") when nothing answers.
+    // There are no chunks to look up, so map every symbol to this module.
+    const symbolMapper = (symbolName) => [symbolName, `./${name}.cjs`];
+    const { html } = await renderToString(jsx(mod.default, props), {
+      containerTagName: "div",
+      qwikLoader: { include: "never" },
+      symbolMapper,
+    });
+    return html;
+  } finally {
+    cleanupGlobalPath();
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+export const RENDERERS = {
+  vue: renderVue,
+  svelte: renderSvelte,
+  solid: renderSolid,
+  qwik: renderQwik,
+};
 
 /**
  * Angular can't be SSR-rendered in plain Node (its distributed packages are
