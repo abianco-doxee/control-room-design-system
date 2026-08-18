@@ -59,7 +59,19 @@ for (const file of readdirSync(QWIK).filter((f) => f.endsWith(".tsx"))) {
     // barrel uses: Mitosis's Qwik target emits `from "./CrFormRow.jsx"`, but the
     // file is `.tsx` and build-pkg only rewrites .tsx/.ts → .js. Left as .jsx the
     // emitted package can't resolve the cross-component import.
-    .replace(/from (["'])(\.\/Cr[A-Za-z0-9]+)\.jsx\1/g, "from $1$2.tsx$1");
+    .replace(/from (["'])(\.\/Cr[A-Za-z0-9]+)\.jsx\1/g, "from $1$2.tsx$1")
+    // Qwik's useContext THROWS ("Code(13): not found state for context") when no
+    // provider is above the component — unlike React/Vue/Solid/Svelte/Angular,
+    // which all yield undefined and let the pt/locale cascade fall back to its
+    // defaults. Since CrContext is optional by design (an app opts in to the
+    // global tier), a bare `useContext(CrContext)` makes EVERY Qwik component
+    // unrenderable in an app that never provides it. The two-arg overload
+    // `useContext(id, null)` returns the default instead of throwing, restoring
+    // parity with the other five targets. NOT `undefined`: the implementation
+    // guards with `if (defaultValue !== undefined)` and falls through to the
+    // throw, so undefined is indistinguishable from passing no default at all.
+    // `null` is falsy, so every `cr && cr.x` read still short-circuits.
+    .replace(/useContext\((CrContext)(?:,\s*undefined)?\)/g, "useContext($1, null)");
   if (out !== src) {
     if (CHECK) {
       unpatched++;

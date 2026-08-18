@@ -98,7 +98,7 @@
     "build:tw": "pnpm --filter @alebianco/cr-styles run build:utilities",
     "build:styles": "node packages/styles/build/build-styles.mjs",
     "build:icons": "node packages/icons/build/build-icons.mjs",
-    "build:components": "node packages/components/build/compile-mitosis.mjs && node packages/components/build/build-fix-qwik.mjs && node packages/components/build/build-fix-react.mjs && node packages/components/build/build-fix-angular.mjs && node packages/components/build/build-fix-solid.mjs && node packages/components/build/build-fix-vue.mjs && node packages/components/build/build-fix-lifecycle.mjs && node packages/components/build/build-barrels.mjs && node packages/components/build/build-pkg-types.mjs",
+    "build:components": "node packages/components/build/compile-mitosis.mjs && node packages/components/build/build-fix-qwik.mjs && node packages/components/build/build-fix-react.mjs && node packages/components/build/build-fix-angular.mjs && node packages/components/build/build-fix-solid.mjs && node packages/components/build/build-fix-vue.mjs && node packages/components/build/build-fix-keys.mjs && node packages/components/build/build-fix-lifecycle.mjs && node packages/components/build/build-barrels.mjs && node packages/components/build/build-pkg-types.mjs",
     "build:components:cli": "pnpm --filter @alebianco/cr-components run build:cli",
     "build:pkg": "node packages/components/build/build-pkg.mjs",
     "build:catalog": "node build/build-catalog.mjs",
