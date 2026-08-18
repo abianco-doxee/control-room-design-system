@@ -35,6 +35,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history: the changesets action does `git checkout
+          # changeset-release/main` to update an EXISTING Version Packages PR, and
+          # the default shallow clone (depth 1) has no ref for it — the checkout
+          # fails with "pathspec did not match", then "shallow file has changed
+          # since we read it". It only shows up once that PR is already open;
+          # while the branch is created fresh each time, depth 1 is enough.
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
