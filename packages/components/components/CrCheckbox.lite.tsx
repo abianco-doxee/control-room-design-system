@@ -67,9 +67,13 @@ export default function CrCheckbox(props: CrCheckboxProps) {
       disabled={props.disabled}
       aria-label={props.label}
       aria-checked={props.indeterminate ? "mixed" : undefined}
+      /* `&&` rather than `if`: Angular templates accept EXPRESSIONS only, and
+       * Mitosis inlines this handler body straight into the template — an `if`
+       * statement fails to parse (NG5002) and breaks the component for Angular
+       * consumers. Same shape CrSwitch already uses. */
       onChange={(event) => {
         ptHandler(ptResolve(cr, props.pt, 'CrCheckbox'), 'root', 'onChange', event);
-        if (props.onChange) props.onChange((event.target as HTMLInputElement).checked);
+        props.onChange && props.onChange((event.target as HTMLInputElement).checked);
       }}
     />
   );

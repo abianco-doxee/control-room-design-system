@@ -100,7 +100,7 @@ export default function CrFormRow(props: CrFormRowProps) {
       {...ptAttrs(ptResolve(cr, props.pt, "CrFormRow"), "root")}
       class={ptClass(ptResolve(cr, props.pt, "CrFormRow"), props.unstyled, "cr-form__row cr-form__row--" + props.rowType + (props.rowType === "field" && props.error ? " cr-field--error" : ""), "root")}
       data-part="root"
-      style={{ paddingLeft: props.padLeft, ...ptStyle(ptResolve(cr, props.pt, "CrFormRow"), props.dt, "root") }}
+      style={ptStyle(ptResolve(cr, props.pt, "CrFormRow"), props.dt, "root", { paddingLeft: props.padLeft })}
     >
       {/* group header */}
       <Show when={props.rowType === "group"}>

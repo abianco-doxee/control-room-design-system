@@ -27,7 +27,7 @@ export default function CrEmptyState(props: CrEmptyStateProps) {
   });
 
   return (
-    <div {...ptAttrs(ptResolve(cr, props.pt, "CrEmptyState"), "root")} class={ptClass(ptResolve(cr, props.pt, "CrEmptyState"), props.unstyled, "cr-panel cr-panel--inset cr-empty", "root")} data-part="root" style={{ textAlign: "center", ...ptStyle(ptResolve(cr, props.pt, "CrEmptyState"), props.dt, "root") }}>
+    <div {...ptAttrs(ptResolve(cr, props.pt, "CrEmptyState"), "root")} class={ptClass(ptResolve(cr, props.pt, "CrEmptyState"), props.unstyled, "cr-panel cr-panel--inset cr-empty", "root")} data-part="root" style={ptStyle(ptResolve(cr, props.pt, "CrEmptyState"), props.dt, "root", { textAlign: "center" })}>
       <p {...ptAttrs(ptResolve(cr, props.pt, "CrEmptyState"), "message")} data-part="message" class={ptClass(ptResolve(cr, props.pt, "CrEmptyState"), props.unstyled, "cr-empty__message", "message")}>{props.message}</p>
       <Show when={props.children}>{props.children}</Show>
     </div>

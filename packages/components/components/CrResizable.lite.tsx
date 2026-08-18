@@ -51,6 +51,12 @@ export default function CrResizable(props: CrResizableProps) {
 
   const state = useStore({
     size: props.defaultSize || 50,
+    /* Angular templates cannot reach globals, so `Math.round(size)` inline is
+     * "Property 'Math' does not exist" under AOT. Rounding here keeps the
+     * template to a property read, which every target can express. */
+    sizeRounded(): number {
+      return Math.round(state.size);
+    },
     dragging: false,
     lo(): number {
       return props.min == null ? 10 : props.min;
@@ -131,7 +137,7 @@ export default function CrResizable(props: CrResizableProps) {
         tabIndex={0}
         aria-orientation={props.orientation === "vertical" ? "horizontal" : "vertical"}
         aria-label={props.label || resolveMessage(cr, props.labels, "CrResizable", "resize")}
-        aria-valuenow={Math.round(state.size)}
+        aria-valuenow={state.sizeRounded()}
         aria-valuemin={state.lo()}
         aria-valuemax={state.hi()}
         style={state.handleStyle()}

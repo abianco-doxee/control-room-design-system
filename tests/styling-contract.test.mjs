@@ -90,7 +90,12 @@ test("pt/dt/unstyled contract covers every functional component", () => {
     // global→component cascade, an inline `ptResolve(cr, props.pt, "<Name>")`.
     // (It must be inlined rather than held in a `state.` field: Mitosis mishandles
     // a `state.` receiver inside a JSX spread — see references/styling-contract.md.)
-    if (!/ptStyle\((props\.pt|ptResolve\([^)]*\)),\s*props\.dt,\s*"root"\)/.test(src))
+    // The optional 4th argument is the component's OWN inline style for the part
+    // (see lib/pt.ts). A few components pass it instead of spreading a literal
+    // alongside the call, because Mitosis cannot express `{ x, ...ptStyle(…) }`
+    // in an Angular template — it emits an unresolved useObjectWrapper() that
+    // fails to parse. Either shape satisfies the contract.
+    if (!/ptStyle\((props\.pt|ptResolve\([^)]*\)),\s*props\.dt,\s*"root"[,)]/.test(src))
       gaps.push('ptStyle(pt, dt, "root")');
     // Every ptResolve must name THIS component. The argument list used to be
     // unconstrained (`ptResolve\([^)]*\)`), so a copy-pasted `"CrChip"` inside

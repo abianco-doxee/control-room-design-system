@@ -49,7 +49,11 @@ export default function CrSlider(props: CrSliderProps) {
       value={props.value}
       disabled={props.disabled}
       aria-label={props.label || "slider"}
-      onInput={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrSlider'), 'root', 'onInput', event); props.onChange && props.onChange(Number((event.target as HTMLInputElement).value)); }}
+      /* `+value`, not `Number(value)`: Mitosis inlines this handler into the
+       * Angular template, which cannot reach globals — `Number` there is
+       * "Property 'Number' does not exist" under AOT. The unary plus is an
+       * operator, so it compiles everywhere. */
+      onInput={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrSlider'), 'root', 'onInput', event); props.onChange && props.onChange(+(event.target as HTMLInputElement).value); }}
     />
   );
 }

@@ -49,7 +49,7 @@ export default function CrScrollArea(props: CrScrollAreaProps) {
       tabIndex={0}
       role={props.label ? "group" : undefined}
       aria-label={props.label}
-      style={{ maxHeight: props.maxHeight, ...ptStyle(ptResolve(cr, props.pt, "CrScrollArea"), props.dt, "root") }}
+      style={ptStyle(ptResolve(cr, props.pt, "CrScrollArea"), props.dt, "root", { maxHeight: props.maxHeight })}
     >
       {props.children}
     </div>

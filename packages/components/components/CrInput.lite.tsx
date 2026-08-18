@@ -133,8 +133,8 @@ export default function CrInput(props: CrInputProps) {
               disabled={props.disabled}
               onClick={(event) => {
                 ptHandler(ptResolve(cr, props.pt, 'CrInput'), 'clear', 'onClick', event);
-                if (props.onClear) props.onClear();
-                if (props.onChange) props.onChange('');
+                props.onClear && props.onClear();
+                props.onChange && props.onChange('');
               }}
             >
               <CrIcon name="close" size={14} pt={ptNested(ptResolve(cr, props.pt, "CrInput"), "clearGlyph")} />
