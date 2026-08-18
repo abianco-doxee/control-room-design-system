@@ -1,7 +1,7 @@
 {
   "name": "@alebianco/cr-design-system",
   "version": "1.0.0",
-  "description": "Control Room — a neon-noir, neobrutalist design system for dense operational dashboards. Design language (the nine laws), a four-theme token layer, a component library, motion tiers, and an accessibility contract.",
+  "description": "Control Room \u2014 a neon-noir, neobrutalist design system for dense operational dashboards. Design language (the nine laws), a four-theme token layer, a component library, motion tiers, and an accessibility contract.",
   "license": "UNLICENSED",
   "repository": {
     "type": "git",
@@ -154,7 +154,8 @@
     "changeset": "changeset",
     "version": "changeset version",
     "release": "changeset publish",
-    "verify": "pnpm run verify:tokens && pnpm run verify:theme && pnpm run verify:palette && pnpm run verify:styles && pnpm run verify:icons && pnpm run verify:catalog && pnpm run verify:llms && pnpm run verify:brand-preview && pnpm run verify:mcp && pnpm run verify:skill && pnpm run skills:check"
+    "verify": "pnpm run verify:tokens && pnpm run verify:theme && pnpm run verify:palette && pnpm run verify:styles && pnpm run verify:icons && pnpm run verify:catalog && pnpm run verify:llms && pnpm run verify:brand-preview && pnpm run verify:mcp && pnpm run verify:skill && pnpm run skills:check",
+    "test:client": "pnpm --filter @alebianco/cr-docs run test:client"
   },
   "devDependencies": {
     "@angular/common": "^22.1.2",

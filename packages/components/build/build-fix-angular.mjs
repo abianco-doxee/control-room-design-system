@@ -49,6 +49,56 @@ let touched = 0;
 // CrIconModule is not defined` the moment the module is evaluated. Pre-existing
 // for CrInput→CrIcon; adding CrCheckbox to CrTable/CrDataGrid surfaced it. Add the
 // missing import for every Cr*Module the file references but does not import.
+// Mitosis emits `@Component({...})` with no `standalone` key, plus an
+// `@NgModule({ declarations: [Cmp] })`. That pairing was correct while Angular
+// defaulted standalone to FALSE. Angular 19 flipped the default to true, so the
+// module now throws at bootstrap:
+//
+//   Unexpected "CrButton" found in the "declarations" array of the
+//   "CrButtonModule" NgModule, "CrButton" is marked as standalone
+//
+// which breaks every component for consumers on Angular >= 19 — all 81 of them.
+// The generator's own shape is the NgModule one, so the component is pinned back
+// to `standalone: false` rather than the modules being rewritten.
+// The generator emits the injected renderer WITHOUT a type:
+//
+//   constructor(public cr : CrContext, private renderer) {}
+//
+// Angular's DI reads constructor parameter types to know what to inject, so a
+// bare parameter fails at bootstrap with "NG0202: This constructor is not
+// compatible with Angular Dependency Injection". Renderer2 is already imported
+// (the generator uses it for the pt handler wiring), only the annotation is
+// missing. Invisible to the instantiate gate, which `new`s the class directly and
+// never involves DI — it only shows up in a real Angular application.
+// Components on the pt/locale cascade inject the context:
+//
+//   constructor(public cr : CrContext, …)
+//
+// but the generator never imports it, so `CrContext` is an undefined identifier
+// and Angular DI fails with NG0202 at index 0 before it ever reaches the
+// renderer. The emitted module is components/cr.context.js, whose default export
+// is named `crContext` (lowercase) — so the import has to be aliased. Like the
+// missing Cr*Module imports above, this only shows up when Angular actually
+// resolves the constructor, which the instantiate gate never does.
+function importContext(code) {
+  if (!/\bCrContext\b/.test(code)) return code;
+  if (/import\s+CrContext\b/.test(code)) return code;
+  return `import CrContext from "./cr.context";\n${code}`;
+}
+
+function typeRenderer(code) {
+  return code.replace(/(\bprivate\s+renderer)(\s*\))/g, "$1: Renderer2$2");
+}
+
+function addStandaloneFalse(code) {
+  if (!/@NgModule\(/.test(code)) return code; // no module — leave it standalone
+  return code.replace(/@Component\(\{\n/g, (m) =>
+    /standalone/.test(code.slice(code.indexOf(m), code.indexOf(m) + 400))
+      ? m
+      : `${m}  standalone: false,\n`
+  );
+}
+
 function addMissingModuleImports(code, file) {
   const referenced = [
     ...new Set([...code.matchAll(/\b(Cr[A-Za-z0-9]+)Module\b/g)].map((m) => m[1])),
@@ -83,7 +133,9 @@ for (const f of files) {
       return fixed;
     })
     .join("\n");
-  const withImports = addMissingModuleImports(out, f);
+  const withImports = importContext(
+    typeRenderer(addStandaloneFalse(addMissingModuleImports(out, f)))
+  );
   if (withImports !== src) {
     touched++;
     if (!CHECK) writeFileSync(path, withImports);
