@@ -60,14 +60,27 @@ typed declarations ship.
 "Compiles to six frameworks" is only worth anything if each target actually *runs*.
 Two gates back it up:
 
-| target | verified how | gate |
-| --- | --- | --- |
-| React | SSR-rendered via `react-dom/server`; markup + props asserted | `test:pkg` |
-| Vue | compiled SFC → `@vue/server-renderer`; markup + props asserted | `test:frameworks` |
-| Svelte | compiled (`svelte/compiler`, ssr) → `.render()`; markup asserted | `test:frameworks` |
-| Solid | compiled (`babel-preset-solid`, ssr) → `renderToString`; markup asserted | `test:frameworks` |
-| Qwik | imported as a consumer; named exports load | `test:pkg` |
-| Angular | instantiated on real `@angular/core`; `@Input`-driven getter + `@Output` executed | `test:frameworks` |
+| target | verified how | coverage | gate |
+| --- | --- | --- | --- |
+| React | SSR-rendered via `react-dom/server` from the published package | **all 81** | `test:pkg` |
+| Vue | compiled SFC → `@vue/server-renderer` | **all 81** | `test:frameworks` |
+| Svelte | compiled (`svelte/compiler`, ssr) → `.render()` | **all 81** | `test:frameworks` |
+| Solid | compiled (`babel-preset-solid`, ssr) → `renderToString` | **all 81** | `test:frameworks` |
+| Angular | instantiated on real `@angular/core`; `@Input` getter + `@Output` executed | **all 81** | `test:frameworks` |
+| Qwik | every export loads as a callable component; all 81 parse as Qwik TSX | load + compile | `test:pkg`, `test:frameworks` |
+
+Every component is rendered with a realistic prop set from
+`tests/fixtures/component-props.mjs`, derived from each `Cr<Name>Props` interface.
+Before that existed the gates rendered only the ~10 components that need no props,
+which is how CrCalendar came to throw on every Solid render, and CrLineChart on
+every Svelte render, with the suite fully green.
+
+**Qwik is the one target without a render gate.** Its `renderToString` needs a Vite
+build context (`import.meta.env`, the client manifest) that plain Node cannot
+supply, and the optimizer only transforms source — so rendering happens in the
+consumer's build, not here. What is enforced instead: every export loads and is
+callable, all 81 compile as valid Qwik TSX, and the `./qwik` subpath still resolves
+to optimizer-processable source.
 
 `test:frameworks` (harness in `build/render-fw.mjs`) feeds each target's compiled
 output through its **own** compiler + runtime and asserts real Control Room markup /
@@ -76,7 +89,7 @@ breaks under Svelte/Solid/Vue/Angular can't slip through. Angular can't be
 SSR-rendered in plain Node (its distributed packages are partially-compiled and need
 the Angular build linker), so its component **logic** is executed on the real
 `@angular/core` instead — a genuine runtime check, one notch below full template
-render. **All six targets are now verified at runtime.**
+render. **All six targets are verified at runtime; five of them across every component.**
 
 ## Coverage
 
