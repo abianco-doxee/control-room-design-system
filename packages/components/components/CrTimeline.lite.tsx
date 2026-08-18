@@ -1,5 +1,7 @@
-import { useStore, For, Show } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, For, Show, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrTimelineItem {
   /** Machine time for the event (ISO or any short label; rendered verbatim). */
@@ -18,8 +20,8 @@ export interface CrTimelineProps {
    * The rail is chrome (`--cr-timeline-rail`); the node colour is the per-item
    * *signal* (Law 2), so it is not a per-component token. */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"detail" | "item" | "node" | "root" | "time" | "title">;
+  dt?: CrDesignTokens;
 }
 
 /* A vertical event timeline — an ordered list of moments on a rail, each with a
@@ -27,6 +29,21 @@ export interface CrTimelineProps {
  * (an <ol>); the node colour is the semantic signal, never decoration. Styling via
  * .cr-timeline; data-part per part. */
 export default function CrTimeline(props: CrTimelineProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrTimeline"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrTimeline"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrTimeline"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const state = useStore({
     sig(item: CrTimelineItem): string {
       return item.signal ? "cr-timeline__node--" + item.signal : "";
@@ -35,47 +52,47 @@ export default function CrTimeline(props: CrTimelineProps) {
 
   return (
     <ol
-      {...ptAttrs(props.pt, "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrTimeline"), "root")}
       data-part="root"
-      class={ptClass(props.pt, props.unstyled, "cr-timeline", "root")}
-      style={ptStyle(props.pt, props.dt, "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrTimeline"), props.unstyled, "cr-timeline", "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrTimeline"), props.dt, "root")}
       aria-label={props.label}
     >
       <For each={props.items}>
         {(item: CrTimelineItem) => (
           <li
-            {...ptAttrs(props.pt, "item")}
+            {...ptAttrs(ptResolve(cr, props.pt, "CrTimeline"), "item")}
             data-part="item"
             data-signal={item.signal}
-            class={ptClass(props.pt, props.unstyled, "cr-timeline__item", "item")}
+            class={ptClass(ptResolve(cr, props.pt, "CrTimeline"), props.unstyled, "cr-timeline__item", "item")}
           >
             <span
-              {...ptAttrs(props.pt, "node")}
+              {...ptAttrs(ptResolve(cr, props.pt, "CrTimeline"), "node")}
               data-part="node"
               aria-hidden="true"
-              class={ptClass(props.pt, props.unstyled, "cr-timeline__node " + state.sig(item), "node")}
+              class={ptClass(ptResolve(cr, props.pt, "CrTimeline"), props.unstyled, "cr-timeline__node " + state.sig(item), "node")}
             />
             <div class="cr-timeline__body">
               <time
-                {...ptAttrs(props.pt, "time")}
+                {...ptAttrs(ptResolve(cr, props.pt, "CrTimeline"), "time")}
                 data-part="time"
-                class={ptClass(props.pt, props.unstyled, "cr-timeline__time", "time")}
+                class={ptClass(ptResolve(cr, props.pt, "CrTimeline"), props.unstyled, "cr-timeline__time", "time")}
                 dateTime={item.time}
               >
                 {item.time}
               </time>
               <span
-                {...ptAttrs(props.pt, "title")}
+                {...ptAttrs(ptResolve(cr, props.pt, "CrTimeline"), "title")}
                 data-part="title"
-                class={ptClass(props.pt, props.unstyled, "cr-timeline__title", "title")}
+                class={ptClass(ptResolve(cr, props.pt, "CrTimeline"), props.unstyled, "cr-timeline__title", "title")}
               >
                 {item.title}
               </span>
               <Show when={item.detail}>
                 <p
-                  {...ptAttrs(props.pt, "detail")}
+                  {...ptAttrs(ptResolve(cr, props.pt, "CrTimeline"), "detail")}
                   data-part="detail"
-                  class={ptClass(props.pt, props.unstyled, "cr-timeline__detail", "detail")}
+                  class={ptClass(ptResolve(cr, props.pt, "CrTimeline"), props.unstyled, "cr-timeline__detail", "detail")}
                 >
                   {item.detail}
                 </p>

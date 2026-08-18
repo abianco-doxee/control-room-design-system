@@ -1,5 +1,7 @@
-import { useStore, Show } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, Show, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 /** Control Room Button. Two independent axes:
  *  - `emphasis` = visual GRAVITY (form): solid (primary) · outline (secondary) ·
@@ -28,11 +30,26 @@ export interface CrButtonProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Single part: "root". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"root">;
+  dt?: CrDesignTokens;
 }
 
 export default function CrButton(props: CrButtonProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrButton"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrButton"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrButton"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const state = useStore({
     get cls(): string {
       let c = "cr-btn";
@@ -58,30 +75,30 @@ export default function CrButton(props: CrButtonProps) {
       when={props.href}
       else={
         <button
-          {...ptAttrs(props.pt, "root")}
+          {...ptAttrs(ptResolve(cr, props.pt, "CrButton"), "root")}
           type={props.type || "button"}
           disabled={props.disabled}
           aria-keyshortcuts={props.keyshortcuts}
           data-part="root"
-          onClick={() => props.onClick && props.onClick()}
-          class={ptClass(props.pt, props.unstyled, state.cls, "root")}
-          style={ptStyle(props.pt, props.dt, "root")}
+          onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrButton'), 'root', 'onClick', event); props.onClick && props.onClick(); }}
+          class={ptClass(ptResolve(cr, props.pt, "CrButton"), props.unstyled, state.cls, "root")}
+          style={ptStyle(ptResolve(cr, props.pt, "CrButton"), props.dt, "root")}
         >
           {props.children}
         </button>
       }
     >
       <a
-        {...ptAttrs(props.pt, "root")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrButton"), "root")}
         href={props.href}
         target={state.external ? "_blank" : undefined}
         rel={state.external ? "noopener noreferrer" : undefined}
         aria-keyshortcuts={props.keyshortcuts}
         aria-disabled={props.disabled ? "true" : undefined}
         data-part="root"
-        onClick={() => props.onClick && props.onClick()}
-        class={ptClass(props.pt, props.unstyled, state.cls, "root")}
-        style={ptStyle(props.pt, props.dt, "root")}
+        onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrButton'), 'root', 'onClick', event); props.onClick && props.onClick(); }}
+        class={ptClass(ptResolve(cr, props.pt, "CrButton"), props.unstyled, state.cls, "root")}
+        style={ptStyle(ptResolve(cr, props.pt, "CrButton"), props.dt, "root")}
       >
         {props.children}
       </a>

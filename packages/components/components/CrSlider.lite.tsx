@@ -1,4 +1,7 @@
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrSliderProps {
   value: number;
@@ -11,27 +14,42 @@ export interface CrSliderProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"root">;
+  dt?: CrDesignTokens;
 }
 
 /* A styled native range input — square track + thumb, keyboard for free (arrows,
  * Home/End, PageUp/Down). Styling via .cr-slider. */
 export default function CrSlider(props: CrSliderProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrSlider"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrSlider"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrSlider"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   return (
     <input
-      {...ptAttrs(props.pt, "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrSlider"), "root")}
       data-part="root"
       type="range"
-      class={ptClass(props.pt, props.unstyled, "cr-slider", "root")}
-      style={ptStyle(props.pt, props.dt, "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrSlider"), props.unstyled, "cr-slider", "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrSlider"), props.dt, "root")}
       min={props.min || 0}
       max={props.max || 100}
       step={props.step || 1}
       value={props.value}
       disabled={props.disabled}
       aria-label={props.label || "slider"}
-      onInput={(event) => props.onChange && props.onChange(Number((event.target as HTMLInputElement).value))}
+      onInput={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrSlider'), 'root', 'onInput', event); props.onChange && props.onChange(Number((event.target as HTMLInputElement).value)); }}
     />
   );
 }

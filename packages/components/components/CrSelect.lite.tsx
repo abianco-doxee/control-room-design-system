@@ -1,5 +1,7 @@
-import { For } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 /* A bare native select. Pair with CrField for a *visible* label; standalone, pass
  * `label` for an accessible name (maps to aria-label) so it is never unnamed.
  *
@@ -28,23 +30,38 @@ export interface CrSelectProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "option". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"option" | "root">;
+  dt?: CrDesignTokens;
 }
 export default function CrSelect(props: CrSelectProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrSelect"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrSelect"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrSelect"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   return (
     <select
-      {...ptAttrs(props.pt, "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrSelect"), "root")}
       id={props.id}
-      class={ptClass(props.pt, props.unstyled, "cr-select", "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrSelect"), props.unstyled, "cr-select", "root")}
       data-part="root"
-      style={ptStyle(props.pt, props.dt, "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrSelect"), props.dt, "root")}
       aria-label={props.label}
       disabled={props.disabled}
       aria-invalid={props.invalid ? "true" : "false"}
       data-state={props.invalid ? "invalid" : "valid"}
     >
-      <For each={props.options}>{(opt: string) => <option {...ptAttrs(props.pt, "option")} data-part="option" value={opt}>{opt}</option>}</For>
+      <For each={props.options}>{(opt: string) => <option {...ptAttrs(ptResolve(cr, props.pt, "CrSelect"), "option")} data-part="option" value={opt}>{opt}</option>}</For>
     </select>
   );
 }

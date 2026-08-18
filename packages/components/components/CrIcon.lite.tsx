@@ -1,6 +1,8 @@
-import { useStore } from "@builder.io/mitosis";
+import { useStore, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
 import { PIXEL_ICONS } from "../lib/icons/pixel.ts";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 /* Control Room icon set — the house operational glyphs.
  *
@@ -33,10 +35,25 @@ export interface CrIconProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"root">;
+  dt?: CrDesignTokens;
 }
 export default function CrIcon(props: CrIconProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrIcon"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrIcon"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrIcon"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const state = useStore({
     get d(): string {
       const paths: Record<string, string> = {
@@ -77,10 +94,10 @@ export default function CrIcon(props: CrIconProps) {
 
   return (
     <svg
-      {...ptAttrs(props.pt, "root")}
-      class={ptClass(props.pt, props.unstyled, "cr-icon", "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrIcon"), "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrIcon"), props.unstyled, "cr-icon", "root")}
       data-part="root"
-      style={ptStyle(props.pt, props.dt, "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrIcon"), props.dt, "root")}
       width={props.size || 20}
       height={props.size || 20}
       viewBox="0 0 24 24"

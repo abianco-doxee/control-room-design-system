@@ -1,5 +1,7 @@
-import { Show, useStore } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { Show, useStore, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, resolveMessage, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrAlertProps {
   /** Signal the alert carries (Law 2). Defaults to work. */
@@ -10,17 +12,36 @@ export interface CrAlertProps {
   dismissible?: boolean;
   onClose?: () => void;
   children?: any;
+  /** Override this component's built-in English strings. Any key you omit falls
+   *  back to the app-level `messages` from context, then to the built-in default.
+   *  See lib/messages.ts for the keys. */
+  labels?: Record<string, any>;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "icon" · "body" · "title" · "msg" · "close". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"body" | "close" | "icon" | "msg" | "root" | "title">;
+  dt?: CrDesignTokens;
 }
 
 /* Inline callout keyed to a signal (Law 2) — a left brush-bar in the signal hue.
  * `err` announces assertively (role=alert); the rest are polite (role=status).
  * Styling via .cr-alert. */
 export default function CrAlert(props: CrAlertProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrAlert"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrAlert"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrAlert"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const state = useStore({
     open: true,
     dismiss() {
@@ -32,26 +53,26 @@ export default function CrAlert(props: CrAlertProps) {
   return (
     <Show when={state.open}>
       <div
-        {...ptAttrs(props.pt, "root")}
-        class={ptClass(props.pt, props.unstyled, "cr-alert cr-alert--" + (props.signal || "work"), "root")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrAlert"), "root")}
+        class={ptClass(ptResolve(cr, props.pt, "CrAlert"), props.unstyled, "cr-alert cr-alert--" + (props.signal || "work"), "root")}
         data-part="root"
         data-state={props.signal || "work"}
-        style={ptStyle(props.pt, props.dt, "root")}
+        style={ptStyle(ptResolve(cr, props.pt, "CrAlert"), props.dt, "root")}
         role={props.signal === "err" ? "alert" : "status"}
         aria-live={props.signal === "err" ? "assertive" : "polite"}
       >
-        <span {...ptAttrs(props.pt, "icon")} class={ptClass(props.pt, props.unstyled, "cr-alert__icon", "icon")} data-part="icon" aria-hidden="true"></span>
-        <div {...ptAttrs(props.pt, "body")} class={ptClass(props.pt, props.unstyled, "cr-alert__body", "body")} data-part="body">
+        <span {...ptAttrs(ptResolve(cr, props.pt, "CrAlert"), "icon")} class={ptClass(ptResolve(cr, props.pt, "CrAlert"), props.unstyled, "cr-alert__icon", "icon")} data-part="icon" aria-hidden="true"></span>
+        <div {...ptAttrs(ptResolve(cr, props.pt, "CrAlert"), "body")} class={ptClass(ptResolve(cr, props.pt, "CrAlert"), props.unstyled, "cr-alert__body", "body")} data-part="body">
           <Show when={props.title}>
-            <p {...ptAttrs(props.pt, "title")} class={ptClass(props.pt, props.unstyled, "cr-alert__title", "title")} data-part="title">{props.title}</p>
+            <p {...ptAttrs(ptResolve(cr, props.pt, "CrAlert"), "title")} class={ptClass(ptResolve(cr, props.pt, "CrAlert"), props.unstyled, "cr-alert__title", "title")} data-part="title">{props.title}</p>
           </Show>
-          <p {...ptAttrs(props.pt, "msg")} class={ptClass(props.pt, props.unstyled, "cr-alert__msg", "msg")} data-part="msg">
+          <p {...ptAttrs(ptResolve(cr, props.pt, "CrAlert"), "msg")} class={ptClass(ptResolve(cr, props.pt, "CrAlert"), props.unstyled, "cr-alert__msg", "msg")} data-part="msg">
             {props.message}
             {props.children}
           </p>
         </div>
         <Show when={props.dismissible}>
-          <button {...ptAttrs(props.pt, "close")} type="button" class={ptClass(props.pt, props.unstyled, "cr-alert__close", "close")} data-part="close" aria-label="Dismiss" onClick={() => state.dismiss()}>
+          <button {...ptAttrs(ptResolve(cr, props.pt, "CrAlert"), "close")} type="button" class={ptClass(ptResolve(cr, props.pt, "CrAlert"), props.unstyled, "cr-alert__close", "close")} data-part="close" aria-label={resolveMessage(cr, props.labels, "CrAlert", "dismiss")} onClick={() => state.dismiss()}>
             ✕
           </button>
         </Show>

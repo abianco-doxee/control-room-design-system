@@ -1,5 +1,7 @@
-import { useStore, onMount, onUnMount, For, Show } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, onMount, onUnMount, For, Show, useContext, onUpdate } from "@builder.io/mitosis";
+import { ptAttrs, ptClass, ptNested, ptResolve, ptStyle, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 import { parseKeys, describeKeys } from "../lib/keys.ts";
 import CrKbd from "./CrKbd.lite";
 
@@ -21,8 +23,12 @@ export interface CrKeyHintsProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "item" · "keys" · "chord" · "plus" · "then" · "label". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  /** `kbd` is a NESTED SECTION: its value is a `pt` for each inner CrKbd
+   *  (`pt={{ kbd: { root: { class: "…" } } }}`), not an attribute bag. */
+  pt?: CrPassThrough<
+    "chord" | "item" | "kbd" | "keys" | "label" | "plus" | "root" | "then"
+  >;
+  dt?: CrDesignTokens;
 }
 
 /* Hold-to-reveal behavior plus an optional shortcut legend.
@@ -48,6 +54,16 @@ export interface CrKeyHintsProps {
  * the reparsed chord, not the author string, so forgiving input cannot leak
  * malformed ARIA. */
 export default function CrKeyHints(props: CrKeyHintsProps) {
+  const cr = useContext(CrContext);
+
+  /* onMounted/onUnmounted are wired further down, merged with this component's own
+   * window listeners — see the note there. Only onUpdated stands alone, because
+   * CrKeyHints has no update work of its own to merge with. */
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrKeyHints"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+
   const state = useStore({
     reveal() {
       document.documentElement.setAttribute("data-cr-keys", "on");
@@ -82,16 +98,31 @@ export default function CrKeyHints(props: CrKeyHintsProps) {
     },
   });
 
+  /* The window listeners live in the SAME onMount/onUnMount as the pt lifecycle
+   * hooks ON PURPOSE. Mitosis keeps only the LAST onMount/onUnMount per component
+   * and silently drops the earlier ones, so a second pair here would discard
+   * `pt.hooks.onMounted`/`onUnmounted` for this component alone — which is exactly
+   * what happened before they were merged. CrKeyHints is the only component with
+   * its own lifecycle work, so it is the only one affected. */
   onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrKeyHints"));
+    if (h && h.onMounted) h.onMounted();
     window.addEventListener("keydown", state.onDown);
     window.addEventListener("keyup", state.onUp);
     window.addEventListener("blur", state.hide);
   });
 
   onUnMount(() => {
-    window.removeEventListener("keydown", state.onDown);
-    window.removeEventListener("keyup", state.onUp);
-    window.removeEventListener("blur", state.hide);
+    const h = ptHooks(ptResolve(cr, props.pt, "CrKeyHints"));
+    if (h && h.onUnmounted) h.onUnmounted();
+    /* Guarded because Svelte runs onDestroy during SSR (unlike onMount, which it
+     * skips), so this block executes on the server and `window` is not defined
+     * there. The mount side needs no guard for the same reason. */
+    if (typeof window !== "undefined") {
+      window.removeEventListener("keydown", state.onDown);
+      window.removeEventListener("keyup", state.onUp);
+      window.removeEventListener("blur", state.hide);
+    }
   });
 
   return (
@@ -101,8 +132,8 @@ export default function CrKeyHints(props: CrKeyHintsProps) {
         /* invisible but in-layout, so Qwik's visible-task (which wires the listeners)
            actually runs — a display:none host would never become "visible". */
         <span
-          {...ptAttrs(props.pt, "root")}
-          class={ptClass(props.pt, props.unstyled, "cr-keyhints", "root")}
+          {...ptAttrs(ptResolve(cr, props.pt, "CrKeyHints"), "root")}
+          class={ptClass(ptResolve(cr, props.pt, "CrKeyHints"), props.unstyled, "cr-keyhints", "root")}
           data-part="root"
           aria-hidden="true"
           style={{ position: "fixed", left: "0", top: "0", width: "1px", height: "1px", opacity: "0", pointerEvents: "none" }}
@@ -110,38 +141,38 @@ export default function CrKeyHints(props: CrKeyHintsProps) {
       }
     >
       <ul
-        {...ptAttrs(props.pt, "root")}
-        class={ptClass(props.pt, props.unstyled, "cr-keyhints cr-keyhints--legend", "root")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrKeyHints"), "root")}
+        class={ptClass(ptResolve(cr, props.pt, "CrKeyHints"), props.unstyled, "cr-keyhints cr-keyhints--legend", "root")}
         data-part="root"
         aria-label={props.label || "Keyboard shortcuts"}
-        style={ptStyle(props.pt, props.dt, "root")}
+        style={ptStyle(ptResolve(cr, props.pt, "CrKeyHints"), props.dt, "root")}
       >
         <For each={state.rows()}>
           {(row: { keys: string; label: string; steps: string[][]; spoken: string; shortcuts: string }) => (
             <li
-              {...ptAttrs(props.pt, "item")}
-              class={ptClass(props.pt, props.unstyled, "cr-keyhints__item", "item")}
+              {...ptAttrs(ptResolve(cr, props.pt, "CrKeyHints"), "item")}
+              class={ptClass(ptResolve(cr, props.pt, "CrKeyHints"), props.unstyled, "cr-keyhints__item", "item")}
               data-part="item"
               aria-keyshortcuts={row.shortcuts}
               aria-label={row.spoken + ": " + row.label}
             >
               <span
-                {...ptAttrs(props.pt, "keys")}
-                class={ptClass(props.pt, props.unstyled, "cr-keyhints__keys", "keys")}
+                {...ptAttrs(ptResolve(cr, props.pt, "CrKeyHints"), "keys")}
+                class={ptClass(ptResolve(cr, props.pt, "CrKeyHints"), props.unstyled, "cr-keyhints__keys", "keys")}
                 data-part="keys"
                 aria-hidden="true"
               >
                 <For each={row.steps}>
                   {(step: string[], si: number) => (
                     <span
-                      {...ptAttrs(props.pt, "chord")}
-                      class={ptClass(props.pt, props.unstyled, "cr-keyhints__chord", "chord")}
+                      {...ptAttrs(ptResolve(cr, props.pt, "CrKeyHints"), "chord")}
+                      class={ptClass(ptResolve(cr, props.pt, "CrKeyHints"), props.unstyled, "cr-keyhints__chord", "chord")}
                       data-part="chord"
                     >
                       <Show when={si > 0}>
                         <span
-                          {...ptAttrs(props.pt, "then")}
-                          class={ptClass(props.pt, props.unstyled, "cr-keyhints__then", "then")}
+                          {...ptAttrs(ptResolve(cr, props.pt, "CrKeyHints"), "then")}
+                          class={ptClass(ptResolve(cr, props.pt, "CrKeyHints"), props.unstyled, "cr-keyhints__then", "then")}
                           data-part="then"
                         >
                           then
@@ -152,14 +183,14 @@ export default function CrKeyHints(props: CrKeyHintsProps) {
                           <span class="cr-keyhints__member">
                             <Show when={ki > 0}>
                               <span
-                                {...ptAttrs(props.pt, "plus")}
-                                class={ptClass(props.pt, props.unstyled, "cr-keyhints__plus", "plus")}
+                                {...ptAttrs(ptResolve(cr, props.pt, "CrKeyHints"), "plus")}
+                                class={ptClass(ptResolve(cr, props.pt, "CrKeyHints"), props.unstyled, "cr-keyhints__plus", "plus")}
                                 data-part="plus"
                               >
                                 +
                               </span>
                             </Show>
-                            <CrKbd keys={k} />
+                            <CrKbd keys={k} pt={ptNested(ptResolve(cr, props.pt, "CrKeyHints"), "kbd")} />
                           </span>
                         )}
                       </For>
@@ -168,8 +199,8 @@ export default function CrKeyHints(props: CrKeyHintsProps) {
                 </For>
               </span>
               <span
-                {...ptAttrs(props.pt, "label")}
-                class={ptClass(props.pt, props.unstyled, "cr-keyhints__label", "label")}
+                {...ptAttrs(ptResolve(cr, props.pt, "CrKeyHints"), "label")}
+                class={ptClass(ptResolve(cr, props.pt, "CrKeyHints"), props.unstyled, "cr-keyhints__label", "label")}
                 data-part="label"
                 aria-hidden="true"
               >

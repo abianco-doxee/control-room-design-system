@@ -50,10 +50,13 @@ function normalizeExtensions(dir) {
       if (e.isDirectory()) walk(p);
       else if (/\.(js|d\.ts)$/.test(e.name)) {
         const src = readFileSync(p, "utf8");
-        const next = src.replace(
-          /((?:from|import)\s*\(?\s*["'][^"']*?)\.(tsx|ts)(["'])/g,
-          "$1.js$3"
-        );
+        const next = src
+          .replace(/((?:from|import)\s*\(?\s*["'][^"']*?)\.(tsx|ts)(["'])/g, "$1.js$3")
+          // Context modules are emitted by Mitosis's context generators, which
+          // strip the extension entirely (`from "./cr.context"`). Node's ESM
+          // resolver needs the explicit `.js`, so add it — matched on the
+          // `.context` infix so no other relative import is touched.
+          .replace(/((?:from|import)\s*\(?\s*["']\.[^"']*\.context)(["'])/g, "$1.js$2");
         if (next !== src) {
           writeFileSync(p, next);
           touched++;

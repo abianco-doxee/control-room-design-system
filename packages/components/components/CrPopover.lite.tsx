@@ -1,5 +1,7 @@
-import { useStore, useRef, Show } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, useRef, Show, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 import { placeEl } from "../lib/position.ts";
 
 export interface CrPopoverProps {
@@ -16,8 +18,8 @@ export interface CrPopoverProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "trigger" · "scrim" · "panel". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"panel" | "root" | "scrim" | "trigger">;
+  dt?: CrDesignTokens;
 }
 
 /* Generic anchored overlay. A trigger toggles a floating panel; a transparent
@@ -25,6 +27,21 @@ export interface CrPopoverProps {
  * the trigger (no global listeners — identical across targets). For arbitrary
  * content; use CrMenu for a list of actions. Styling via .cr-popover. */
 export default function CrPopover(props: CrPopoverProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrPopover"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrPopover"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrPopover"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const rootRef = useRef(null);
 
   const state = useStore({
@@ -82,24 +99,24 @@ export default function CrPopover(props: CrPopoverProps) {
   });
 
   return (
-    <div {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-popover", "root")} data-part="root" style={ptStyle(props.pt, props.dt, "root")} ref={rootRef}>
+    <div {...ptAttrs(ptResolve(cr, props.pt, "CrPopover"), "root")} class={ptClass(ptResolve(cr, props.pt, "CrPopover"), props.unstyled, "cr-popover", "root")} data-part="root" style={ptStyle(ptResolve(cr, props.pt, "CrPopover"), props.dt, "root")} ref={rootRef}>
       <button
-        {...ptAttrs(props.pt, "trigger")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrPopover"), "trigger")}
         type="button"
-        class={ptClass(props.pt, props.unstyled, "cr-btn cr-btn--outline cr-btn--sm", "trigger")}
+        class={ptClass(ptResolve(cr, props.pt, "CrPopover"), props.unstyled, "cr-btn cr-btn--outline cr-btn--sm", "trigger")}
         data-part="trigger"
         data-state={state.open ? "open" : "closed"}
         aria-haspopup="dialog"
         aria-expanded={state.open ? "true" : "false"}
-        onClick={() => state.toggle()}
+        onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrPopover'), 'trigger', 'onClick', event); state.toggle(); }}
       >
         {props.label}
       </button>
       <Show when={state.open}>
-        <button {...ptAttrs(props.pt, "scrim")} type="button" class={ptClass(props.pt, props.unstyled, "cr-popover__scrim", "scrim")} data-part="scrim" aria-hidden="true" tabIndex={-1} onClick={() => state.close()}></button>
+        <button {...ptAttrs(ptResolve(cr, props.pt, "CrPopover"), "scrim")} type="button" class={ptClass(ptResolve(cr, props.pt, "CrPopover"), props.unstyled, "cr-popover__scrim", "scrim")} data-part="scrim" aria-hidden="true" tabIndex={-1} onClick={() => state.close()}></button>
         <div
-          {...ptAttrs(props.pt, "panel")}
-          class={ptClass(props.pt, props.unstyled, "cr-popover__panel", "panel")}
+          {...ptAttrs(ptResolve(cr, props.pt, "CrPopover"), "panel")}
+          class={ptClass(ptResolve(cr, props.pt, "CrPopover"), props.unstyled, "cr-popover__panel", "panel")}
           data-part="panel"
           data-state={state.open ? "open" : "closed"}
           role="dialog"
@@ -109,7 +126,7 @@ export default function CrPopover(props: CrPopoverProps) {
            * place() reveals it once placeEl() has run. Not ptStyle-backed: this
            * part carries no pt/dt style hook (see styling-contract.md). */
           style={{ visibility: "hidden" }}
-          onKeyDown={(event) => state.onKey(event)}
+          onKeyDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrPopover'), 'panel', 'onKeyDown', event); state.onKey(event); }}
         >
           {props.children}
         </div>

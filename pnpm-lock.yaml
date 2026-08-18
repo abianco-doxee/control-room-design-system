@@ -169,7 +169,7 @@ importers:
         specifier: '>=1.8'
         version: 1.9.14
       svelte:
-        specifier: '>=4'
+        specifier: '>=4 <6'
         version: 4.2.20
       vue:
         specifier: '>=3.4'

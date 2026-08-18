@@ -1,5 +1,7 @@
-import { useStore, Show } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, Show, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrSparklineProps {
   /** The series to draw. Sampled left→right; the last point gets the end dot. */
@@ -15,8 +17,8 @@ export interface CrSparklineProps {
   /* ── styling contract (portable pt/dt subset). Part: "root" (SVG internals are
    * aria-hidden decoration and stay on the cr-spark classes). */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"root">;
+  dt?: CrDesignTokens;
 }
 
 /* An inline micro line/area chart for a KPI or table cell — no axes, no grid,
@@ -27,6 +29,21 @@ export interface CrSparklineProps {
  * strips free consts and cross-referenced getters can init out of order on some
  * targets. role=img + an aria-label summary; the SVG itself is aria-hidden. */
 export default function CrSparkline(props: CrSparklineProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrSparkline"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrSparkline"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrSparkline"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const state = useStore({
     get geo() {
       const d = props.data || [];
@@ -48,10 +65,10 @@ export default function CrSparkline(props: CrSparklineProps) {
         y: pad + (1 - (v - min) / range) * innerH,
       }));
       const line = pts.map((p: { x: number; y: number }) => p.x.toFixed(2) + "," + p.y.toFixed(2)).join(" ");
-      let area = "M " + pts[0].x.toFixed(2) + "," + H.toFixed(2);
-      for (const p of pts) area += " L " + p.x.toFixed(2) + "," + p.y.toFixed(2);
-      area += " L " + pts[n - 1].x.toFixed(2) + "," + H.toFixed(2) + " Z";
-      return { line, area, dx: pts[n - 1].x, dy: pts[n - 1].y, H, W };
+      let areaPath = "M " + pts[0].x.toFixed(2) + "," + H.toFixed(2);
+      for (const p of pts) areaPath += " L " + p.x.toFixed(2) + "," + p.y.toFixed(2);
+      areaPath += " L " + pts[n - 1].x.toFixed(2) + "," + H.toFixed(2) + " Z";
+      return { line, area: areaPath, dx: pts[n - 1].x, dy: pts[n - 1].y, H, W };
     },
     get summary(): string {
       const d = props.data || [];
@@ -62,7 +79,7 @@ export default function CrSparkline(props: CrSparklineProps) {
   });
 
   return (
-    <span {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-spark cr-spark--" + (props.signal || "work"), "root")} data-part="root" style={ptStyle(props.pt, props.dt, "root")} role="img" aria-label={state.summary}>
+    <span {...ptAttrs(ptResolve(cr, props.pt, "CrSparkline"), "root")} class={ptClass(ptResolve(cr, props.pt, "CrSparkline"), props.unstyled, "cr-spark cr-spark--" + (props.signal || "work"), "root")} data-part="root" style={ptStyle(ptResolve(cr, props.pt, "CrSparkline"), props.dt, "root")} role="img" aria-label={state.summary}>
       <svg class="cr-spark__svg" viewBox={"0 0 " + state.geo.W + " " + state.geo.H} preserveAspectRatio="none" aria-hidden="true" focusable="false">
         <Show when={props.area}>
           <path class="cr-spark__area" d={state.geo.area} />

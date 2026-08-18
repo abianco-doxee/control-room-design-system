@@ -26,7 +26,10 @@
 </template>
 
 <script setup>
-import { ref, computed, inject, mergeProps } from 'vue';
+import { ref, computed, inject, mergeProps, onMounted, onUpdated, onUnmounted } from 'vue';
+// Sibling import: this file is copied to dist/frameworks/vue/components/CrTabs.vue,
+// so the context is beside it — the same specifier the generated components use.
+import CrContext from './cr.context';
 
 const props = defineProps({
   tabs: { type: Array, default: () => [] },
@@ -39,8 +42,25 @@ const props = defineProps({
 const emit = defineEmits(['change']);
 
 const active = ref(props.active || 0);
-// global pt injected once at app level (PrimeVue-style): app.provide('crGlobalPT', {...})
-const globalPT = inject('crGlobalPT', {});
+
+// The app-level tier comes from the SAME context every generated component uses —
+// `CrContext.key`, a Symbol. This file previously injected a string key
+// ('crGlobalPT'), which meant an app providing the documented context configured
+// all 80 components EXCEPT this one, and an app configuring this one reached
+// nothing else. Two incompatible global tiers, silently.
+const cr = inject(CrContext.key, undefined);
+const globalPT = computed(() => (cr && cr.pt && cr.pt.CrTabs) || {});
+
+// PT lifecycle hooks, resolved through the same cascade (global then instance) as
+// the generated components — see ptHooks/ptResolve in lib/pt.ts.
+function hooks() {
+  const g = globalPT.value && globalPT.value.hooks;
+  const l = typeof props.pt === 'object' && props.pt ? props.pt.hooks : undefined;
+  return { ...(g || {}), ...(l || {}) };
+}
+onMounted(() => { const h = hooks(); if (h.onMounted) h.onMounted(); });
+onUpdated(() => { const h = hooks(); if (h.onUpdated) h.onUpdated(); });
+onUnmounted(() => { const h = hooks(); if (h.onUnmounted) h.onUnmounted(); });
 
 // resolve a section's pt from BOTH global and local, each of which may be a
 // FUNCTION of live state — the reactive form the portable layer can't do.
@@ -49,7 +69,7 @@ function resolveSection(source, part) {
   return typeof section === 'function' ? section({ active: active.value, part }) : section || {};
 }
 function sectionProps(part, base) {
-  const g = resolveSection(globalPT, part);
+  const g = resolveSection(globalPT.value, part);
   const l = resolveSection(props.pt, part);
   const cls = props.unstyled ? '' : base;
   // Vue mergeProps: concatenates class, merges style, and CHAINS listeners.

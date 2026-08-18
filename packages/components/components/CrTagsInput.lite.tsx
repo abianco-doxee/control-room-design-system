@@ -1,5 +1,7 @@
-import { useStore, For } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptAttrs, ptClass, ptHandler, ptResolve, ptStyle, resolveMessage, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrTagsInputProps {
   /** Seed tags. */
@@ -11,11 +13,15 @@ export interface CrTagsInputProps {
    *  error styling comes from a wrapping CrField — this is the a11y half only. */
   invalid?: boolean;
   onChange?: (tags: string[]) => void;
+  /** Override this component's built-in English strings. Any key you omit
+   *  falls back to the app-level `messages` from context, then to the built-in
+   *  default. See lib/messages.ts for the keys. */
+  labels?: Record<string, any>;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "list" · "tag" · "label" · "remove" · "input". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"input" | "label" | "list" | "remove" | "root" | "tag">;
+  dt?: CrDesignTokens;
 }
 
 /* TagsInput — enter a set of short tokens. Type and press Enter or "," to add a
@@ -24,6 +30,21 @@ export interface CrTagsInputProps {
  * every remove button names its tag ("Remove <tag>"). Duplicates are ignored.
  * Styling via .cr-tags. */
 export default function CrTagsInput(props: CrTagsInputProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrTagsInput"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrTagsInput"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrTagsInput"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const state = useStore({
     tags: props.value ? [...props.value] : [],
     draft: "",
@@ -57,19 +78,19 @@ export default function CrTagsInput(props: CrTagsInputProps) {
 
   return (
     <div
-      {...ptAttrs(props.pt, "root")}
-      class={ptClass(props.pt, props.unstyled, "cr-tags", "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrTagsInput"), "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrTagsInput"), props.unstyled, "cr-tags", "root")}
       data-part="root"
-      style={ptStyle(props.pt, props.dt, "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrTagsInput"), props.dt, "root")}
       role="group"
       aria-label={props.label || "Tags"}
     >
-      <ul {...ptAttrs(props.pt, "list")} class={ptClass(props.pt, props.unstyled, "cr-tags__list", "list")} data-part="list">
+      <ul {...ptAttrs(ptResolve(cr, props.pt, "CrTagsInput"), "list")} class={ptClass(ptResolve(cr, props.pt, "CrTagsInput"), props.unstyled, "cr-tags__list", "list")} data-part="list">
         <For each={state.tags}>
           {(tag: string, i: number) => (
-            <li {...ptAttrs(props.pt, "tag")} class={ptClass(props.pt, props.unstyled, "cr-tags__tag", "tag")} data-part="tag">
-              <span {...ptAttrs(props.pt, "label")} class={ptClass(props.pt, props.unstyled, "cr-tags__label", "label")} data-part="label">{tag}</span>
-              <button {...ptAttrs(props.pt, "remove")} type="button" class={ptClass(props.pt, props.unstyled, "cr-tags__remove", "remove")} data-part="remove" aria-label={"Remove " + tag} onClick={() => state.removeAt(i)}>
+            <li {...ptAttrs(ptResolve(cr, props.pt, "CrTagsInput"), "tag")} class={ptClass(ptResolve(cr, props.pt, "CrTagsInput"), props.unstyled, "cr-tags__tag", "tag")} data-part="tag">
+              <span {...ptAttrs(ptResolve(cr, props.pt, "CrTagsInput"), "label")} class={ptClass(ptResolve(cr, props.pt, "CrTagsInput"), props.unstyled, "cr-tags__label", "label")} data-part="label">{tag}</span>
+              <button {...ptAttrs(ptResolve(cr, props.pt, "CrTagsInput"), "remove")} type="button" class={ptClass(ptResolve(cr, props.pt, "CrTagsInput"), props.unstyled, "cr-tags__remove", "remove")} data-part="remove" aria-label={resolveMessage(cr, props.labels, "CrTagsInput", "removeTag", tag)} onClick={() => state.removeAt(i)}>
                 ✕
               </button>
             </li>
@@ -77,8 +98,8 @@ export default function CrTagsInput(props: CrTagsInputProps) {
         </For>
       </ul>
       <input
-        {...ptAttrs(props.pt, "input")}
-        class={ptClass(props.pt, props.unstyled, "cr-tags__input", "input")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrTagsInput"), "input")}
+        class={ptClass(ptResolve(cr, props.pt, "CrTagsInput"), props.unstyled, "cr-tags__input", "input")}
         data-part="input"
         type="text"
         value={state.draft}
@@ -86,9 +107,9 @@ export default function CrTagsInput(props: CrTagsInputProps) {
         aria-label={props.label || "Add tag"}
         aria-invalid={props.invalid ? "true" : "false"}
         data-state={props.invalid ? "invalid" : "valid"}
-        onInput={(event) => state.updateDraft((event.target as HTMLInputElement).value)}
-        onKeyDown={(event) => state.onKeyDown(event)}
-        onBlur={() => state.add()}
+        onInput={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrTagsInput'), 'input', 'onInput', event); state.updateDraft((event.target as HTMLInputElement).value); }}
+        onKeyDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrTagsInput'), 'input', 'onKeyDown', event); state.onKeyDown(event); }}
+        onBlur={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrTagsInput'), 'input', 'onBlur', event); state.add(); }}
       />
     </div>
   );

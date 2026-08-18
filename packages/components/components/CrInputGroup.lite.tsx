@@ -1,5 +1,7 @@
-import { Show } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { Show, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrInputGroupProps {
   id?: string;
@@ -18,11 +20,15 @@ export interface CrInputGroupProps {
    *  error styling comes from a wrapping CrField — this is the a11y half only. */
   invalid?: boolean;
   onInput?: (value: string) => void;
+  /** Supply your own control instead of the built-in <input> — the prefix/suffix
+   *  addons still flank it. You own the control's `id`, aria-label and validity
+   *  state when you do. */
+  children?: any;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "addon" · "input". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"addon" | "input" | "root">;
+  dt?: CrDesignTokens;
 }
 
 /* InputGroup — an input flanked by prefix / suffix addons (protocol, currency,
@@ -31,32 +37,54 @@ export interface CrInputGroupProps {
  * validated form field with its own label/hint/error use Field or Form instead.
  * Styling via .cr-input-group. */
 export default function CrInputGroup(props: CrInputGroupProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrInputGroup"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrInputGroup"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrInputGroup"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   return (
     <div
-      {...ptAttrs(props.pt, "root")}
-      class={ptClass(props.pt, props.unstyled, "cr-input-group", "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrInputGroup"), "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrInputGroup"), props.unstyled, "cr-input-group", "root")}
       data-part="root"
-      style={ptStyle(props.pt, props.dt, "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrInputGroup"), props.dt, "root")}
     >
       <Show when={props.prefix}>
-        <span {...ptAttrs(props.pt, "addon")} class={ptClass(props.pt, props.unstyled, "cr-input-group__addon cr-input-group__addon--prefix", "addon")} data-part="addon" aria-hidden="true">{props.prefix}</span>
+        <span {...ptAttrs(ptResolve(cr, props.pt, "CrInputGroup"), "addon")} class={ptClass(ptResolve(cr, props.pt, "CrInputGroup"), props.unstyled, "cr-input-group__addon cr-input-group__addon--prefix", "addon")} data-part="addon" aria-hidden="true">{props.prefix}</span>
       </Show>
-      <input
-        {...ptAttrs(props.pt, "input")}
-        id={props.id}
-        class={ptClass(props.pt, props.unstyled, "cr-input cr-input-group__input", "input")}
-        data-part="input"
-        type={props.type || "text"}
-        value={props.value}
-        placeholder={props.placeholder}
-        disabled={props.disabled}
-        aria-label={props.label}
-        aria-invalid={props.invalid ? "true" : "false"}
-        data-state={props.invalid ? "invalid" : "valid"}
-        onInput={(event) => props.onInput && props.onInput((event.target as HTMLInputElement).value)}
-      />
+      <Show
+        when={props.children}
+        else={
+          <input
+            {...ptAttrs(ptResolve(cr, props.pt, "CrInputGroup"), "input")}
+            id={props.id}
+            class={ptClass(ptResolve(cr, props.pt, "CrInputGroup"), props.unstyled, "cr-input cr-input-group__input", "input")}
+            data-part="input"
+            type={props.type || "text"}
+            value={props.value}
+            placeholder={props.placeholder}
+            disabled={props.disabled}
+            aria-label={props.label}
+            aria-invalid={props.invalid ? "true" : "false"}
+            data-state={props.invalid ? "invalid" : "valid"}
+            onInput={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrInputGroup'), 'input', 'onInput', event); props.onInput && props.onInput((event.target as HTMLInputElement).value); }}
+          />
+        }
+      >
+        {props.children}
+      </Show>
       <Show when={props.suffix}>
-        <span {...ptAttrs(props.pt, "addon")} class={ptClass(props.pt, props.unstyled, "cr-input-group__addon cr-input-group__addon--suffix", "addon")} data-part="addon" aria-hidden="true">{props.suffix}</span>
+        <span {...ptAttrs(ptResolve(cr, props.pt, "CrInputGroup"), "addon")} class={ptClass(ptResolve(cr, props.pt, "CrInputGroup"), props.unstyled, "cr-input-group__addon cr-input-group__addon--suffix", "addon")} data-part="addon" aria-hidden="true">{props.suffix}</span>
       </Show>
     </div>
   );

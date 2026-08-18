@@ -1,5 +1,7 @@
-import { useStore } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler, resolveMessage, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrNumberFieldProps {
   value: number;
@@ -12,16 +14,35 @@ export interface CrNumberFieldProps {
    *  error styling comes from a wrapping CrField — this is the a11y half only. */
   invalid?: boolean;
   onChange?: (value: number) => void;
+  /** Override this component's built-in English strings. Any key you omit falls
+   *  back to the app-level `messages` from context, then to the built-in default.
+   *  See lib/messages.ts for the keys. */
+  labels?: Record<string, any>;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "btn" · "input". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"btn" | "input" | "root">;
+  dt?: CrDesignTokens;
 }
 
 /* Number input with −/+ steppers, clamped to min/max. The native input keeps its
  * own keyboard (arrows); the buttons step by `step`. Styling via .cr-numberfield. */
 export default function CrNumberField(props: CrNumberFieldProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrNumberField"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrNumberField"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrNumberField"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const state = useStore({
     clampVal(n: number): number {
       let v = n;
@@ -47,26 +68,26 @@ export default function CrNumberField(props: CrNumberFieldProps) {
 
   return (
     <div
-      {...ptAttrs(props.pt, "root")}
-      class={ptClass(props.pt, props.unstyled, "cr-numberfield", "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrNumberField"), "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrNumberField"), props.unstyled, "cr-numberfield", "root")}
       data-part="root"
-      style={ptStyle(props.pt, props.dt, "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrNumberField"), props.dt, "root")}
     >
       <button
-        {...ptAttrs(props.pt, "btn")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrNumberField"), "btn")}
         type="button"
-        class={ptClass(props.pt, props.unstyled, "cr-numberfield__btn", "btn")}
+        class={ptClass(ptResolve(cr, props.pt, "CrNumberField"), props.unstyled, "cr-numberfield__btn", "btn")}
         data-part="btn"
-        aria-label="Decrease"
+        aria-label={resolveMessage(cr, props.labels, "CrNumberField", "decrease")}
         disabled={props.disabled || state.atMin()}
-        onClick={() => state.bump(-1)}
+        onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrNumberField'), 'btn', 'onClick', event); state.bump(-1); }}
       >
         −
       </button>
       <input
-        {...ptAttrs(props.pt, "input")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrNumberField"), "input")}
         type="number"
-        class={ptClass(props.pt, props.unstyled, "cr-numberfield__input", "input")}
+        class={ptClass(ptResolve(cr, props.pt, "CrNumberField"), props.unstyled, "cr-numberfield__input", "input")}
         data-part="input"
         value={props.value}
         min={props.min}
@@ -76,16 +97,16 @@ export default function CrNumberField(props: CrNumberFieldProps) {
         aria-label={props.label || "number"}
         aria-invalid={props.invalid ? "true" : "false"}
         data-state={props.invalid ? "invalid" : "valid"}
-        onInput={(event) => state.onInput((event.target as HTMLInputElement).value)}
+        onInput={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrNumberField'), 'input', 'onInput', event); state.onInput((event.target as HTMLInputElement).value); }}
       />
       <button
-        {...ptAttrs(props.pt, "btn")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrNumberField"), "btn")}
         type="button"
-        class={ptClass(props.pt, props.unstyled, "cr-numberfield__btn", "btn")}
+        class={ptClass(ptResolve(cr, props.pt, "CrNumberField"), props.unstyled, "cr-numberfield__btn", "btn")}
         data-part="btn"
-        aria-label="Increase"
+        aria-label={resolveMessage(cr, props.labels, "CrNumberField", "increase")}
         disabled={props.disabled || state.atMax()}
-        onClick={() => state.bump(1)}
+        onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrNumberField'), 'btn', 'onClick', event); state.bump(1); }}
       >
         +
       </button>

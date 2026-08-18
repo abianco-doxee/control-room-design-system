@@ -1,5 +1,7 @@
-import { useStore, onMount, Show, For } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, onMount, Show, For, useContext, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrTreeNode {
   id: string;
@@ -16,14 +18,29 @@ export interface CrTreeProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "item" · "twist" · "lead". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"item" | "lead" | "root" | "twist">;
+  dt?: CrDesignTokens;
 }
 
 /* Hierarchical tree (role=tree), rendered as a flat list of visible rows (Mitosis
    cannot recurse a component). Each row carries aria-level and aria-expanded, with
    full arrow-key navigation and expand/collapse. Styling via .cr-tree. */
 export default function CrTree(props: CrTreeProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrTree"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrTree"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrTree"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const state = useStore({
     expanded: {} as Record<string, boolean>,
     selected: "",
@@ -135,14 +152,14 @@ export default function CrTree(props: CrTreeProps) {
   });
 
   return (
-    <ul {...ptAttrs(props.pt, "root")} data-part="root" class={ptClass(props.pt, props.unstyled, "cr-tree", "root")} role="tree" aria-label={props.label} style={ptStyle(props.pt, props.dt, "root")} onKeyDown={(event) => state.onKey(event)}>
+    <ul {...ptAttrs(ptResolve(cr, props.pt, "CrTree"), "root")} data-part="root" class={ptClass(ptResolve(cr, props.pt, "CrTree"), props.unstyled, "cr-tree", "root")} role="tree" aria-label={props.label} style={ptStyle(ptResolve(cr, props.pt, "CrTree"), props.dt, "root")} onKeyDown={(event) => state.onKey(event)}>
       <For each={state.rows()}>
         {(row: any, i: number) => (
           <li
-            {...ptAttrs(props.pt, "item")}
+            {...ptAttrs(ptResolve(cr, props.pt, "CrTree"), "item")}
             data-part="item"
             data-state={state.selected === row.id ? "selected" : "unselected"}
-            class={ptClass(props.pt, props.unstyled, "cr-tree__item", "item")}
+            class={ptClass(ptResolve(cr, props.pt, "CrTree"), props.unstyled, "cr-tree__item", "item")}
             role="treeitem"
             data-id={row.id}
             aria-level={row.depth + 1}
@@ -150,10 +167,10 @@ export default function CrTree(props: CrTreeProps) {
             aria-selected={state.selected === row.id ? "true" : "false"}
             tabIndex={state.tabIndexFor(row, i)}
             style={state.indent(row)}
-            onClick={() => state.activate(row)}
+            onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrTree'), 'item', 'onClick', event); state.activate(row); }}
           >
-            <Show when={row.hasChildren} else={<span {...ptAttrs(props.pt, "lead")} data-part="lead" class={ptClass(props.pt, props.unstyled, "cr-tree__lead", "lead")} aria-hidden="true">·</span>}>
-              <span {...ptAttrs(props.pt, "twist")} data-part="twist" class={ptClass(props.pt, props.unstyled, "cr-tree__twist", "twist")} aria-hidden="true"></span>
+            <Show when={row.hasChildren} else={<span {...ptAttrs(ptResolve(cr, props.pt, "CrTree"), "lead")} data-part="lead" class={ptClass(ptResolve(cr, props.pt, "CrTree"), props.unstyled, "cr-tree__lead", "lead")} aria-hidden="true">·</span>}>
+              <span {...ptAttrs(ptResolve(cr, props.pt, "CrTree"), "twist")} data-part="twist" class={ptClass(ptResolve(cr, props.pt, "CrTree"), props.unstyled, "cr-tree__twist", "twist")} aria-hidden="true"></span>
             </Show>
             <span>{row.label}</span>
           </li>

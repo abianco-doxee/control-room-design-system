@@ -1,5 +1,7 @@
-import { useStore, For } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptAttrs, ptClass, ptHandler, ptResolve, ptStyle, resolveMessage, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrPaginationProps {
   /** Current page, 1-based (controlled). */
@@ -7,11 +9,15 @@ export interface CrPaginationProps {
   /** Total number of pages. */
   total: number;
   onChange?: (page: number) => void;
+  /** Override this component's built-in English strings. Any key you omit falls
+   *  back to the app-level `messages` from context, then to the built-in default.
+   *  See lib/messages.ts for the keys. */
+  labels?: Record<string, any>;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "btn" · "ellipsis". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"btn" | "ellipsis" | "root">;
+  dt?: CrDesignTokens;
 }
 
 /* Controlled pager: ◂ prev · windowed page numbers with ellipses · next ▸.
@@ -21,6 +27,21 @@ export interface CrPaginationProps {
  * Derived values live in useStore getters (Mitosis strips free consts in the
  * component body for some targets). Styling via .cr-pager. */
 export default function CrPagination(props: CrPaginationProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrPagination"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrPagination"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrPagination"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const state = useStore({
     get cur() {
       return props.page || 1;
@@ -52,32 +73,32 @@ export default function CrPagination(props: CrPaginationProps) {
   });
 
   return (
-    <nav {...ptAttrs(props.pt, "root")} data-part="root" class={ptClass(props.pt, props.unstyled, "cr-pager", "root")} aria-label="Pagination" style={ptStyle(props.pt, props.dt, "root")}>
+    <nav {...ptAttrs(ptResolve(cr, props.pt, "CrPagination"), "root")} data-part="root" class={ptClass(ptResolve(cr, props.pt, "CrPagination"), props.unstyled, "cr-pager", "root")} aria-label={resolveMessage(cr, props.labels, "CrPagination", "pagination")} style={ptStyle(ptResolve(cr, props.pt, "CrPagination"), props.dt, "root")}>
       <button
-        {...ptAttrs(props.pt, "btn")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrPagination"), "btn")}
         type="button"
         data-part="btn"
-        class={ptClass(props.pt, props.unstyled, "cr-pager__btn", "btn")}
-        aria-label="Previous page"
+        class={ptClass(ptResolve(cr, props.pt, "CrPagination"), props.unstyled, "cr-pager__btn", "btn")}
+        aria-label={resolveMessage(cr, props.labels, "CrPagination", "prevPage")}
         disabled={state.cur <= 1}
-        onClick={() => state.go(state.cur - 1)}
+        onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrPagination'), 'btn', 'onClick', event); state.go(state.cur - 1); }}
       >
         <span aria-hidden="true">◂</span>
       </button>
       <For each={state.items}>
         {(n: number) =>
           n < 0 ? (
-            <span {...ptAttrs(props.pt, "ellipsis")} data-part="ellipsis" class={ptClass(props.pt, props.unstyled, "cr-pager__ellipsis", "ellipsis")} aria-hidden="true">…</span>
+            <span {...ptAttrs(ptResolve(cr, props.pt, "CrPagination"), "ellipsis")} data-part="ellipsis" class={ptClass(ptResolve(cr, props.pt, "CrPagination"), props.unstyled, "cr-pager__ellipsis", "ellipsis")} aria-hidden="true">…</span>
           ) : (
             <button
-              {...ptAttrs(props.pt, "btn")}
+              {...ptAttrs(ptResolve(cr, props.pt, "CrPagination"), "btn")}
               type="button"
               data-part="btn"
               data-state={n === state.cur ? "current" : "inactive"}
-              class={ptClass(props.pt, props.unstyled, "cr-pager__btn" + (n === state.cur ? " cr-pager__btn--on" : ""), "btn")}
-              aria-label={"Page " + n}
+              class={ptClass(ptResolve(cr, props.pt, "CrPagination"), props.unstyled, "cr-pager__btn" + (n === state.cur ? " cr-pager__btn--on" : ""), "btn")}
+              aria-label={resolveMessage(cr, props.labels, "CrPagination", "page", n)}
               aria-current={n === state.cur ? "page" : "false"}
-              onClick={() => state.go(n)}
+              onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrPagination'), 'btn', 'onClick', event); state.go(n); }}
             >
               {n}
             </button>
@@ -85,13 +106,13 @@ export default function CrPagination(props: CrPaginationProps) {
         }
       </For>
       <button
-        {...ptAttrs(props.pt, "btn")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrPagination"), "btn")}
         type="button"
         data-part="btn"
-        class={ptClass(props.pt, props.unstyled, "cr-pager__btn", "btn")}
-        aria-label="Next page"
+        class={ptClass(ptResolve(cr, props.pt, "CrPagination"), props.unstyled, "cr-pager__btn", "btn")}
+        aria-label={resolveMessage(cr, props.labels, "CrPagination", "nextPage")}
         disabled={state.cur >= state.last}
-        onClick={() => state.go(state.cur + 1)}
+        onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrPagination'), 'btn', 'onClick', event); state.go(state.cur + 1); }}
       >
         <span aria-hidden="true">▸</span>
       </button>

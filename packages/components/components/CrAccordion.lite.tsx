@@ -1,5 +1,7 @@
-import { useStore, onMount, Show, For } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, onMount, Show, For, useContext, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrAccordionItem {
   title: string;
@@ -15,14 +17,29 @@ export interface CrAccordionProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "item" · "header" · "chevron" · "panel". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"chevron" | "header" | "item" | "panel" | "root">;
+  dt?: CrDesignTokens;
 }
 
 /* Collapsible sections. Each header is a button (aria-expanded + aria-controls);
  * panels are regions revealed on toggle. `single` makes it exclusive. ↑/↓/Home/End
  * move between headers (Enter/Space toggle natively). Styling via .cr-accordion. */
 export default function CrAccordion(props: CrAccordionProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrAccordion"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrAccordion"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrAccordion"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const state = useStore({
     open: {} as Record<number, boolean>,
     toggle(i: number) {
@@ -57,26 +74,26 @@ export default function CrAccordion(props: CrAccordionProps) {
   });
 
   return (
-    <div {...ptAttrs(props.pt, "root")} data-part="root" class={ptClass(props.pt, props.unstyled, "cr-accordion", "root")} style={ptStyle(props.pt, props.dt, "root")} onKeyDown={(event) => state.onKey(event)}>
+    <div {...ptAttrs(ptResolve(cr, props.pt, "CrAccordion"), "root")} data-part="root" class={ptClass(ptResolve(cr, props.pt, "CrAccordion"), props.unstyled, "cr-accordion", "root")} style={ptStyle(ptResolve(cr, props.pt, "CrAccordion"), props.dt, "root")} onKeyDown={(event) => state.onKey(event)}>
       <For each={props.items}>
         {(item: CrAccordionItem, i: number) => (
-          <div {...ptAttrs(props.pt, "item")} data-part="item" class={ptClass(props.pt, props.unstyled, "cr-accordion__item", "item")}>
+          <div {...ptAttrs(ptResolve(cr, props.pt, "CrAccordion"), "item")} data-part="item" class={ptClass(ptResolve(cr, props.pt, "CrAccordion"), props.unstyled, "cr-accordion__item", "item")}>
             <button
-              {...ptAttrs(props.pt, "header")}
+              {...ptAttrs(ptResolve(cr, props.pt, "CrAccordion"), "header")}
               type="button"
               data-part="header"
               data-state={state.open[i] ? "expanded" : "collapsed"}
-              class={ptClass(props.pt, props.unstyled, "cr-accordion__header", "header")}
+              class={ptClass(ptResolve(cr, props.pt, "CrAccordion"), props.unstyled, "cr-accordion__header", "header")}
               aria-expanded={state.open[i] ? "true" : "false"}
               aria-controls={"cr-acc-panel-" + i}
               id={"cr-acc-head-" + i}
-              onClick={() => state.toggle(i)}
+              onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrAccordion'), 'header', 'onClick', event); state.toggle(i); }}
             >
               <span>{item.title}</span>
-              <span {...ptAttrs(props.pt, "chevron")} data-part="chevron" class={ptClass(props.pt, props.unstyled, "cr-accordion__chevron", "chevron")} aria-hidden="true"></span>
+              <span {...ptAttrs(ptResolve(cr, props.pt, "CrAccordion"), "chevron")} data-part="chevron" class={ptClass(ptResolve(cr, props.pt, "CrAccordion"), props.unstyled, "cr-accordion__chevron", "chevron")} aria-hidden="true"></span>
             </button>
             <Show when={state.open[i]}>
-              <div {...ptAttrs(props.pt, "panel")} data-part="panel" class={ptClass(props.pt, props.unstyled, "cr-accordion__panel", "panel")} id={"cr-acc-panel-" + i} role="region" aria-labelledby={"cr-acc-head-" + i}>
+              <div {...ptAttrs(ptResolve(cr, props.pt, "CrAccordion"), "panel")} data-part="panel" class={ptClass(ptResolve(cr, props.pt, "CrAccordion"), props.unstyled, "cr-accordion__panel", "panel")} id={"cr-acc-panel-" + i} role="region" aria-labelledby={"cr-acc-head-" + i}>
                 {item.body}
               </div>
             </Show>

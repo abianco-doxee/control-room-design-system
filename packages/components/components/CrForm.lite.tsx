@@ -1,6 +1,8 @@
-import { useStore, Show, For } from "@builder.io/mitosis";
+import { useStore, Show, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
 import CrFormRow from "./CrFormRow.lite";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { ptAttrs, ptClass, ptHandler, ptNested, ptResolve, ptStyle, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrFormField {
   name: string;
@@ -70,8 +72,10 @@ export interface CrFormProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" (form) · "title" · "actions". Rows are CrFormRow (own contract). */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  /** `row` is a NESTED SECTION: its value is a `pt` for each inner CrFormRow
+   *  (`pt={{ row: { root: { "data-dense": "" } } }}`), not an attribute bag. */
+  pt?: CrPassThrough<"actions" | "root" | "row" | "title">;
+  dt?: CrDesignTokens;
 }
 
 /* CrForm — a schema-driven form. Feed it a Form Model (which may nest: `group`
@@ -88,6 +92,21 @@ export interface CrFormProps {
  * + helpers are METHODS (a getter would run before the store initialises on
  * Qwik). See references/forms.md. */
 export default function CrForm(props: CrFormProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrForm"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrForm"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrForm"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const state = useStore({
     vals: props.values || {},
     /* the seed values — `dirty()` compares against this, `reset()` restores it */
@@ -365,11 +384,18 @@ export default function CrForm(props: CrFormProps) {
      * `mode` = when a field FIRST validates (blur | change | submit);
      * `revalidateMode` = once it has validated once, when it re-checks
      * (change | blur). A field that has errored is always live-revalidated so a
-     * fix clears the message as expected. */
-    mode(): string {
+     * fix clears the message as expected.
+     *
+     * NOT named `mode`/`revalidateMode`: Svelte flattens `state.x()` to a bare
+     * `function x()` in the SAME scope as the `export let x` prop, so a state
+     * member sharing a prop's name emits `export let mode` + `function mode()`
+     * — "Identifier 'mode' has already been declared", and the body's
+     * `return mode || "blur"` self-references the function. Same trap as
+     * CrTabs' `current`; see the note there. */
+    firstMode(): string {
       return props.mode || "blur";
     },
-    revalidateMode(): string {
+    reMode(): string {
       return props.revalidateMode || "change";
     },
     isLive(path: any[]): boolean {
@@ -409,8 +435,8 @@ export default function CrForm(props: CrFormProps) {
       const k = state.key(path);
       if (state.isLive(path)) {
         /* already validated once — re-check on change if that's the revalidate mode */
-        if (state.revalidateMode() === "change" || state.errs[k]) state.revalidate(next);
-      } else if (state.mode() === "change") {
+        if (state.reMode() === "change" || state.errs[k]) state.revalidate(next);
+      } else if (state.firstMode() === "change") {
         /* first validation happens on change */
         state.touched = { ...state.touched, [k]: true };
         state.revalidate(next);
@@ -419,8 +445,8 @@ export default function CrForm(props: CrFormProps) {
     blur(path: any[]) {
       const k = state.key(path);
       if (state.isLive(path)) {
-        if (state.revalidateMode() === "blur") state.revalidate(state.vals);
-      } else if (state.mode() === "blur") {
+        if (state.reMode() === "blur") state.revalidate(state.vals);
+      } else if (state.firstMode() === "blur") {
         state.touched = { ...state.touched, [k]: true };
         state.revalidate(state.vals);
       }
@@ -448,10 +474,11 @@ export default function CrForm(props: CrFormProps) {
      * `data-kind` / `data-action`; these helpers translate that back into the
      * store operations. Handlers live here (recreated each render), so they always
      * read the latest state — no stale-closure risk. */
-    pathOf(key: string): any[] {
+    pathOf(dotted: string): any[] {
       /* dotted key → path array, coercing pure-integer segments back to numeric
-       * array indices (so setDeep rebuilds arrays, not objects). */
-      return key.split(".").map((seg: string) => (/^\d+$/.test(seg) ? Number(seg) : seg));
+       * array indices (so setDeep rebuilds arrays, not objects).
+       * `dotted`, not `key` — same reason as fieldAtKey's `wantKey` below. */
+      return dotted.split(".").map((seg: string) => (/^\d+$/.test(seg) ? Number(seg) : seg));
     },
     fieldAtKey(wantKey: string): any {
       /* resolve the field descriptor for a leaf path (needed by autocomplete).
@@ -472,11 +499,11 @@ export default function CrForm(props: CrFormProps) {
       const el = event.target;
       if (!el || !el.dataset || el.dataset.path == null) return;
       const kind = el.dataset.kind;
-      const key = el.dataset.path;
+      const pathKey = el.dataset.path;
       if (kind === "autocomplete") {
-        state.acInput(state.fieldAtKey(key), state.pathOf(key), el.value);
+        state.acInput(state.fieldAtKey(pathKey), state.pathOf(pathKey), el.value);
       } else if (kind === "text" || kind === "email" || kind === "url" || kind === "number" || kind === "textarea" || kind === "json") {
-        state.setField(state.pathOf(key), el.value);
+        state.setField(state.pathOf(pathKey), el.value);
       }
     },
     onFormChange(event: any) {
@@ -507,10 +534,10 @@ export default function CrForm(props: CrFormProps) {
     onFormMouseDown(event: any) {
       const li = event.target && event.target.closest ? event.target.closest("li[data-idx]") : null;
       if (!li || li.dataset.path == null) return;
-      const key = li.dataset.path;
+      const pathKey = li.dataset.path;
       const idx = Number(li.dataset.idx);
-      const items = state.acItems(state.pathOf(key));
-      if (items[idx]) state.acPick(state.fieldAtKey(key), state.pathOf(key), items[idx]);
+      const items = state.acItems(state.pathOf(pathKey));
+      if (items[idx]) state.acPick(state.fieldAtKey(pathKey), state.pathOf(pathKey), items[idx]);
     },
     onFormClick(event: any) {
       const btn = event.target && event.target.closest ? event.target.closest("[data-action]") : null;
@@ -521,19 +548,22 @@ export default function CrForm(props: CrFormProps) {
     },
     submit(event: any) {
       event.preventDefault();
-      const values = state.vals;
+      const vals2 = state.vals;
       state.submitted = true;
       state.submitting = true;
       /* validate may be sync or async — normalise with Promise.resolve; the
        * button stays in its pending state until validate AND onSubmit settle. */
-      const payload = state.pruned(values); /* drop hidden fields from validation + submit */
+      const payload = state.pruned(vals2); /* drop hidden fields from validation + submit */
       Promise.resolve(props.validate ? props.validate(payload) || {} : {}).then((e: any) => {
-        const errs = e || {};
-        state.errs = errs;
+        /* NOT named `errs`: Mitosis strips the `state.` prefix, so a local with a
+         * store member's name collapses to `const errs = …; errs = errs;` — a
+         * const reassignment that fails to compile on Svelte. */
+        const nextErrs = e || {};
+        state.errs = nextErrs;
         const t: Record<string, boolean> = {};
-        for (const k of Object.keys(errs)) t[k] = true;
+        for (const k of Object.keys(nextErrs)) t[k] = true;
         state.touched = t;
-        if (Object.keys(errs).length === 0 && props.onSubmit) {
+        if (Object.keys(nextErrs).length === 0 && props.onSubmit) {
           Promise.resolve(props.onSubmit(payload)).then(
             () => { state.submitting = false; },
             () => { state.submitting = false; },
@@ -547,24 +577,24 @@ export default function CrForm(props: CrFormProps) {
 
   return (
     <form
-      {...ptAttrs(props.pt, "root")}
-      class={ptClass(props.pt, props.unstyled, "cr-form", "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrForm"), "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrForm"), props.unstyled, "cr-form", "root")}
       data-part="root"
-      style={ptStyle(props.pt, props.dt, "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrForm"), props.dt, "root")}
       noValidate
-      onSubmit={(event) => state.submit(event)}
-      onInput={(event) => state.onFormInput(event)}
-      onChange={(event) => state.onFormChange(event)}
-      onKeyDown={(event) => state.onFormKeyDown(event)}
-      onMouseDown={(event) => state.onFormMouseDown(event)}
-      onClick={(event) => state.onFormClick(event)}
-      onBlur={(event) => state.onFormLeave(event)}
-      onFocusOut={(event) => state.onFormLeave(event)}
-      onFocus={(event) => state.onFormEnter(event)}
-      onFocusIn={(event) => state.onFormEnter(event)}
+      onSubmit={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onSubmit', event); state.submit(event); }}
+      onInput={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onInput', event); state.onFormInput(event); }}
+      onChange={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onChange', event); state.onFormChange(event); }}
+      onKeyDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onKeyDown', event); state.onFormKeyDown(event); }}
+      onMouseDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onMouseDown', event); state.onFormMouseDown(event); }}
+      onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onClick', event); state.onFormClick(event); }}
+      onBlur={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onBlur', event); state.onFormLeave(event); }}
+      onFocusOut={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onFocusOut', event); state.onFormLeave(event); }}
+      onFocus={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onFocus', event); state.onFormEnter(event); }}
+      onFocusIn={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrForm'), 'root', 'onFocusIn', event); state.onFormEnter(event); }}
     >
       <Show when={props.title}>
-        <h3 {...ptAttrs(props.pt, "title")} class={ptClass(props.pt, props.unstyled, "cr-form__title", "title")} data-part="title">{props.title}</h3>
+        <h3 {...ptAttrs(ptResolve(cr, props.pt, "CrForm"), "title")} class={ptClass(ptResolve(cr, props.pt, "CrForm"), props.unstyled, "cr-form__title", "title")} data-part="title">{props.title}</h3>
       </Show>
       <Show when={state.hasSummary()}>
         <div class="cr-form__summary" role="alert">
@@ -581,6 +611,13 @@ export default function CrForm(props: CrFormProps) {
       <For each={state.rows()}>
         {(row: any) => (
           <CrFormRow
+            pt={ptNested(ptResolve(cr, props.pt, "CrForm"), "row")}
+            /* `unstyled` has to travel with `pt`: CrFormRow puts the `cr-form__row`
+             * class on its own root and on the controls it renders (input, select,
+             * textarea, the nested checkbox), so without this `<CrForm unstyled />`
+             * still emits every one of them and the opt-out is a no-op on the rows —
+             * which is the whole surface of a form. */
+            unstyled={props.unstyled}
             rowType={row.t}
             field={row.field}
             pathKey={state.key(row.path)}
@@ -601,7 +638,7 @@ export default function CrForm(props: CrFormProps) {
           />
         )}
       </For>
-      <div {...ptAttrs(props.pt, "actions")} class={ptClass(props.pt, props.unstyled, "cr-form__actions", "actions")} data-part="actions">
+      <div {...ptAttrs(ptResolve(cr, props.pt, "CrForm"), "actions")} class={ptClass(ptResolve(cr, props.pt, "CrForm"), props.unstyled, "cr-form__actions", "actions")} data-part="actions">
         <button type="submit" class="cr-btn" disabled={props.disabled || state.submitting} aria-busy={state.submitting ? "true" : undefined}>
           {state.submitBtnLabel()}
         </button>

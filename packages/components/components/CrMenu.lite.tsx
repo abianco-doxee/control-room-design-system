@@ -1,5 +1,7 @@
-import { useStore, useRef, Show, For } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, useRef, Show, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 import { placeEl } from "../lib/position.ts";
 
 export interface CrMenuItem {
@@ -21,8 +23,8 @@ export interface CrMenuProps {
   /* ── styling contract (portable pt/dt subset) ──
    * Parts: "root" · "trigger" · "panel" · "item". Each carries data-part. */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"item" | "panel" | "root" | "trigger">;
+  dt?: CrDesignTokens;
 }
 
 /* Dropdown menu with full keyboard support: the trigger opens on click or ↓;
@@ -30,6 +32,21 @@ export interface CrMenuProps {
  * to the trigger. A transparent full-viewport scrim closes it on outside click
  * (no global listeners — identical across targets). Styling via .cr-menu. */
 export default function CrMenu(props: CrMenuProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrMenu"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrMenu"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrMenu"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const rootRef = useRef(null);
 
   const state = useStore({
@@ -97,20 +114,20 @@ export default function CrMenu(props: CrMenuProps) {
     onPanelKey(e: any) {
       const root: any = rootRef;
       if (!root) return;
-      const items = Array.from(root.querySelectorAll('[role="menuitem"]'));
-      const i = items.indexOf(document.activeElement);
+      const nodes = Array.from(root.querySelectorAll('[role="menuitem"]'));
+      const i = nodes.indexOf(document.activeElement);
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        ((items[i + 1] || items[0]) as HTMLElement).focus();
+        ((nodes[i + 1] || nodes[0]) as HTMLElement).focus();
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        ((items[i - 1] || items[items.length - 1]) as HTMLElement).focus();
+        ((nodes[i - 1] || nodes[nodes.length - 1]) as HTMLElement).focus();
       } else if (e.key === "Home") {
         e.preventDefault();
-        (items[0] as HTMLElement).focus();
+        (nodes[0] as HTMLElement).focus();
       } else if (e.key === "End") {
         e.preventDefault();
-        (items[items.length - 1] as HTMLElement).focus();
+        (nodes[nodes.length - 1] as HTMLElement).focus();
       } else if (e.key === "Escape") {
         e.preventDefault();
         state.open = false;
@@ -123,10 +140,10 @@ export default function CrMenu(props: CrMenuProps) {
         state.buffer = (now - state.bufferAt < 600 ? state.buffer : "") + e.key.toLowerCase();
         state.bufferAt = now;
         const labels = props.items.map((it: CrMenuItem) => (it.label || "").toLowerCase());
-        for (let k = 1; k <= items.length; k++) {
-          const idx = (i + k) % items.length; // start after the focused item (i = -1 → from 0)
+        for (let k = 1; k <= nodes.length; k++) {
+          const idx = (i + k) % nodes.length; // start after the focused item (i = -1 → from 0)
           if (labels[idx].indexOf(state.buffer) === 0) {
-            (items[idx] as HTMLElement).focus();
+            (nodes[idx] as HTMLElement).focus();
             break;
           }
         }
@@ -135,16 +152,16 @@ export default function CrMenu(props: CrMenuProps) {
   });
 
   return (
-    <div {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-menu", "root")} data-part="root" data-state={state.open ? "open" : "closed"} style={ptStyle(props.pt, props.dt, "root")} ref={rootRef}>
+    <div {...ptAttrs(ptResolve(cr, props.pt, "CrMenu"), "root")} class={ptClass(ptResolve(cr, props.pt, "CrMenu"), props.unstyled, "cr-menu", "root")} data-part="root" data-state={state.open ? "open" : "closed"} style={ptStyle(ptResolve(cr, props.pt, "CrMenu"), props.dt, "root")} ref={rootRef}>
       <button
-        {...ptAttrs(props.pt, "trigger")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrMenu"), "trigger")}
         type="button"
         data-part="trigger"
-        class={ptClass(props.pt, props.unstyled, "cr-btn cr-btn--outline cr-btn--sm", "trigger")}
+        class={ptClass(ptResolve(cr, props.pt, "CrMenu"), props.unstyled, "cr-btn cr-btn--outline cr-btn--sm", "trigger")}
         aria-haspopup="menu"
         aria-expanded={state.open ? "true" : "false"}
-        onClick={() => state.toggle()}
-        onKeyDown={(event) => state.onTriggerKey(event)}
+        onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrMenu'), 'trigger', 'onClick', event); state.toggle(); }}
+        onKeyDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrMenu'), 'trigger', 'onKeyDown', event); state.onTriggerKey(event); }}
       >
         {props.label}
       </button>
@@ -157,26 +174,26 @@ export default function CrMenu(props: CrMenuProps) {
           onClick={() => state.close()}
         ></button>
         <div
-          {...ptAttrs(props.pt, "panel")}
+          {...ptAttrs(ptResolve(cr, props.pt, "CrMenu"), "panel")}
           data-part="panel"
-          class={ptClass(props.pt, props.unstyled, "cr-menu__panel", "panel")}
+          class={ptClass(ptResolve(cr, props.pt, "CrMenu"), props.unstyled, "cr-menu__panel", "panel")}
           role="menu"
           /* Hidden at mount so it can never paint at its unplaced CSS position —
            * place() (via focusFirst) reveals it once placeEl() has run. Not
            * ptStyle-backed: this part carries no pt/dt style hook (see
            * styling-contract.md). */
           style={{ visibility: "hidden" }}
-          onKeyDown={(event) => state.onPanelKey(event)}
+          onKeyDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrMenu'), 'panel', 'onKeyDown', event); state.onPanelKey(event); }}
         >
           <For each={props.items}>
             {(item: CrMenuItem, i: number) => (
               <button
-                {...ptAttrs(props.pt, "item")}
+                {...ptAttrs(ptResolve(cr, props.pt, "CrMenu"), "item")}
                 type="button"
                 role="menuitem"
                 data-part="item"
-                class={ptClass(props.pt, props.unstyled, "cr-menu__item" + (item.danger ? " cr-menu__item--danger" : ""), "item")}
-                onClick={() => state.pick(i)}
+                class={ptClass(ptResolve(cr, props.pt, "CrMenu"), props.unstyled, "cr-menu__item" + (item.danger ? " cr-menu__item--danger" : ""), "item")}
+                onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrMenu'), 'item', 'onClick', event); state.pick(i); }}
               >
                 {item.label}
               </button>

@@ -1,4 +1,7 @@
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrChoiceProps {
   type?: "checkbox" | "radio";
@@ -13,14 +16,29 @@ export interface CrChoiceProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "input" · "label". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"input" | "label" | "root">;
+  dt?: CrDesignTokens;
 }
 export default function CrChoice(props: CrChoiceProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrChoice"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrChoice"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrChoice"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   return (
-    <label {...ptAttrs(props.pt, "root")} data-part="root" class={ptClass(props.pt, props.unstyled, "cr-check", "root")} style={ptStyle(props.pt, props.dt, "root")}>
+    <label {...ptAttrs(ptResolve(cr, props.pt, "CrChoice"), "root")} data-part="root" class={ptClass(ptResolve(cr, props.pt, "CrChoice"), props.unstyled, "cr-check", "root")} style={ptStyle(ptResolve(cr, props.pt, "CrChoice"), props.dt, "root")}>
       <input
-        {...ptAttrs(props.pt, "input")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrChoice"), "input")}
         data-part="input"
         data-state={props.checked ? "checked" : "unchecked"}
         type={props.type || "checkbox"}
@@ -28,9 +46,9 @@ export default function CrChoice(props: CrChoiceProps) {
         checked={props.checked}
         disabled={props.disabled}
         aria-invalid={props.invalid ? "true" : "false"}
-        onChange={(event) => props.onChange && props.onChange(event.target.checked)}
+        onChange={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrChoice'), 'input', 'onChange', event); props.onChange && props.onChange(event.target.checked); }}
       />
-      <span {...ptAttrs(props.pt, "label")} data-part="label">{props.label}</span>
+      <span {...ptAttrs(ptResolve(cr, props.pt, "CrChoice"), "label")} data-part="label">{props.label}</span>
     </label>
   );
 }

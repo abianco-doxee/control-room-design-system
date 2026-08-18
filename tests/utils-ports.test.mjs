@@ -43,7 +43,25 @@ test("refreshCadence uses one unit", () => {
 
 test("relativeTime is signed and clock-injected (no internal Date.now)", () => {
   const now = 1_000_000_000_000;
+  // The terse machine register is unchanged by the move to Intl — these two are
+  // byte-identical to the hand-rolled output, which is the regression check.
   assert.equal(relativeTime(now - 5 * 60000, now), "5m ago");
   assert.equal(relativeTime(now + 2 * 3600000, now), "in 2h");
-  assert.equal(relativeTime(now - 1000, now), "just now");
+  // Sub-45s now comes from `numeric: "auto"`, so it is the locale's own word for
+  // the present ("now") rather than the hand-written "just now".
+  assert.equal(relativeTime(now - 1000, now), "now");
+});
+
+test("relativeTime is localised, and unit selection stays ours", () => {
+  const now = 1_000_000_000_000;
+  assert.equal(relativeTime(now - 5 * 60000, now, "it"), "5 min fa");
+  assert.equal(relativeTime(now - 2 * 3600000, now, "de"), "vor 2 Std.");
+  // French renders `narrow` as a bare sign ("-5 min"), which reads as a delta, so
+  // it falls back to `short`. Guards the behaviour table in duration.js.
+  // NB: CLDR separates the number from the unit with U+00A0 (non-breaking space)
+  // in fr — compare on the normalised string so the intent is legible.
+  assert.equal(relativeTime(now - 5 * 60000, now, "fr").replace(/ /g, " "), "il y a 5 min");
+  // The d/h/m/s ladder is ours, not Intl's: 2 days must not become "the day
+  // before yesterday" style prose at the wrong granularity.
+  assert.equal(relativeTime(now - 3 * 86400000, now), "3d ago");
 });

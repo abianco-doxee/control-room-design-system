@@ -29,10 +29,28 @@ const CHECK = process.argv.includes("--check");
 const NEEDS_SEMI = /(=\s*useState\(\(\)\s*=>\s*\([^)]*\)\))(?!\s*;)/g;
 
 // Same missing-semicolon family, for a deps-less effect (Mitosis `onUpdate` with
-// no deps → `useEffect(() => {...}, )`). Emitted on one line immediately before
-// `return`, ASI can't insert the separator, so prettier throws "';' expected".
-// The `}, )` close is the distinctive deps-less-hook shape; add the semicolon.
-const NEEDS_SEMI_EFFECT = /(\},\s*\))(\s*return\b)/g;
+// no deps → `useEffect(() => {...}, )`). Collapsed onto one line it runs straight
+// into whatever follows — `return`, another `useEffect`, a `const` — and ASI can't
+// insert the separator, so prettier throws "';' expected". The `}, )` close is the
+// distinctive deps-less-hook shape; add the semicolon whenever a statement (rather
+// than an existing `;`) follows.
+const NEEDS_SEMI_EFFECT = /(\},\s*\))(?!\s*[;,)\]}])/g;
+
+// A WITH-deps effect (`useEffect(() => {...}, [a, b])`) has the same missing
+// semicolon and the same collapsed-onto-one-line consequence.
+//
+// Anchored on the effect's OWN closing `}, [deps])` rather than scanning forward
+// from `useEffect(`: a lazy `[\s\S]*?` span would stop at the FIRST `}, [...])`
+// after the keyword, which for a body containing a nested `useCallback`/`reduce`
+// is the inner hook's close, not the effect's — putting the semicolon in the wrong
+// place and leaving the real parse error. Matching the close alone has no such
+// ambiguity, and the negative lookahead is what keeps it idempotent.
+//
+// The deps list is matched as a balanced-free `[^\]]*` on purpose: a nested `]`
+// (`[props.items[0]]`) would not match and is left alone rather than mis-cut.
+// Mitosis does not emit such deps today; if it ever does, prettier fails loudly
+// here rather than this silently corrupting the file.
+const NEEDS_SEMI_EFFECT_DEPS = /(\},\s*\[[^\]]*\]\))(?!\s*[;,)\]}])/g;
 
 // Presentational children wrapped in React.memo so a parent re-render only
 // re-renders the child whose props actually changed. Safe ONLY for components
@@ -82,7 +100,11 @@ for (const f of files) {
   // cross-component import at runtime.
   let patched = src
     .replace(NEEDS_SEMI, "$1;")
-    .replace(NEEDS_SEMI_EFFECT, "$1;$2")
+    // Deps variant FIRST: its `}, [x])` close ends in `)`, which the deps-less
+    // pattern's `}, )` shape does not match, so the two are disjoint — but running
+    // the narrower one first keeps that independence obvious rather than incidental.
+    .replace(NEEDS_SEMI_EFFECT_DEPS, "$1;")
+    .replace(NEEDS_SEMI_EFFECT, "$1;")
     .replace(/from (["'])(\.\/Cr[A-Za-z0-9]+)\1/g, "from $1$2.tsx$1");
   if (MEMOIZE.has(f)) patched = wrapInMemo(patched, f);
   let formatted;

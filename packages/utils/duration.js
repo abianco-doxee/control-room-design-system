@@ -31,12 +31,57 @@ export function refreshCadence(ms) {
 
 // Signed relative phrase between two epoch-ms timestamps. `now` is REQUIRED — see
 // the header note on the clock.
-export function relativeTime(then, now) {
+// Localised via Intl.RelativeTimeFormat — MUST stay in lockstep with the
+// CrRelativeTime component, which renders the same phrase (a parity test asserts
+// the two match exactly). `style: "narrow"` keeps the terse machine register: in
+// English it is byte-identical to the previous hand-rolled output ("5m ago",
+// "in 2h"). Some CLDR locales render narrow as a bare +/- sign ("-5 min"), which
+// reads as a delta rather than an elapsed time, so those take "short" instead —
+// a BEHAVIOUR table, not a translation table.
+//
+// `numeric` is "always" for the ladder and "auto" ONLY for the sub-45s case.
+// "auto" is what yields the locale's own "now"/"ora"/"jetzt" there, but applying
+// it to the ladder would swap in CALENDAR words for ±1 of any unit — "yesterday",
+// "tomorrow" — and our `value` is an ELAPSED-DURATION count, not a calendar
+// offset. 47 hours ago is "2d ago" by elapsed time and rendered "yesterday" by
+// calendar words, which is simply wrong. So the ladder pins "always".
+const SIGN_ONLY_NARROW = ["fr", "ru", "sv", "nb", "nn", "no", "da", "uk", "be"];
+
+function rtfFor(loc, numeric) {
+  const base = loc.split("-")[0];
+  const style = SIGN_ONLY_NARROW.indexOf(base) !== -1 ? "short" : "narrow";
+  try {
+    return new Intl.RelativeTimeFormat(loc, { numeric, style });
+  } catch {
+    // An invalid tag ("en_US" — the Java/Python/POSIX spelling — is the common
+    // mistake) throws RangeError. This runs during render from app config, so a
+    // single typo would blank the whole subtree; fall back to English instead.
+    return new Intl.RelativeTimeFormat("en", { numeric, style: "narrow" });
+  }
+}
+
+export function relativeTime(then, now, locale) {
   const delta = now - then;
   const abs = Math.abs(delta);
-  if (abs < 45000) return "just now";
-  const phrase = humanDuration(abs, { max: 1 });
-  return delta >= 0 ? phrase + " ago" : "in " + phrase;
+  const loc = locale || "en";
+  if (abs < 45000) return rtfFor(loc, "auto").format(0, "second");
+  // Unit SELECTION stays ours (Intl formats a value+unit pair, it does not pick
+  // the unit), so the d/h/m/s ladder is unchanged.
+  let value, unit;
+  if (abs >= 86400000) {
+    value = Math.floor(abs / 86400000);
+    unit = "day";
+  } else if (abs >= 3600000) {
+    value = Math.floor(abs / 3600000);
+    unit = "hour";
+  } else if (abs >= 60000) {
+    value = Math.floor(abs / 60000);
+    unit = "minute";
+  } else {
+    value = Math.max(1, Math.floor(abs / 1000));
+    unit = "second";
+  }
+  return rtfFor(loc, "always").format(delta >= 0 ? -value : value, unit);
 }
 
 function compactParts(ms, max) {

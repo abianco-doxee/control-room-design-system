@@ -1,13 +1,15 @@
-import { useStore } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrTelemetryProps {
   seed: string;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"root">;
+  dt?: CrDesignTokens;
 }
 
 /* A seeded FUI telemetry string — a NERV-style decorative readout (hex id, a
@@ -23,6 +25,21 @@ export interface CrTelemetryProps {
  * The derivation lives in a useStore getter (not free consts in the body) so the
  * Mitosis codegen keeps it — free consts get stripped from the compiled output. */
 export default function CrTelemetry(props: CrTelemetryProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrTelemetry"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrTelemetry"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrTelemetry"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const state = useStore({
     get line(): string {
       let x = 2166136261 >>> 0;
@@ -41,7 +58,7 @@ export default function CrTelemetry(props: CrTelemetryProps) {
   });
 
   return (
-    <span {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-telemetry", "root")} data-part="root" role="presentation" aria-hidden="true" style={ptStyle(props.pt, props.dt, "root")}>
+    <span {...ptAttrs(ptResolve(cr, props.pt, "CrTelemetry"), "root")} class={ptClass(ptResolve(cr, props.pt, "CrTelemetry"), props.unstyled, "cr-telemetry", "root")} data-part="root" role="presentation" aria-hidden="true" style={ptStyle(ptResolve(cr, props.pt, "CrTelemetry"), props.dt, "root")}>
       {state.line}
     </span>
   );

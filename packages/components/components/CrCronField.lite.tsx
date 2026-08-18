@@ -1,5 +1,7 @@
-import { Show, For } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { Show, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrCronPreset {
   label: string;
@@ -33,8 +35,8 @@ export interface CrCronFieldProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "label" · "req" · "input" · "presets" · "preset" · "error" · "out" · "hint". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"error" | "hint" | "input" | "label" | "out" | "preset" | "presets" | "req" | "root">;
+  dt?: CrDesignTokens;
 }
 
 /* Control Room cron Field — a proper form field: label + input + presets + a live
@@ -45,27 +47,42 @@ export interface CrCronFieldProps {
  * aria-describedby. Controlled via value + onChange; onBlur lets a form validate on
  * leave. Styling via .cr-cron (+ the shared .cr-field__* label/hint/error). */
 export default function CrCronField(props: CrCronFieldProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrCronField"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrCronField"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrCronField"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   return (
     <div
-      {...ptAttrs(props.pt, "root")}
-      class={ptClass(props.pt, props.unstyled, "cr-cron" + (props.error ? " cr-cron--error" : ""), "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrCronField"), "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrCronField"), props.unstyled, "cr-cron" + (props.error ? " cr-cron--error" : ""), "root")}
       data-part="root"
       data-state={props.error ? "error" : undefined}
-      style={ptStyle(props.pt, props.dt, "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrCronField"), props.dt, "root")}
     >
       <Show when={props.label}>
-        <label {...ptAttrs(props.pt, "label")} class={ptClass(props.pt, props.unstyled, "cr-field__label", "label")} data-part="label" for={props.id}>
+        <label {...ptAttrs(ptResolve(cr, props.pt, "CrCronField"), "label")} class={ptClass(ptResolve(cr, props.pt, "CrCronField"), props.unstyled, "cr-field__label", "label")} data-part="label" for={props.id}>
           {props.label}
           <Show when={props.required}>
-            <span {...ptAttrs(props.pt, "req")} class={ptClass(props.pt, props.unstyled, "cr-field__req", "req")} data-part="req" aria-hidden="true"> *</span>
+            <span {...ptAttrs(ptResolve(cr, props.pt, "CrCronField"), "req")} class={ptClass(ptResolve(cr, props.pt, "CrCronField"), props.unstyled, "cr-field__req", "req")} data-part="req" aria-hidden="true"> *</span>
           </Show>
         </label>
       </Show>
       <input
-        {...ptAttrs(props.pt, "input")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrCronField"), "input")}
         id={props.id}
         name={props.name}
-        class={ptClass(props.pt, props.unstyled, "cr-cron__input", "input")}
+        class={ptClass(ptResolve(cr, props.pt, "CrCronField"), props.unstyled, "cr-cron__input", "input")}
         data-part="input"
         data-state={props.error ? "error" : undefined}
         type="text"
@@ -78,14 +95,14 @@ export default function CrCronField(props: CrCronFieldProps) {
         aria-required={props.required ? "true" : undefined}
         aria-invalid={props.error ? "true" : "false"}
         aria-describedby={props.error ? props.id + "-err" : props.description ? props.id + "-desc" : props.hint ? props.id + "-hint" : undefined}
-        onInput={(event) => props.onChange && props.onChange((event.target as HTMLInputElement).value)}
-        onBlur={() => props.onBlur && props.onBlur()}
+        onInput={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrCronField'), 'input', 'onInput', event); props.onChange && props.onChange((event.target as HTMLInputElement).value); }}
+        onBlur={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrCronField'), 'input', 'onBlur', event); props.onBlur && props.onBlur(); }}
       />
       <Show when={props.presets}>
-        <div {...ptAttrs(props.pt, "presets")} class={ptClass(props.pt, props.unstyled, "cr-cron__presets", "presets")} data-part="presets">
+        <div {...ptAttrs(ptResolve(cr, props.pt, "CrCronField"), "presets")} class={ptClass(ptResolve(cr, props.pt, "CrCronField"), props.unstyled, "cr-cron__presets", "presets")} data-part="presets">
           <For each={props.presets}>
             {(pre: CrCronPreset) => (
-              <button {...ptAttrs(props.pt, "preset")} type="button" class={ptClass(props.pt, props.unstyled, "cr-cron__preset", "preset")} data-part="preset" disabled={props.disabled} onClick={() => props.onChange && props.onChange(pre.cron)}>
+              <button {...ptAttrs(ptResolve(cr, props.pt, "CrCronField"), "preset")} type="button" class={ptClass(ptResolve(cr, props.pt, "CrCronField"), props.unstyled, "cr-cron__preset", "preset")} data-part="preset" disabled={props.disabled} onClick={() => props.onChange && props.onChange(pre.cron)}>
                 {pre.label}
               </button>
             )}
@@ -93,13 +110,13 @@ export default function CrCronField(props: CrCronFieldProps) {
         </div>
       </Show>
       <Show when={props.error}>
-        <span {...ptAttrs(props.pt, "error")} class={ptClass(props.pt, props.unstyled, "cr-field__error", "error")} data-part="error" id={props.id + "-err"} role="alert">{props.error}</span>
+        <span {...ptAttrs(ptResolve(cr, props.pt, "CrCronField"), "error")} class={ptClass(ptResolve(cr, props.pt, "CrCronField"), props.unstyled, "cr-field__error", "error")} data-part="error" id={props.id + "-err"} role="alert">{props.error}</span>
       </Show>
       <Show when={props.description && !props.error}>
-        <p {...ptAttrs(props.pt, "out")} class={ptClass(props.pt, props.unstyled, "cr-cron__out", "out")} data-part="out" id={props.id + "-desc"} aria-live="polite">{props.description}</p>
+        <p {...ptAttrs(ptResolve(cr, props.pt, "CrCronField"), "out")} class={ptClass(ptResolve(cr, props.pt, "CrCronField"), props.unstyled, "cr-cron__out", "out")} data-part="out" id={props.id + "-desc"} aria-live="polite">{props.description}</p>
       </Show>
       <Show when={props.hint && !props.description && !props.error}>
-        <span {...ptAttrs(props.pt, "hint")} class={ptClass(props.pt, props.unstyled, "cr-field__hint", "hint")} data-part="hint" id={props.id + "-hint"}>{props.hint}</span>
+        <span {...ptAttrs(ptResolve(cr, props.pt, "CrCronField"), "hint")} class={ptClass(ptResolve(cr, props.pt, "CrCronField"), props.unstyled, "cr-field__hint", "hint")} data-part="hint" id={props.id + "-hint"}>{props.hint}</span>
       </Show>
     </div>
   );

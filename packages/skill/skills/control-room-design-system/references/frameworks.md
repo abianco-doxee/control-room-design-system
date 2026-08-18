@@ -18,6 +18,13 @@ import { CrButton } from "@alebianco/cr-design-system/qwik";
 import { CrButton } from "@alebianco/cr-design-system/vue";
 ```
 
+Every entry also exports **`CrContext`** — the app-level tier for global `pt`,
+`locale` and `messages`. It is the one non-component export, and its shape is that
+framework's own context primitive (React/Solid a context object, Vue/Svelte a
+`{ cr, key }` pair, Qwik a `ContextId`, Angular an injectable), so how you provide
+it differs per target. Typed as `CrGlobalConfig`; see
+[styling-contract.md](styling-contract.md) for the per-target provider examples.
+
 How each entry is distributed reflects what that framework needs — the package is
 private, but every entry is a genuine, consumable package:
 
@@ -33,9 +40,13 @@ Qwik are TSX, so `tsc` emits full declarations. For Vue/Svelte/Solid/Angular
 (non-TSX source), `build/build-pkg-types.mjs` generates an `index.d.ts` from the
 shared, framework-agnostic prop interfaces — every component's `<Name>Props` is
 re-exported, and the component value is typed per framework (Vue `DefineComponent`,
-Solid render fn, Svelte component constructor, Angular class). Peer deps cover all
-six frameworks, each marked `optional` so installing for one target doesn't pull
-the rest. Guarded by `verify:pkg-types` (drift) and `tests/pkg-exports.test.mjs`.
+Solid render fn, Svelte component constructor, Angular class). The shared styling
+types (`CrPassThrough`, `CrDesignTokens`, `CrHooks`, `CrGlobalConfig`, …) are
+**inlined** from `lib/pt-types.ts` into each `index.d.ts`, because a type merely
+imported from `lib/` would be referenced but never declared; `CrContext` is declared
+per target alongside them. Peer deps cover all six frameworks, each marked
+`optional` so installing for one target doesn't pull the rest. Guarded by
+`verify:pkg-types` (drift) and `tests/pkg-exports.test.mjs`.
 
 The build compiles the typed packages with `pnpm run build:pkg` (relative import
 extensions rewritten `.tsx → .js` so the emit resolves in Node ESM and bundlers);
@@ -49,14 +60,27 @@ typed declarations ship.
 "Compiles to six frameworks" is only worth anything if each target actually *runs*.
 Two gates back it up:
 
-| target | verified how | gate |
-| --- | --- | --- |
-| React | SSR-rendered via `react-dom/server`; markup + props asserted | `test:pkg` |
-| Vue | compiled SFC → `@vue/server-renderer`; markup + props asserted | `test:frameworks` |
-| Svelte | compiled (`svelte/compiler`, ssr) → `.render()`; markup asserted | `test:frameworks` |
-| Solid | compiled (`babel-preset-solid`, ssr) → `renderToString`; markup asserted | `test:frameworks` |
-| Qwik | imported as a consumer; named exports load | `test:pkg` |
-| Angular | instantiated on real `@angular/core`; `@Input`-driven getter + `@Output` executed | `test:frameworks` |
+| target | verified how | coverage | gate |
+| --- | --- | --- | --- |
+| React | SSR-rendered via `react-dom/server` from the published package | **all 81** | `test:pkg` |
+| Vue | compiled SFC → `@vue/server-renderer` | **all 81** | `test:frameworks` |
+| Svelte | compiled (`svelte/compiler`, ssr) → `.render()` | **all 81** | `test:frameworks` |
+| Solid | compiled (`babel-preset-solid`, ssr) → `renderToString` | **all 81** | `test:frameworks` |
+| Angular | instantiated on real `@angular/core`; `@Input` getter + `@Output` executed | **all 81** | `test:frameworks` |
+| Qwik | every export loads as a callable component; all 81 parse as Qwik TSX | load + compile | `test:pkg`, `test:frameworks` |
+
+Every component is rendered with a realistic prop set from
+`tests/fixtures/component-props.mjs`, derived from each `Cr<Name>Props` interface.
+Before that existed the gates rendered only the ~10 components that need no props,
+which is how CrCalendar came to throw on every Solid render, and CrLineChart on
+every Svelte render, with the suite fully green.
+
+**Qwik is the one target without a render gate.** Its `renderToString` needs a Vite
+build context (`import.meta.env`, the client manifest) that plain Node cannot
+supply, and the optimizer only transforms source — so rendering happens in the
+consumer's build, not here. What is enforced instead: every export loads and is
+callable, all 81 compile as valid Qwik TSX, and the `./qwik` subpath still resolves
+to optimizer-processable source.
 
 `test:frameworks` (harness in `build/render-fw.mjs`) feeds each target's compiled
 output through its **own** compiler + runtime and asserts real Control Room markup /
@@ -65,7 +89,7 @@ breaks under Svelte/Solid/Vue/Angular can't slip through. Angular can't be
 SSR-rendered in plain Node (its distributed packages are partially-compiled and need
 the Angular build linker), so its component **logic** is executed on the real
 `@angular/core` instead — a genuine runtime check, one notch below full template
-render. **All six targets are now verified at runtime.**
+render. **All six targets are verified at runtime; five of them across every component.**
 
 ## Coverage
 
@@ -163,6 +187,20 @@ transpiles the `.tsx`/`.vue`/`.svelte` (same as any first-party component); noth
 is pre-bundled, so tree-shaking and your own toolchain stay in charge. The barrels
 live under the git-ignored `dist/frameworks/**` and are regenerated by
 `build:components` (`build/build-barrels.mjs`), so they always match what compiled.
+
+> **Svelte: legacy mode only — not runes.** Mitosis emits Svelte 4 idiom
+> (`export let`, `on:`, `<slot>`, `$:`). Svelte 5 compiles all of it, because it
+> auto-detects mode per file and a file without runes stays in legacy mode — the
+> peer range is `>=4 <6` and both majors SSR-render byte-identical markup.
+>
+> What does **not** work is forcing runes project-wide. With
+> `compilerOptions.runes: true`, 80 of 81 components fail to compile with
+> `Cannot use 'export let' in runes mode` (or `afterUpdate cannot be used in
+> runes mode`). Leave runes on auto-detect — the default — and your own
+> components can still use runes: the setting is per-file, so ours stay legacy
+> while yours don't have to. Runes-mode output
+> needs a Mitosis generator that emits `$props()`; it is not something this
+> repo can patch in `build/`.
 
 ## `cn()` — composing classes
 

@@ -1,5 +1,7 @@
-import { Show } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { Show, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 export interface CrMastheadProps {
   /** Short kicker above the title (the editorial "eyebrow") — a section,
    * phase or category label. Rendered only when set. */
@@ -8,14 +10,29 @@ export interface CrMastheadProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "eyebrow" · "title". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"eyebrow" | "root" | "title">;
+  dt?: CrDesignTokens;
 }
 export default function CrMasthead(props: CrMastheadProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrMasthead"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrMasthead"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrMasthead"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   return (
-    <header {...ptAttrs(props.pt, "root")} class={ptClass(props.pt, props.unstyled, "cr-masthead", "root")} data-part="root" style={ptStyle(props.pt, props.dt, "root")}>
-      <Show when={props.eyebrow}><p {...ptAttrs(props.pt, "eyebrow")} class={ptClass(props.pt, props.unstyled, "cr-masthead__eyebrow", "eyebrow")} data-part="eyebrow">{props.eyebrow}</p></Show>
-      <h1 {...ptAttrs(props.pt, "title")} class={ptClass(props.pt, props.unstyled, "cr-masthead__title", "title")} data-part="title">{props.title}</h1>
+    <header {...ptAttrs(ptResolve(cr, props.pt, "CrMasthead"), "root")} class={ptClass(ptResolve(cr, props.pt, "CrMasthead"), props.unstyled, "cr-masthead", "root")} data-part="root" style={ptStyle(ptResolve(cr, props.pt, "CrMasthead"), props.dt, "root")}>
+      <Show when={props.eyebrow}><p {...ptAttrs(ptResolve(cr, props.pt, "CrMasthead"), "eyebrow")} class={ptClass(ptResolve(cr, props.pt, "CrMasthead"), props.unstyled, "cr-masthead__eyebrow", "eyebrow")} data-part="eyebrow">{props.eyebrow}</p></Show>
+      <h1 {...ptAttrs(ptResolve(cr, props.pt, "CrMasthead"), "title")} class={ptClass(ptResolve(cr, props.pt, "CrMasthead"), props.unstyled, "cr-masthead__title", "title")} data-part="title">{props.title}</h1>
       {props.children}
     </header>
   );

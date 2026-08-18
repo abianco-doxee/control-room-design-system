@@ -1,5 +1,7 @@
-import { useStore, For } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHandler, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrSegmentedOption {
   value: string;
@@ -15,14 +17,29 @@ export interface CrSegmentedProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "opt". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"opt" | "root">;
+  dt?: CrDesignTokens;
 }
 
 /* Single-select segmented control — a connected button bar (role=radiogroup with
  * roving tabindex; ←/→/Home/End move + select). Visually distinct from a radio
  * group, same semantics. Styling via .cr-segmented. */
 export default function CrSegmented(props: CrSegmentedProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrSegmented"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrSegmented"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrSegmented"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const state = useStore({
     select(v: string) {
       if (props.onChange) props.onChange(v);
@@ -54,20 +71,20 @@ export default function CrSegmented(props: CrSegmentedProps) {
   });
 
   return (
-    <div {...ptAttrs(props.pt, "root")} data-part="root" class={ptClass(props.pt, props.unstyled, "cr-segmented", "root")} role="radiogroup" aria-label={props.label} style={ptStyle(props.pt, props.dt, "root")} onKeyDown={(event) => state.onKey(event)}>
+    <div {...ptAttrs(ptResolve(cr, props.pt, "CrSegmented"), "root")} data-part="root" class={ptClass(ptResolve(cr, props.pt, "CrSegmented"), props.unstyled, "cr-segmented", "root")} role="radiogroup" aria-label={props.label} style={ptStyle(ptResolve(cr, props.pt, "CrSegmented"), props.dt, "root")} onKeyDown={(event) => state.onKey(event)}>
       <For each={props.options}>
         {(opt: CrSegmentedOption, i: number) => (
           <button
-            {...ptAttrs(props.pt, "opt")}
+            {...ptAttrs(ptResolve(cr, props.pt, "CrSegmented"), "opt")}
             type="button"
             role="radio"
             data-part="opt"
             data-state={props.value === opt.value ? "active" : "inactive"}
-            class={ptClass(props.pt, props.unstyled, "cr-segmented__opt", "opt")}
+            class={ptClass(ptResolve(cr, props.pt, "CrSegmented"), props.unstyled, "cr-segmented__opt", "opt")}
             data-value={opt.value}
             aria-checked={props.value === opt.value ? "true" : "false"}
             tabIndex={state.tabbable(i)}
-            onClick={() => state.select(opt.value)}
+            onClick={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrSegmented'), 'opt', 'onClick', event); state.select(opt.value); }}
           >
             {opt.label}
           </button>

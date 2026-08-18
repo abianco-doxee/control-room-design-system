@@ -1,4 +1,7 @@
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptClass, ptAttrs, ptStyle, ptResolve, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrScrollAreaProps {
   /** Max size along the scroll axis (e.g. "16rem", "40vh"). */
@@ -12,8 +15,8 @@ export interface CrScrollAreaProps {
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"root">;
+  dt?: CrDesignTokens;
 }
 
 /* ScrollArea — a container with cross-browser styled scrollbars (thin, inked,
@@ -23,15 +26,30 @@ export interface CrScrollAreaProps {
  * scrollbar styling is pure CSS (scrollbar-width + ::-webkit-scrollbar); the
  * content scrolls natively. Styling via .cr-scroll. */
 export default function CrScrollArea(props: CrScrollAreaProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrScrollArea"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrScrollArea"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrScrollArea"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   return (
     <div
-      {...ptAttrs(props.pt, "root")}
-      class={ptClass(props.pt, props.unstyled, "cr-scroll" + (props.axis === "x" ? " cr-scroll--x" : props.axis === "both" ? " cr-scroll--both" : ""), "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrScrollArea"), "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrScrollArea"), props.unstyled, "cr-scroll" + (props.axis === "x" ? " cr-scroll--x" : props.axis === "both" ? " cr-scroll--both" : ""), "root")}
       data-part="root"
       tabIndex={0}
       role={props.label ? "group" : undefined}
       aria-label={props.label}
-      style={{ maxHeight: props.maxHeight }}
+      style={{ maxHeight: props.maxHeight, ...ptStyle(ptResolve(cr, props.pt, "CrScrollArea"), props.dt, "root") }}
     >
       {props.children}
     </div>

@@ -1,6 +1,8 @@
-import { useStore, For } from "@builder.io/mitosis";
+import { useStore, For, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
 import CrChoice from "./CrChoice.lite";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { ptAttrs, ptClass, ptNested, ptResolve, ptStyle, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrChoiceOption {
   value: string;
@@ -32,10 +34,15 @@ export interface CrChoiceGroupProps {
   /** Fires with the full next selection — `type="checkbox"` only. */
   onChangeMany?: (values: string[]) => void;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
+   * Parts: "root". The "choice" section is a NESTED pt handed to each CrChoice
+   * (its own parts), not an attribute bag — it was previously spread onto the
+   * component, which set stray props instead of styling the child.
    * Parts: "root" · "choice". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  /** `choice` is a NESTED SECTION: its value is a `pt` for the inner CrChoice
+   *  (`pt={{ choice: { input: { … } } }}`), not an attribute bag for an element. */
+  pt?: CrPassThrough<"choice" | "root">;
+  dt?: CrDesignTokens;
 }
 
 /* One grouped-choice control for BOTH types, rendering CrChoice (native inputs)
@@ -52,6 +59,21 @@ export interface CrChoiceGroupProps {
  * selection also fires change, so onChange still round-trips.
  * Styling via .cr-choicegroup. */
 export default function CrChoiceGroup(props: CrChoiceGroupProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrChoiceGroup"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrChoiceGroup"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrChoiceGroup"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const state = useStore({
     /* Stable per-instance fallback name so two radio groups on one page never
      * collide (colliding names would make the browser treat them as ONE group). */
@@ -80,10 +102,10 @@ export default function CrChoiceGroup(props: CrChoiceGroupProps) {
 
   return (
     <div
-      {...ptAttrs(props.pt, "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrChoiceGroup"), "root")}
       data-part="root"
-      class={ptClass(props.pt, props.unstyled, "cr-choicegroup" + (props.row ? " cr-choicegroup--row" : ""), "root")}
-      style={ptStyle(props.pt, props.dt, "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrChoiceGroup"), props.unstyled, "cr-choicegroup" + (props.row ? " cr-choicegroup--row" : ""), "root")}
+      style={ptStyle(ptResolve(cr, props.pt, "CrChoiceGroup"), props.dt, "root")}
       role={props.type === "checkbox" ? "group" : "radiogroup"}
       aria-label={props.label}
       aria-invalid={props.invalid ? "true" : "false"}
@@ -91,7 +113,7 @@ export default function CrChoiceGroup(props: CrChoiceGroupProps) {
       <For each={props.options}>
         {(opt: CrChoiceOption) => (
           <CrChoice
-            {...ptAttrs(props.pt, "choice")}
+            pt={ptNested(ptResolve(cr, props.pt, "CrChoiceGroup"), "choice")}
             type={props.type === "checkbox" ? "checkbox" : "radio"}
             name={state.isRadio() ? state.groupName() : undefined}
             label={opt.label}

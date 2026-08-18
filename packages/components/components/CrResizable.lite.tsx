@@ -1,5 +1,7 @@
-import { useStore, useRef } from "@builder.io/mitosis";
-import { ptClass, ptAttrs, ptStyle } from "../lib/pt.ts";
+import { useStore, useRef, useContext, onMount, onUpdate, onUnMount } from "@builder.io/mitosis";
+import { ptAttrs, ptClass, ptHandler, ptResolve, ptStyle, resolveMessage, ptHooks } from "../lib/pt.ts";
+import type { CrPassThrough, CrDesignTokens } from "../lib/pt-types.ts";
+import CrContext from "./cr.context.lite";
 
 export interface CrResizableProps {
   /** Split axis: "horizontal" (default, side-by-side) · "vertical" (stacked). */
@@ -13,11 +15,13 @@ export interface CrResizableProps {
   label?: string;
   /** Exactly TWO panes — the leading (left/top) and trailing (right/bottom). */
   children?: any;
+  /** Override this component's built-in English strings. See lib/messages.ts. */
+  labels?: Record<string, any>;
   /* ── styling contract (portable pt/dt subset — see references/styling-contract.md) ──
    * Parts: "root" · "separator". */
   unstyled?: boolean;
-  pt?: any;
-  dt?: any;
+  pt?: CrPassThrough<"root" | "separator">;
+  dt?: CrDesignTokens;
 }
 
 /* Resizable — two panes with a draggable divider. Pass the two panes as children
@@ -28,6 +32,21 @@ export interface CrResizableProps {
  * ←/→ (or ↑/↓) resize by 2%, Home/End jump to the clamps. Dragging uses pointer
  * capture — no global listeners, and it can't get stuck. Styling via .cr-resizable. */
 export default function CrResizable(props: CrResizableProps) {
+  const cr = useContext(CrContext);
+
+  onMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrResizable"));
+    if (h && h.onMounted) h.onMounted();
+  });
+  onUpdate(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrResizable"));
+    if (h && h.onUpdated) h.onUpdated();
+  });
+  onUnMount(() => {
+    const h = ptHooks(ptResolve(cr, props.pt, "CrResizable"));
+    if (h && h.onUnmounted) h.onUnmounted();
+  });
+
   const rootRef = useRef(null);
 
   const state = useStore({
@@ -94,32 +113,32 @@ export default function CrResizable(props: CrResizableProps) {
 
   return (
     <div
-      {...ptAttrs(props.pt, "root")}
-      class={ptClass(props.pt, props.unstyled, "cr-resizable" + (props.orientation === "vertical" ? " cr-resizable--vertical" : ""), "root")}
+      {...ptAttrs(ptResolve(cr, props.pt, "CrResizable"), "root")}
+      class={ptClass(ptResolve(cr, props.pt, "CrResizable"), props.unstyled, "cr-resizable" + (props.orientation === "vertical" ? " cr-resizable--vertical" : ""), "root")}
       data-part="root"
       data-state={state.dragging ? "dragging" : "idle"}
       ref={rootRef}
       data-dragging={state.dragging ? "true" : undefined}
-      style={state.trackStyle()}
+      style={{ ...state.trackStyle(), ...ptStyle(ptResolve(cr, props.pt, "CrResizable"), props.dt, "root") }}
     >
       {props.children}
       <div
-        {...ptAttrs(props.pt, "separator")}
-        class={ptClass(props.pt, props.unstyled, "cr-resizable__handle", "separator")}
+        {...ptAttrs(ptResolve(cr, props.pt, "CrResizable"), "separator")}
+        class={ptClass(ptResolve(cr, props.pt, "CrResizable"), props.unstyled, "cr-resizable__handle", "separator")}
         data-part="separator"
         data-state={state.dragging ? "dragging" : "idle"}
         role="separator"
         tabIndex={0}
         aria-orientation={props.orientation === "vertical" ? "horizontal" : "vertical"}
-        aria-label={props.label || "Resize panels"}
+        aria-label={props.label || resolveMessage(cr, props.labels, "CrResizable", "resize")}
         aria-valuenow={Math.round(state.size)}
         aria-valuemin={state.lo()}
         aria-valuemax={state.hi()}
         style={state.handleStyle()}
-        onPointerDown={(event) => state.onPointerDown(event)}
-        onPointerMove={(event) => state.onPointerMove(event)}
-        onPointerUp={(event) => state.onPointerUp(event)}
-        onKeyDown={(event) => state.onKeyDown(event)}
+        onPointerDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrResizable'), 'separator', 'onPointerDown', event); state.onPointerDown(event); }}
+        onPointerMove={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrResizable'), 'separator', 'onPointerMove', event); state.onPointerMove(event); }}
+        onPointerUp={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrResizable'), 'separator', 'onPointerUp', event); state.onPointerUp(event); }}
+        onKeyDown={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrResizable'), 'separator', 'onKeyDown', event); state.onKeyDown(event); }}
       ></div>
     </div>
   );
