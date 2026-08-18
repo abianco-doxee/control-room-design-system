@@ -547,12 +547,12 @@ export default function CrForm(props: CrFormProps) {
     },
     submit(event: any) {
       event.preventDefault();
-      const values = state.vals;
+      const vals2 = state.vals;
       state.submitted = true;
       state.submitting = true;
       /* validate may be sync or async — normalise with Promise.resolve; the
        * button stays in its pending state until validate AND onSubmit settle. */
-      const payload = state.pruned(values); /* drop hidden fields from validation + submit */
+      const payload = state.pruned(vals2); /* drop hidden fields from validation + submit */
       Promise.resolve(props.validate ? props.validate(payload) || {} : {}).then((e: any) => {
         /* NOT named `errs`: Mitosis strips the `state.` prefix, so a local with a
          * store member's name collapses to `const errs = …; errs = errs;` — a

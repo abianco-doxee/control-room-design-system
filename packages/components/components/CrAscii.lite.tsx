@@ -20,7 +20,7 @@ export default function CrAscii(props: CrAsciiProps) {
     paint() {
       const W = props.width || 320;
       const H = props.height || 140;
-      const variant = props.variant || "braille";
+      const variantName = props.variant || "braille";
       const hashSeed = (s: string) => {
         let h = 2166136261 >>> 0;
         for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
@@ -39,7 +39,7 @@ export default function CrAscii(props: CrAsciiProps) {
         ramp: [" ", ".", ":", "-", "=", "+", "*", "#", "%", "@"],
         braille: [" ", "⠁", "⠃", "⠇", "⡇", "⣇", "⣧", "⣿"],
       };
-      const ramp: any = RAMPS[variant] || RAMPS.braille;
+      const ramp: any = RAMPS[variantName] || RAMPS.braille;
 
       const lobes = Array.from({ length: 3 }, () => ({
         fx: 0.4 + rng() * 1.6, fy: 0.4 + rng() * 1.6, px: rng() * 6.283, py: rng() * 6.283,
@@ -57,7 +57,7 @@ export default function CrAscii(props: CrAsciiProps) {
       node.style.width = "100%"; node.style.height = "100%";
       const ctx = node.getContext("2d"); ctx.scale(dpr, dpr); ctx.clearRect(0, 0, W, H);
 
-      const cw = variant === "braille" ? 7 : 9;
+      const cw = variantName === "braille" ? 7 : 9;
       const ch = 12;
       ctx.font = "12px 'JetBrains Mono', ui-monospace, monospace";
       ctx.textBaseline = "top";

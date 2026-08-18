@@ -114,20 +114,20 @@ export default function CrMenu(props: CrMenuProps) {
     onPanelKey(e: any) {
       const root: any = rootRef;
       if (!root) return;
-      const items = Array.from(root.querySelectorAll('[role="menuitem"]'));
-      const i = items.indexOf(document.activeElement);
+      const nodes = Array.from(root.querySelectorAll('[role="menuitem"]'));
+      const i = nodes.indexOf(document.activeElement);
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        ((items[i + 1] || items[0]) as HTMLElement).focus();
+        ((nodes[i + 1] || nodes[0]) as HTMLElement).focus();
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        ((items[i - 1] || items[items.length - 1]) as HTMLElement).focus();
+        ((nodes[i - 1] || nodes[nodes.length - 1]) as HTMLElement).focus();
       } else if (e.key === "Home") {
         e.preventDefault();
-        (items[0] as HTMLElement).focus();
+        (nodes[0] as HTMLElement).focus();
       } else if (e.key === "End") {
         e.preventDefault();
-        (items[items.length - 1] as HTMLElement).focus();
+        (nodes[nodes.length - 1] as HTMLElement).focus();
       } else if (e.key === "Escape") {
         e.preventDefault();
         state.open = false;
@@ -140,10 +140,10 @@ export default function CrMenu(props: CrMenuProps) {
         state.buffer = (now - state.bufferAt < 600 ? state.buffer : "") + e.key.toLowerCase();
         state.bufferAt = now;
         const labels = props.items.map((it: CrMenuItem) => (it.label || "").toLowerCase());
-        for (let k = 1; k <= items.length; k++) {
-          const idx = (i + k) % items.length; // start after the focused item (i = -1 → from 0)
+        for (let k = 1; k <= nodes.length; k++) {
+          const idx = (i + k) % nodes.length; // start after the focused item (i = -1 → from 0)
           if (labels[idx].indexOf(state.buffer) === 0) {
-            (items[idx] as HTMLElement).focus();
+            (nodes[idx] as HTMLElement).focus();
             break;
           }
         }

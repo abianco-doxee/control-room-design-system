@@ -65,10 +65,10 @@ export default function CrSparkline(props: CrSparklineProps) {
         y: pad + (1 - (v - min) / range) * innerH,
       }));
       const line = pts.map((p: { x: number; y: number }) => p.x.toFixed(2) + "," + p.y.toFixed(2)).join(" ");
-      let area = "M " + pts[0].x.toFixed(2) + "," + H.toFixed(2);
-      for (const p of pts) area += " L " + p.x.toFixed(2) + "," + p.y.toFixed(2);
-      area += " L " + pts[n - 1].x.toFixed(2) + "," + H.toFixed(2) + " Z";
-      return { line, area, dx: pts[n - 1].x, dy: pts[n - 1].y, H, W };
+      let areaPath = "M " + pts[0].x.toFixed(2) + "," + H.toFixed(2);
+      for (const p of pts) areaPath += " L " + p.x.toFixed(2) + "," + p.y.toFixed(2);
+      areaPath += " L " + pts[n - 1].x.toFixed(2) + "," + H.toFixed(2) + " Z";
+      return { line, area: areaPath, dx: pts[n - 1].x, dy: pts[n - 1].y, H, W };
     },
     get summary(): string {
       const d = props.data || [];

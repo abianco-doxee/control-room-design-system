@@ -102,3 +102,28 @@ for (const target of ["react", "qwik"]) {
     assert.deepEqual(failed, [], `${target} parse failures:\n  ${failed.join("\n  ")}`);
   });
 }
+
+// A local that shares a PROP's name is the same trap one level up: Mitosis strips
+// the `props.` prefix, so `const series = props.series || []` becomes
+// `const series = series || []` — a self-referential TDZ error that compiles fine
+// and throws the moment the component renders. It cost CrLineChart its entire
+// Svelte runtime. Scan the generated Svelte (the target where the collapse is a
+// hard error) for any local declaration reusing an `export let` name.
+test("svelte: no local shadows a prop (the props.x → x TDZ collapse)", () => {
+  const shadows = [];
+  for (const n of NAMES) {
+    const lines = readFileSync(join(FW, "svelte", "components", `${n}.svelte`), "utf8").split("\n");
+    const props = new Set();
+    for (const l of lines) {
+      const m = /^\s*export let ([A-Za-z_][A-Za-z0-9_]*)/.exec(l);
+      if (m) props.add(m[1]);
+    }
+    lines.forEach((l, i) => {
+      if (/^\s*export let /.test(l)) return;
+      for (const m of l.matchAll(/\b(?:const|let)\s+([A-Za-z_][A-Za-z0-9_]*)\b/g)) {
+        if (props.has(m[1])) shadows.push(`${n}.svelte:${i + 1}: local '${m[1]}' shadows the prop`);
+      }
+    });
+  }
+  assert.deepEqual(shadows, [], `prop shadows:\n  ${shadows.join("\n  ")}`);
+});

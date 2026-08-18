@@ -98,11 +98,11 @@ export default function CrBarChart(props: CrBarChartProps) {
       return String(Math.round(v * 100) / 100);
     },
     metrics() {
-      const data = props.data || [];
-      const axis = props.axis !== false;
+      const rows = props.data || [];
+      const showAxis = props.axis !== false;
       const W = 320;
       const H = props.height || 140;
-      const L = axis ? 30 : 6;
+      const L = showAxis ? 30 : 6;
       const R = 6;
       const T = 14;
       const B = 18;
@@ -112,23 +112,23 @@ export default function CrBarChart(props: CrBarChartProps) {
       let hi = props.max;
       if (hi === undefined) {
         let dh = props.target || 0;
-        for (const d of data) if (d.value > dh) dh = d.value;
+        for (const d of rows) if (d.value > dh) dh = d.value;
         hi = dh || 1;
       }
       const forced = props.max !== undefined;
       const sc = state.niceScale(0, hi, 5);
-      const max = forced ? hi : sc.max;
+      const hiV = forced ? hi : sc.max;
       const ticks: number[] = [];
-      for (const t of sc.ticks) if (t >= -max * 1e-6 && t <= max + max * 1e-6) ticks.push(t);
-      const n = data.length || 1;
+      for (const t of sc.ticks) if (t >= -hiV * 1e-6 && t <= hiV + hiV * 1e-6) ticks.push(t);
+      const n = rows.length || 1;
       const gap = 2;
       const bw = (plotW - gap * (n - 1)) / n;
-      return { W, H, L, R, T, B, plotW, plotH, base, max, n, gap, bw, axis, ticks };
+      return { W, H, L, R, T, B, plotW, plotH, base, max: hiV, n, gap, bw, axis: showAxis, ticks };
     },
     geo() {
       const m = state.metrics();
-      const data = props.data || [];
-      const bars = data.map((d: CrBarDatum, i: number) => {
+      const rows = props.data || [];
+      const bars = rows.map((d: CrBarDatum, i: number) => {
         const h = Math.max(0, Math.min(1, d.value / m.max)) * m.plotH;
         const x = m.L + i * (m.bw + m.gap);
         return { label: d.label, value: d.value, color: state.hue(d.signal, i), x, y: m.base - h, w: m.bw, h, cx: x + m.bw / 2 };
@@ -139,8 +139,8 @@ export default function CrBarChart(props: CrBarChartProps) {
       return { W: m.W, H: m.H, L: m.L, R: m.R, base: m.base, axis: m.axis, bars, yticks, targetY };
     },
     summary(): string {
-      const data = props.data || [];
-      const parts = data.map((d: CrBarDatum) => d.label + " " + d.value);
+      const rows = props.data || [];
+      const parts = rows.map((d: CrBarDatum) => d.label + " " + d.value);
       return (props.label || "bar chart") + " — " + parts.join(", ");
     },
     move(event: any) {
@@ -159,9 +159,9 @@ export default function CrBarChart(props: CrBarChartProps) {
     },
     cursor() {
       const m = state.metrics();
-      const data = props.data || [];
+      const rows = props.data || [];
       const idx = state.at;
-      const d = data[idx];
+      const d = rows[idx];
       const cx = m.L + idx * (m.bw + m.gap) + m.bw / 2;
       let leftPct = (cx / m.W) * 100;
       if (leftPct < 14) leftPct = 14;

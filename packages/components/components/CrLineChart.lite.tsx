@@ -267,42 +267,42 @@ export default function CrLineChart(props: CrLineChartProps) {
           return out;
         }
       }
-      let unit = "year";
+      let unitName = "year";
       let step = 500;
-      if (span / DAY <= target) { unit = "day"; step = 1; }
-      else if (span / (2 * DAY) <= target) { unit = "day"; step = 2; }
-      else if (span / (7 * DAY) <= target) { unit = "week"; step = 1; }
-      else if (span / (30.4 * DAY) <= target) { unit = "month"; step = 1; }
-      else if (span / (3 * 30.4 * DAY) <= target) { unit = "month"; step = 3; }
+      if (span / DAY <= target) { unitName = "day"; step = 1; }
+      else if (span / (2 * DAY) <= target) { unitName = "day"; step = 2; }
+      else if (span / (7 * DAY) <= target) { unitName = "week"; step = 1; }
+      else if (span / (30.4 * DAY) <= target) { unitName = "month"; step = 1; }
+      else if (span / (3 * 30.4 * DAY) <= target) { unitName = "month"; step = 3; }
       else {
         const years = [1, 2, 5, 10, 25, 50, 100];
         step = years[years.length - 1];
         for (const ny of years) { if (span / (ny * 365 * DAY) <= target) { step = ny; break; } }
-        unit = "year";
+        unitName = "year";
       }
       const p0 = state.zoneParts(a, zone);
       let cy = p0.year, cmo = p0.month - 1, cd = p0.day;
-      if (unit === "year") {
+      if (unitName === "year") {
         cmo = fs - 1; cd = 1;
         if (fs > 1 && p0.month - 1 < fs - 1) cy = cy - 1;
         cy = Math.floor(cy / step) * step;
-      } else if (unit === "month") {
+      } else if (unitName === "month") {
         const off = (fs - 1) % step;
         cmo = Math.floor((p0.month - 1 - off) / step) * step + off;
         cd = 1;
       }
       let cur = state.zEpoch(cy, cmo, cd, 0, 0, 0, zone);
-      if (unit === "week") {
+      if (unitName === "week") {
         const back = (state.zWeekday(cur, zone) + 6) % 7;
         cur = state.zEpoch(cy, cmo, cd - back, 0, 0, 0, zone);
       }
       let guard = 0;
       while (cur <= b && guard < 5000) {
-        if (cur >= a) out.push({ value: cur, label: state.calLabel(cur, unit, step, zone, locale, week, fs) });
+        if (cur >= a) out.push({ value: cur, label: state.calLabel(cur, unitName, step, zone, locale, week, fs) });
         const q = state.zoneParts(cur, zone);
-        if (unit === "year") cur = state.zEpoch(q.year + step, fs - 1, 1, 0, 0, 0, zone);
-        else if (unit === "month") cur = state.zEpoch(q.year, q.month - 1 + step, 1, 0, 0, 0, zone);
-        else if (unit === "week") cur = state.zEpoch(q.year, q.month - 1, q.day + 7, 0, 0, 0, zone);
+        if (unitName === "year") cur = state.zEpoch(q.year + step, fs - 1, 1, 0, 0, 0, zone);
+        else if (unitName === "month") cur = state.zEpoch(q.year, q.month - 1 + step, 1, 0, 0, 0, zone);
+        else if (unitName === "week") cur = state.zEpoch(q.year, q.month - 1, q.day + 7, 0, 0, 0, zone);
         else cur = state.zEpoch(q.year, q.month - 1, q.day + step, 0, 0, 0, zone);
         guard++;
       }
@@ -318,11 +318,11 @@ export default function CrLineChart(props: CrLineChartProps) {
       state.hidden = next;
     },
     metrics() {
-      const series = props.series || [];
-      const axis = props.axis !== false;
+      const allSeries = props.series || [];
+      const showAxis = props.axis !== false;
       const W = 320;
       const H = props.height || 140;
-      const L = axis ? 30 : 8;
+      const L = showAxis ? 30 : 8;
       const R = 8;
       const T = 10;
       const xs = props.x && props.x.length ? props.x : null;
@@ -331,15 +331,15 @@ export default function CrLineChart(props: CrLineChartProps) {
       const plotW = W - L - R;
       const plotH = H - T - B;
       let n = 0;
-      for (const s of series) if ((s.data || []).length > n) n = (s.data || []).length;
+      for (const s of allSeries) if ((s.data || []).length > n) n = (s.data || []).length;
       let lo = props.min;
       let hi = props.max;
       if (lo === undefined || hi === undefined) {
         let dlo = Infinity;
         let dhi = -Infinity;
-        for (let si = 0; si < series.length; si++) {
+        for (let si = 0; si < allSeries.length; si++) {
           if (state.isHidden(si)) continue;
-          for (const v of series[si].data || []) {
+          for (const v of allSeries[si].data || []) {
             if (v < dlo) dlo = v;
             if (v > dhi) dhi = v;
           }
@@ -350,11 +350,11 @@ export default function CrLineChart(props: CrLineChartProps) {
       }
       const forced = props.min !== undefined && props.max !== undefined;
       const sc = state.niceScale(lo, hi, 5);
-      let min = forced ? lo : sc.min;
-      let max = forced ? hi : sc.max;
-      let range = max - min || 1;
+      let loV = forced ? lo : sc.min;
+      let hiV = forced ? hi : sc.max;
+      let range = hiV - loV || 1;
       let ticks: number[] = [];
-      for (const t of sc.ticks) if (t >= min - range * 1e-6 && t <= max + range * 1e-6) ticks.push(t);
+      for (const t of sc.ticks) if (t >= loV - range * 1e-6 && t <= hiV + range * 1e-6) ticks.push(t);
       /* Log y-scale: derive a positive, power-of-ten-snapped domain from the
        * visible data (or explicit >0 min/max) and swap in log ticks. Falls back
        * to the linear scale above if there's no positive data. */
@@ -364,17 +364,17 @@ export default function CrLineChart(props: CrLineChartProps) {
       if (props.yScale === "log") {
         let plo = Infinity;
         let phi = -Infinity;
-        for (let si = 0; si < series.length; si++) {
+        for (let si = 0; si < allSeries.length; si++) {
           if (state.isHidden(si)) continue;
-          for (const v of series[si].data || []) { if (v > 0) { if (v < plo) plo = v; if (v > phi) phi = v; } }
+          for (const v of allSeries[si].data || []) { if (v > 0) { if (v < plo) plo = v; if (v > phi) phi = v; } }
         }
         if (props.min !== undefined && props.min > 0) plo = props.min;
         if (props.max !== undefined && props.max > 0) phi = props.max;
         if (isFinite(plo) && phi > 0) {
           const dlo = Math.pow(10, Math.floor(Math.log10(plo)));
           const dhi = Math.pow(10, Math.ceil(Math.log10(phi)));
-          min = dlo;
-          max = dhi;
+          loV = dlo;
+          hiV = dhi;
           range = dhi - dlo || 1;
           llo = Math.log(dlo);
           lrange = Math.log(dhi) - Math.log(dlo) || 1;
@@ -449,35 +449,35 @@ export default function CrLineChart(props: CrLineChartProps) {
           for (let i = 0; i < xs.length; i += everyN) dticks.push({ label: xf ? xf(xs[i]) : state.fmtTick(xs[i]), frac: cpos[i] });
         }
       }
-      return { W, H, L, R, T, B, plotW, plotH, n, min, max, range, axis, ticks, xs, continuous, xmin, xmax, xticks, ylog, llo, lrange, broken, cpos, cbreaks, dticks };
+      return { W, H, L, R, T, B, plotW, plotH, n, min: loV, max: hiV, range, axis: showAxis, ticks, xs, continuous, xmin, xmax, xticks, ylog, llo, lrange, broken, cpos, cbreaks, dticks };
     },
     geo() {
       const m = state.metrics();
-      const series = props.series || [];
+      const allSeries = props.series || [];
       const xs = m.xs || [];
       const xspan = (m.xmax - m.xmin) || 1;
       const yAt = (v: number) => state.yPix(v, m);
       const xAtV = (v: number) => m.L + ((v - m.xmin) / xspan) * m.plotW;
       const xAtF = (f: number) => m.L + f * m.plotW;
       const xAtI = (i: number, n: number) => m.L + (n <= 1 ? m.plotW / 2 : (i / (n - 1)) * m.plotW);
-      const lines = series.map((s: CrLineSeries, si: number) => {
+      const lines = allSeries.map((s: CrLineSeries, si: number) => {
         const d = s.data || [];
         const lim = m.continuous ? Math.min(d.length, xs.length) : d.length;
         const pts: { x: number; y: number }[] = [];
         for (let i = 0; i < lim; i++) pts.push({ x: m.broken ? xAtF(m.cpos[i]) : (m.continuous ? xAtV(xs[i]) : xAtI(i, lim)), y: yAt(d[i]) });
         const line = pts.map((p: { x: number; y: number }) => p.x.toFixed(2) + "," + p.y.toFixed(2)).join(" ");
-        let area = "";
+        let areaPath = "";
         if (pts.length) {
-          area = "M " + pts[0].x.toFixed(2) + "," + (m.T + m.plotH).toFixed(2);
-          for (const p of pts) area += " L " + p.x.toFixed(2) + "," + p.y.toFixed(2);
-          area += " L " + pts[pts.length - 1].x.toFixed(2) + "," + (m.T + m.plotH).toFixed(2) + " Z";
+          areaPath = "M " + pts[0].x.toFixed(2) + "," + (m.T + m.plotH).toFixed(2);
+          for (const p of pts) areaPath += " L " + p.x.toFixed(2) + "," + p.y.toFixed(2);
+          areaPath += " L " + pts[pts.length - 1].x.toFixed(2) + "," + (m.T + m.plotH).toFixed(2) + " Z";
         }
         const end = pts.length ? pts[pts.length - 1] : { x: m.L, y: m.T };
         /* key NOT named `hidden`: it collides with the store member of the same
          * name, and Mitosis's Vue generator rewrites store reads to `.value` —
          * the property key becomes `hidden.value:`, a syntax error. Same trap as
          * CrCombobox's `query`; see the note there. */
-        return { name: s.name, color: state.hue(s.signal, si), line, area, ex: end.x, ey: end.y, si, off: state.isHidden(si) };
+        return { name: s.name, color: state.hue(s.signal, si), line, area: areaPath, ex: end.x, ey: end.y, si, off: state.isHidden(si) };
       });
       const yticks = m.ticks.map((v: number) => ({ y: yAt(v), label: state.fmtTick(v) + (props.unit || "") }));
       const ticks = m.broken
@@ -489,8 +489,8 @@ export default function CrLineChart(props: CrLineChartProps) {
       return { W: m.W, H: m.H, L: m.L, R: m.R, axis: m.axis, continuous: m.continuous, plotTop: m.T, plotBot: m.T + m.plotH, lines, yticks, ticks, breaks };
     },
     summary(): string {
-      const series = props.series || [];
-      const parts = series.map((s: CrLineSeries) => {
+      const allSeries = props.series || [];
+      const parts = allSeries.map((s: CrLineSeries) => {
         const d = s.data || [];
         return s.name + " latest " + (d.length ? d[d.length - 1] : "n/a");
       });
@@ -537,7 +537,7 @@ export default function CrLineChart(props: CrLineChartProps) {
     cursor() {
       const m = state.metrics();
       const idx = state.at;
-      const series = props.series || [];
+      const allSeries = props.series || [];
       const xs = m.xs || [];
       const xspan = (m.xmax - m.xmin) || 1;
       const cx = m.broken
@@ -545,7 +545,7 @@ export default function CrLineChart(props: CrLineChartProps) {
         : m.continuous
           ? (idx < xs.length ? m.L + ((xs[idx] - m.xmin) / xspan) * m.plotW : m.L)
           : m.L + (m.n <= 1 ? m.plotW / 2 : (idx / (m.n - 1)) * m.plotW);
-      const rows = series
+      const rows = allSeries
         .map((s: CrLineSeries, si: number) => {
           if (state.isHidden(si)) return null;
           const d = s.data || [];
@@ -557,12 +557,12 @@ export default function CrLineChart(props: CrLineChartProps) {
       let leftPct = (cx / m.W) * 100;
       if (leftPct < 12) leftPct = 12;
       if (leftPct > 88) leftPct = 88;
-      const label = m.continuous
+      const axLabel = m.continuous
         ? (idx < xs.length
             ? (props.xFormat ? props.xFormat(xs[idx]) : (props.xTime ? state.fmtStamp(xs[idx], props.xZone || "UTC", resolveLocale(props.xLocale, cr && cr.locale)) : state.fmtTick(xs[idx])))
             : "")
         : ((props.labels || [])[idx] || "");
-      return { cx, top: m.T, bot: m.T + m.plotH, leftPct, label, rows };
+      return { cx, top: m.T, bot: m.T + m.plotH, leftPct, label: axLabel, rows };
     },
   });
 
