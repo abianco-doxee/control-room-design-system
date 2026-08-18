@@ -474,10 +474,11 @@ export default function CrForm(props: CrFormProps) {
      * `data-kind` / `data-action`; these helpers translate that back into the
      * store operations. Handlers live here (recreated each render), so they always
      * read the latest state — no stale-closure risk. */
-    pathOf(key: string): any[] {
+    pathOf(dotted: string): any[] {
       /* dotted key → path array, coercing pure-integer segments back to numeric
-       * array indices (so setDeep rebuilds arrays, not objects). */
-      return key.split(".").map((seg: string) => (/^\d+$/.test(seg) ? Number(seg) : seg));
+       * array indices (so setDeep rebuilds arrays, not objects).
+       * `dotted`, not `key` — same reason as fieldAtKey's `wantKey` below. */
+      return dotted.split(".").map((seg: string) => (/^\d+$/.test(seg) ? Number(seg) : seg));
     },
     fieldAtKey(wantKey: string): any {
       /* resolve the field descriptor for a leaf path (needed by autocomplete).
@@ -498,11 +499,11 @@ export default function CrForm(props: CrFormProps) {
       const el = event.target;
       if (!el || !el.dataset || el.dataset.path == null) return;
       const kind = el.dataset.kind;
-      const key = el.dataset.path;
+      const pathKey = el.dataset.path;
       if (kind === "autocomplete") {
-        state.acInput(state.fieldAtKey(key), state.pathOf(key), el.value);
+        state.acInput(state.fieldAtKey(pathKey), state.pathOf(pathKey), el.value);
       } else if (kind === "text" || kind === "email" || kind === "url" || kind === "number" || kind === "textarea" || kind === "json") {
-        state.setField(state.pathOf(key), el.value);
+        state.setField(state.pathOf(pathKey), el.value);
       }
     },
     onFormChange(event: any) {
@@ -533,10 +534,10 @@ export default function CrForm(props: CrFormProps) {
     onFormMouseDown(event: any) {
       const li = event.target && event.target.closest ? event.target.closest("li[data-idx]") : null;
       if (!li || li.dataset.path == null) return;
-      const key = li.dataset.path;
+      const pathKey = li.dataset.path;
       const idx = Number(li.dataset.idx);
-      const items = state.acItems(state.pathOf(key));
-      if (items[idx]) state.acPick(state.fieldAtKey(key), state.pathOf(key), items[idx]);
+      const items = state.acItems(state.pathOf(pathKey));
+      if (items[idx]) state.acPick(state.fieldAtKey(pathKey), state.pathOf(pathKey), items[idx]);
     },
     onFormClick(event: any) {
       const btn = event.target && event.target.closest ? event.target.closest("[data-action]") : null;
