@@ -1,0 +1,47 @@
+# Dependabot config.
+#
+# Until now there was no config at all, so dependabot ran on repo defaults: root
+# manifest only, everything in one group, no awareness of the example app's own
+# npm lockfile. Two consequences worth recording, because both bit us:
+#
+#  1. It does NOT reason about peer dependencies. PR #6 proposed vite@8 for
+#     examples/console while @builder.io/qwik@1.20 declares `peer vite@">=5 <8"`.
+#     Dependabot resolves the direct dependency and opens the PR; the conflict
+#     only surfaces when something actually installs the tree. Nothing did — the
+#     example app had no CI job — so the PR sat green while being unmergeable.
+#     The `example-console` job in deploy.yml now runs `npm ci` and catches it.
+#
+#  2. It will keep re-proposing a blocked bump. Dependabot has no memory of "this
+#     failed to install"; it re-opens on its own schedule until the version is
+#     reachable or it is told otherwise. Hence the explicit ignore below, which
+#     documents WHY rather than silently dropping the update.
+version: 2
+updates:
+  # ── the library (pnpm workspace) ──
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # Patch/minor together — these are the ones that are routinely safe and
+      # would otherwise arrive as a stream of separate PRs.
+      routine:
+        update-types: [minor, patch]
+    # Majors still come as individual PRs: they need the reasoning written down,
+    # not batched into a group commit.
+
+  # ── examples/console (its own npm lockfile, outside the workspace) ──
+  - package-ecosystem: npm
+    directory: /examples/console
+    schedule:
+      interval: weekly
+    groups:
+      routine:
+        update-types: [minor, patch]
+    ignore:
+      # Qwik 1.20 pins `peer vite@">=5 <8"`. Vite 8 is not installable here until
+      # a Qwik release widens that range — npm ci fails with ERESOLVE, so the bump
+      # is not merely risky, it is impossible. Re-evaluate when @builder.io/qwik
+      # ships support; drop this entry at that point rather than raising the bound.
+      - dependency-name: vite
+        versions: [">=8"]
