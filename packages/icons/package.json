@@ -30,7 +30,7 @@
     "verify": "node build/build-icons.mjs --check"
   },
   "devDependencies": {
-    "@iconify-json/pixelarticons": "^1.2.7"
+    "@iconify-json/pixelarticons": "^1.2.8"
   },
   "publishConfig": {
     "access": "restricted",
