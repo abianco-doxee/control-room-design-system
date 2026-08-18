@@ -147,8 +147,25 @@ export default function CrCalendar(props: CrCalendarProps) {
         for (let dow = 0; dow < 7; dow++) {
           const i = w * 7 + dow;
           const d = new Date(y, m, 1 - lead + i);
-          const iso = d.getFullYear() + "-" + state.pad(d.getMonth() + 1) + "-" + state.pad(d.getDate());
-          row.push({ iso, day: d.getDate(), inMonth: d.getMonth() === m, disabled: state.outOfRange(iso) });
+          /* Padded inline rather than via state.pad(): Mitosis threads EVERY store
+           * binding into a hoisted method as parameters, so `state.pad(…)` here
+           * compiles to `pad(props, state, …, weeks, …, n)` — making the `weeks`
+           * getter reference `weeks`. Qwik's optimizer then captures `weeks` in
+           * its own lexical scope and every render dies with "Cannot access
+           * 'weeks' before initialization". */
+          const mm = d.getMonth() + 1;
+          const dd = d.getDate();
+          const iso =
+            d.getFullYear() +
+            "-" +
+            (mm < 10 ? "0" + mm : "" + mm) +
+            "-" +
+            (dd < 10 ? "0" + dd : "" + dd);
+          /* outOfRange inlined for the same reason as the padding above — any
+           * store-method call from inside this getter drags `weeks` in as a
+           * parameter and re-creates the self-capture. */
+          const out = !!((props.min && iso < props.min) || (props.max && iso > props.max));
+          row.push({ iso, day: d.getDate(), inMonth: d.getMonth() === m, disabled: out });
         }
         rows.push(row);
       }

@@ -34,57 +34,60 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SOLID = join(ROOT, "dist", "frameworks", "solid", "components");
+/* Both targets flatten the context read to a plain `const` in the component body
+ * and can emit it AFTER code that reads it. Solid hits the TDZ because its server
+ * build runs createMemo eagerly; Qwik because the optimizer hoists the component's
+ * inner functions above the declaration. Same defect, same fix. */
+const TARGETS = [
+  { fw: "solid", ext: ".jsx", open: /^(function Cr[A-Za-z0-9]+\(props\)\s*\{\n)/m },
+  {
+    fw: "qwik",
+    ext: ".tsx",
+    open: /^(export const Cr[A-Za-z0-9]+ = component\$\(\([^)]*\) => \{\n)/m,
+  },
+];
 const CHECK = process.argv.includes("--check");
 
-const DECL = /^(\s*)const cr = useContext\(CrContext\);\n/m;
-
-/* The component function's opening line: `function CrX(props) {`. The context
- * declaration goes immediately after it. */
-const FN_OPEN = /^(function Cr[A-Za-z0-9]+\(props\)\s*\{\n)/m;
-
-if (!existsSync(SOLID)) {
-  if (CHECK) {
-    console.log("✓ solid fixup: nothing compiled yet");
-    process.exit(0);
-  }
-  console.warn("⚠ solid fixup: no dist/frameworks/solid/components — run mitosis build first");
-  process.exit(0);
-}
+const DECL = /^(\s*)const cr = useContext\(CrContext(?:,\s*[A-Za-z]+)?\);\n/m;
 
 let patched = 0;
 let unpatched = 0;
 
-for (const file of readdirSync(SOLID).filter((f) => f.endsWith(".jsx"))) {
-  const p = join(SOLID, file);
-  const src = readFileSync(p, "utf8");
+for (const { fw, ext, open: FN_OPEN } of TARGETS) {
+  const dir = join(ROOT, "dist", "frameworks", fw, "components");
+  if (!existsSync(dir)) continue;
 
-  const decl = DECL.exec(src);
-  if (!decl) continue; // component does not join the cascade
+  for (const file of readdirSync(dir).filter((f) => f.endsWith(ext))) {
+    const p = join(dir, file);
+    const src = readFileSync(p, "utf8");
 
-  const declIdx = decl.index;
-  const open = FN_OPEN.exec(src);
-  if (!open) continue;
-  const bodyStart = open.index + open[0].length;
+    const decl = DECL.exec(src);
+    if (!decl) continue; // component does not join the cascade
 
-  // Already first in the body? Nothing to do.
-  if (src.slice(bodyStart, declIdx).trim() === "") continue;
+    const open = FN_OPEN.exec(src);
+    if (!open) continue;
+    const bodyStart = open.index + open[0].length;
+    const declIdx = decl.index;
 
-  // Does anything before the declaration actually reference `cr`? If not the
-  // ordering is latent rather than broken, but hoist anyway so it cannot become
-  // broken later — the whole point is that client and server agree.
-  const out = `${src.slice(0, bodyStart)}  const cr = useContext(CrContext);\n\n${src
-    .slice(bodyStart)
-    .replace(DECL, "")}`;
+    // Already first in the body? Nothing to do.
+    if (src.slice(bodyStart, declIdx).trim() === "") continue;
 
-  if (out !== src) {
-    if (CHECK) {
-      unpatched++;
-      console.error(`✗ ${file} declares \`cr\` after the store block (server-build TDZ)`);
-      continue;
+    // Hoist even when nothing before it reads `cr` yet: the ordering is latent
+    // rather than broken in that case, and the point is that it cannot silently
+    // become broken later.
+    const out = `${src.slice(0, bodyStart)}  ${decl[0].trim()}\n\n${src
+      .slice(bodyStart)
+      .replace(DECL, "")}`;
+
+    if (out !== src) {
+      if (CHECK) {
+        unpatched++;
+        console.error(`✗ ${fw}/${file} declares \`cr\` after code that reads it (TDZ)`);
+        continue;
+      }
+      writeFileSync(p, out);
+      patched++;
     }
-    writeFileSync(p, out);
-    patched++;
   }
 }
 
@@ -93,8 +96,8 @@ if (CHECK) {
     console.error("\nRun: npm run build:components (regenerates + patches).");
     process.exit(1);
   }
-  console.log("✓ solid fixup: every `cr` is declared before use");
+  console.log("✓ context fixup: every `cr` is declared before use");
   process.exit(0);
 }
 
-console.log(`solid fixup: hoisted the context read in ${patched} component(s)`);
+console.log(`context fixup: hoisted the context read in ${patched} component(s)`);
