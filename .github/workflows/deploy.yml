@@ -18,6 +18,11 @@ jobs:
   # Verify the token layer is not stale and the site builds (runs on PRs too).
   build:
     runs-on: ubuntu-latest
+    # The gates take ~5 min. The cap is for HANGS, not slowness: `playwright
+    # install --with-deps` shells out to apt and has stalled indefinitely (once
+    # for 26 min against a 22-56s norm), and without a timeout a stuck job runs
+    # to GitHub's 6-hour default before anyone finds out.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -58,6 +63,9 @@ jobs:
       - name: Tooling gate (MCP server tools + skill installer)
         run: pnpm run test:tooling
       - name: Install Playwright Chromium
+        # Its own cap: this is the one step that reaches the network via apt, so
+        # it should fail on its own rather than consume the whole job's budget.
+        timeout-minutes: 10
         run: pnpm exec playwright install --with-deps chromium
       - name: Accessibility gate (axe, all four themes)
         run: pnpm run test:a11y
@@ -89,6 +97,7 @@ jobs:
   # must go red when the example can no longer be installed or built.
   example-console:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
