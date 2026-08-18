@@ -39,8 +39,8 @@ import {
   CrDateTime,
   CrCronField,
   CrForm,
-} from "../../../../dist/frameworks/qwik";
-import { defineForm, type as ark } from "../../../../lib/forms/index.js";
+} from "@alebianco/cr-components/qwik";
+import { defineForm, type as ark } from "@alebianco/cr-utils/forms";
 
 /* A schema-driven "new session" form, defined once. The ArkType type is the
  * single source of truth — it yields the render model AND the validator. In Qwik,
