@@ -107,7 +107,11 @@ export default function CrRelativeTime(props: CrRelativeTimeProps) {
   return (
     <time
       {...ptAttrs(ptResolve(cr, props.pt, "CrRelativeTime"), "root")}
-      dateTime={state.iso(props.time)}
+      /* `datetime`, not `dateTime`: React and Vue map the camelCase spelling to
+       * the DOM attribute, but Qwik, Svelte and Solid emit it literally, so those
+       * three shipped an invalid `dateTime=` attribute and lost the
+       * machine-readable instant entirely. */
+      datetime={state.iso(props.time)}
       data-part="root"
       class={ptClass(ptResolve(cr, props.pt, "CrRelativeTime"), props.unstyled, "cr-reltime", "root")}
       style={ptStyle(ptResolve(cr, props.pt, "CrRelativeTime"), props.dt, "root")}
