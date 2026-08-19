@@ -1,6 +1,6 @@
 {
   "name": "@alebianco/cr-utils",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "license": "UNLICENSED",
   "type": "module",
   "description": "Control Room framework-agnostic utilities — class merge, href/duration/position/time-scale helpers, forms (ArkType ⇄ JSON Schema) and theme runtime.",
