@@ -59,6 +59,11 @@ export default function CrModal(props: CrModalProps) {
       ref={dialogRef}
       aria-label={props.title || "Dialog"}
       onClose={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrModal'), 'root', 'onClose', event); props.onClose && props.onClose(); }}
+      /* A click whose target IS the dialog landed on the ::backdrop — children sit
+       * inside the padding box, so any click on them has a descendant as target.
+       * The platform gives the top layer, the focus trap and Escape for free, but
+       * NOT backdrop-to-dismiss; without this the backdrop is inert. */
+      onClick={(event: any) => { ptHandler(ptResolve(cr, props.pt, 'CrModal'), 'root', 'onClick', event); event.target === dialogRef && props.onClose && props.onClose(); }}
     >
       <div {...ptAttrs(ptResolve(cr, props.pt, "CrModal"), "head")} class={ptClass(ptResolve(cr, props.pt, "CrModal"), props.unstyled, "cr-modal__head", "head")} data-part="head">
         <Show when={props.title}>
