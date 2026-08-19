@@ -1792,15 +1792,39 @@ control loses its accessible name."
 | 13 | `IconToggle` | `CrToggleChip` | 5 | ⚠ `count=` → `badge=` |
 | 14 | `ToggleChip` | `CrToggleChip` | 16 | ⚠ `count=` → `badge=` (`badge={true}` renders a bare dot) |
 | 15 | `ErrorState` | `CrDrip` | 10 | — |
-| 16 | `Hero` | `CrHero` | 10 | — |
+| 16 | `Hero` | **stays local** | 9 | ⚠ NOT a swap — see below |
 | 17 | `Field` / `SelectField` | `CrField` / `CrInput` / `CrSelect` | 16 | ⚠ leaf controls gained `invalid?` (a11y only, never for looks); `CrInput` gained `icon`/`clearable`/`onClear` |
 | 18 | `CronField` | `CrCronField` | 3 | — |
 | 19 | `FilterBar` | `CrToolbar` | 6 | — |
 | 20 | `MasterDetail` | `CrResizable` | 4 | — |
 | 21 | `EmptyState` | `CrEmptyState` | 25 | — |
-| 22 | `CrIcon` | `CrIcon` | 20 | — |
+| 22 | `CrIcon` | **stays local** | 19 | ⚠ NOT a swap — see below |
 | 23 | `ToastStack` | `CrToastRegion` / `CrToast` | 2 | ⚠ 9 anchors not 4; toasts dedup; `onDismiss` fires `newestId`; takes `labels?` |
 | 24 | `Shell` | `CrMasthead` + `CrNav` | 1 | — |
+
+**Note on `Hero` (#16) and `CrIcon` (#22) — measured, both stay local.**
+
+Two entries in this table are wrong, found by reading the contracts during the
+port rather than by assuming the name match held:
+
+- **`Hero` is not `CrHero`.** The design system's Hero is *"the one region that
+  keys to the state needing attention (Law 2)"* — a signal-**filled** focal box,
+  one per screen, whose background is `--sig-wait` / `--sig-err` / `--stage`. The
+  app's Hero is a per-view page header on all seven views, sitting on neutral
+  `--board` and taking a **route** accent: all 9 call sites pass
+  `SECTION_ACCENT.*`, never a signal. Swapping would flood seven page headers with
+  a state colour asserting no state — the exact Law 2 violation Step 2.0b's hue
+  constraint exists to prevent — and would drop the icon, the stats row and the
+  actions slot, none of which `CrHero` has. If a view ever needs a real attention
+  region, that is `CrHero` used *alongside* the header, not instead of it.
+- **`CrIcon` is not the design system's `CrIcon`.** 17 of the app's 21 glyphs are
+  domain names the system does not ship (sprint, jobs, sessions, contacts,
+  working, waiting, idle, notes); only close/done/error/scan overlap. Five are
+  `<g>` wrappers over multiple `<path>` elements, so they cannot round-trip
+  through the system's single-`d`-string `path` hatch. Separately, the system
+  passes `size` through raw and emits no `shape-rendering`, so pixel art
+  antialiases — the local `crispSize` snap is why these icons are sharp at 14px on
+  a 24-unit grid.
 
 **Note on `ErrorState` (#15).** It maps to `CrDrip`, not `CrAlert`: the app's
 error surface floods with `--sig-err` and carries Law 3's drip, which is exactly
