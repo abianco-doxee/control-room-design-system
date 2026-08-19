@@ -561,8 +561,7 @@ Expected: typecheck clean, suite PASS. Record the passing test count — Phase 2
 
 - [ ] **Step 2: Confirm the app boots — use `pnpm preview`, not `pnpm dev`**
 
-**`pnpm dev` is broken, and was already broken in `dp-tooling`** (verified
-2026-08-19). It serves a 5006-byte Vite error shell with a Qwik error overlay and
+**`pnpm dev` was broken and is now FIXED** (2026-08-19, commit `7aa45e2`). It It serves a 5006-byte Vite error shell with a Qwik error overlay and
 no app markup, logging *"Could not auto-determine entry point … Skipping dependency
 pre-bundling"*. The original app at
 `/Users/abianco/Workspace/DP/dp-tooling/skills/sprint-dashboard` serves the
@@ -570,19 +569,22 @@ pre-bundling"*. The original app at
 inherited defect, **not** extraction damage. The SSR suite does not catch it because
 those tests use `createDOM()` rather than the dev pipeline.
 
-Use the build+preview path, which serves the real app (32,411 bytes):
+Root cause was upstream: Qwik 1.20.0's client-dev-only branch stringifies a
+payload holding the circular Node request. `mode: 'ssr'` in `vite.config.ts`
+renders dev through SSR and skips it. Either path now serves the real app:
 
 ```bash
-pnpm build && pnpm preview
+pnpm dev                    # now works
+# or: pnpm build && pnpm preview
 ```
 
 Open <http://localhost:4178>. Confirm real markup — `cr-nav`, `data-section=`,
 per-route icons with `aria-label`, Qwik hydration ids — not a `<vite-error-overlay>`
 or an `errored-host` element. Stop the server.
 
-**Fixing `pnpm dev` is out of scope for this plan** (it is a pre-existing app defect,
-not a design-system port concern), but it should be fixed before this repo is a
-comfortable place to work. Tracked in the Deferred section.
+All seven views serve 95k-133k of real markup. If dev ever regresses to ~5k, check
+that `mode: 'ssr'` is still set — and never reinstate a global `JSON.stringify`
+patch, which corrupts Qwik's own SSR serialization.
 
 - [ ] **Step 3: Tag the baseline**
 
@@ -2014,11 +2016,8 @@ Expected: all clean. Compare the passing count against the Task 5 baseline; ever
 
 - [ ] **Step 5: Final visual pass, both schemes, all 7 views**
 
-Use `pnpm build && pnpm preview` — `pnpm dev` is broken and inherited that way from
-`dp-tooling`; see Task 5 Step 2.
-
 ```bash
-pnpm build && pnpm preview
+pnpm dev
 ```
 
 For each of sprint, sessions, jobs, notes, contacts, catalogue, settings — in dark and light:
@@ -2141,21 +2140,6 @@ the real proof the release works.
 ---
 
 ## Deferred — not in this plan
-
-- **Fix `pnpm dev`.** It serves a Vite error shell with no app markup ("Could not
-  auto-determine entry point"), and did so in `dp-tooling` too — the extraction did
-  not cause it. `pnpm build && pnpm preview` serves the app correctly, so this is a
-  developer-ergonomics defect rather than a functional one, and it is an app bug, not
-  a design-system one. Out of scope here; fix it before the repo is a comfortable
-  place to work day to day.
-
-- **Fix the root package's `./qwik` export upstream.** `@alebianco/cr-design-system`
-  exports `./qwik` → `packages/components/dist/pkg/qwik/index.js`, where all 81
-  files carry raw `component$()` calls the optimizer cannot process — the spec's
-  Finding 1, reintroduced at the root package. `references/frameworks.md:17` and
-  `:182` document that broken specifier. This port sidesteps it by importing
-  `@alebianco/cr-components/qwik`, but it is a live bug for any other Qwik
-  consumer and should be fixed in the design system on its own commit.
 
 - **Retiring the `dp-tooling` copy.** It stays untouched as the rollback. Removing it, dropping it from `.claude-plugin/marketplace.json`, and repointing `tools/bin/dash` is a separate decision once this is proven.
 - **A general wayfinding mechanism in the design system.** If a second consumer ever needs per-route accents, the right shape is a documented recipe for deriving an N-way ramp from a route name — the DS has `hashSeed`/`mulberry32` but no seeded-colour utility. That needs its own Law 2 boundary decision plus a contrast-safe hue generator.
