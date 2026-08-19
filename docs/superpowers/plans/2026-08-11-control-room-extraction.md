@@ -559,13 +559,30 @@ pnpm test 2>&1 | tail -15
 
 Expected: typecheck clean, suite PASS. Record the passing test count — Phase 2 must never drop below it except for tests deliberately deleted with a stated reason.
 
-- [ ] **Step 2: Confirm the app boots**
+- [ ] **Step 2: Confirm the app boots — use `pnpm preview`, not `pnpm dev`**
+
+**`pnpm dev` is broken, and was already broken in `dp-tooling`** (verified
+2026-08-19). It serves a 5006-byte Vite error shell with a Qwik error overlay and
+no app markup, logging *"Could not auto-determine entry point … Skipping dependency
+pre-bundling"*. The original app at
+`/Users/abianco/Workspace/DP/dp-tooling/skills/sprint-dashboard` serves the
+**byte-for-byte identical** 5006-byte shell on its own dev server, so this is an
+inherited defect, **not** extraction damage. The SSR suite does not catch it because
+those tests use `createDOM()` rather than the dev pipeline.
+
+Use the build+preview path, which serves the real app (32,411 bytes):
 
 ```bash
-pnpm dev
+pnpm build && pnpm preview
 ```
 
-Open <http://localhost:4178>. Confirm the sprint view renders. Stop the server.
+Open <http://localhost:4178>. Confirm real markup — `cr-nav`, `data-section=`,
+per-route icons with `aria-label`, Qwik hydration ids — not a `<vite-error-overlay>`
+or an `errored-host` element. Stop the server.
+
+**Fixing `pnpm dev` is out of scope for this plan** (it is a pre-existing app defect,
+not a design-system port concern), but it should be fixed before this repo is a
+comfortable place to work. Tracked in the Deferred section.
 
 - [ ] **Step 3: Tag the baseline**
 
@@ -1997,8 +2014,11 @@ Expected: all clean. Compare the passing count against the Task 5 baseline; ever
 
 - [ ] **Step 5: Final visual pass, both schemes, all 7 views**
 
+Use `pnpm build && pnpm preview` — `pnpm dev` is broken and inherited that way from
+`dp-tooling`; see Task 5 Step 2.
+
 ```bash
-pnpm dev
+pnpm build && pnpm preview
 ```
 
 For each of sprint, sessions, jobs, notes, contacts, catalogue, settings — in dark and light:
@@ -2121,6 +2141,13 @@ the real proof the release works.
 ---
 
 ## Deferred — not in this plan
+
+- **Fix `pnpm dev`.** It serves a Vite error shell with no app markup ("Could not
+  auto-determine entry point"), and did so in `dp-tooling` too — the extraction did
+  not cause it. `pnpm build && pnpm preview` serves the app correctly, so this is a
+  developer-ergonomics defect rather than a functional one, and it is an app bug, not
+  a design-system one. Out of scope here; fix it before the repo is a comfortable
+  place to work day to day.
 
 - **Fix the root package's `./qwik` export upstream.** `@alebianco/cr-design-system`
   exports `./qwik` → `packages/components/dist/pkg/qwik/index.js`, where all 81
