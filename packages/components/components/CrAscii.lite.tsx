@@ -55,7 +55,13 @@ export default function CrAscii(props: CrAsciiProps) {
       const dpr = Math.max(1, Math.min(2, (typeof window !== "undefined" && window.devicePixelRatio) || 1));
       node.width = W * dpr; node.height = H * dpr;
       node.style.width = "100%"; node.style.height = "100%";
-      const ctx = node.getContext("2d"); ctx.scale(dpr, dpr); ctx.clearRect(0, 0, W, H);
+/* getContext can THROW or return null where 2D is unavailable — a headless
+       * DOM, a canvas-blocking privacy mode, an exhausted context pool. Painting
+       * is decorative here, so bail out instead of taking the render down. */
+      let ctx: any = null;
+      try { ctx = node.getContext("2d"); } catch { ctx = null; }
+      if (!ctx) return;
+      ctx.scale(dpr, dpr); ctx.clearRect(0, 0, W, H);
 
       const cw = variantName === "braille" ? 7 : 9;
       const ch = 12;

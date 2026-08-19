@@ -48,7 +48,13 @@ export default function CrChrome(props: CrChromeProps) {
       if (!node || !node.getContext) return;
       const dpr = Math.max(1, Math.min(3, (typeof window !== "undefined" && window.devicePixelRatio) || 1));
       node.width = W * dpr; node.height = H * dpr; node.style.width = W + "px"; node.style.height = H + "px";
-      const ctx = node.getContext("2d"); ctx.imageSmoothingEnabled = false; ctx.scale(dpr, dpr);
+/* getContext can THROW or return null where 2D is unavailable — a headless
+       * DOM, a canvas-blocking privacy mode, an exhausted context pool. Painting
+       * is decorative here, so bail out instead of taking the render down. */
+      let ctx: any = null;
+      try { ctx = node.getContext("2d"); } catch { ctx = null; }
+      if (!ctx) return;
+      ctx.imageSmoothingEnabled = false; ctx.scale(dpr, dpr);
 
       // two-tone metal bar (hard boundary — lit top half, dark bottom half; Law 1)
       ctx.fillStyle = MID; ctx.fillRect(0, 0, W, H);

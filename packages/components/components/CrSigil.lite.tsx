@@ -67,7 +67,13 @@ export default function CrSigil(props: CrSigilProps) {
       const dpr = Math.max(1, Math.min(3, (typeof window !== "undefined" && window.devicePixelRatio) || 1));
       const cell = Math.max(1, Math.round((px * dpr) / G)); const back = cell * G;
       node.width = back; node.height = back; node.style.width = px + "px"; node.style.height = px + "px";
-      const ctx = node.getContext("2d"); ctx.imageSmoothingEnabled = false; ctx.clearRect(0, 0, back, back);
+/* getContext can THROW or return null where 2D is unavailable — a headless
+       * DOM, a canvas-blocking privacy mode, an exhausted context pool. Painting
+       * is decorative here, so bail out instead of taking the render down. */
+      let ctx: any = null;
+      try { ctx = node.getContext("2d"); } catch { ctx = null; }
+      if (!ctx) return;
+      ctx.imageSmoothingEnabled = false; ctx.clearRect(0, 0, back, back);
       // faint halftone bleed behind the glyph
       ctx.globalAlpha = 0.12; ctx.fillStyle = ink;
       for (let y = cell; y < back; y += cell * 2) for (let x = cell; x < back; x += cell * 2) ctx.fillRect(x, y, 1, 1);

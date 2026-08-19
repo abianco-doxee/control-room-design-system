@@ -62,7 +62,9 @@ export default function CrDither(props: CrDitherProps) {
 
       const node: any = canvasRef;
       if (!node || !node.getContext) return;
-      const ctx = node.getContext("2d");
+      /* getContext can THROW as well as return null where 2D is unavailable. */
+      let ctx: any = null;
+      try { ctx = node.getContext("2d"); } catch { ctx = null; }
       if (!ctx) return;
       node.width = W; node.height = H;
       node.style.width = W + "px"; node.style.height = H + "px";
