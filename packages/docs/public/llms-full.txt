@@ -1101,11 +1101,11 @@ Two ways to consume:
 
 ```html
 <!-- A. bundle: every built-in theme, pick with data-theme (simplest) -->
-<link rel="stylesheet" href="@alebianco/cr-design-system/css" />
+<link rel="stylesheet" href="@alebianco/cr-tokens/css" />
 
 <!-- B. split: structure once + exactly the theme(s) you ship (leaner, brandable) -->
-<link rel="stylesheet" href="@alebianco/cr-design-system/structure.css" />
-<link rel="stylesheet" href="@alebianco/cr-design-system/themes/slate.css" />
+<link rel="stylesheet" href="@alebianco/cr-tokens/structure.css" />
+<link rel="stylesheet" href="@alebianco/cr-tokens/themes/slate.css" />
 ```
 
 Then select a theme on the root element:
@@ -1143,10 +1143,10 @@ Component Browser puts every card under one page theme while you flip it.)
 
 ## The theme contract
 
-`dist/theme-contract.json` (`@alebianco/cr-design-system/theme-contract`) is the
+`dist/theme-contract.json` (`@alebianco/cr-tokens/theme-contract`) is the
 machine-readable list of every semantic role a complete theme must define — the
 exact surface a brand writes to. The same list is the runtime `THEME_ROLES` in
-`@alebianco/cr-design-system/theme`; a test keeps the two (and tokens.json) in
+`@alebianco/cr-utils/theme`; a test keeps the two (and tokens.json) in
 lock-step so they can't drift.
 
 Roles by group: **surface** (`--ground` `--board` `--panel` `--panel-2` `--rail`),
@@ -1396,14 +1396,14 @@ That's `brands/aurora.json`: the same indigo/cyan brand in both modes, the light
 mode auto-darkening the inherited neon signals to stay readable on its near-white
 surfaces. Select the light variant with `data-theme="aurora-light"`.
 
-### Programmatic authoring (`@alebianco/cr-design-system/theme`)
+### Programmatic authoring (`@alebianco/cr-utils/theme`)
 
 The build path is thin wrapping over a framework-agnostic core you can call
 directly — at build time, or in the browser for per-tenant / user-chosen themes:
 
 ```js
 import { defineTheme, applyTheme, validateTheme, checkThemeContrast }
-  from "@alebianco/cr-design-system/theme";
+  from "@alebianco/cr-utils/theme";
 
 // validate + render to a scoped CSS string
 const { css, validation, contrast } = defineTheme("acme", acmeBrand);
@@ -1631,12 +1631,12 @@ convenience compositions on top.
 
 ```css
 /* your app's main CSS, processed by Tailwind v4 */
-@import "@alebianco/cr-design-system/tailwind.css";   /* Tailwind + the CR @theme */
+@import "@alebianco/cr-styles/tailwind.css";   /* Tailwind + the CR @theme */
 ```
 
 ```html
 <!-- load the runtime token layer once, and pick a theme -->
-<link rel="stylesheet" href="@alebianco/cr-design-system/css" />   <!-- dist/control-room.css -->
+<link rel="stylesheet" href="@alebianco/cr-tokens/css" />   <!-- dist/control-room.css -->
 <html data-theme="dark">
 ```
 
@@ -3342,7 +3342,7 @@ in local time, a multi-week chart on local Mondays, a multi-year chart on Jan 1.
 Labels format to the unit (`09:30`, `3 Mar`, `Mar`, `Jan '25`, `2025`); the hover
 tooltip shows a fuller stamp (`3 Mar 09:15`). This uses the built-in `Intl` zone
 database (no date library, no bundle cost) and is shared with the static gallery via
-`@alebianco/cr-design-system/time-scale` (`timeTicks(lo, hi, { zone, target, locale,
+`@alebianco/cr-utils/time-scale` (`timeTicks(lo, hi, { zone, target, locale,
 week, fiscalStart })`), so hand-rendered and live charts agree.
 
 The calendar can be expressed the way a team reads it, via three more props (all
@@ -3561,7 +3561,7 @@ closes and returns focus to the trigger. Use **Menu** for a list of actions.
 trigger, **flips** above when there's no room below, and **shifts** horizontally to
 stay in the viewport (never clipping off-screen), tagging itself with
 `data-placement`. The algorithm is exported for your own overlays as
-`@alebianco/cr-design-system/position` — `computePosition` (pure geometry, unit-
+`@alebianco/cr-utils/position` — `computePosition` (pure geometry, unit-
 tested), `place(anchor, floating, opts)`, and `autoPlace(...)` (keeps it pinned on
 scroll/resize). No dependency on Floating UI.
 
@@ -3872,7 +3872,7 @@ A retro-futuristic **cyber-sigil** generated from a seed — a per-entity identi
 mark that pairs with the pixel-cat. Full contract in `references/seeded-sigil.md`.
 
 ```tsx
-import { CrSigil } from "@alebianco/cr-design-system/react";
+import { CrSigil } from "@alebianco/cr-components/react";
 <CrSigil seed="nova-01" state="working" />
 ```
 
@@ -3896,7 +3896,7 @@ operators — it **is** the non-colour backup the a11y contract requires.
 <span class="cr-sev cr-sev--idle" role="img" aria-label="idle"></span>      <!-- ● ∞ -->
 ```
 ```tsx
-import { CrShape } from "@alebianco/cr-design-system/react";
+import { CrShape } from "@alebianco/cr-components/react";
 <CrShape severity="crit" label="build failing" />
 ```
 
@@ -3940,7 +3940,7 @@ paint rivets, hex bolts or screw heads, which read as a novelty machine-panel
 skin rather than as an instrument face.
 
 ```tsx
-import { CrChrome } from "@alebianco/cr-design-system/react";
+import { CrChrome } from "@alebianco/cr-components/react";
 <CrChrome seed="nova-rack" width={440} />
 ```
 
@@ -3978,7 +3978,7 @@ screen.**
 <span class="cr-blob" aria-hidden="true"></span>  <!-- standalone soft accent -->
 ```
 ```tsx
-import { CrBreach } from "@alebianco/cr-design-system/react";
+import { CrBreach } from "@alebianco/cr-components/react";
 <CrBreach signal="done" wash alive>…the one exceptional thing…</CrBreach>
 ```
 
@@ -4396,14 +4396,14 @@ emits (`data-pc-section`). Three props drive the rest:
 The stylesheet ships three ways, so a consumer pays only for what they render
 (PrimeVue-style), without giving up the one-import option:
 
-- **Everything** — `@alebianco/cr-design-system/components` (the full
+- **Everything** — `@alebianco/cr-styles/components` (the full
   `styles/components.css` bundle). Simplest; one import.
 - **Base + per-component** — import the thin chassis once, then one file per
   component you actually use:
   ```js
-  import "@alebianco/cr-design-system/base";          // resets, chassis, responsive, shared primitives
-  import "@alebianco/cr-design-system/styles/button.css";
-  import "@alebianco/cr-design-system/styles/calendar.css";
+  import "@alebianco/cr-styles/base";          // resets, chassis, responsive, shared primitives
+  import "@alebianco/cr-styles/parts/button.css";
+  import "@alebianco/cr-styles/parts/calendar.css";
   ```
   Slugs match the catalog ids (`button`, `calendar`, `toggle-chip`, …); the full
   list is `styles/parts/manifest.json`. **Import `base` first** — it carries the
@@ -4583,7 +4583,7 @@ the whole point of exporting it:
 
 ```tsx
 // React / Solid — a context object
-import { CrContext, CrModal } from "@alebianco/cr-design-system/react";
+import { CrContext, CrModal } from "@alebianco/cr-components/react";
 <CrContext.Provider value={{ pt: { CrModal: { root: { class: "shadow-lg" } } },
                              locale: "it",
                              messages: { "CrModal.close": "Chiudi" } }}>
@@ -4593,7 +4593,7 @@ import { CrContext, CrModal } from "@alebianco/cr-design-system/react";
 
 ```ts
 // Vue — a { cr, key } pair; provide under its Symbol key
-import { CrContext } from "@alebianco/cr-design-system/vue";
+import { CrContext } from "@alebianco/cr-components/vue";
 app.provide(CrContext.key, { pt: { … }, locale: "it", messages: { … } });
 
 // Svelte — the same pair, via setContext
@@ -4846,7 +4846,7 @@ derived from the JSON Schema (the lingua franca), so the two sources produce the
 
 ```ts
 import { type } from "arktype";
-import { defineForm } from "@alebianco/cr-design-system/forms";
+import { defineForm } from "@alebianco/cr-utils/forms";
 
 // (a) ArkType
 const Session = type({
@@ -5170,9 +5170,9 @@ Each framework has a subpath export with named components (and, where the target
 is typed, prop-type exports):
 
 ```ts
-import { CrButton, type CrButtonProps } from "@alebianco/cr-design-system/react";
-import { CrButton } from "@alebianco/cr-design-system/qwik";
-import { CrButton } from "@alebianco/cr-design-system/vue";
+import { CrButton, type CrButtonProps } from "@alebianco/cr-components/react";
+import { CrButton } from "@alebianco/cr-components/qwik";
+import { CrButton } from "@alebianco/cr-components/vue";
 ```
 
 Every entry also exports **`CrContext`** — the app-level tier for global `pt`,
@@ -5318,25 +5318,25 @@ Load the token + component CSS once (any framework), then import the compiled
 component for your framework:
 
 ```html
-<link rel="stylesheet" href="@alebianco/cr-design-system/css" />        <!-- tokens -->
-<link rel="stylesheet" href="@alebianco/cr-design-system/components" />  <!-- cr- classes -->
+<link rel="stylesheet" href="@alebianco/cr-tokens/css" />        <!-- tokens -->
+<link rel="stylesheet" href="@alebianco/cr-styles/components" />  <!-- cr- classes -->
 ```
 Each framework has a **barrel entry** — import any component by name from one
 subpath (`/react`, `/vue`, `/svelte`, `/angular`, `/solid`, `/qwik`):
 
 ```tsx
 // React
-import { CrSwitch, CrModal } from "@alebianco/cr-design-system/react";
+import { CrSwitch, CrModal } from "@alebianco/cr-components/react";
 <CrSwitch checked={on} label="Live" onChange={setOn} />
 ```
 ```vue
 <!-- Vue -->
-<script setup> import { CrSwitch } from "@alebianco/cr-design-system/vue"; </script>
+<script setup> import { CrSwitch } from "@alebianco/cr-components/vue"; </script>
 <CrSwitch :checked="on" label="Live" @change="on = $event" />
 ```
 ```tsx
 // Qwik
-import { CrSwitch } from "@alebianco/cr-design-system/qwik";
+import { CrSwitch } from "@alebianco/cr-components/qwik";
 <CrSwitch checked={on.value} label="Live" onChange$={(v) => (on.value = v)} />
 ```
 
@@ -5345,7 +5345,7 @@ on this barrel — read it for a full composition (nav rail, masthead, session
 panels, breach). It is source-only; the published site does not host it.
 
 Need just one component? The deep path still works (extension required):
-`import CrSwitch from "@alebianco/cr-design-system/frameworks/react/components/CrSwitch.tsx"`.
+`import CrSwitch from "@alebianco/cr-components/frameworks/react/components/CrSwitch.tsx"`.
 
 The barrels re-export the **default** of every compiled component (Angular also
 re-exports each `<Name>Module`). They ship as **source** — your app's bundler
@@ -5375,7 +5375,7 @@ utility on a `cr-` element. Use the `cn()` helper (clsx + tailwind-merge) so
 conflicting utilities resolve last-wins instead of both shipping:
 
 ```tsx
-import { cn } from "@alebianco/cr-design-system/cn";
+import { cn } from "@alebianco/cr-utils/cn";
 <button class={cn("cr-btn", primary && "cr-btn--accent", "px-4", className)} />
 ```
 
@@ -5574,7 +5574,7 @@ targets.
 ## Use it
 
 ```tsx
-import { CrSigil } from "@alebianco/cr-design-system/react";
+import { CrSigil } from "@alebianco/cr-components/react";
 <CrSigil seed="nova-01" state="working" size={48} />
 <CrSigil seed="ptl-757" />           {/* no state → seed picks the hue */}
 ```
@@ -5638,7 +5638,7 @@ sets: `braille` (finest), `block` (`░▒▓█`), `ramp` (`.:-=+*#%@`).
 </div>
 ```
 ```tsx
-import { CrAscii } from "@alebianco/cr-design-system/react";
+import { CrAscii } from "@alebianco/cr-components/react";
 <div class="cr-ascii cr-ascii--mask-l" aria-hidden="true">
   <CrAscii seed="nova-01" variant="braille" />
 </div>
@@ -5659,7 +5659,7 @@ modifier fades it off the content edge (`-l` toward left-aligned text, `-r`,
   latency measurement, which is exactly what this component must not be taken for.
 
 ```tsx
-import { CrTelemetry } from "@alebianco/cr-design-system/react";
+import { CrTelemetry } from "@alebianco/cr-components/react";
 <CrTelemetry seed="cr-1130" />
 ```
 
@@ -5696,7 +5696,7 @@ path and stays script-free, matching the `CrDrip` precedent that the house
 glitch must render identically without JS.
 
 ```tsx
-import { CrDither } from "@alebianco/cr-design-system/react";
+import { CrDither } from "@alebianco/cr-components/react";
 <CrDither seed="cr-1130" mode="bayer" state="working" />
 ```
 

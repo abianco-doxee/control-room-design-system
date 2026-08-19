@@ -12,7 +12,8 @@ First release — Control Room 1.0.0, published privately to GitHub Packages und
 `@alebianco` scope.
 
 A neon-noir, neobrutalist design system for dense operational dashboards: the nine laws,
-a token layer driving four core themes and six brand themes, 83 catalogued components,
+a token layer driving four core themes and seven brand themes, 83 catalogued
+entries (76 components, 4 utilities, 3 blocks),
 interactive components compiled to six frameworks, a WCAG 2.1 AA contract enforced in CI,
 and AI-native surfaces (MCP server, `llms.txt`, queryable catalog, installable skill).
 

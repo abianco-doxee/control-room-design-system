@@ -39,7 +39,7 @@ targets.
 ## Use it
 
 ```tsx
-import { CrSigil } from "@alebianco/cr-design-system/react";
+import { CrSigil } from "@alebianco/cr-components/react";
 <CrSigil seed="nova-01" state="working" size={48} />
 <CrSigil seed="ptl-757" />           {/* no state → seed picks the hue */}
 ```

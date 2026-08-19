@@ -38,7 +38,7 @@ sets: `braille` (finest), `block` (`░▒▓█`), `ramp` (`.:-=+*#%@`).
 </div>
 ```
 ```tsx
-import { CrAscii } from "@alebianco/cr-design-system/react";
+import { CrAscii } from "@alebianco/cr-components/react";
 <div class="cr-ascii cr-ascii--mask-l" aria-hidden="true">
   <CrAscii seed="nova-01" variant="braille" />
 </div>
@@ -59,7 +59,7 @@ modifier fades it off the content edge (`-l` toward left-aligned text, `-r`,
   latency measurement, which is exactly what this component must not be taken for.
 
 ```tsx
-import { CrTelemetry } from "@alebianco/cr-design-system/react";
+import { CrTelemetry } from "@alebianco/cr-components/react";
 <CrTelemetry seed="cr-1130" />
 ```
 
@@ -96,7 +96,7 @@ path and stays script-free, matching the `CrDrip` precedent that the house
 glitch must render identically without JS.
 
 ```tsx
-import { CrDither } from "@alebianco/cr-design-system/react";
+import { CrDither } from "@alebianco/cr-components/react";
 <CrDither seed="cr-1130" mode="bayer" state="working" />
 ```
 

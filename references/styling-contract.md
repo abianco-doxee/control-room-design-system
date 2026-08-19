@@ -27,14 +27,14 @@ emits (`data-pc-section`). Three props drive the rest:
 The stylesheet ships three ways, so a consumer pays only for what they render
 (PrimeVue-style), without giving up the one-import option:
 
-- **Everything** — `@alebianco/cr-design-system/components` (the full
+- **Everything** — `@alebianco/cr-styles/components` (the full
   `styles/components.css` bundle). Simplest; one import.
 - **Base + per-component** — import the thin chassis once, then one file per
   component you actually use:
   ```js
-  import "@alebianco/cr-design-system/base";          // resets, chassis, responsive, shared primitives
-  import "@alebianco/cr-design-system/styles/button.css";
-  import "@alebianco/cr-design-system/styles/calendar.css";
+  import "@alebianco/cr-styles/base";          // resets, chassis, responsive, shared primitives
+  import "@alebianco/cr-styles/parts/button.css";
+  import "@alebianco/cr-styles/parts/calendar.css";
   ```
   Slugs match the catalog ids (`button`, `calendar`, `toggle-chip`, …); the full
   list is `styles/parts/manifest.json`. **Import `base` first** — it carries the
@@ -214,7 +214,7 @@ the whole point of exporting it:
 
 ```tsx
 // React / Solid — a context object
-import { CrContext, CrModal } from "@alebianco/cr-design-system/react";
+import { CrContext, CrModal } from "@alebianco/cr-components/react";
 <CrContext.Provider value={{ pt: { CrModal: { root: { class: "shadow-lg" } } },
                              locale: "it",
                              messages: { "CrModal.close": "Chiudi" } }}>
@@ -224,7 +224,7 @@ import { CrContext, CrModal } from "@alebianco/cr-design-system/react";
 
 ```ts
 // Vue — a { cr, key } pair; provide under its Symbol key
-import { CrContext } from "@alebianco/cr-design-system/vue";
+import { CrContext } from "@alebianco/cr-components/vue";
 app.provide(CrContext.key, { pt: { … }, locale: "it", messages: { … } });
 
 // Svelte — the same pair, via setContext

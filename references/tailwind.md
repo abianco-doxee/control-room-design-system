@@ -10,12 +10,12 @@ convenience compositions on top.
 
 ```css
 /* your app's main CSS, processed by Tailwind v4 */
-@import "@alebianco/cr-design-system/tailwind.css";   /* Tailwind + the CR @theme */
+@import "@alebianco/cr-styles/tailwind.css";   /* Tailwind + the CR @theme */
 ```
 
 ```html
 <!-- load the runtime token layer once, and pick a theme -->
-<link rel="stylesheet" href="@alebianco/cr-design-system/css" />   <!-- dist/control-room.css -->
+<link rel="stylesheet" href="@alebianco/cr-tokens/css" />   <!-- dist/control-room.css -->
 <html data-theme="dark">
 ```
 

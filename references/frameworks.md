@@ -13,9 +13,9 @@ Each framework has a subpath export with named components (and, where the target
 is typed, prop-type exports):
 
 ```ts
-import { CrButton, type CrButtonProps } from "@alebianco/cr-design-system/react";
-import { CrButton } from "@alebianco/cr-design-system/qwik";
-import { CrButton } from "@alebianco/cr-design-system/vue";
+import { CrButton, type CrButtonProps } from "@alebianco/cr-components/react";
+import { CrButton } from "@alebianco/cr-components/qwik";
+import { CrButton } from "@alebianco/cr-components/vue";
 ```
 
 Every entry also exports **`CrContext`** — the app-level tier for global `pt`,
@@ -161,25 +161,25 @@ Load the token + component CSS once (any framework), then import the compiled
 component for your framework:
 
 ```html
-<link rel="stylesheet" href="@alebianco/cr-design-system/css" />        <!-- tokens -->
-<link rel="stylesheet" href="@alebianco/cr-design-system/components" />  <!-- cr- classes -->
+<link rel="stylesheet" href="@alebianco/cr-tokens/css" />        <!-- tokens -->
+<link rel="stylesheet" href="@alebianco/cr-styles/components" />  <!-- cr- classes -->
 ```
 Each framework has a **barrel entry** — import any component by name from one
 subpath (`/react`, `/vue`, `/svelte`, `/angular`, `/solid`, `/qwik`):
 
 ```tsx
 // React
-import { CrSwitch, CrModal } from "@alebianco/cr-design-system/react";
+import { CrSwitch, CrModal } from "@alebianco/cr-components/react";
 <CrSwitch checked={on} label="Live" onChange={setOn} />
 ```
 ```vue
 <!-- Vue -->
-<script setup> import { CrSwitch } from "@alebianco/cr-design-system/vue"; </script>
+<script setup> import { CrSwitch } from "@alebianco/cr-components/vue"; </script>
 <CrSwitch :checked="on" label="Live" @change="on = $event" />
 ```
 ```tsx
 // Qwik
-import { CrSwitch } from "@alebianco/cr-design-system/qwik";
+import { CrSwitch } from "@alebianco/cr-components/qwik";
 <CrSwitch checked={on.value} label="Live" onChange$={(v) => (on.value = v)} />
 ```
 
@@ -188,7 +188,7 @@ on this barrel — read it for a full composition (nav rail, masthead, session
 panels, breach). It is source-only; the published site does not host it.
 
 Need just one component? The deep path still works (extension required):
-`import CrSwitch from "@alebianco/cr-design-system/frameworks/react/components/CrSwitch.tsx"`.
+`import CrSwitch from "@alebianco/cr-components/frameworks/react/components/CrSwitch.tsx"`.
 
 The barrels re-export the **default** of every compiled component (Angular also
 re-exports each `<Name>Module`). They ship as **source** — your app's bundler
@@ -218,7 +218,7 @@ utility on a `cr-` element. Use the `cn()` helper (clsx + tailwind-merge) so
 conflicting utilities resolve last-wins instead of both shipping:
 
 ```tsx
-import { cn } from "@alebianco/cr-design-system/cn";
+import { cn } from "@alebianco/cr-utils/cn";
 <button class={cn("cr-btn", primary && "cr-btn--accent", "px-4", className)} />
 ```
 

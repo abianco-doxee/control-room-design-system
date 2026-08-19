@@ -1272,7 +1272,7 @@ in local time, a multi-week chart on local Mondays, a multi-year chart on Jan 1.
 Labels format to the unit (`09:30`, `3 Mar`, `Mar`, `Jan '25`, `2025`); the hover
 tooltip shows a fuller stamp (`3 Mar 09:15`). This uses the built-in `Intl` zone
 database (no date library, no bundle cost) and is shared with the static gallery via
-`@alebianco/cr-design-system/time-scale` (`timeTicks(lo, hi, { zone, target, locale,
+`@alebianco/cr-utils/time-scale` (`timeTicks(lo, hi, { zone, target, locale,
 week, fiscalStart })`), so hand-rendered and live charts agree.
 
 The calendar can be expressed the way a team reads it, via three more props (all
@@ -1491,7 +1491,7 @@ closes and returns focus to the trigger. Use **Menu** for a list of actions.
 trigger, **flips** above when there's no room below, and **shifts** horizontally to
 stay in the viewport (never clipping off-screen), tagging itself with
 `data-placement`. The algorithm is exported for your own overlays as
-`@alebianco/cr-design-system/position` — `computePosition` (pure geometry, unit-
+`@alebianco/cr-utils/position` — `computePosition` (pure geometry, unit-
 tested), `place(anchor, floating, opts)`, and `autoPlace(...)` (keeps it pinned on
 scroll/resize). No dependency on Floating UI.
 
@@ -1802,7 +1802,7 @@ A retro-futuristic **cyber-sigil** generated from a seed — a per-entity identi
 mark that pairs with the pixel-cat. Full contract in `references/seeded-sigil.md`.
 
 ```tsx
-import { CrSigil } from "@alebianco/cr-design-system/react";
+import { CrSigil } from "@alebianco/cr-components/react";
 <CrSigil seed="nova-01" state="working" />
 ```
 
@@ -1826,7 +1826,7 @@ operators — it **is** the non-colour backup the a11y contract requires.
 <span class="cr-sev cr-sev--idle" role="img" aria-label="idle"></span>      <!-- ● ∞ -->
 ```
 ```tsx
-import { CrShape } from "@alebianco/cr-design-system/react";
+import { CrShape } from "@alebianco/cr-components/react";
 <CrShape severity="crit" label="build failing" />
 ```
 
@@ -1870,7 +1870,7 @@ paint rivets, hex bolts or screw heads, which read as a novelty machine-panel
 skin rather than as an instrument face.
 
 ```tsx
-import { CrChrome } from "@alebianco/cr-design-system/react";
+import { CrChrome } from "@alebianco/cr-components/react";
 <CrChrome seed="nova-rack" width={440} />
 ```
 
@@ -1908,7 +1908,7 @@ screen.**
 <span class="cr-blob" aria-hidden="true"></span>  <!-- standalone soft accent -->
 ```
 ```tsx
-import { CrBreach } from "@alebianco/cr-design-system/react";
+import { CrBreach } from "@alebianco/cr-components/react";
 <CrBreach signal="done" wash alive>…the one exceptional thing…</CrBreach>
 ```
 
