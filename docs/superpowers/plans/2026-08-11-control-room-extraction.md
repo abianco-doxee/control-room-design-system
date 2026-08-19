@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Extract the dashboard at `dp-tooling/skills/sprint-dashboard` into a standalone `control-room` repo and replace its private UI layer with the `@alebianco/cr-*` design system packages.
+**Goal:** Extract the dashboard at `/Users/abianco/Workspace/DP/dp-tooling/skills/sprint-dashboard` (245 commits; **not** the 29-commit copy at `~/Workspace/AI/dx-skills`) into a standalone `control-room` repo and replace its private UI layer with the `@alebianco/cr-*` design system packages.
 
 **Architecture:** Two phases with a hard boundary. Phase 1 moves the app verbatim (history preserved via `git filter-repo`) and gets it green with its own `src/ui` untouched — the known-good baseline. Phase 2 swaps the token layer, then the primitives one per commit, each swap gated on a test asserting *rendered output* rather than merely a passing suite.
 
@@ -23,6 +23,117 @@
 - Qwik tests use `qwikVite()` in `vitest.config.ts` plus `createDOM()` from `@builder.io/qwik/testing`.
 
 **Reference:** the design spec is `docs/superpowers/specs/2026-08-11-control-room-extraction-design.md` in the design-system repo. Working verifier scripts live in that repo at `docs/superpowers/specs/assets/`.
+
+---
+
+## Addendum — design-system drift since 2026-08-11 (audited 2026-08-19)
+
+This plan was written the same day as the spec. ~150 design-system commits have
+landed since. The plan's **structure, sequencing and gates are unchanged** — the
+drift lands almost entirely inside Task 11's per-primitive cycle, which exists to
+catch exactly this. Corrections, all verified against source:
+
+**Breaking prop drift** (changesets `w3`, `w7`, `w8-signal-vocabulary`):
+
+| Component | Plan-era API | Current API | Plan task |
+| --- | --- | --- | --- |
+| `CrChip` | `tone=` taking `done` · `alt` | `signal=` taking `work` · `wait` · `done` · `err` · `idle` · `accent` (`alt` → `work`) | 11 #3 |
+| `CrToggleChip` | `count?: number` | `badge?:` string · number · boolean (`true` = bare dot) | 11 #13, #14 (21 sites) |
+| `CrPopover`/`CrMenu`/`CrHoverCard`/`CrModal` | `align=` taking `left` · `right` | `placement?: string` (`"bottom-start"` default) | 11 #9 |
+| `CrCalendar` | `weekStart?: number` | `weekStart?=` taking `"sunday"` · `"monday"` | — |
+| `CrKeyHints` | (no key API existed) | `hints: {keys,label}[]` | 11 #5 |
+| `CrToastRegion` | 4 corners | 9 anchors; toasts dedup; `onDismiss` fires `newestId` | 11 #23 |
+| `CrProgress` | `role="progressbar"` on root | moved down to `.cr-progress__track` | — |
+
+**Unchanged — Tasks 8 and 10 are still accurate as written.** The signal-vocabulary
+changeset canonicalised *other* components onto `CrStatusDot`'s existing list; it
+did not rename `CrStatusDot` or `CrButton`. Note `CrPanel` still uses `tone` for
+its eyebrow — the rename was **per-component, not global**. Always read the
+contract; never pattern-match from a sibling.
+
+**New tokens:** `--focus` (split from `--sig-work`; the light theme's cyan reached
+only 2.86:1) and `--seam` (internal divider, split from the chassis-edge
+`--border`). Both are auto-derived for brands that omit them, so `control-room`
+stays valid — but Task 6's audit must not treat them as unknown app tokens.
+
+**Additive, plan-relevant:** every leaf form control gains `invalid?: boolean` (an
+a11y hook only — never set it for appearance; visual error state still derives
+from the wrapping `CrField`). `CrInput` gains `icon`, `clearable`, `onClear`.
+
+**Not affected:** `CrMeter` and `CrRadioGroup` were removed, but this plan never
+referenced either. All 28 components in Task 11's table still exist.
+
+### Build prerequisite (blocks Task 3)
+
+`packages/components/dist/` is **gitignored and untracked** (0 files in git),
+unlike `packages/tokens/dist` and `packages/styles/styles`, which are tracked. A
+fresh sibling checkout therefore has **no** `dist/frameworks/qwik/index.ts`, and
+Task 3's `link:` install plus smoke test will fail until the design system is
+built. See Task 3 Step 0.
+
+### Import specifier warning
+
+`references/frameworks.md:17` and `:182` tell consumers to import from
+`@alebianco/cr-design-system/qwik`. **That specifier is wrong for Qwik.** The root
+package exports it to `packages/components/dist/pkg/qwik/index.js`, and all 81
+files there contain raw `component$()` calls the Qwik optimizer cannot process —
+the exact failure in the spec's Finding 1. Only `@alebianco/cr-components/qwik`
+is correct. This is a live design-system bug for any Qwik consumer, independent of
+this port; fixing it upstream is tracked in the Deferred section.
+
+### Cascade context — new tier the plan predates
+
+The design system gained a global `pt` / `locale` / `messages` tier. Export:
+`CrContext` from `@alebianco/cr-components/qwik`; mount with
+`useContextProvider(CrContext, { pt, locale, messages })` in `src/root.tsx`.
+There is **no `<CrProvider>` component and no global `dt` tier** — `dt` stays
+per-component. Mounting is optional (reads are rewritten to
+`useContext(CrContext, null)`), so omitting it will not break the app; it just
+leaves the tier unused. Locale-aware components this plan swaps: `CrRelativeTime`
+(Task 11 #12), plus `CrCalendar`, `CrDateTime`, `CrDataGrid`, `CrLineChart`.
+`CrModal`, `CrToastRegion` and `CrNav` take a `labels?: Record<string, any>` prop.
+See Task 5b.
+
+### Release state — this port IS the release validation
+
+**Sequencing decision (2026-08-19): migrate first, fix what the port finds, then cut
+1.0.0.** The port is the design system's first real consumer, so it is the only thing
+that can establish whether the contract is shippable. Publishing first would freeze a
+contract nothing has exercised.
+
+Consequences for this plan:
+
+- **Stay on `link:` for the whole port.** Do not publish mid-port. The `^1.0.0` deps
+  in Task 3 resolve from no registry today; the `pnpm.overrides` block is
+  load-bearing, not a convenience. All 7 packages are `0.0.0`;
+  `.changeset/first-release.md` marks them `major`, so the eventual first release is
+  `1.0.0` and the declared deps become correct at that moment.
+- **Every upstream fix needs a changeset.** See the rule below — this is the one
+  genuinely new discipline the sequencing imposes.
+- **`.github/workflows/release.yml` stays gated** on `vars.RELEASE_ENABLED` until the
+  port is green. Flipping it is the last step, not a prerequisite.
+- **Expect the port to change the design system.** Findings are the deliverable, not
+  a setback. Log them (Task 14) so the release notes describe what actually shipped.
+
+#### Rule: every upstream fix carries a changeset
+
+The plan already says to fix gaps **upstream** rather than shim locally (Task 11
+Step 5, Task 12). Under this sequencing every such fix lands in the release cut
+afterwards, so an unversioned fix either ships silently or blocks the release. So:
+
+> Any commit to `control-room-design-system` made **because of** this port MUST add a
+> `.changeset/*.md` in the same commit, with the correct bump. Breaking prop changes
+> are `major`; additive props are `minor`; visual/CSS-only corrections are `patch`.
+
+**Branch policy (decided 2026-08-19): straight to `main`.** No feature branch, no PR
+per fix. Nothing is published, so `main` is not a release surface yet, and the
+changeset rule above already makes every fix individually reviewable. The tradeoff:
+the release cut is not one reviewable diff, so Task 14 Step 1's audit is what
+catches an unversioned fix instead. Task 1 Step 0 tags `port-start` to bound it.
+
+Since nothing is published yet, `major` is nearly free — prefer it over a shim or a
+reluctant `minor` when a contract is genuinely wrong. This port is the last moment
+breaking changes are cheap.
 
 ---
 
@@ -58,6 +169,18 @@
 - Produces: a git repo whose `HEAD` contains the app at its former `skills/sprint-dashboard/` paths, rewritten to the repo root, with all 245 commits.
 
 **Context:** All 245 commits touching `skills/sprint-dashboard` touch *only* that directory (verified), so the filter is lossless with no mixed commits to untangle. `git-filter-repo` is already installed at `/opt/homebrew/bin/git-filter-repo`.
+
+- [ ] **Step 0: Tag the design system at the port's starting point**
+
+Port-driven fixes land straight on `main` in the design-system repo, so this tag is
+the only reliable boundary for Task 14's changeset audit. Create it **before** any
+port work.
+
+```bash
+cd ~/Workspace-personal/control-room-design-system
+git tag port-start
+git tag --list port-start   # confirm it exists
+```
 
 - [ ] **Step 1: Clone the source repo to the new location**
 
@@ -227,6 +350,27 @@ Add the README and lint config the app previously inherited from dp-tooling."
 - Produces: `@alebianco/cr-components/qwik`, `@alebianco/cr-tokens/css`, `@alebianco/cr-styles/components` resolvable from the app. **Nothing imports them yet.**
 
 **Context:** The design system is a sibling checkout, so `link:` relative paths work. Declaring normal semver deps plus a `pnpm.overrides` block means switching to published packages later is a one-block deletion.
+
+**As of 2026-08-19 the overrides are load-bearing, not a convenience.** Nothing is
+published: all packages are `0.0.0`, and the release workflow is gated off
+(`vars.RELEASE_ENABLED`) and targets restricted GitHub Packages. The `^1.0.0` deps
+below resolve from no registry today. Keep them — they document intent and make the
+future switch a one-block deletion — but do not expect a registry fallback.
+
+- [ ] **Step 0: Build the design system first (REQUIRED)**
+
+`packages/components/dist/` is gitignored and untracked, so a fresh sibling
+checkout has no `dist/frameworks/qwik/index.ts` for `link:` to resolve. Tokens
+and styles ARE tracked, so only components needs this.
+
+```bash
+cd ~/Workspace-personal/control-room-design-system
+pnpm install
+pnpm run build
+test -f packages/components/dist/frameworks/qwik/index.ts && echo OK || echo BUILD-FAILED
+```
+
+Expected: `OK`. Without it, Step 3's smoke test fails on resolution, not on contract.
 
 - [ ] **Step 1: Add the dependencies and overrides**
 
@@ -407,6 +551,49 @@ git log --oneline -1
 
 ---
 
+### Task 5b: Mount the cascade context (added 2026-08-19)
+
+**Files:**
+- Modify: `src/root.tsx`
+- Create: `tests/ui/crContext.test.tsx`
+
+**Interfaces:**
+- Consumes: Task 4's proven render.
+- Produces: a global `pt` / `locale` / `messages` tier available to every `Cr*`.
+
+**Context:** The design system gained a cascade context after this plan was
+written. There is **no `<CrProvider>` component and no global `dt` tier** — `dt`
+stays per-component. Mounting is optional: every read is compiled to
+`useContext(CrContext, null)`, so the app works without it. Mount it anyway, so
+locale-aware components (`CrRelativeTime`, `CrCalendar`, `CrDateTime`,
+`CrDataGrid`, `CrLineChart`) resolve one locale rather than each defaulting.
+
+- [ ] **Step 1: Mount it in `src/root.tsx`**
+
+```tsx
+import { useContextProvider } from '@builder.io/qwik';
+import { CrContext } from '@alebianco/cr-components/qwik';
+
+// inside the root component$, before the returned tree:
+useContextProvider(CrContext, { locale: 'en-GB', pt: {}, messages: {} });
+```
+
+- [ ] **Step 2: Assert a locale-aware component honours it**
+
+Write `tests/ui/crContext.test.tsx` rendering `CrRelativeTime` under the provider
+and asserting the **rendered string** reflects the mounted locale — not merely
+that it rendered.
+
+- [ ] **Step 3: Run and commit**
+
+```bash
+pnpm test tests/ui/crContext.test.tsx 2>&1 | tail -15
+pnpm test 2>&1 | tail -10
+git commit -am "feat(ui): mount the design system cascade context at root"
+```
+
+---
+
 ## Phase 2 — Port
 
 ### Task 6: Swap the token layer
@@ -433,6 +620,13 @@ git log --oneline -1
    | `--weight-body` | `--type-body-weight` |
 
    Roles: `display`, `h1`, `h2`, `body`, `data`, `label`, `meta`, `chrome`.
+
+0. **Two DS tokens that did not exist when this plan was written.** `--focus`
+   (split from `--sig-work`) and `--seam` (internal divider, split from the
+   chassis-edge `--border`). Both are auto-derived for brands that omit them, so
+   `control-room` needs no change — but the token audit must recognise them as
+   **design-system** roles, not stray app tokens. Never redefine either in
+   `app-tokens.css`.
 
 2. **6 `--on-sig-*` tokens — DELETE, do not port.** They exist because the app's `--sig-idle` (`#5a5a78`) sat at 4.14:1. The DS lightened idle to `#848496`; all four signal/foreground pairings clear AA in both shipped schemes (worst 5.53:1). Replace every `var(--on-sig-work)` etc. with `var(--on-sig)`, except `--on-sig-err` → `var(--on-err)` and `--on-sig-idle` → `var(--on-idle)`.
 
@@ -1152,7 +1346,16 @@ and shape is a non-colour a11y channel."
 | `accent` | — | wrapper maps to `dt` |
 | `class` | `pt`/`dt` | wrapper maps it |
 
-Five props have no `CrPanel` equivalent. They are real app behaviour (scroll containment, corner registration marks seeded from the title, route accent) — **not** dead weight. Rather than 83 call-site rewrites plus five upstream features, wrap: `AppPanel` renders `CrPanel` for the frame and title and adds the app's own concerns around it.
+**Corrected 2026-08-19:** `CrPanel` now ships `marks?: boolean`, plus `eyebrow`,
+`index`, `lede`, `footer`, `tone`, `bleed` and `ambient`. So `crosshairs` (marks
+on/off) is now covered upstream and should map to `CrPanel marks`. But `marks` is
+a **static boolean** applying the `.cr-mark` preset — it does NOT carry the app's
+`chromeSeed`, which varies the marks per panel by hashing the title. So four
+props, not five, remain genuinely app-local: `chromeSeed`, `scroll`, `flush`,
+`accent`. The wrapper still earns its place; update the mapping table row for
+`crosshairs` from "wrapper keeps it" to "→ `CrPanel marks`".
+
+Four props have no `CrPanel` equivalent. They are real app behaviour (scroll containment, per-panel seeded mark variation, route accent) — **not** dead weight. Rather than 83 call-site rewrites plus five upstream features, wrap: `AppPanel` renders `CrPanel` for the frame and title and adds the app's own concerns around it.
 
 This is the one place a wrapper is right. Elsewhere prefer the bare `Cr*` component.
 
@@ -1528,32 +1731,32 @@ control loses its accessible name."
 
 **Context:** These are the primitives whose contracts are close enough to swap without a wrapper. Ordered by ascending call-site count so the cheap, low-risk ones land first and any systemic problem surfaces early.
 
-| Order | Local | → | Sites |
-| --- | --- | --- | --- |
-| 1 | `FrameBox` | `CrBezel` | 1 |
-| 2 | `TelemetryStrip` | `CrTelemetry` | 1 |
-| 3 | `Chip` | `CrChip` | 3 |
-| 4 | `ScrollColumn` | `CrScrollArea` | 3 |
-| 5 | `Cheatsheet` / `Kbd` | `CrKeyHints` / `CrKbd` | 8 |
-| 6 | `PixelCat` | `CrCat` | 4 |
-| 7 | `Avatar` | `CrAvatar` | 5 |
-| 8 | `OptionSearch` | `CrCombobox` | 2 |
-| 9 | `Dialog` / `ConfirmDialog` | `CrModal` | 11 |
-| 10 | `StackBar` / `BarList` / `Sparkline` | `CrStackedBar` / `CrBarChart` / `CrSparkline` | 7 |
-| 11 | `OverflowToggle` | `CrOverflow` | 6 |
-| 12 | `RelativeTime` | `CrRelativeTime` | 7 |
-| 13 | `IconToggle` | `CrToggleChip` | 5 |
-| 14 | `ToggleChip` | `CrToggleChip` | 16 |
-| 15 | `ErrorState` | `CrDrip` | 10 |
-| 16 | `Hero` | `CrHero` | 10 |
-| 17 | `Field` / `SelectField` | `CrField` / `CrInput` / `CrSelect` | 16 |
-| 18 | `CronField` | `CrCronField` | 3 |
-| 19 | `FilterBar` | `CrToolbar` | 6 |
-| 20 | `MasterDetail` | `CrResizable` | 4 |
-| 21 | `EmptyState` | `CrEmptyState` | 25 |
-| 22 | `CrIcon` | `CrIcon` | 20 |
-| 23 | `ToastStack` | `CrToastRegion` / `CrToast` | 2 |
-| 24 | `Shell` | `CrMasthead` + `CrNav` | 1 |
+| Order | Local | → | Sites | Drift since this plan was written |
+| --- | --- | --- | --- | --- |
+| 1 | `FrameBox` | `CrBezel` | 1 | — |
+| 2 | `TelemetryStrip` | `CrTelemetry` | 1 | — |
+| 3 | `Chip` | `CrChip` | 3 | ⚠ `tone=` → `signal=`; `tone="alt"` → `signal="work"` |
+| 4 | `ScrollColumn` | `CrScrollArea` | 3 | — |
+| 5 | `Cheatsheet` / `Kbd` | `CrKeyHints` / `CrKbd` | 8 | ⚠ `CrKeyHints` gained `hints: {keys,label}[]` — it had no key API when this plan was written |
+| 6 | `PixelCat` | `CrCat` | 4 | — |
+| 7 | `Avatar` | `CrAvatar` | 5 | — |
+| 8 | `OptionSearch` | `CrCombobox` | 2 | — |
+| 9 | `Dialog` / `ConfirmDialog` | `CrModal` | 11 | ⚠ overlay siblings use `placement=`, not `align=`; `CrModal` takes `labels?` |
+| 10 | `StackBar` / `BarList` / `Sparkline` | `CrStackedBar` / `CrBarChart` / `CrSparkline` | 7 | — |
+| 11 | `OverflowToggle` | `CrOverflow` | 6 | — |
+| 12 | `RelativeTime` | `CrRelativeTime` | 7 | ⚠ now locale-aware via `CrContext` (Task 5b) |
+| 13 | `IconToggle` | `CrToggleChip` | 5 | ⚠ `count=` → `badge=` |
+| 14 | `ToggleChip` | `CrToggleChip` | 16 | ⚠ `count=` → `badge=` (`badge={true}` renders a bare dot) |
+| 15 | `ErrorState` | `CrDrip` | 10 | — |
+| 16 | `Hero` | `CrHero` | 10 | — |
+| 17 | `Field` / `SelectField` | `CrField` / `CrInput` / `CrSelect` | 16 | ⚠ leaf controls gained `invalid?` (a11y only, never for looks); `CrInput` gained `icon`/`clearable`/`onClear` |
+| 18 | `CronField` | `CrCronField` | 3 | — |
+| 19 | `FilterBar` | `CrToolbar` | 6 | — |
+| 20 | `MasterDetail` | `CrResizable` | 4 | — |
+| 21 | `EmptyState` | `CrEmptyState` | 25 | — |
+| 22 | `CrIcon` | `CrIcon` | 20 | — |
+| 23 | `ToastStack` | `CrToastRegion` / `CrToast` | 2 | ⚠ 9 anchors not 4; toasts dedup; `onDismiss` fires `newestId`; takes `labels?` |
+| 24 | `Shell` | `CrMasthead` + `CrNav` | 1 | — |
 
 **Note on `ErrorState` (#15).** It maps to `CrDrip`, not `CrAlert`: the app's
 error surface floods with `--sig-err` and carries Law 3's drip, which is exactly
@@ -1607,6 +1810,12 @@ git rm src/ui/<Name>.tsx
 ```
 
 Update `src/ui/index.ts`. Where the design system genuinely lacks something the app needs, **fix it upstream** in `control-room-design-system` as its own commit in that repo — never shim locally. (`AppPanel` in Task 9 is the sole sanctioned wrapper.)
+
+**That upstream commit MUST include a `.changeset/*.md`** — this port validates the
+unreleased 1.0.0, so an unversioned fix ships silently or blocks the release. Nothing
+is published yet, so a `major` bump is nearly free: prefer breaking the contract
+properly over shimming around it. Rebuild the design system afterwards
+(`pnpm run build`) or the linked app will not see the change.
 
 - [ ] **Step 6: Run the test, the suite, and typecheck**
 
@@ -1782,7 +1991,119 @@ git log --oneline | head -20
 
 ---
 
+### Task 14: Cut the 1.0.0 release (added 2026-08-19)
+
+**Files:**
+- Modify: `control-room-design-system` — `.changeset/first-release.md`, repo variable
+
+**Interfaces:**
+- Consumes: Task 13's verified port.
+- Produces: a published 1.0.0 whose contract has been exercised by a real consumer.
+
+**Context:** This runs in the **design-system** repo, not the app. It is the payoff
+for the sequencing: the release describes what a real port proved, and every fix the
+port forced is already versioned by the Task 11 changeset rule.
+
+- [ ] **Step 1: Confirm every port-driven fix carried a changeset**
+
+Port-driven fixes land **straight on `main`** (decided 2026-08-19), so the audit is
+commit-scoped, not date- or branch-scoped. Task 1 tags the design system at the
+moment the port begins:
+
+```bash
+cd ~/Workspace-personal/control-room-design-system
+git tag port-start        # ← do this in Task 1, before any port work
+```
+
+Then at release time, flag commits that touched **shipped source** without a
+changeset:
+
+```bash
+cd ~/Workspace-personal/control-room-design-system
+for c in $(git rev-list port-start..main); do
+  src=$(git show --name-only --format= $c -- \
+    'packages/*/components/*' 'packages/*/styles/*' \
+    'packages/tokens/brands/*' 'packages/*/lib/*' | grep -c . || true)
+  cs=$(git show --name-only --format= $c -- .changeset/ | grep -c . || true)
+  [ "$src" -gt 0 ] && [ "$cs" -eq 0 ] && echo "FLAG $(git log -1 --format='%h %s' $c)"
+done
+```
+
+**This is a review prompt, not a hard gate.** The filter deliberately scopes to
+shipped source so test-only and CI-only commits do not flag — but a flagged commit
+is not automatically wrong. Judge each: a codegen or build-script fix that changes
+no public contract may legitimately need no changeset; a prop or CSS change always
+does. Add the missing ones before going further.
+
+*(Verified against real history: over `HEAD~5..HEAD` this filter drops four test/CI
+commits and flags one — `08b4e1d fix(angular)`, which changed seven `.lite.tsx`
+files with no changeset. That commit predates the port and may be fine, but it is
+exactly the kind of thing this step exists to surface.)*
+
+- [ ] **Step 2: Reconcile the first-release notes with reality**
+
+`.changeset/first-release.md` was written before the port. Check its claims still
+hold — component counts, framework support, the feature list — and correct anything
+the port disproved.
+
+Known already: it says "83 catalogued components". `catalog/registry.json` holds 83
+**entries** — 76 `component`, 4 `utility`, 3 `block` — against 81 `.lite.tsx` files.
+Reword to "83 catalogued entries (76 components)" or similar.
+
+- [ ] **Step 3: Full verification**
+
+```bash
+pnpm install
+pnpm run build
+pnpm run verify:types
+pnpm run verify:pkg-types
+pnpm test 2>&1 | tail -20
+```
+
+Expected: all clean.
+
+- [ ] **Step 4: Fix the root `./qwik` export and the docs specifier**
+
+The bug in the Deferred list below is a **release blocker** once publishing is real:
+`@alebianco/cr-design-system` exports `./qwik` to unoptimizable pre-compiled JS, and
+`references/frameworks.md:17`/`:182` document that specifier. Fix both, with a
+changeset, before publishing.
+
+- [ ] **Step 5: Enable and cut**
+
+Set repo variable `RELEASE_ENABLED=true`, merge the changesets Version PR, and
+confirm `changeset publish` pushed all 7 packages at `1.0.0`.
+
+- [ ] **Step 6: Switch the app off `link:`**
+
+```bash
+cd ~/Workspace-personal/control-room
+```
+
+Delete the `pnpm.overrides` block — a one-block deletion, as Task 3 intended. The
+`^1.0.0` deps now resolve from GitHub Packages. Requires an `.npmrc` with
+`@alebianco:registry=https://npm.pkg.github.com` and a `read:packages` token.
+
+```bash
+pnpm install
+pnpm test 2>&1 | tail -20
+pnpm build
+```
+
+Expected: green against the **published** packages, not the linked checkout. This is
+the real proof the release works.
+
+---
+
 ## Deferred — not in this plan
+
+- **Fix the root package's `./qwik` export upstream.** `@alebianco/cr-design-system`
+  exports `./qwik` → `packages/components/dist/pkg/qwik/index.js`, where all 81
+  files carry raw `component$()` calls the optimizer cannot process — the spec's
+  Finding 1, reintroduced at the root package. `references/frameworks.md:17` and
+  `:182` document that broken specifier. This port sidesteps it by importing
+  `@alebianco/cr-components/qwik`, but it is a live bug for any other Qwik
+  consumer and should be fixed in the design system on its own commit.
 
 - **Retiring the `dp-tooling` copy.** It stays untouched as the rollback. Removing it, dropping it from `.claude-plugin/marketplace.json`, and repointing `tools/bin/dash` is a separate decision once this is proven.
 - **A general wayfinding mechanism in the design system.** If a second consumer ever needs per-route accents, the right shape is a documented recipe for deriving an N-way ramp from a route name — the DS has `hashSeed`/`mulberry32` but no seeded-colour utility. That needs its own Law 2 boundary decision plus a contrast-safe hue generator.
