@@ -184,9 +184,16 @@ git tag --list port-start   # confirm it exists
 
 - [ ] **Step 1: Clone the source repo to the new location**
 
+**Branch matters.** The dashboard work lives on
+`feature/DOXP-11-dashboard-foundations` (245 commits for this path), **not** on
+`main` (137 commits). A plain `git clone` checks out `main` and would silently drop
+108 commits — including the newest features. Clone the branch explicitly:
+
 ```bash
-git clone /Users/abianco/Workspace/DP/dp-tooling ~/Workspace-personal/control-room
+git clone --branch feature/DOXP-11-dashboard-foundations \
+  /Users/abianco/Workspace/DP/dp-tooling ~/Workspace-personal/control-room
 cd ~/Workspace-personal/control-room
+git rev-list --count HEAD -- skills/sprint-dashboard   # expect 245, not 137
 ```
 
 - [ ] **Step 2: Verify the clone has the expected history**
