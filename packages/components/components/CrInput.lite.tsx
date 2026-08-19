@@ -119,7 +119,7 @@ export default function CrInput(props: CrInputProps) {
             data-state={props.invalid ? "invalid" : "valid"}
             data-icon={props.icon ? "true" : undefined}
             data-clearable={state.showClear ? "true" : undefined}
-            onInput={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrInput'), 'root', 'onInput', event); props.onChange && props.onChange((event.target as HTMLInputElement).value); }}
+            onInput={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrInput'), 'root', 'onInput', event); props.onChange && props.onChange(((event.target || event.currentTarget) as HTMLInputElement).value); }}
             onBlur={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrInput'), 'root', 'onBlur', event); props.onBlur && props.onBlur(); }}
           />
           <Show when={state.showClear}>
@@ -159,7 +159,7 @@ export default function CrInput(props: CrInputProps) {
           disabled={props.disabled}
           aria-invalid={props.invalid ? "true" : "false"}
           data-state={props.invalid ? "invalid" : "valid"}
-          onInput={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrInput'), 'root', 'onInput', event); props.onChange && props.onChange((event.target as HTMLInputElement).value); }}
+          onInput={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrInput'), 'root', 'onInput', event); props.onChange && props.onChange(((event.target || event.currentTarget) as HTMLInputElement).value); }}
           onBlur={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrInput'), 'root', 'onBlur', event); props.onBlur && props.onBlur(); }}
         />
       </Show>

@@ -56,7 +56,7 @@ export default function CrTextarea(props: CrTextareaProps) {
       disabled={props.disabled}
       aria-invalid={props.invalid ? "true" : "false"}
       data-state={props.invalid ? "invalid" : "valid"}
-      onInput={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrTextarea'), 'root', 'onInput', event); props.onChange && props.onChange((event.target as HTMLTextAreaElement).value); }}
+      onInput={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrTextarea'), 'root', 'onInput', event); props.onChange && props.onChange(((event.target || event.currentTarget) as HTMLTextAreaElement).value); }}
       onBlur={(event) => { ptHandler(ptResolve(cr, props.pt, 'CrTextarea'), 'root', 'onBlur', event); props.onBlur && props.onBlur(); }}
     ></textarea>
   );
