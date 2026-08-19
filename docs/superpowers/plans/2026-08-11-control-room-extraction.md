@@ -214,12 +214,30 @@ git filter-repo --subdirectory-filter skills/sprint-dashboard --force
 - [ ] **Step 4: Verify the rewrite**
 
 ```bash
-git log --oneline | wc -l          # expect 245
+git rev-list --count HEAD              # expect 248 — see below
 ls package.json src/routes/index.tsx   # both must exist at the root now
 git log --oneline -3
 ```
 
-Expected: 245 commits; `package.json` and `src/routes/index.tsx` at the repo root.
+Expected: **248** commits; `package.json` and `src/routes/index.tsx` at the repo root.
+
+**Why 248 and not 245.** The "245" figure came from `git log -- <path>`, which
+applies history simplification and hides commits it considers uninteresting.
+`filter-repo` does not simplify, so it keeps three more (verified 2026-08-19):
+
+| Extra commit | Why kept |
+| --- | --- |
+| `docs(design): record the per-view quality-gate state` | genuinely touched `skills/sprint-dashboard/SKILL.md`; hidden by simplification |
+| `chore: initialize workspace tracker` | the repo's root commit — filter-repo always retains it |
+| `Merge feature/DOXP-11-control-room-jobs into main` | the path's single merge commit |
+
+`git rev-list --count --full-history <branch> -- skills/sprint-dashboard` gives 247,
+plus the merge = 248. **Nothing was lost and nothing foreign was pulled in** — verify
+that directly rather than trusting the count:
+
+```bash
+git ls-tree --name-only HEAD   # every entry must be app-owned
+```
 
 - [ ] **Step 5: Detach from the origin and re-point at nothing**
 
